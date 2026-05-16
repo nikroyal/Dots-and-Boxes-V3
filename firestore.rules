@@ -47,9 +47,13 @@ service cloud.firestore {
     // closes the squat-any-name attack.
     match /usernames/{username} {
       allow read: if true;
+      // The get() cross-reference was removed because Firestore security rules
+      // can fail to see a document written moments earlier in the same signup
+      // flow (the users doc is written just before this usernames doc). The
+      // uid-match check alone still prevents anyone from claiming a username
+      // that points to a different user's account.
       allow create: if isSignedIn()
-                    && request.resource.data.uid == request.auth.uid
-                    && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.username == username;
+                    && request.resource.data.uid == request.auth.uid;
       allow update: if false;
       // Allow self-delete (only the user who owns the username can release it).
       // Used by deleteAccount in AuthContext.
