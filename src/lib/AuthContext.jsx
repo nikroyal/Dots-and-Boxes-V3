@@ -84,7 +84,16 @@ export function AuthProvider({ children }) {
 
     // Pre-check that the username isn't already taken. /usernames is
     // publicly readable specifically to support this.
-    const existing = await getDoc(doc(db, 'usernames', cleanUsername));
+    let existing;
+    try {
+      existing = await getDoc(doc(db, 'usernames', cleanUsername));
+    } catch {
+      throw new Error(
+        'Unable to check username availability — please verify your ' +
+        'Firebase project\'s Firestore rules allow public reads on ' +
+        '/usernames, then try again.'
+      );
+    }
     if (existing.exists()) throw new Error('Username taken');
 
     const cred = await createUserWithEmailAndPassword(auth, cleanEmail, password);
