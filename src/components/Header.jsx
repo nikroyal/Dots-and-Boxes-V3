@@ -19,6 +19,7 @@ export default function Header() {
   const [motionState, setMotionState] = useState(getReducedMotion());
   const [unreadCount, setUnreadCount] = useState(0);
   const settingsRef = useRef(null);
+  const isAdmin = profile?.role === 'admin';
 
   // Subscribe to total unread DM count
   useEffect(() => {
@@ -100,6 +101,7 @@ export default function Header() {
           {navItem('/messages', 'Msgs', unreadCount)}
           {navItem('/clubs', 'Clubs')}
           {navItem('/history', 'History')}
+          {isAdmin && navItem('/admin', 'Admin')}
         </nav>
 
         <div className="flex items-center gap-3">
@@ -165,7 +167,7 @@ export default function Header() {
               <div className="text-right hidden sm:block">
                 <div className="font-display text-sm leading-tight">{profile.username}</div>
                 <div className="font-mono text-[0.6rem] tracking-widest opacity-60" style={{ color: rank?.color }}>
-                  {rank?.name} · {profile.elo || 1000}
+                  {isAdmin ? 'Admin' : rank?.name} · {profile.elo || 1000}
                 </div>
               </div>
             </Link>
@@ -186,6 +188,7 @@ export default function Header() {
         {navItem('/messages', 'Msgs', unreadCount)}
         {navItem('/clubs', 'Clubs')}
         {navItem('/history', 'History')}
+        {isAdmin && navItem('/admin', 'Admin')}
       </nav>
     </header>
   );
