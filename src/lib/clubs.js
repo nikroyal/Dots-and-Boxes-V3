@@ -1,6 +1,6 @@
 import {
   collection, doc, addDoc, getDoc, getDocs, updateDoc, deleteDoc,
-  query, where, orderBy, limit, onSnapshot, serverTimestamp, runTransaction,
+  query, where, limit, onSnapshot, serverTimestamp, runTransaction,
   arrayUnion,
 } from 'firebase/firestore';
 import { db } from './firebase';
@@ -51,11 +51,16 @@ export async function listPublicClubs() {
   const q = query(
     collection(db, 'clubs'),
     where('isPublic', '==', true),
-    orderBy('createdAt', 'desc'),
     limit(50)
   );
   const snap = await getDocs(q);
-  return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  return snap.docs
+    .map(d => ({ id: d.id, ...d.data() }))
+    .sort((a, b) => {
+      const aTime = a.createdAt?.toMillis?.() || 0;
+      const bTime = b.createdAt?.toMillis?.() || 0;
+      return bTime - aTime;
+    });
 }
 
 // List clubs the current user is a member of.
