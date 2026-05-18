@@ -118,6 +118,8 @@ export function AuthProvider({ children }) {
         username: cleanUsername,
         displayName: username.trim(),
         email: cleanEmail, // for the user's own reference; never displayed publicly
+        role: 'player',
+        status: 'active',
         avatar: AVATAR_OPTIONS[Math.floor(Math.random() * AVATAR_OPTIONS.length)],
         title: '',
         bio: '',
