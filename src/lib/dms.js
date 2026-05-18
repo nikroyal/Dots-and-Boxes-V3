@@ -1,6 +1,6 @@
 import {
   collection, doc, getDoc, setDoc, updateDoc, addDoc,
-  query, where, orderBy, limit, onSnapshot, serverTimestamp, increment,
+  query, where, limit, onSnapshot, serverTimestamp, increment,
 } from 'firebase/firestore';
 import { db } from './firebase';
 
@@ -11,7 +11,7 @@ export function conversationId(uidA, uidB) {
   return [uidA, uidB].sort().join('_');
 }
 
-// Get or create a conversation doc between current user and target.
+// Get or create a message request between current user and target.
 // Returns the conversation id.
 export async function openConversation(currentUser, target) {
   const convId = conversationId(currentUser.id, target.id);
@@ -31,6 +31,7 @@ export async function openConversation(currentUser, target) {
   // the sorted-uid convId — so we sort here, not just in conversationId().
   // (conversationId is a pure helper; this is the create site.)
   const participants = [currentUser.id, target.id].sort();
+  const now = Date.now();
 
   await setDoc(convRef, {
     participants,
@@ -44,9 +45,12 @@ export async function openConversation(currentUser, target) {
         avatar: target.avatar || '◆',
       },
     },
-    lastMessage: null,
+    status: 'pending',
+    requestedBy: currentUser.id,
+    requestedAt: serverTimestamp(),
+    lastMessage: { text: 'Message request', fromId: currentUser.id, ts: now, system: true },
     lastMessageAt: serverTimestamp(),
-    unreadFor: { [currentUser.id]: 0, [target.id]: 0 },
+    unreadFor: { [currentUser.id]: 0, [target.id]: 1 },
     createdAt: serverTimestamp(),
   });
   return convId;
@@ -58,11 +62,16 @@ export function watchMyConversations(uid, callback) {
   const q = query(
     collection(db, 'conversations'),
     where('participants', 'array-contains', uid),
-    orderBy('lastMessageAt', 'desc'),
     limit(50)
   );
   return onSnapshot(q, (snap) => {
-    const list = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    const list = snap.docs
+      .map(d => ({ id: d.id, ...d.data() }))
+      .sort((a, b) => {
+        const aTime = a.lastMessageAt?.toMillis?.() || a.createdAt?.toMillis?.() || 0;
+        const bTime = b.lastMessageAt?.toMillis?.() || b.createdAt?.toMillis?.() || 0;
+        return bTime - aTime;
+      });
     callback(list);
   }, (err) => {
     console.warn('watchMyConversations error:', err);
@@ -74,15 +83,51 @@ export function watchMyConversations(uid, callback) {
 export function watchMessages(convId, callback) {
   const q = query(
     collection(db, 'conversations', convId, 'messages'),
-    orderBy('ts', 'asc'),
     limit(200)
   );
   return onSnapshot(q, (snap) => {
-    const list = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    const list = snap.docs
+      .map(d => ({ id: d.id, ...d.data() }))
+      .sort((a, b) => {
+        const aTime = a.ts?.toMillis?.() || 0;
+        const bTime = b.ts?.toMillis?.() || 0;
+        return aTime - bTime;
+      });
     callback(list);
   }, (err) => {
     console.warn('watchMessages error:', err);
     callback([]);
+  });
+}
+
+export async function acceptMessageRequest(convId, currentUser) {
+  const convRef = doc(db, 'conversations', convId);
+  const snap = await getDoc(convRef);
+  if (!snap.exists()) throw new Error('Conversation not found');
+  const conv = snap.data();
+  if (!conv.participants.includes(currentUser.id)) throw new Error('Not a participant');
+  if (conv.requestedBy === currentUser.id) throw new Error('Waiting for the other player to accept');
+  await updateDoc(convRef, {
+    status: 'accepted',
+    acceptedAt: serverTimestamp(),
+    [`unreadFor.${currentUser.id}`]: 0,
+  });
+}
+
+export async function declineMessageRequest(convId, currentUser) {
+  const convRef = doc(db, 'conversations', convId);
+  const snap = await getDoc(convRef);
+  if (!snap.exists()) throw new Error('Conversation not found');
+  const conv = snap.data();
+  if (!conv.participants.includes(currentUser.id)) throw new Error('Not a participant');
+  if (conv.requestedBy === currentUser.id) throw new Error('Only the recipient can decline');
+  await updateDoc(convRef, {
+    status: 'declined',
+    declinedAt: serverTimestamp(),
+    lastMessage: { text: 'Request declined', fromId: currentUser.id, ts: Date.now(), system: true },
+    lastMessageAt: serverTimestamp(),
+    [`unreadFor.${currentUser.id}`]: 0,
+    [`unreadFor.${conv.requestedBy}`]: increment(1),
   });
 }
 
@@ -97,6 +142,7 @@ export async function sendMessage(convId, currentUser, text) {
   if (!convSnap.exists()) throw new Error('Conversation not found');
   const conv = convSnap.data();
   if (!conv.participants.includes(currentUser.id)) throw new Error('Not a participant');
+  if (conv.status && conv.status !== 'accepted') throw new Error('This message request has not been accepted yet');
 
   // Add the message
   await addDoc(collection(db, 'conversations', convId, 'messages'), {
