@@ -4,22 +4,6 @@ rules_version = '2';
 // FIRESTORE SECURITY RULES
 // Paste these into Firebase Console → Firestore Database → Rules → Publish
 // ============================================================================
-//
-// Design notes
-// ------------
-// The original v1 rules took a "trust the client" approach because the app
-// was meant for friends-only casual play. That stance gave any signed-in
-// user the ability to overwrite anyone else's match results, friend lists,
-// blocked lists, and club memberships — a real problem even for a small
-// deployment. These rules tighten cross-user writes to the narrowest set
-// of shapes the app actually performs, while keeping the legitimate flows
-// (friend requests, accepting requests, spectating, club join/leave)
-// working.
-//
-// What rules CAN'T enforce, even here: they can't see whether a write used
-// `arrayUnion(x)` or a wholesale overwrite — they only see the final array.
-// So instead of trusting the operator, we constrain the *result*: the array
-// must have grown by exactly one, and the new element must be self-owned.
 
 service cloud.firestore {
   match /databases/{database}/documents {
@@ -31,148 +15,89 @@ service cloud.firestore {
     function isSelf(userId) {
       return isSignedIn() && request.auth.uid == userId;
     }
+    function isAdmin() {
+      return isSignedIn()
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
     function changedKeys() {
       return request.resource.data.diff(resource.data).affectedKeys();
     }
+    function protectedUserKeysChanged() {
+      return changedKeys().hasAny(['role', 'status', 'chatMuted', 'moderationNote']);
+    }
 
     // ─── Username lookups ───────────────────────────────────────────────
-    // Doc id IS the username; doc body is { uid, email }. The `email` field
-    // lets the login flow translate a username into the synthetic Firebase
-    // Auth email pre-auth, and powers password-reset flows. Reads are
-    // PUBLIC because login itself needs them — there's no signed-in identity
-    // yet when the user is trying to log in. The information leaked is
-    // "does username X exist", which an attacker could probe anyway by
-    // attempting sign-ups; not a real protection. Creating a username
-    // requires that the caller's user doc actually claims this username —
-    // closes the squat-any-name attack.
     match /usernames/{username} {
       allow read: if true;
-      // The get() cross-reference was removed because Firestore security rules
-      // can fail to see a document written moments earlier in the same signup
-      // flow (the users doc is written just before this usernames doc). The
-      // uid-match check alone still prevents anyone from claiming a username
-      // that points to a different user's account.
       allow create: if isSignedIn()
                     && request.resource.data.uid == request.auth.uid;
       allow update: if false;
-      // Allow self-delete (only the user who owns the username can release it).
-      // Used by deleteAccount in AuthContext.
       allow delete: if isSignedIn() && resource.data.uid == request.auth.uid;
     }
 
     // ─── User profiles ──────────────────────────────────────────────────
     match /users/{userId} {
-      // Anyone signed in can read profiles (leaderboard, profile pages).
       allow read: if isSignedIn();
 
-      // Only the user themselves can create their own doc, and the
-      // username field is required.
       allow create: if isSelf(userId)
-                    && request.resource.data.username is string;
+                    && request.resource.data.username is string
+                    && request.resource.data.get('role', 'player') == 'player'
+                    && request.resource.data.get('status', 'active') == 'active';
 
-      // Updates split into two flavors:
-      //  (a) The user updates their own doc — anything goes, EXCEPT the
-      //      `username` field is immutable. Allowing username changes
-      //      would let someone claim someone else's `/usernames/X` doc
-      //      by first updating their own profile to claim that name.
-      //  (b) Another user makes a narrow, self-referencing social write.
-      //      Specifically: append the current user's id to the target's
-      //      `friends` array (acceptFriendRequest's symmetric write), OR
-      //      append a request object whose fromId is the current user
-      //      to the target's `friendRequests`.
-      //
-      //  Notably the cross-user branch can NEVER touch `blocked`. That
-      //  was the worst hole in v1 — anyone could unblock themselves on
-      //  someone else's account.
       allow update: if isSignedIn() && (
-        (
+        isAdmin()
+        || (
           request.auth.uid == userId
           && request.resource.data.username == resource.data.username
+          && !protectedUserKeysChanged()
         )
         || (
-          // Cross-user friend append: only `friends` changed, and grew by
-          // one element equal to the caller's uid.
           changedKeys().hasOnly(['friends'])
           && request.resource.data.friends.size() == (resource.data.friends.size() + 1)
           && request.resource.data.friends[request.resource.data.friends.size() - 1] == request.auth.uid
         )
         || (
-          // Cross-user friend removal (symmetric write of removeFriend
-          // and the symmetric write in blockUser): only `friends`
-          // changed, shrank by one, and the caller's uid is no longer
-          // in it. We don't constrain which other elements stayed —
-          // someone who can't see your friends list anyway can't
-          // meaningfully exploit "I'll remove myself plus mess with
-          // other entries" because the array isn't queryable from
-          // another user's vantage.
           changedKeys().hasOnly(['friends'])
           && request.resource.data.friends.size() == (resource.data.friends.size() - 1)
           && !(request.auth.uid in request.resource.data.friends)
           && (request.auth.uid in resource.data.friends)
         )
         || (
-          // Cross-user friend request: only `friendRequests` changed, and
-          // grew by one element whose fromId is the caller. We can't
-          // validate the rest of the object shape from rules (Firestore
-          // can't deep-equal nested fields against arbitrary references),
-          // but the fromId == auth.uid check prevents impersonation.
           changedKeys().hasOnly(['friendRequests'])
           && request.resource.data.friendRequests.size() == (resource.data.friendRequests.size() + 1)
           && request.resource.data.friendRequests[request.resource.data.friendRequests.size() - 1].fromId == request.auth.uid
         )
       );
 
-      // Self-delete is allowed so users can delete their own accounts.
-      // The companion /usernames doc and the Firebase Auth record are
-      // cleaned up by the client-side deleteAccount flow.
-      allow delete: if isSelf(userId);
+      allow delete: if isSelf(userId) || isAdmin();
     }
 
     // ─── Invites ────────────────────────────────────────────────────────
     match /invites/{inviteId} {
-      // Read: only sender or recipient.
-      allow read: if isSignedIn() && (
+      allow read: if isAdmin() || (isSignedIn() && (
         request.auth.uid == resource.data.fromId
         || request.auth.uid == resource.data.toId
-      );
-      // Create: sender must match the auth user.
+      ));
       allow create: if isSignedIn()
                     && request.resource.data.fromId == request.auth.uid;
-      // Update: sender or recipient (for accept/decline/cancel/consume).
-      allow update: if isSignedIn() && (
+      allow update: if isAdmin() || (isSignedIn() && (
         request.auth.uid == resource.data.fromId
         || request.auth.uid == resource.data.toId
-      );
-      // Delete: sender only (used by cancelInvite for pending invites).
-      allow delete: if isSignedIn()
-                    && request.auth.uid == resource.data.fromId;
+      ));
+      allow delete: if isAdmin() || (isSignedIn()
+                    && request.auth.uid == resource.data.fromId);
     }
 
     // ─── Matches ────────────────────────────────────────────────────────
-    // Reads stay open so spectators can watch any match. Writes are scoped
-    // to participants — or, for non-players, to a narrow set of spectator
-    // and chat appends.
     match /matches/{matchId} {
       allow read: if isSignedIn();
 
-      // Create: caller must be one of the players. (Both acceptInvite
-      // codepaths are by the recipient, who's in players[].)
       allow create: if isSignedIn()
                     && request.auth.uid in request.resource.data.players;
 
-      // Update path 1: players can update anything (game state, status,
-      // chat, pause flags, etc). We accept the client-trust model for
-      // game logic — cheating between consenting friends is out of scope
-      // and would require Cloud Functions to fix.
       function isPlayer() {
         return isSignedIn() && request.auth.uid in resource.data.players;
       }
-
-      // Update path 2: non-players can only do one of:
-      //   - append themselves to `spectators` (joinAsSpectator)
-      //   - remove themselves from `spectators` (leaveSpectator)
-      //   - append a chat message authored by themselves (sendChatAs)
-      // Each path is keyed to which field set is changing.
       function specJoin() {
         return changedKeys().hasOnly(['spectators'])
           && request.resource.data.spectators.size() == (resource.data.get('spectators', []).size() + 1)
@@ -181,10 +106,6 @@ service cloud.firestore {
       function specLeave() {
         return changedKeys().hasOnly(['spectators'])
           && request.resource.data.spectators.size() == (resource.data.get('spectators', []).size() - 1);
-        // (We can't verify that the removed element was the caller from
-        // rules — but the client-side leave function only removes self,
-        // and the worst a malicious caller can do is remove someone
-        // else's spectator entry, which is cosmetic.)
       }
       function chatAppend() {
         return changedKeys().hasOnly(['chat'])
@@ -192,48 +113,36 @@ service cloud.firestore {
           && request.resource.data.chat[request.resource.data.chat.size() - 1].userId == request.auth.uid;
       }
 
-      allow update: if isPlayer() || specJoin() || specLeave() || chatAppend();
-      allow delete: if false;
+      allow update: if isAdmin() || isPlayer() || specJoin() || specLeave() || chatAppend();
+      allow delete: if isAdmin();
     }
 
     // ─── Direct Message Conversations ──────────────────────────────────
-    // Doc id format: sortedUidA_sortedUidB
     match /conversations/{convId} {
-      allow read: if isSignedIn()
-                  && request.auth.uid in resource.data.participants;
+      allow read: if isAdmin() || (isSignedIn()
+                  && request.auth.uid in resource.data.participants);
 
-      // Create: caller must be one of exactly two participants. The doc
-      // id must match the sorted-uid format used by conversationId() in
-      // dms.js — participants[0] < participants[1] and convId is their
-      // underscore-join. This prevents someone from creating a conv with
-      // an attacker-controlled id while still letting both real
-      // participants find it deterministically.
       allow create: if isSignedIn()
                     && request.auth.uid in request.resource.data.participants
                     && request.resource.data.participants.size() == 2
                     && request.resource.data.participants[0] < request.resource.data.participants[1]
                     && convId == (request.resource.data.participants[0] + '_' + request.resource.data.participants[1]);
 
-      // Update: only participants. Lets sendMessage update lastMessage,
-      // lastMessageAt, unreadFor.
-      allow update: if isSignedIn()
-                    && request.auth.uid in resource.data.participants;
-      allow delete: if false;
+      allow update: if isAdmin() || (isSignedIn()
+                    && request.auth.uid in resource.data.participants);
+      allow delete: if isAdmin();
 
       match /messages/{msgId} {
-        allow read: if isSignedIn()
-                    && request.auth.uid in get(/databases/$(database)/documents/conversations/$(convId)).data.participants;
+        allow read: if isAdmin() || (isSignedIn()
+                    && request.auth.uid in get(/databases/$(database)/documents/conversations/$(convId)).data.participants);
         allow create: if isSignedIn()
                       && request.resource.data.fromId == request.auth.uid
                       && request.auth.uid in get(/databases/$(database)/documents/conversations/$(convId)).data.participants;
-        allow update, delete: if false;
+        allow update, delete: if isAdmin();
       }
     }
 
     // ─── Clubs ──────────────────────────────────────────────────────────
-    // Reads stay open for discoverability. Member writes are open; non-
-    // member writes are limited to a self-append to `members` (+ the
-    // matching memberInfo entry) — that's the join path.
     match /clubs/{clubId} {
       allow read: if isSignedIn();
 
@@ -245,16 +154,6 @@ service cloud.firestore {
       function isMember() {
         return isSignedIn() && request.auth.uid in resource.data.members;
       }
-      // Non-member join: members grows by 1, the new id is caller, and
-      // memberInfo also changes — but ONLY by adding the caller's own
-      // entry. We can't validate the value of that entry (Firestore rules
-      // can't deep-equal a nested map against arbitrary inputs), but we
-      // can require:
-      //   - exactly the same memberInfo keys plus the caller's uid as a
-      //     new key, AND
-      //   - every existing memberInfo[k] is unchanged for all other keys.
-      // The `affectedKeys()` on a map diff gives us added/removed/modified
-      // top-level keys, so we require it to be exactly {caller's uid}.
       function memberJoin() {
         return changedKeys().hasOnly(['members', 'memberInfo'])
           && request.resource.data.members.size() == (resource.data.members.size() + 1)
@@ -262,18 +161,24 @@ service cloud.firestore {
           && request.resource.data.memberInfo.diff(resource.data.get('memberInfo', {})).affectedKeys().hasOnly([request.auth.uid]);
       }
 
-      allow update: if isMember() || memberJoin();
-      allow delete: if isSignedIn()
-                    && request.auth.uid == resource.data.ownerId;
+      allow update: if isAdmin() || isMember() || memberJoin();
+      allow delete: if isAdmin() || (isSignedIn()
+                    && request.auth.uid == resource.data.ownerId);
     }
 
     // ─── Activity feed entries ─────────────────────────────────────────
-    // Open reads (filtered to friends client-side). README acknowledges
-    // this is a discoverability tradeoff, not a privacy feature.
     match /activities/{activityId} {
       allow read: if isSignedIn();
       allow create: if isSignedIn()
                     && request.resource.data.userId == request.auth.uid;
+      allow update, delete: if isAdmin();
+    }
+
+    // ─── Admin audit log ───────────────────────────────────────────────
+    match /adminAudit/{auditId} {
+      allow read: if isAdmin();
+      allow create: if isAdmin()
+                    && request.resource.data.adminId == request.auth.uid;
       allow update, delete: if false;
     }
   }
