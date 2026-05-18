@@ -15,6 +15,7 @@ import Replay from './pages/Replay';
 import Messages from './pages/Messages';
 import Clubs from './pages/Clubs';
 import ClubDetail from './pages/ClubDetail';
+import Admin from './pages/Admin';
 
 export default function App() {
   return (
@@ -64,6 +65,7 @@ function Shell() {
           <Route path="/messages/:convId" element={<Messages />} />
           <Route path="/clubs"          element={<Clubs />} />
           <Route path="/clubs/:id"      element={<ClubDetail />} />
+          <Route path="/admin"          element={<Admin />} />
           <Route path="*"               element={<Navigate to="/" />} />
         </Routes>
       </main>
