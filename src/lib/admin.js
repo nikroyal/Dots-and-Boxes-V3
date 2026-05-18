@@ -1,5 +1,5 @@
 import {
-  collection, doc, deleteDoc, getDocs, limit, onSnapshot, query,
+  collection, doc, deleteDoc, limit, onSnapshot, query,
   serverTimestamp, updateDoc, addDoc,
 } from 'firebase/firestore';
 import { db } from './firebase';
@@ -75,6 +75,13 @@ async function audit(admin, action, targetType, targetId, details = {}) {
     details,
     createdAt: serverTimestamp(),
   }).catch(() => {});
+}
+
+export async function updateAdminDisplayName(admin, displayName) {
+  const clean = displayName.trim().slice(0, 40);
+  if (clean.length < 2) throw new Error('Name must be at least 2 characters');
+  await updateDoc(doc(db, 'users', admin.id), { displayName: clean });
+  await audit(admin, 'update_admin_name', 'user', admin.id, { displayName: clean });
 }
 
 export async function setUserModeration(admin, user, patch) {
