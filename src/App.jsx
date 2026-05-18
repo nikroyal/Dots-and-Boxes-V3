@@ -25,16 +25,18 @@ export default function App() {
   );
 }
 
-function Shell() {
-  const { user, loading } = useAuth();
+function LoadingScreen() {
+  return (
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="font-mono text-xs tracking-widest opacity-50">LOADING…</div>
+    </div>
+  );
+}
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="font-mono text-xs tracking-widest opacity-50">LOADING…</div>
-      </div>
-    );
-  }
+function Shell() {
+  const { user, profile, loading } = useAuth();
+
+  if (loading) return <LoadingScreen />;
 
   if (!user) {
     return (
@@ -42,6 +44,20 @@ function Shell() {
         <Route path="/login" element={<Login />} />
         <Route path="*" element={<Navigate to="/login" />} />
       </Routes>
+    );
+  }
+
+  if (!profile) return <LoadingScreen />;
+
+  if (profile.role === 'admin') {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Notifications />
+        <Routes>
+          <Route path="/admin" element={<Admin />} />
+          <Route path="*" element={<Navigate to="/admin" />} />
+        </Routes>
+      </div>
     );
   }
 
@@ -65,7 +81,6 @@ function Shell() {
           <Route path="/messages/:convId" element={<Messages />} />
           <Route path="/clubs"          element={<Clubs />} />
           <Route path="/clubs/:id"      element={<ClubDetail />} />
-          <Route path="/admin"          element={<Admin />} />
           <Route path="*"               element={<Navigate to="/" />} />
         </Routes>
       </main>
