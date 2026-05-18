@@ -16,8 +16,16 @@ export function conversationId(uidA, uidB) {
 export async function openConversation(currentUser, target) {
   const convId = conversationId(currentUser.id, target.id);
   const convRef = doc(db, 'conversations', convId);
-  const snap = await getDoc(convRef);
-  if (snap.exists()) return convId;
+
+  try {
+    const snap = await getDoc(convRef);
+    if (snap.exists()) return convId;
+  } catch (err) {
+    // A first-time conversation may be denied by rules on getDoc because the
+    // document does not exist yet, so there is no participants array to check.
+    // Creating the deterministic document below is still validated by rules.
+    if (err.code !== 'permission-denied') throw err;
+  }
 
   // The Firestore rule requires participants[0] < participants[1] to match
   // the sorted-uid convId — so we sort here, not just in conversationId().
@@ -72,6 +80,9 @@ export function watchMessages(convId, callback) {
   return onSnapshot(q, (snap) => {
     const list = snap.docs.map(d => ({ id: d.id, ...d.data() }));
     callback(list);
+  }, (err) => {
+    console.warn('watchMessages error:', err);
+    callback([]);
   });
 }
 
