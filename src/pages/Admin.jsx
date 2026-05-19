@@ -174,7 +174,7 @@ function UserRow({ admin, user, onViewAs }) {
         </div>
       </div>
       <div className="flex flex-wrap gap-2">
-        <button className="btn-primary" onClick={() => onViewAs(user.id)}><Eye size={12} /> View As</button>
+        <button className="btn-primary" onClick={() => onViewAs(user)}><Eye size={12} /> View As</button>
         <button className="btn-ghost" onClick={() => setPatch({ status: banned ? 'active' : 'banned' }, banned ? 'User unbanned' : 'User banned')}>
           {banned ? <CheckCircle size={12} /> : <Ban size={12} />} {banned ? 'Unban' : 'Ban'}
         </button>

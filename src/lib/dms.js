@@ -179,7 +179,7 @@ export async function sendMessage(convId, currentUser, text) {
 
 // Mark a conversation as read for the current user. Called when they open it.
 export async function markConversationRead(convId, currentUser) {
-  guard(currentUser);
+  if (currentUser?._isImpersonated) return;
   const convRef = doc(db, 'conversations', convId);
   const snap = await getDoc(convRef);
   if (!snap.exists()) return;

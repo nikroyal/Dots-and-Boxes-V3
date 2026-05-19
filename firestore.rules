@@ -155,16 +155,27 @@ service cloud.firestore {
       function isMember() {
         return isSignedIn() && request.auth.uid in resource.data.members;
       }
+      function isOwner() {
+        return isSignedIn() && request.auth.uid == resource.data.ownerId;
+      }
       function memberJoin() {
         return changedKeys().hasOnly(['members', 'memberInfo'])
           && request.resource.data.members.size() == (resource.data.members.size() + 1)
           && request.resource.data.members[request.resource.data.members.size() - 1] == request.auth.uid
           && request.resource.data.memberInfo.diff(resource.data.get('memberInfo', {})).affectedKeys().hasOnly([request.auth.uid]);
       }
+      function memberLeave() {
+        return changedKeys().hasOnly(['members', 'memberInfo'])
+          && request.resource.data.members.size() == (resource.data.members.size() - 1)
+          && !(request.auth.uid in request.resource.data.members);
+      }
+      function chatUpdate() {
+        return changedKeys().hasOnly(['chat'])
+          && request.resource.data.chat.size() >= resource.data.get('chat', []).size();
+      }
 
-      allow update: if isAdmin() || isMember() || memberJoin();
-      allow delete: if isAdmin() || (isSignedIn()
-                    && request.auth.uid == resource.data.ownerId);
+      allow update: if isAdmin() || isOwner() || memberJoin() || memberLeave() || (isMember() && chatUpdate());
+      allow delete: if isAdmin() || isOwner();
     }
 
     // ─── Activity feed entries ─────────────────────────────────────────
