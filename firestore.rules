@@ -88,6 +88,7 @@ service cloud.firestore {
                     && request.auth.uid == resource.data.fromId);
     }
 
+
     // ─── Matches ────────────────────────────────────────────────────────
     match /matches/{matchId} {
       allow read: if isSignedIn();

@@ -17,6 +17,9 @@ export const ACTIVITY_TYPES = {
 // Append an activity entry. Best-effort — failures are swallowed so they
 // never block the action that triggered them (e.g. finishing a match).
 export async function recordActivity(currentUser, type, data = {}) {
+  // We block activity recording during impersonation because the admin
+  // shouldn't be generating "real" activities (wins, friend adds) on
+  // the user's behalf.
   if (!currentUser?.id || currentUser?._isImpersonated) return;
   try {
     await addDoc(collection(db, 'activities'), {
