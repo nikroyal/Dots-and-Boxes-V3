@@ -11,7 +11,7 @@ import { watchTotalUnread } from '../lib/dms';
 import { startHeartbeat, stopHeartbeat } from '../lib/presence';
 
 export default function Header() {
-  const { profile, logout } = useAuth();
+  const { profile, isImpersonating, logout } = useAuth();
   const loc = useLocation();
   const [soundOn, setSoundOn] = useState(isSoundEnabled());
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -23,19 +23,22 @@ export default function Header() {
 
   // Subscribe to total unread DM count
   useEffect(() => {
-    if (!profile) return;
+    if (!profile || isImpersonating) return;
     const unsub = watchTotalUnread(profile.id, setUnreadCount);
     return () => unsub();
-  }, [profile?.id]);
+  }, [profile?.id, isImpersonating]);
 
   // Start heartbeat once profile is loaded; stop on unmount/logout.
-  // The heartbeat module is idempotent so re-running this on prop changes
-  // is safe.
+  // We disable the heartbeat while impersonating so we don't mark the
+  // impersonated user as online.
   useEffect(() => {
-    if (!profile?.id) return;
-    startHeartbeat(profile.id);
+    if (profile?.id && !isImpersonating) {
+      startHeartbeat(profile.id);
+    } else {
+      stopHeartbeat();
+    }
     return () => stopHeartbeat();
-  }, [profile?.id]);
+  }, [profile?.id, isImpersonating]);
 
   // Close settings menu when clicking outside
   useEffect(() => {

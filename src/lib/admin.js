@@ -4,6 +4,12 @@ import {
 } from 'firebase/firestore';
 import { db } from './firebase';
 
+function guard(user) {
+  if (user?._isImpersonated) {
+    throw new Error('Action blocked: you are in read-only impersonation mode.');
+  }
+}
+
 function byNewest(field = 'createdAt') {
   return (a, b) => {
     const aTime = a[field]?.toMillis?.() || a[field] || 0;
@@ -78,6 +84,7 @@ async function audit(admin, action, targetType, targetId, details = {}) {
 }
 
 export async function updateAdminDisplayName(admin, displayName) {
+  guard(admin);
   const clean = displayName.trim().slice(0, 40);
   if (clean.length < 2) throw new Error('Name must be at least 2 characters');
   await updateDoc(doc(db, 'users', admin.id), { displayName: clean });
@@ -85,11 +92,13 @@ export async function updateAdminDisplayName(admin, displayName) {
 }
 
 export async function setUserModeration(admin, user, patch) {
+  guard(admin);
   await updateDoc(doc(db, 'users', user.id), patch);
   await audit(admin, 'update_user', 'user', user.id, patch);
 }
 
 export async function forceFinishMatch(admin, match) {
+  guard(admin);
   await updateDoc(doc(db, 'matches', match.id), {
     status: 'finished',
     adminClosed: true,
@@ -102,6 +111,7 @@ export async function forceFinishMatch(admin, match) {
 }
 
 export async function deleteClubAsAdmin(admin, club) {
+  guard(admin);
   await deleteDoc(doc(db, 'clubs', club.id));
   await audit(admin, 'delete_club', 'club', club.id, {
     name: club.name || '',

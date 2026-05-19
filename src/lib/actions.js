@@ -21,6 +21,13 @@ const PREGAME_COUNTDOWN_MS = 3500;
 // safety net for abandoned games.
 const TURN_TIMEOUT_MS = 60 * 1000;
 
+// ─── Guard ────────────────────────────────────────────────────────────────
+function guard(user) {
+  if (user?._isImpersonated) {
+    throw new Error('Action blocked: you are in read-only impersonation mode.');
+  }
+}
+
 // ─── User lookups ─────────────────────────────────────────────────────────
 const USERNAME_RE = /^[a-z0-9_]{3,20}$/;
 
@@ -41,6 +48,7 @@ export async function lookupUserByUsername(username) {
 // ─── Invites ──────────────────────────────────────────────────────────────
 // invites collection: { fromId, fromUsername, toId, toUsername, rows, cols, status, createdAt, matchId? }
 export async function sendInvite(fromUser, toUsername, rows, cols) {
+  guard(fromUser);
   const target = await lookupUserByUsername(toUsername);
   if (!target) throw new Error('User not found');
   if (target.id === fromUser.id) throw new Error("You can't invite yourself");
@@ -74,6 +82,7 @@ export async function sendInvite(fromUser, toUsername, rows, cols) {
 }
 
 export async function acceptInvite(inviteId, currentUser) {
+  guard(currentUser);
   const invRef = doc(db, 'invites', inviteId);
   const invSnap = await getDoc(invRef);
   if (!invSnap.exists()) throw new Error('Invite not found');
@@ -115,6 +124,7 @@ export async function acceptInvite(inviteId, currentUser) {
 }
 
 export async function declineInvite(inviteId, currentUser) {
+  guard(currentUser);
   const invRef = doc(db, 'invites', inviteId);
   const invSnap = await getDoc(invRef);
   if (!invSnap.exists()) return;
@@ -123,6 +133,7 @@ export async function declineInvite(inviteId, currentUser) {
 }
 
 export async function cancelInvite(inviteId, currentUser) {
+  guard(currentUser);
   const invRef = doc(db, 'invites', inviteId);
   const invSnap = await getDoc(invRef);
   if (!invSnap.exists()) return;
@@ -135,6 +146,7 @@ export async function cancelInvite(inviteId, currentUser) {
 // their own outgoing invite — we use updateDoc against an existing doc so
 // the rule allowing sender/recipient to update applies.
 export async function consumeAcceptedInvite(inviteId, currentUser) {
+  guard(currentUser);
   const invRef = doc(db, 'invites', inviteId);
   const invSnap = await getDoc(invRef);
   if (!invSnap.exists()) return;
@@ -149,6 +161,7 @@ export async function consumeAcceptedInvite(inviteId, currentUser) {
 // Returns { ok: true, opponent } on success, or throws with a friendly
 // "no players found" message.
 export async function quickMatch(currentUser, rows = 5, cols = 5) {
+  guard(currentUser);
   const myElo = currentUser.elo || 1000;
   const blockedByMe = currentUser.blocked || [];
 
@@ -217,6 +230,7 @@ export async function quickMatch(currentUser, rows = 5, cols = 5) {
 // same board size. Marks the invite with `isRematch: true` so the recipient
 // can see at a glance that this comes from a recently-finished game.
 export async function requestRematch(match, currentUser) {
+  guard(currentUser);
   if (!match || match.status !== 'finished') throw new Error('Match not finished');
   if (!match.players.includes(currentUser.id)) throw new Error('Not a player');
   const opponentId = match.players.find(id => id !== currentUser.id);
@@ -239,7 +253,9 @@ export function watchMatch(matchId, callback) {
 }
 
 export async function makeMove(matchId, orientation, r, c, currentUser) {
+  guard(currentUser);
   await runTransaction(db, async (tx) => {
+// ... (rest of makeMove)
     const matchRef = doc(db, 'matches', matchId);
     const snap = await tx.get(matchRef);
     if (!snap.exists()) throw new Error('Match not found');
@@ -286,6 +302,7 @@ export async function makeMove(matchId, orientation, r, c, currentUser) {
 }
 
 export async function requestPause(matchId, currentUser) {
+  guard(currentUser);
   const matchRef = doc(db, 'matches', matchId);
   const snap = await getDoc(matchRef);
   if (!snap.exists()) throw new Error('Match not found');
@@ -299,6 +316,7 @@ export async function requestPause(matchId, currentUser) {
 }
 
 export async function respondToPause(matchId, currentUser, accept) {
+  guard(currentUser);
   const matchRef = doc(db, 'matches', matchId);
   const snap = await getDoc(matchRef);
   if (!snap.exists()) throw new Error('Match not found');
@@ -319,6 +337,7 @@ export async function respondToPause(matchId, currentUser, accept) {
 }
 
 export async function resumeMatch(matchId, currentUser) {
+  guard(currentUser);
   const matchRef = doc(db, 'matches', matchId);
   const snap = await getDoc(matchRef);
   if (!snap.exists()) throw new Error('Match not found');
@@ -333,6 +352,7 @@ export async function resumeMatch(matchId, currentUser) {
 }
 
 export async function resignMatch(matchId, currentUser) {
+  guard(currentUser);
   const matchRef = doc(db, 'matches', matchId);
   const snap = await getDoc(matchRef);
   if (!snap.exists()) return;
@@ -355,6 +375,7 @@ export async function resignMatch(matchId, currentUser) {
 // claims: if the opponent's `lastSeen` is stale, the present player can
 // claim the win the same way.
 export async function forfeitOnTimeout(matchId, currentUser) {
+  guard(currentUser);
   const matchRef = doc(db, 'matches', matchId);
   await runTransaction(db, async (tx) => {
     const snap = await tx.get(matchRef);
@@ -415,6 +436,7 @@ export async function sendChat(matchId, currentUser, text) {
 }
 
 export async function sendChatAs(matchId, currentUser, text, isSpectator) {
+  guard(currentUser);
   const trimmed = text.trim().slice(0, 200);
   if (!trimmed) return;
   const matchRef = doc(db, 'matches', matchId);
@@ -453,6 +475,7 @@ export async function sendChatAs(matchId, currentUser, text, isSpectator) {
 
 // ─── Spectating ───────────────────────────────────────────────────────────
 export async function joinAsSpectator(matchId, currentUser) {
+  guard(currentUser);
   const matchRef = doc(db, 'matches', matchId);
   const snap = await getDoc(matchRef);
   if (!snap.exists()) throw new Error('Match not found');
@@ -488,6 +511,7 @@ export async function joinAsSpectator(matchId, currentUser) {
 }
 
 export async function leaveSpectator(matchId, currentUser) {
+  guard(currentUser);
   const matchRef = doc(db, 'matches', matchId);
   const snap = await getDoc(matchRef);
   if (!snap.exists()) return;
@@ -504,6 +528,7 @@ export async function leaveSpectator(matchId, currentUser) {
 // to avoid opening a transaction at all when there's nothing to do — the
 // authoritative idempotency check lives inside the transaction below.
 export async function finalizeStats(matchId, currentUser) {
+  guard(currentUser);
   const matchRef = doc(db, 'matches', matchId);
   const matchSnap = await getDoc(matchRef);
   if (!matchSnap.exists()) return;
@@ -668,6 +693,7 @@ export async function finalizeStats(matchId, currentUser) {
 
 // ─── Friends / social ─────────────────────────────────────────────────────
 export async function sendFriendRequest(currentUser, targetUsername) {
+  guard(currentUser);
   const target = await lookupUserByUsername(targetUsername);
   if (!target) throw new Error('User not found');
   if (target.id === currentUser.id) throw new Error("You can't friend yourself");
@@ -685,6 +711,7 @@ export async function sendFriendRequest(currentUser, targetUsername) {
 }
 
 export async function acceptFriendRequest(currentUser, fromId) {
+  guard(currentUser);
   // We need the sender's profile to populate the activity-feed entry, and
   // we need to read+write the current user's doc atomically — if a second
   // friend request arrives between the in-memory `currentUser.friendRequests`
@@ -729,6 +756,7 @@ export async function acceptFriendRequest(currentUser, fromId) {
 }
 
 export async function declineFriendRequest(currentUser, fromId) {
+  guard(currentUser);
   // Same race as acceptFriendRequest: do the filter inside a transaction so
   // a request that arrives concurrently isn't clobbered by a stale read.
   const myRef = doc(db, 'users', currentUser.id);
@@ -742,6 +770,7 @@ export async function declineFriendRequest(currentUser, fromId) {
 }
 
 export async function removeFriend(currentUser, friendId) {
+  guard(currentUser);
   // Remove from my doc first — that part always succeeds for self-updates.
   await updateDoc(doc(db, 'users', currentUser.id), {
     friends: arrayRemove(friendId),
@@ -758,6 +787,7 @@ export async function removeFriend(currentUser, friendId) {
 }
 
 export async function blockUser(currentUser, targetUsername) {
+  guard(currentUser);
   const target = await lookupUserByUsername(targetUsername);
   if (!target) throw new Error('User not found');
   // Update my doc: add to blocked, remove from friends.
@@ -803,6 +833,7 @@ export async function blockUser(currentUser, targetUsername) {
 }
 
 export async function unblockUser(currentUser, targetId) {
+  guard(currentUser);
   await updateDoc(doc(db, 'users', currentUser.id), {
     blocked: arrayRemove(targetId),
   });
@@ -810,6 +841,7 @@ export async function unblockUser(currentUser, targetId) {
 
 // ─── Profile updates ──────────────────────────────────────────────────────
 export async function updateProfile(currentUser, updates) {
+  guard(currentUser);
   const allowed = ['avatar', 'title', 'bio', 'displayName'];
   const filtered = {};
   for (const k of allowed) if (k in updates) filtered[k] = updates[k];

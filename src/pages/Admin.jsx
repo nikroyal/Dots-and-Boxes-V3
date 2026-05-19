@@ -22,13 +22,12 @@ const TABS = [
 ];
 
 export default function Admin() {
-  const { profile, logout } = useAuth();
+  const { profile, logout, startImpersonation } = useAuth();
   const [tab, setTab] = useState('overview');
   const [users, setUsers] = useState([]);
   const [matches, setMatches] = useState([]);
   const [clubs, setClubs] = useState([]);
   const [conversations, setConversations] = useState([]);
-  const [viewUserId, setViewUserId] = useState(null);
 
   useEffect(() => {
     if (!isAdminProfile(profile)) return;
@@ -44,7 +43,6 @@ export default function Admin() {
   if (!profile) return null;
   if (!isAdminProfile(profile)) return <Navigate to="/" />;
 
-  const viewedUser = users.find(u => u.id === viewUserId) || null;
   const activeMatches = matches.filter(m => m.status === 'active' || m.status === 'paused');
   const pendingRequests = conversations.filter(c => c.status === 'pending');
   const onlineUsers = users.filter(u => u.online);
@@ -79,30 +77,13 @@ export default function Admin() {
         </nav>
       </header>
 
-      {viewedUser && (
-        <div className="border-b hairline px-4 sm:px-6 py-3" style={{ background: 'rgba(183,121,31,0.08)' }}>
-          <div className="max-w-7xl mx-auto flex items-center justify-between gap-3 flex-wrap">
-            <div className="font-mono text-[0.7rem] tracking-widest uppercase">
-              <Eye size={14} className="inline mr-2" /> Read-only view as {viewedUser.username}. You cannot send messages or act as this user.
-            </div>
-            <button onClick={() => setViewUserId(null)} className="btn-ghost"><X size={12} /> Exit View</button>
-          </div>
-        </div>
-      )}
-
       <main className="max-w-7xl mx-auto px-4 sm:px-6 py-6 space-y-6">
-        {viewedUser ? (
-          <ViewAsPanel user={viewedUser} matches={matches} clubs={clubs} conversations={conversations} />
-        ) : (
-          <>
-            {tab === 'overview' && <Overview users={users} matches={matches} clubs={clubs} conversations={conversations} />}
-            {tab === 'users' && <UsersPanel admin={profile} users={users} onViewAs={setViewUserId} />}
-            {tab === 'games' && <MatchesPanel admin={profile} matches={matches} />}
-            {tab === 'chats' && <ConversationsPanel conversations={conversations} />}
-            {tab === 'clubs' && <ClubsPanel admin={profile} clubs={clubs} />}
-            {tab === 'settings' && <OwnerSettings admin={profile} />}
-          </>
-        )}
+        {tab === 'overview' && <Overview users={users} matches={matches} clubs={clubs} conversations={conversations} />}
+        {tab === 'users' && <UsersPanel admin={profile} users={users} onViewAs={startImpersonation} />}
+        {tab === 'games' && <MatchesPanel admin={profile} matches={matches} />}
+        {tab === 'chats' && <ConversationsPanel conversations={conversations} />}
+        {tab === 'clubs' && <ClubsPanel admin={profile} clubs={clubs} />}
+        {tab === 'settings' && <OwnerSettings admin={profile} />}
       </main>
     </div>
   );
@@ -386,62 +367,6 @@ function OwnerSettings({ admin }) {
         <button type="submit" disabled={saving || !name.trim()} className="btn-primary"><Save size={13} /> {saving ? 'Saving…' : 'Save'}</button>
       </form>
     </section>
-  );
-}
-
-function ViewAsPanel({ user, matches, clubs, conversations }) {
-  const userMatches = matches.filter(m => (m.players || []).includes(user.id));
-  const userClubs = clubs.filter(c => (c.members || []).includes(user.id));
-  const userConversations = conversations.filter(c => (c.participants || []).includes(user.id));
-  return (
-    <section className="space-y-4">
-      <div className="grid grid-cols-1 lg:grid-cols-[320px_1fr] gap-4">
-        <article className="border hairline p-4 space-y-3">
-          <div className="font-display text-4xl">{user.avatar || '◆'}</div>
-          <div>
-            <div className="font-display text-3xl">{user.username}</div>
-            <div className="font-mono text-[0.65rem] tracking-widest uppercase opacity-50">{user.id}</div>
-          </div>
-          <div className="grid grid-cols-2 gap-2">
-            <Metric label="ELO" value={user.elo || 1000} />
-            <Metric label="Status" value={user.status || 'active'} />
-            <Metric label="Games" value={user.gamesPlayed || 0} />
-            <Metric label="Friends" value={user.friends?.length || 0} />
-          </div>
-        </article>
-        <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
-          <Panel title="Their Games">{userMatches.slice(0, 8).map(m => <TinyMatch key={m.id} match={m} />)}</Panel>
-          <Panel title="Their Clubs">{userClubs.slice(0, 8).map(c => <div key={c.id} className="p-3 font-display">{c.name || c.id}</div>)}</Panel>
-        </div>
-      </div>
-      <section className="border hairline">
-        <div className="border-b hairline px-4 py-3 font-mono text-[0.65rem] tracking-widest uppercase opacity-60">Their private chats</div>
-        <div className="grid grid-cols-1 lg:grid-cols-[340px_1fr]" style={{ minHeight: 420 }}>
-          <ViewAsConversationList conversations={userConversations} userId={user.id} />
-        </div>
-      </section>
-    </section>
-  );
-}
-
-function ViewAsConversationList({ conversations, userId }) {
-  const [selected, setSelected] = useState(null);
-  const active = conversations.find(c => c.id === selected) || conversations[0] || null;
-  useEffect(() => {
-    if (!selected && conversations[0]) setSelected(conversations[0].id);
-  }, [conversations, selected]);
-  return (
-    <>
-      <aside className="border-r hairline overflow-y-auto">
-        {conversations.map(conv => {
-          const otherId = conv.participants?.find(id => id !== userId);
-          const other = conv.participantInfo?.[otherId]?.username || otherId || '?';
-          return <ConversationButton key={conv.id} conv={{ ...conv, participantInfo: { other: { username: other } } }} active={active?.id === conv.id} onClick={() => setSelected(conv.id)} />;
-        })}
-        {conversations.length === 0 && <div className="font-mono text-[0.65rem] opacity-40 text-center py-12 italic">No chats for this user</div>}
-      </aside>
-      <ConversationReader conv={active} />
-    </>
   );
 }
 

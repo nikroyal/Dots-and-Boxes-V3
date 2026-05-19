@@ -5,6 +5,13 @@ import {
 } from 'firebase/firestore';
 import { db } from './firebase';
 
+// ─── Guard ────────────────────────────────────────────────────────────────
+function guard(user) {
+  if (user?._isImpersonated) {
+    throw new Error('Action blocked: you are in read-only impersonation mode.');
+  }
+}
+
 // Maximum chat messages stored on a single club doc. New messages bump the
 // oldest off, keeping the doc small enough that listening to it stays cheap.
 const MAX_CHAT = 100;
@@ -15,6 +22,7 @@ const MAX_DESC = 200;
 
 // Create a club. Owner becomes the first member.
 export async function createClub(currentUser, { name, description, isPublic = true }) {
+  guard(currentUser);
   const cleanName = (name || '').trim().slice(0, MAX_NAME);
   if (cleanName.length < 3) throw new Error('Club name must be at least 3 characters');
   const cleanDesc = (description || '').trim().slice(0, MAX_DESC);
@@ -77,6 +85,7 @@ export async function listMyClubs(uid) {
 // Join a club. Uses a transaction to avoid races where two simultaneous
 // joiners overwrite each other's memberInfo.
 export async function joinClub(clubId, currentUser) {
+  guard(currentUser);
   const ref = doc(db, 'clubs', clubId);
   await runTransaction(db, async (tx) => {
     const snap = await tx.get(ref);
@@ -98,6 +107,7 @@ export async function joinClub(clubId, currentUser) {
 // Leave a club. The owner can't leave without first transferring ownership
 // or deleting the club; we throw a clear error in that case.
 export async function leaveClub(clubId, currentUser) {
+  guard(currentUser);
   const ref = doc(db, 'clubs', clubId);
   await runTransaction(db, async (tx) => {
     const snap = await tx.get(ref);
@@ -116,6 +126,7 @@ export async function leaveClub(clubId, currentUser) {
 
 // Owner-only: delete the entire club.
 export async function deleteClub(clubId, currentUser) {
+  guard(currentUser);
   const ref = doc(db, 'clubs', clubId);
   const snap = await getDoc(ref);
   if (!snap.exists()) return;
@@ -125,6 +136,7 @@ export async function deleteClub(clubId, currentUser) {
 
 // Send a chat message to a club. Caps the chat array at MAX_CHAT entries.
 export async function sendClubChat(clubId, currentUser, text) {
+  guard(currentUser);
   const trimmed = text.trim().slice(0, 500);
   if (!trimmed) return;
   const ref = doc(db, 'clubs', clubId);

@@ -23,6 +23,7 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);          // Firebase user
   const [profile, setProfile] = useState(null);    // Firestore user doc
   const [loading, setLoading] = useState(true);
+  const [impersonatedProfile, setImpersonatedProfile] = useState(null);
 
   // Listen for auth changes
   useEffect(() => {
@@ -30,6 +31,7 @@ export function AuthProvider({ children }) {
       setUser(u);
       if (!u) {
         setProfile(null);
+        setImpersonatedProfile(null);
         setLoading(false);
         return;
       }
@@ -203,6 +205,7 @@ export function AuthProvider({ children }) {
   // (profile, username, auth) is fully removed, which is the GDPR
   // right-to-erasure baseline.
   const deleteAccount = async (password) => {
+    if (impersonatedProfile) throw new Error('Cannot delete account while impersonating');
     if (!auth.currentUser) throw new Error('Not signed in');
     if (!profile) throw new Error('Profile not loaded yet');
 
@@ -235,11 +238,36 @@ export function AuthProvider({ children }) {
     if (user) {
       await updateDoc(doc(db, 'users', user.uid), { online: false }).catch(() => {});
     }
+    setImpersonatedProfile(null);
     await signOut(auth);
   };
 
+  const startImpersonation = (target) => {
+    if (profile?.role !== 'admin') return;
+    setImpersonatedProfile(target);
+  };
+
+  const stopImpersonation = () => {
+    setImpersonatedProfile(null);
+  };
+
+  const value = {
+    user,
+    profile: impersonatedProfile ? { ...impersonatedProfile, _isImpersonated: true } : profile,
+    realProfile: profile,
+    isImpersonating: !!impersonatedProfile,
+    loading,
+    signup,
+    login,
+    logout,
+    resetPassword,
+    deleteAccount,
+    startImpersonation,
+    stopImpersonation
+  };
+
   return (
-    <AuthContext.Provider value={{ user, profile, loading, signup, login, logout, resetPassword, deleteAccount }}>
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );

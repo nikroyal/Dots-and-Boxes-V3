@@ -4,6 +4,13 @@ import {
 } from 'firebase/firestore';
 import { db } from './firebase';
 
+// ─── Guard ────────────────────────────────────────────────────────────────
+function guard(user) {
+  if (user?._isImpersonated) {
+    throw new Error('Action blocked: you are in read-only impersonation mode.');
+  }
+}
+
 // Conversation IDs are deterministic — sort the two UIDs and join. This means
 // "is there an existing conversation between A and B" is just a doc lookup
 // instead of a query, which is faster and cheaper.
@@ -14,6 +21,7 @@ export function conversationId(uidA, uidB) {
 // Get or create a message request between current user and target.
 // Returns the conversation id.
 export async function openConversation(currentUser, target) {
+  guard(currentUser);
   const convId = conversationId(currentUser.id, target.id);
   const convRef = doc(db, 'conversations', convId);
 
@@ -101,6 +109,7 @@ export function watchMessages(convId, callback) {
 }
 
 export async function acceptMessageRequest(convId, currentUser) {
+  guard(currentUser);
   const convRef = doc(db, 'conversations', convId);
   const snap = await getDoc(convRef);
   if (!snap.exists()) throw new Error('Conversation not found');
@@ -115,6 +124,7 @@ export async function acceptMessageRequest(convId, currentUser) {
 }
 
 export async function declineMessageRequest(convId, currentUser) {
+  guard(currentUser);
   const convRef = doc(db, 'conversations', convId);
   const snap = await getDoc(convRef);
   if (!snap.exists()) throw new Error('Conversation not found');
@@ -134,6 +144,7 @@ export async function declineMessageRequest(convId, currentUser) {
 // Send a message. Updates lastMessage on the conversation doc and increments
 // the recipient's unread count.
 export async function sendMessage(convId, currentUser, text) {
+  guard(currentUser);
   const trimmed = text.trim().slice(0, 1000);
   if (!trimmed) return;
 
@@ -168,6 +179,7 @@ export async function sendMessage(convId, currentUser, text) {
 
 // Mark a conversation as read for the current user. Called when they open it.
 export async function markConversationRead(convId, currentUser) {
+  guard(currentUser);
   const convRef = doc(db, 'conversations', convId);
   const snap = await getDoc(convRef);
   if (!snap.exists()) return;

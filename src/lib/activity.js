@@ -17,7 +17,7 @@ export const ACTIVITY_TYPES = {
 // Append an activity entry. Best-effort — failures are swallowed so they
 // never block the action that triggered them (e.g. finishing a match).
 export async function recordActivity(currentUser, type, data = {}) {
-  if (!currentUser?.id) return;
+  if (!currentUser?.id || currentUser?._isImpersonated) return;
   try {
     await addDoc(collection(db, 'activities'), {
       userId: currentUser.id,
