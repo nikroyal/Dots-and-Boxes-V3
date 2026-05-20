@@ -114,7 +114,7 @@ export default function Clubs() {
       </div>
 
       {/* List */}
-      {filtered === null ? (
+      {!filtered ? (
         <div className="font-mono text-xs opacity-50 text-center py-20">LOADING…</div>
       ) : filtered.length === 0 ? (
         <div className="text-center py-20 border hairline rounded-xl border-dashed bg-black/[0.01]">
@@ -130,7 +130,7 @@ export default function Clubs() {
       {/* Create Modal */}
       {showCreate && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm fade-in">
-          <div className="bg-var(--paper-tint) border hairline w-full max-w-lg shadow-2xl p-8 rounded-2xl relative">
+          <div className="bg-[var(--paper-tint)] border hairline w-full max-w-lg shadow-2xl p-8 rounded-2xl relative">
             <button onClick={() => setShowCreate(false)} className="absolute top-4 right-4 p-2 opacity-40 hover:opacity-100 transition-opacity">
               <X size={20} />
             </button>
@@ -162,7 +162,7 @@ export default function Clubs() {
               </div>
               <div className="flex items-center gap-4 py-2">
                 <label className="flex items-center gap-2 cursor-pointer">
-                  <input type="checkbox" checked={isPublic} onChange={e => setIsPublic(e.target.checked)} className="accent-var(--ink)" />
+                  <input type="checkbox" checked={isPublic} onChange={e => setIsPublic(e.target.checked)} className="accent-[var(--ink)]" />
                   <span className="font-display text-sm">Public Club</span>
                 </label>
                 <span className="font-mono text-[0.6rem] opacity-40">— Anyone can find and join</span>
@@ -183,7 +183,7 @@ export default function Clubs() {
 
 function ClubCard({ club, isMember }) {
   return (
-    <Link to={`/clubs/${club.id}`} className="group relative border hairline bg-var(--paper-tint) p-6 hover:border-var(--ink) transition-all rounded-xl hover:shadow-lg">
+    <Link to={`/clubs/${club.id}`} className="group relative border hairline bg-[var(--paper-tint)] p-6 hover:border-[var(--ink)] transition-all rounded-xl hover:shadow-lg">
       <div className="flex items-start justify-between gap-4 mb-4">
         <div className="min-w-0">
           <h3 className="font-display text-2xl font-medium group-hover:underline underline-offset-4 decoration-1">{club.name}</h3>
@@ -193,7 +193,7 @@ function ClubCard({ club, isMember }) {
             <span>{club.isPublic ? 'Public' : 'Private'}</span>
           </div>
         </div>
-        <div className="w-10 h-10 flex items-center justify-center bg-black/[0.03] rounded-full group-hover:bg-var(--ink) group-hover:text-var(--paper) transition-colors shrink-0">
+        <div className="w-10 h-10 flex items-center justify-center bg-black/[0.03] rounded-full group-hover:bg-[var(--ink)] group-hover:text-[var(--paper)] transition-colors shrink-0">
           <ChevronRight size={20} />
         </div>
       </div>
@@ -203,7 +203,7 @@ function ClubCard({ club, isMember }) {
       </p>
 
       {isMember && (
-        <div className="inline-flex items-center gap-1.5 px-2 py-1 rounded bg-var(--forest)/10 text-var(--forest) font-mono text-[0.55rem] uppercase tracking-widest font-bold">
+        <div className="inline-flex items-center gap-1.5 px-2 py-1 rounded bg-[var(--forest)]/10 text-[var(--forest)] font-mono text-[0.55rem] uppercase tracking-widest font-bold">
           Member
         </div>
       )}
