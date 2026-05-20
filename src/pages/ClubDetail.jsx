@@ -17,7 +17,7 @@ import {
   Send, ArrowLeft, Users, Trash2, LogOut, UserPlus, 
   Hash, Settings, MoreVertical, Reply, Edit3, X, 
   ChevronRight, Shield, Crown, MessageSquare, Pin,
-  Plus, Check, UserMinus, AlertCircle
+  Plus, Check, UserMinus
 } from 'lucide-react';
 
 export default function ClubDetail() {
@@ -159,11 +159,11 @@ export default function ClubDetail() {
         myRole={myRole}
       />
     )}
-    <div className="fade-in grid grid-cols-1 lg:grid-cols-[240px_1fr_260px] gap-0 h-[calc(100vh-160px)] border hairline overflow-hidden bg-var(--paper-tint) relative">
+    <div className="fade-in grid grid-cols-1 lg:grid-cols-[240px_1fr_260px] gap-0 h-[calc(100vh-160px)] border hairline overflow-hidden bg-[var(--paper-tint)] relative">
       
       {/* ─── Sidebar: Channels ─── */}
       <aside className={`
-        ${showMobileSidebar ? 'fixed inset-y-0 left-0 z-[70] w-64 bg-var(--paper-tint) shadow-2xl' : 'hidden'} 
+        ${showMobileSidebar ? 'fixed inset-y-0 left-0 z-[70] w-64 bg-[var(--paper-tint)] shadow-2xl' : 'hidden'} 
         lg:flex lg:relative lg:z-0 lg:shadow-none border-r hairline flex-col bg-black/[0.02]
       `}>
         <div className="p-4 border-b hairline flex items-center justify-between gap-2 overflow-hidden">
@@ -177,7 +177,7 @@ export default function ClubDetail() {
             {isAdmin && (
               <button onClick={() => setShowSettings(true)} className="p-2 opacity-40 hover:opacity-100 transition-opacity relative">
                 <Settings size={18} />
-                {joinRequests.length > 0 && <span className="absolute top-1 right-1 w-2 h-2 bg-var(--crimson) rounded-full" />}
+                {joinRequests.length > 0 && <span className="absolute top-1 right-1 w-2 h-2 bg-[var(--crimson)] rounded-full" />}
               </button>
             )}
             <button onClick={() => setShowMobileSidebar(false)} className="lg:hidden p-2 opacity-40"><X size={18}/></button>
@@ -223,7 +223,7 @@ export default function ClubDetail() {
       </aside>
 
       {/* ─── Main: Chat Area ─── */}
-      <main className="flex flex-col min-w-0 bg-var(--paper)">
+      <main className="flex flex-col min-w-0 bg-[var(--paper)]">
         {/* Header */}
         <div className="h-14 px-4 flex items-center justify-between border-b hairline shrink-0">
           <div className="flex items-center gap-2 font-display text-lg font-medium">
@@ -236,10 +236,6 @@ export default function ClubDetail() {
             <button onClick={() => setShowMobileMembers(true)} className="opacity-40 hover:opacity-100 lg:hidden" title="Members List"><Users size={16} /></button>
           </div>
         </div>
-
-        {/* ... messages ... */}
-        {/* (I'll keep the rest as is but need to make sure the replacement block is correct) */}
-
 
         {/* Messages */}
         <div className="flex-1 overflow-y-auto p-4 space-y-6 scrollbar-thin">
@@ -280,7 +276,7 @@ export default function ClubDetail() {
         {/* Input Area */}
         <div className="p-4 pt-0 shrink-0">
           {isMember ? (
-            <div className="relative border hairline rounded-lg bg-black/[0.02] focus-within:border-var(--ink) transition-colors">
+            <div className="relative border hairline rounded-lg bg-black/[0.02] focus-within:border-[var(--ink)] transition-colors">
               {replyTo && (
                 <div className="px-3 py-1.5 border-b hairline flex items-center justify-between text-xs opacity-70 bg-black/5 rounded-t-lg">
                   <div className="flex items-center gap-2 truncate">
@@ -318,7 +314,7 @@ export default function ClubDetail() {
 
       {/* ─── Sidebar: Members ─── */}
       <aside className={`
-        ${showMobileMembers ? 'fixed inset-y-0 right-0 z-[70] w-64 bg-var(--paper-tint) shadow-2xl overflow-y-auto' : 'hidden'} 
+        ${showMobileMembers ? 'fixed inset-y-0 right-0 z-[70] w-64 bg-[var(--paper-tint)] shadow-2xl overflow-y-auto' : 'hidden'} 
         lg:flex lg:relative lg:z-0 lg:shadow-none border-l hairline flex-col bg-black/[0.01]
       `}>
         <div className="h-14 px-4 flex items-center justify-between border-b hairline font-mono text-[0.65rem] uppercase tracking-widest opacity-50 shrink-0">
@@ -381,7 +377,7 @@ function SettingsModal({ club, members, channels, requests, onClose, currentUser
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm fade-in">
       {confirmEl}
-      <div className="bg-var(--paper-tint) border hairline w-full max-w-4xl h-[80vh] shadow-2xl rounded-2xl flex overflow-hidden">
+      <div className="bg-[var(--paper-tint)] border hairline w-full max-w-4xl h-[80vh] shadow-2xl rounded-2xl flex overflow-hidden">
         {/* Sidebar */}
         <div className="w-56 border-r hairline bg-black/[0.02] p-4 space-y-1">
           <div className="font-mono text-[0.6rem] opacity-40 uppercase tracking-widest px-3 mb-2">Club Settings</div>
@@ -394,22 +390,22 @@ function SettingsModal({ club, members, channels, requests, onClose, currentUser
             <button 
               key={t.id} 
               onClick={() => setTab(t.id)}
-              className={`w-full flex items-center gap-3 px-3 py-2 rounded font-display text-sm transition-colors ${tab === t.id ? 'bg-var(--ink) text-var(--paper)' : 'hover:bg-black/5 opacity-70'}`}
+              className={`w-full flex items-center gap-3 px-3 py-2 rounded font-display text-sm transition-colors ${tab === t.id ? 'bg-[var(--ink)] text-[var(--paper)]' : 'hover:bg-black/5 opacity-70'}`}
             >
               <t.icon size={16} />
               <span className="flex-1 text-left">{t.label}</span>
-              {t.count > 0 && <span className={`text-[0.6rem] px-1.5 rounded-full ${tab === t.id ? 'bg-white/20' : 'bg-var(--crimson) text-white'}`}>{t.count}</span>}
+              {t.count > 0 && <span className={`text-[0.6rem] px-1.5 rounded-full ${tab === t.id ? 'bg-white/20' : 'bg-[var(--crimson)] text-white'}`}>{t.count}</span>}
             </button>
           ))}
           <div className="pt-4 mt-4 border-t hairline">
-            <button onClick={onClose} className="w-full flex items-center gap-3 px-3 py-2 rounded font-display text-sm text-var(--crimson) hover:bg-var(--crimson)/5">
+            <button onClick={onClose} className="w-full flex items-center gap-3 px-3 py-2 rounded font-display text-sm text-[var(--crimson)] hover:bg-[var(--crimson)]/5">
               <LogOut size={16} /> Close Settings
             </button>
           </div>
         </div>
 
         {/* Content */}
-        <div className="flex-1 p-8 overflow-y-auto bg-var(--paper)">
+        <div className="flex-1 p-8 overflow-y-auto bg-[var(--paper)]">
           {tab === 'general' && (
             <div className="max-w-md space-y-6">
               <h2 className="font-display text-2xl mb-6">General Settings</h2>
@@ -422,7 +418,7 @@ function SettingsModal({ club, members, channels, requests, onClose, currentUser
                 <textarea className="input-field" value={desc} onChange={e => setDesc(e.target.value)} style={{ minHeight: 80 }} />
               </div>
               <div className="flex items-center gap-3">
-                <input type="checkbox" id="isPublic" checked={isPublic} onChange={e => setIsPublic(e.target.checked)} className="accent-var(--ink)" />
+                <input type="checkbox" id="isPublic" checked={isPublic} onChange={e => setIsPublic(e.target.checked)} className="accent-[var(--ink)]" />
                 <label htmlFor="isPublic" className="font-display text-sm cursor-pointer">Public Club (Visible to everyone)</label>
               </div>
               <button onClick={handleUpdateGeneral} disabled={busy} className="btn-primary w-full">Save Changes</button>
@@ -438,20 +434,20 @@ function SettingsModal({ club, members, channels, requests, onClose, currentUser
                     placeholder="New channel name..." 
                     value={newChanName} 
                     onChange={e => setNewChanName(e.target.value)}
-                    className="bg-black/5 border hairline rounded px-3 py-1.5 text-sm outline-none focus:border-var(--ink)"
+                    className="bg-black/5 border hairline rounded px-3 py-1.5 text-sm outline-none focus:border-[var(--ink)]"
                   />
                   <button type="submit" disabled={busy || !newChanName.trim()} className="btn-primary text-xs py-1.5 px-3"><Plus size={14}/></button>
                 </form>
               </div>
               <div className="border hairline rounded-xl overflow-hidden divide-y divide-hairline">
                 {channels.map(c => (
-                  <div key={c.id} className="flex items-center justify-between p-4 bg-var(--paper-tint)">
+                  <div key={c.id} className="flex items-center justify-between p-4 bg-[var(--paper-tint)]">
                     <div className="flex items-center gap-3">
                       <Hash size={16} className="opacity-40" />
                       <span className="font-display font-medium">#{c.name}</span>
                     </div>
                     {c.name !== 'general' && (
-                      <button onClick={() => handleDeleteChan(c.id)} className="p-2 text-var(--crimson) hover:bg-var(--crimson)/5 rounded transition-colors">
+                      <button onClick={() => handleDeleteChan(c.id)} className="p-2 text-[var(--crimson)] hover:bg-[var(--crimson)]/5 rounded transition-colors">
                         <Trash2 size={16} />
                       </button>
                     )}
@@ -466,7 +462,7 @@ function SettingsModal({ club, members, channels, requests, onClose, currentUser
               <h2 className="font-display text-2xl">Members ({members.length})</h2>
               <div className="border hairline rounded-xl overflow-hidden divide-y divide-hairline">
                 {members.sort((a,b) => a.username.localeCompare(b.username)).map(m => (
-                  <div key={m.userId} className="flex items-center justify-between p-4 bg-var(--paper-tint)">
+                  <div key={m.userId} className="flex items-center justify-between p-4 bg-[var(--paper-tint)]">
                     <div className="flex items-center gap-3">
                       <span className="text-xl">{m.avatar}</span>
                       <div>
@@ -485,7 +481,7 @@ function SettingsModal({ club, members, channels, requests, onClose, currentUser
                           <option value={ROLES.MODERATOR}>Moderator</option>
                           <option value={ROLES.MEMBER}>Member</option>
                         </select>
-                        <button onClick={() => kickMember(club.id, m.userId, currentUser)} className="p-2 text-var(--crimson) hover:bg-var(--crimson)/5 rounded transition-colors" title="Kick">
+                        <button onClick={() => kickMember(club.id, m.userId, currentUser)} className="p-2 text-[var(--crimson)] hover:bg-[var(--crimson)]/5 rounded transition-colors" title="Kick">
                           <UserMinus size={16} />
                         </button>
                       </div>
@@ -504,7 +500,7 @@ function SettingsModal({ club, members, channels, requests, onClose, currentUser
               ) : (
                 <div className="border hairline rounded-xl overflow-hidden divide-y divide-hairline">
                   {requests.map(r => (
-                    <div key={r.userId} className="flex items-center justify-between p-4 bg-var(--paper-tint)">
+                    <div key={r.userId} className="flex items-center justify-between p-4 bg-[var(--paper-tint)]">
                       <div className="flex items-center gap-3">
                         <span className="text-xl">{r.avatar}</span>
                         <div>
@@ -513,10 +509,10 @@ function SettingsModal({ club, members, channels, requests, onClose, currentUser
                         </div>
                       </div>
                       <div className="flex gap-2">
-                        <button onClick={() => acceptJoinRequest(club.id, r, currentUser)} className="p-2 bg-var(--forest)/10 text-var(--forest) hover:bg-var(--forest)/20 rounded transition-colors">
+                        <button onClick={() => acceptJoinRequest(club.id, r, currentUser)} className="p-2 bg-[var(--forest)]/10 text-[var(--forest)] hover:bg-[var(--forest)]/20 rounded transition-colors">
                           <Check size={18} />
                         </button>
-                        <button onClick={() => rejectJoinRequest(club.id, r.userId, currentUser)} className="p-2 bg-var(--crimson)/10 text-var(--crimson) hover:bg-var(--crimson)/20 rounded transition-colors">
+                        <button onClick={() => rejectJoinRequest(club.id, r.userId, currentUser)} className="p-2 bg-[var(--crimson)]/10 text-[var(--crimson)] hover:bg-[var(--crimson)]/20 rounded transition-colors">
                           <X size={18} />
                         </button>
                       </div>
@@ -541,7 +537,7 @@ function MessageItem({
     if (!text) return '';
     return text.split(/(@\w+)/g).map((part, i) => {
       if (part.startsWith('@')) {
-        return <span key={i} className="text-var(--ochre) font-bold bg-var(--ochre)/10 px-0.5 rounded">{part}</span>;
+        return <span key={i} className="text-[var(--ochre)] font-bold bg-[var(--ochre)]/10 px-0.5 rounded">{part}</span>;
       }
       return part;
     });
@@ -587,9 +583,9 @@ function MessageItem({
                 autoFocus
               />
               <div className="flex gap-2 mt-1 text-[0.65rem] font-mono">
-                <span>escape to <button onClick={onCancelEdit} className="text-var(--crimson) hover:underline">cancel</button></span>
+                <span>escape to <button onClick={onCancelEdit} className="text-[var(--crimson)] hover:underline">cancel</button></span>
                 <span>•</span>
-                <span>enter to <button onClick={() => onSaveEdit(editInput)} className="text-var(--forest) hover:underline">save</button></span>
+                <span>enter to <button onClick={() => onSaveEdit(editInput)} className="text-[var(--forest)] hover:underline">save</button></span>
               </div>
             </div>
           ) : (
@@ -601,11 +597,11 @@ function MessageItem({
 
         {/* Message Actions */}
         {!editing && (
-          <div className="absolute top-[-10px] right-4 opacity-0 group-hover:opacity-100 transition-opacity flex bg-var(--paper-tint) border hairline rounded shadow-sm overflow-hidden z-10">
+          <div className="absolute top-[-10px] right-4 opacity-0 group-hover:opacity-100 transition-opacity flex bg-[var(--paper-tint)] border hairline rounded shadow-sm overflow-hidden z-10">
             <button onClick={onReply} className="p-1.5 hover:bg-black/5" title="Reply"><Reply size={14}/></button>
             <button onClick={onForward} className="p-1.5 hover:bg-black/5" title="Forward"><ChevronRight size={14}/></button>
             {isOwn && <button onClick={onEdit} className="p-1.5 hover:bg-black/5" title="Edit"><Edit3 size={14}/></button>}
-            {(isOwn || isAdmin) && <button onClick={onDelete} className="p-1.5 hover:bg-black/5 text-var(--crimson)" title="Delete"><Trash2 size={14}/></button>}
+            {(isOwn || isAdmin) && <button onClick={onDelete} className="p-1.5 hover:bg-black/5 text-[var(--crimson)]" title="Delete"><Trash2 size={14}/></button>}
             <button className="p-1.5 hover:bg-black/5" title="More"><MoreVertical size={14}/></button>
           </div>
         )}
@@ -635,8 +631,8 @@ function MemberGroup({ title, members }) {
 }
 
 function RoleBadge({ role }) {
-  if (role === ROLES.OWNER) return <Crown size={12} className="text-var(--ochre) ml-auto" />;
-  if (role === ROLES.ADMIN) return <Shield size={12} className="text-var(--crimson) ml-auto" />;
-  if (role === ROLES.MODERATOR) return <Shield size={12} className="text-var(--forest) ml-auto" />;
+  if (role === ROLES.OWNER) return <Crown size={12} className="text-[var(--ochre)] ml-auto" />;
+  if (role === ROLES.ADMIN) return <Shield size={12} className="text-[var(--crimson)] ml-auto" />;
+  if (role === ROLES.MODERATOR) return <Shield size={12} className="text-[var(--forest)] ml-auto" />;
   return null;
 }

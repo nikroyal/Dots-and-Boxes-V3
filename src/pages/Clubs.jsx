@@ -62,7 +62,7 @@ export default function Clubs() {
   const currentList = tab === 'mine' ? myClubs : publicClubs;
   const filtered = currentList?.filter(c => 
     c.name.toLowerCase().includes(search.toLowerCase()) || 
-    c.description?.toLowerCase().includes(search.toLowerCase())
+    (c.description && c.description.toLowerCase().includes(search.toLowerCase()))
   );
 
   return (
@@ -87,7 +87,7 @@ export default function Clubs() {
                 value={search}
                 onChange={e => setSearch(e.target.value)}
                 placeholder="Search clubs..."
-                className="w-full bg-var(--paper-tint) border hairline rounded-lg py-2.5 pl-10 pr-4 font-display text-base outline-none focus:border-var(--ink) transition-colors"
+                className="w-full bg-[var(--paper-tint)] border hairline rounded-lg py-2.5 pl-10 pr-4 font-display text-base outline-none focus:border-[var(--ink)] transition-colors"
               />
             </div>
           </div>
@@ -108,7 +108,7 @@ export default function Clubs() {
           >
             <t.icon size={14} />
             {t.label} {t.count !== undefined && `(${t.count})`}
-            {tab === t.id && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-var(--ink) fade-in" />}
+            {tab === t.id && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[var(--ink)] fade-in" />}
           </button>
         ))}
       </div>
