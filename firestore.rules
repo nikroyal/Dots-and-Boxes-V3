@@ -146,36 +146,51 @@ service cloud.firestore {
     // ─── Clubs ──────────────────────────────────────────────────────────
     match /clubs/{clubId} {
       allow read: if isSignedIn();
-
       allow create: if isSignedIn()
-                    && request.resource.data.ownerId == request.auth.uid
-                    && request.auth.uid in request.resource.data.members
-                    && request.resource.data.members.size() == 1;
-
-      function isMember() {
-        return isSignedIn() && request.auth.uid in resource.data.members;
-      }
-      function isOwner() {
-        return isSignedIn() && request.auth.uid == resource.data.ownerId;
-      }
-      function memberJoin() {
-        return changedKeys().hasOnly(['members', 'memberInfo'])
-          && request.resource.data.members.size() == (resource.data.members.size() + 1)
-          && request.resource.data.members[request.resource.data.members.size() - 1] == request.auth.uid
-          && request.resource.data.memberInfo.diff(resource.data.get('memberInfo', {})).affectedKeys().hasOnly([request.auth.uid]);
-      }
-      function memberLeave() {
-        return changedKeys().hasOnly(['members', 'memberInfo'])
-          && request.resource.data.members.size() == (resource.data.members.size() - 1)
-          && !(request.auth.uid in request.resource.data.members);
-      }
-      function chatUpdate() {
-        return changedKeys().hasOnly(['chat'])
-          && request.resource.data.chat.size() >= resource.data.get('chat', []).size();
+                    && request.resource.data.ownerId == request.auth.uid;
+      
+      function getMyRole() {
+        return get(/databases/$(database)/documents/clubs/$(clubId)/members/$(request.auth.uid)).data.role;
       }
 
-      allow update: if isAdmin() || isOwner() || memberJoin() || memberLeave() || (isMember() && chatUpdate());
-      allow delete: if isAdmin() || isOwner();
+      // Metadata update (Owner/Admin) or Join/Leave (anyone)
+      allow update: if isAdmin() 
+                    || (isSignedIn() && get(/databases/$(database)/documents/clubs/$(clubId)/members/$(request.auth.uid)).data.role in ['owner', 'admin'])
+                    || (isSignedIn() && (
+                         changedKeys().hasOnly(['memberCount', 'memberIds'])
+                         || changedKeys().hasOnly(['memberCount', 'memberIds', 'joinRequests'])
+                       ));
+      
+      allow delete: if isAdmin() || (isSignedIn() && request.auth.uid == resource.data.ownerId);
+
+      match /members/{userId} {
+        allow read: if isSignedIn();
+        allow create: if isSignedIn() && request.auth.uid == userId;
+        allow update, delete: if isAdmin() || (isSignedIn() && (
+          request.auth.uid == userId
+          || get(/databases/$(database)/documents/clubs/$(clubId)/members/$(request.auth.uid)).data.role in ['owner', 'admin', 'moderator']
+        ));
+      }
+
+      match /channels/{channelId} {
+        allow read: if isSignedIn();
+        allow create, update, delete: if isAdmin() || (isSignedIn() && get(/databases/$(database)/documents/clubs/$(clubId)/members/$(request.auth.uid)).data.role in ['owner', 'admin']);
+
+        match /messages/{msgId} {
+          allow read: if isSignedIn();
+          allow create: if isSignedIn() && exists(/databases/$(database)/documents/clubs/$(clubId)/members/$(request.auth.uid));
+          allow update, delete: if isAdmin() || (isSignedIn() && (
+            request.auth.uid == resource.data.userId
+            || get(/databases/$(database)/documents/clubs/$(clubId)/members/$(request.auth.uid)).data.role in ['owner', 'admin', 'moderator']
+          ));
+        }
+      }
+
+      match /joinRequests/{userId} {
+        allow read: if isAdmin() || (isSignedIn() && (request.auth.uid == userId || get(/databases/$(database)/documents/clubs/$(clubId)/members/$(request.auth.uid)).data.role in ['owner', 'admin']));
+        allow create: if isSignedIn() && request.auth.uid == userId;
+        allow delete: if isAdmin() || (isSignedIn() && (request.auth.uid == userId || get(/databases/$(database)/documents/clubs/$(clubId)/members/$(request.auth.uid)).data.role in ['owner', 'admin']));
+      }
     }
 
     // ─── Activity feed entries ─────────────────────────────────────────

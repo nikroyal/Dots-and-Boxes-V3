@@ -94,6 +94,7 @@ function Shell() {
           <Route path="/messages/:convId" element={<Messages />} />
           <Route path="/clubs"          element={<Clubs />} />
           <Route path="/clubs/:id"      element={<ClubDetail />} />
+          <Route path="/clubs/:id/:channelId" element={<ClubDetail />} />
           <Route path="*"               element={<Navigate to="/" />} />
         </Routes>
       </main>
