@@ -104,8 +104,9 @@ export default function ClubDetail() {
     </div>
   );
 
-  const myMemberInfo = members.find(m => m.userId === profile.id);
   const isMember = !!myMemberInfo;
+  const isPublic = club.isPublic;
+  const canViewChat = isPublic || isMember;
   const myRole = myMemberInfo?.role || ROLES.MEMBER;
   const isAdmin = myRole === ROLES.OWNER || myRole === ROLES.ADMIN;
 
@@ -239,37 +240,44 @@ export default function ClubDetail() {
 
         {/* Messages */}
         <div className="flex-1 overflow-y-auto p-4 space-y-6 scrollbar-thin">
-          {messages.length === 0 && (
+          {!canViewChat ? (
+            <div className="h-full flex flex-col items-center justify-center opacity-40 text-center px-8">
+              <Shield size={48} className="mb-4 stroke-[1px]" />
+              <div className="font-display text-lg mb-1">This Club is Private</div>
+              <p className="font-display text-sm">You must be a member to view the conversation.</p>
+            </div>
+          ) : messages.length === 0 ? (
             <div className="h-full flex flex-col items-center justify-center opacity-30 italic font-display">
               <MessageSquare size={48} className="mb-4 stroke-[1px]" />
               No messages here yet.
             </div>
-          )}
-          {messages.map((msg, idx) => {
-            const prevMsg = messages[idx-1];
-            const isContinuation = prevMsg && prevMsg.userId === msg.userId && (msg.ts - prevMsg.ts < 300000);
-            const replyMsg = msg.replyTo ? messages.find(m => m.id === msg.replyTo) : null;
+          ) : (
+            messages.map((msg, idx) => {
+              const prevMsg = messages[idx-1];
+              const isContinuation = prevMsg && prevMsg.userId === msg.userId && (msg.ts - prevMsg.ts < 300000);
+              const replyMsg = msg.replyTo ? messages.find(m => m.id === msg.replyTo) : null;
 
-            return (
-              <MessageItem 
-                key={msg.id}
-                msg={msg}
-                isContinuation={isContinuation}
-                replyMsg={replyMsg}
-                isOwn={msg.userId === profile.id}
-                isAdmin={isAdmin}
-                onReply={() => setReplyTo(msg)}
-                onForward={() => { setChatInput(`Forwarded: ${msg.text}`); setReplyTo(null); }}
-                onEdit={() => { setEditingMsgId(msg.id); setEditInput(msg.text); }}
-                onDelete={() => handleDeleteMsg(msg.id)}
-                editing={editingMsgId === msg.id}
-                editInput={editInput}
-                setEditInput={setEditInput}
-                onSaveEdit={(text) => handleEditMsg(msg.id, text)}
-                onCancelEdit={() => setEditingMsgId(null)}
-              />
-            );
-          })}
+              return (
+                <MessageItem 
+                  key={msg.id}
+                  msg={msg}
+                  isContinuation={isContinuation}
+                  replyMsg={replyMsg}
+                  isOwn={msg.userId === profile.id}
+                  isAdmin={isAdmin}
+                  onReply={() => setReplyTo(msg)}
+                  onForward={() => { setChatInput(`Forwarded: ${msg.text}`); setReplyTo(null); }}
+                  onEdit={() => { setEditingMsgId(msg.id); setEditInput(msg.text); }}
+                  onDelete={() => handleDeleteMsg(msg.id)}
+                  editing={editingMsgId === msg.id}
+                  editInput={editInput}
+                  setEditInput={setEditInput}
+                  onSaveEdit={(text) => handleEditMsg(msg.id, text)}
+                  onCancelEdit={() => setEditingMsgId(null)}
+                />
+              );
+            })
+          )}
           <div ref={chatEndRef} />
         </div>
 
@@ -303,6 +311,10 @@ export default function ClubDetail() {
                   <Send size={18} />
                 </button>
               </form>
+            </div>
+          ) : !canViewChat ? (
+            <div className="text-center p-4 border hairline rounded-lg font-mono text-xs opacity-40 uppercase tracking-widest">
+              Join this club to view and participate
             </div>
           ) : (
             <div className="text-center p-4 border hairline rounded-lg font-mono text-xs opacity-40 uppercase tracking-widest">
