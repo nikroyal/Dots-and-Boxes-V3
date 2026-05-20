@@ -32,8 +32,11 @@ export async function createClub(currentUser, { name, description, isPublic = tr
   if (cleanName.length < 3) throw new Error('Club name must be at least 3 characters');
   const cleanDesc = (description || '').trim().slice(0, MAX_DESC);
 
+  const clubRef = doc(collection(db, 'clubs'));
+  const batch = writeBatch(db);
+
   // 1. Create Club Doc
-  const clubRef = await addDoc(collection(db, 'clubs'), {
+  batch.set(clubRef, {
     name: cleanName,
     description: cleanDesc,
     ownerId: currentUser.id,
@@ -43,8 +46,6 @@ export async function createClub(currentUser, { name, description, isPublic = tr
     isPublic,
     joinMode: isPublic ? 'open' : 'approval',
   });
-
-  const batch = writeBatch(db);
 
   // 2. Add Owner as first member in subcollection
   const memberRef = doc(db, 'clubs', clubRef.id, 'members', currentUser.id);
