@@ -152,24 +152,104 @@ service cloud.firestore {
       function getMyRole() {
         return get(/databases/$(database)/documents/clubs/$(clubId)/members/$(request.auth.uid)).data.role;
       }
+      function canManageClub() {
+        return isSignedIn() && getMyRole() in ['owner', 'admin'];
+      }
+      function canManageMembers() {
+        return isSignedIn() && getMyRole() in ['owner', 'admin', 'moderator'];
+      }
+      function memberIdsBefore() {
+        return resource.data.get('memberIds', []);
+      }
+      function memberIdsAfter() {
+        return request.resource.data.memberIds;
+      }
+      function validMetadataUpdate() {
+        return canManageClub()
+          && changedKeys().hasOnly(['name', 'description', 'isPublic', 'joinMode']);
+      }
+      function validManagedMemberListUpdate() {
+        return canManageMembers()
+          && changedKeys().hasOnly(['memberCount', 'memberIds']);
+      }
+      function validJoinUpdate() {
+        return isSignedIn()
+          && changedKeys().hasOnly(['memberCount', 'memberIds'])
+          && !(request.auth.uid in memberIdsBefore())
+          && request.auth.uid in memberIdsAfter()
+          && memberIdsAfter().size() == memberIdsBefore().size() + 1
+          && memberIdsAfter().hasAll(memberIdsBefore())
+          && request.resource.data.memberCount == resource.data.get('memberCount', 0) + 1
+          && getAfter(/databases/$(database)/documents/clubs/$(clubId)/members/$(request.auth.uid)).data.userId == request.auth.uid
+          && getAfter(/databases/$(database)/documents/clubs/$(clubId)/members/$(request.auth.uid)).data.role == 'member';
+      }
+      function validLeaveUpdate() {
+        return isSignedIn()
+          && changedKeys().hasOnly(['memberCount', 'memberIds'])
+          && request.auth.uid in memberIdsBefore()
+          && !(request.auth.uid in memberIdsAfter())
+          && memberIdsBefore().hasAll(memberIdsAfter())
+          && memberIdsAfter().size() == memberIdsBefore().size() - 1
+          && request.resource.data.memberCount == resource.data.get('memberCount', 1) - 1
+          && get(/databases/$(database)/documents/clubs/$(clubId)/members/$(request.auth.uid)).data.role != 'owner'
+          && !existsAfter(/databases/$(database)/documents/clubs/$(clubId)/members/$(request.auth.uid));
+      }
 
-      // Metadata update (Owner/Admin) or Join/Leave (anyone)
       allow update: if isAdmin()
-                    || (isSignedIn() && get(/databases/$(database)/documents/clubs/$(clubId)/members/$(request.auth.uid)).data.role in ['owner', 'admin'])
-                    || (isSignedIn() && (
-                         changedKeys().hasOnly(['memberCount', 'memberIds'])
-                         || changedKeys().hasOnly(['memberCount', 'memberIds', 'joinRequests'])
-                       ));
+                    || validMetadataUpdate()
+                    || validManagedMemberListUpdate()
+                    || validJoinUpdate()
+                    || validLeaveUpdate();
 
       allow delete: if isAdmin() || (isSignedIn() && request.auth.uid == resource.data.ownerId);
 
       match /members/{userId} {
         allow read: if isSignedIn();
-        allow create: if isSignedIn() && request.auth.uid == userId;
-        allow update, delete: if isAdmin() || (isSignedIn() && (
-          request.auth.uid == userId
-          || get(/databases/$(database)/documents/clubs/$(clubId)/members/$(request.auth.uid)).data.role in ['owner', 'admin', 'moderator']
-        ));
+
+        function listedAfter() {
+          return userId in getAfter(/databases/$(database)/documents/clubs/$(clubId)).data.get('memberIds', []);
+        }
+        function validMemberCreate() {
+          return isSignedIn()
+            && request.resource.data.userId == userId
+            && listedAfter()
+            && (
+              (
+                request.auth.uid == userId
+                && getAfter(/databases/$(database)/documents/clubs/$(clubId)).data.ownerId == request.auth.uid
+                && request.resource.data.role == 'owner'
+              )
+              || (
+                request.auth.uid == userId
+                && request.resource.data.role == 'member'
+              )
+              || (
+                get(/databases/$(database)/documents/clubs/$(clubId)/members/$(request.auth.uid)).data.role in ['owner', 'admin']
+                && request.resource.data.role == 'member'
+              )
+            );
+        }
+        function validRoleUpdate() {
+          return isSignedIn()
+            && get(/databases/$(database)/documents/clubs/$(clubId)/members/$(request.auth.uid)).data.role == 'owner'
+            && request.auth.uid != userId
+            && resource.data.role != 'owner'
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['role'])
+            && request.resource.data.role in ['admin', 'moderator', 'member'];
+        }
+        function validMemberDelete() {
+          return isSignedIn()
+            && resource.data.role != 'owner'
+            && !(userId in getAfter(/databases/$(database)/documents/clubs/$(clubId)).data.get('memberIds', []))
+            && (
+              request.auth.uid == userId
+              || get(/databases/$(database)/documents/clubs/$(clubId)/members/$(request.auth.uid)).data.role in ['owner', 'admin', 'moderator']
+            );
+        }
+
+        allow create: if isAdmin() || validMemberCreate();
+        allow update: if isAdmin() || validRoleUpdate();
+        allow delete: if isAdmin() || validMemberDelete();
       }
 
       match /channels/{channelId} {
@@ -191,9 +271,18 @@ service cloud.firestore {
       }
 
       match /joinRequests/{userId} {
-        allow read: if isAdmin() || (isSignedIn() && (request.auth.uid == userId || get(/databases/$(database)/documents/clubs/$(clubId)/members/$(request.auth.uid)).data.role in ['owner', 'admin']));
-        allow create: if isSignedIn() && request.auth.uid == userId;
-        allow delete: if isAdmin() || (isSignedIn() && (request.auth.uid == userId || get(/databases/$(database)/documents/clubs/$(clubId)/members/$(request.auth.uid)).data.role in ['owner', 'admin']));
+        allow read: if isAdmin() || (isSignedIn() && (
+          request.auth.uid == userId
+          || get(/databases/$(database)/documents/clubs/$(clubId)/members/$(request.auth.uid)).data.role in ['owner', 'admin']
+        ));
+        allow create: if isSignedIn()
+                      && request.auth.uid == userId
+                      && request.resource.data.userId == userId
+                      && !(userId in get(/databases/$(database)/documents/clubs/$(clubId)).data.get('memberIds', []));
+        allow delete: if isAdmin() || (isSignedIn() && (
+          request.auth.uid == userId
+          || get(/databases/$(database)/documents/clubs/$(clubId)/members/$(request.auth.uid)).data.role in ['owner', 'admin']
+        ));
       }
     }
 
