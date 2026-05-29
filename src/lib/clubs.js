@@ -77,6 +77,9 @@ export function watchClub(clubId, callback) {
   return onSnapshot(doc(db, 'clubs', clubId), (snap) => {
     if (snap.exists()) callback({ id: snap.id, ...snap.data() });
     else callback(null);
+  }, (err) => {
+    console.warn('watchClub error:', err);
+    callback(null);
   });
 }
 
@@ -87,6 +90,9 @@ export function watchMembers(clubId, callback) {
   const q = query(collection(db, 'clubs', clubId, 'members'), limit(500));
   return onSnapshot(q, (snap) => {
     callback(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+  }, (err) => {
+    console.warn('watchMembers error:', err);
+    callback([]);
   });
 }
 
@@ -97,6 +103,9 @@ export function watchChannels(clubId, callback) {
   const q = query(collection(db, 'clubs', clubId, 'channels'), orderBy('order', 'asc'));
   return onSnapshot(q, (snap) => {
     callback(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+  }, (err) => {
+    console.warn('watchChannels error:', err);
+    callback([]);
   });
 }
 
@@ -114,6 +123,9 @@ export function watchMessages(clubId, channelId, callback) {
     // Reverse because we want oldest at top for Discord-style
     const msgs = snap.docs.map(d => ({ id: d.id, ...d.data() })).reverse();
     callback(msgs);
+  }, (err) => {
+    console.warn('watchClubMessages error:', err);
+    callback([]);
   });
 }
 
@@ -494,5 +506,8 @@ export function watchJoinRequests(clubId, callback) {
   const q = query(collection(db, 'clubs', clubId, 'joinRequests'), orderBy('ts', 'desc'));
   return onSnapshot(q, (snap) => {
     callback(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+  }, (err) => {
+    console.warn('watchJoinRequests error:', err);
+    callback([]);
   });
 }
