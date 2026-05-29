@@ -1,5 +1,5 @@
 import {
-  collection, doc, addDoc, getDoc, getDocs, updateDoc, deleteDoc,
+  collection, doc, getDoc, getDocs, updateDoc, deleteDoc,
   query, where, limit, onSnapshot, serverTimestamp, runTransaction,
   arrayUnion, arrayRemove, setDoc, orderBy, writeBatch
 } from 'firebase/firestore';
@@ -153,13 +153,13 @@ export async function joinClub(clubId, currentUser) {
   const clubRef = doc(db, 'clubs', clubId);
   const memberRef = doc(db, 'clubs', clubId, 'members', currentUser.id);
 
-  await runTransaction(db, async (tx) => {
+  return await runTransaction(db, async (tx) => {
     const clubSnap = await tx.get(clubRef);
     if (!clubSnap.exists()) throw new Error('Club not found');
     const club = clubSnap.data();
     
     const memberSnap = await tx.get(memberRef);
-    if (memberSnap.exists()) return; // Already a member
+    if (memberSnap.exists()) return 'joined'; // Already a member
 
     if (club.joinMode === 'approval') {
       const reqRef = doc(db, 'clubs', clubId, 'joinRequests', currentUser.id);
@@ -238,6 +238,7 @@ export async function deleteClub(clubId, currentUser) {
  */
 export async function sendClubChat(clubId, channelId, currentUser, text, replyTo = null) {
   guard(currentUser);
+  if (!clubId || !channelId) throw new Error('No channel selected');
   const trimmed = text.trim().slice(0, 2000);
   if (!trimmed) return;
 
@@ -258,6 +259,7 @@ export async function sendClubChat(clubId, channelId, currentUser, text, replyTo
  */
 export async function editMessage(clubId, channelId, messageId, currentUser, newText) {
   guard(currentUser);
+  if (!clubId || !channelId) throw new Error('No channel selected');
   const trimmed = newText.trim().slice(0, 2000);
   if (!trimmed) return;
   const ref = doc(db, 'clubs', clubId, 'channels', channelId, 'messages', messageId);
@@ -273,6 +275,7 @@ export async function editMessage(clubId, channelId, messageId, currentUser, new
  */
 export async function deleteMessage(clubId, channelId, messageId, currentUser) {
   guard(currentUser);
+  if (!clubId || !channelId) throw new Error('No channel selected');
   const ref = doc(db, 'clubs', clubId, 'channels', channelId, 'messages', messageId);
   await deleteDoc(ref);
 }
@@ -347,9 +350,17 @@ export async function migrateClubIfNeeded(club) {
  */
 export async function createChannel(clubId, currentUser, { name, type = 'text', order = 0 }) {
   guard(currentUser);
+  const cleanName = (name || '')
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, '-')
+    .replace(/[^a-z0-9_-]/g, '')
+    .slice(0, 30);
+  if (!cleanName) throw new Error('Channel name is required');
+
   const ref = doc(collection(db, 'clubs', clubId, 'channels'));
   await setDoc(ref, {
-    name: name.toLowerCase().replace(/\s+/g, '-').slice(0, 30),
+    name: cleanName,
     type,
     order,
     createdAt: serverTimestamp(),
@@ -380,6 +391,9 @@ export async function deleteChannel(clubId, channelId, currentUser) {
  */
 export async function updateMemberRole(clubId, userId, currentUser, newRole) {
   guard(currentUser);
+  if (![ROLES.ADMIN, ROLES.MODERATOR, ROLES.MEMBER].includes(newRole)) {
+    throw new Error('Invalid role');
+  }
   const ref = doc(db, 'clubs', clubId, 'members', userId);
   await updateDoc(ref, { role: newRole });
 }
@@ -389,12 +403,17 @@ export async function updateMemberRole(clubId, userId, currentUser, newRole) {
  */
 export async function kickMember(clubId, userId, currentUser) {
   guard(currentUser);
+  if (userId === currentUser.id) throw new Error('You cannot kick yourself');
   const clubRef = doc(db, 'clubs', clubId);
   const memberRef = doc(db, 'clubs', clubId, 'members', userId);
 
   await runTransaction(db, async (tx) => {
     const clubSnap = await tx.get(clubRef);
     if (!clubSnap.exists()) return;
+    const memberSnap = await tx.get(memberRef);
+    if (!memberSnap.exists()) return;
+    if (memberSnap.data().role === ROLES.OWNER) throw new Error('The owner cannot be kicked');
+
     tx.delete(memberRef);
     tx.update(clubRef, {
       memberCount: Math.max(0, (clubSnap.data().memberCount || 1) - 1),
@@ -415,17 +434,24 @@ export async function acceptJoinRequest(clubId, userData, currentUser) {
   await runTransaction(db, async (tx) => {
     const clubSnap = await tx.get(clubRef);
     if (!clubSnap.exists()) return;
-    tx.set(memberRef, {
-      userId: userData.userId,
-      username: userData.username,
-      avatar: userData.avatar || '◆',
-      role: ROLES.MEMBER,
-      joinedAt: serverTimestamp(),
-    });
-    tx.update(clubRef, {
-      memberCount: (clubSnap.data().memberCount || 0) + 1,
-      memberIds: arrayUnion(userData.userId)
-    });
+    const reqSnap = await tx.get(reqRef);
+    if (!reqSnap.exists()) return;
+    const memberSnap = await tx.get(memberRef);
+    const requestData = reqSnap.data();
+
+    if (!memberSnap.exists()) {
+      tx.set(memberRef, {
+        userId: requestData.userId,
+        username: requestData.username,
+        avatar: requestData.avatar || '◆',
+        role: ROLES.MEMBER,
+        joinedAt: serverTimestamp(),
+      });
+      tx.update(clubRef, {
+        memberCount: (clubSnap.data().memberCount || 0) + 1,
+        memberIds: arrayUnion(requestData.userId)
+      });
+    }
     tx.delete(reqRef);
   });
 }
@@ -444,8 +470,21 @@ export async function rejectJoinRequest(clubId, userId, currentUser) {
  */
 export async function updateClubMetadata(clubId, currentUser, updates) {
   guard(currentUser);
+  const cleanUpdates = {};
+  if (updates.name !== undefined) {
+    const cleanName = String(updates.name).trim().slice(0, MAX_NAME);
+    if (cleanName.length < 3) throw new Error('Club name must be at least 3 characters');
+    cleanUpdates.name = cleanName;
+  }
+  if (updates.description !== undefined) {
+    cleanUpdates.description = String(updates.description).trim().slice(0, MAX_DESC);
+  }
+  if (updates.isPublic !== undefined) {
+    cleanUpdates.isPublic = !!updates.isPublic;
+    cleanUpdates.joinMode = updates.isPublic ? 'open' : 'approval';
+  }
   const ref = doc(db, 'clubs', clubId);
-  await updateDoc(ref, updates);
+  await updateDoc(ref, cleanUpdates);
 }
 
 /**
