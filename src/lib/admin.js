@@ -101,6 +101,7 @@ export async function forceFinishMatch(admin, match) {
   guard(admin);
   await updateDoc(doc(db, 'matches', match.id), {
     status: 'finished',
+    winner: 'draw',
     adminClosed: true,
     adminClosedAt: serverTimestamp(),
     finishedAt: serverTimestamp(),
