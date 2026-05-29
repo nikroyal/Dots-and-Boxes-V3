@@ -26,7 +26,7 @@ export default function ClubDetail() {
   const navigate = useNavigate();
   const { confirm, dialog: confirmEl } = useConfirm();
 
-  const [club, setClub] = useState(null);
+  const [club, setClub] = useState(undefined);
   const [members, setMembers] = useState([]);
   const [channels, setChannels] = useState([]);
   const [messages, setMessages] = useState([]);
@@ -47,6 +47,7 @@ export default function ClubDetail() {
   // 1. Watch Club & Migration
   useEffect(() => {
     if (!id) return;
+    setClub(undefined);
     return watchClub(id, (c) => {
       setClub(c);
       if (c && (c.chat || c.members)) {
@@ -61,12 +62,14 @@ export default function ClubDetail() {
     const unsubMembers = watchMembers(id, setMembers);
     const unsubChannels = watchChannels(id, (chans) => {
       setChannels(chans);
-      if (!activeChannelId && chans.length > 0) {
-        setActiveChannelId(chans[0].id);
-      }
+      setActiveChannelId((current) => {
+        if (routeChannelId && chans.some(c => c.id === routeChannelId)) return routeChannelId;
+        if (current && chans.some(c => c.id === current)) return current;
+        return chans[0]?.id || null;
+      });
     });
     return () => { unsubMembers(); unsubChannels(); };
-  }, [id]);
+  }, [id, routeChannelId]);
 
   // 3. Watch Messages
   useEffect(() => {
@@ -76,19 +79,23 @@ export default function ClubDetail() {
 
   // 4. Watch Join Requests (if admin)
   useEffect(() => {
-    if (!id || !club) return;
+    if (!id || !profile?.id || !club) {
+      setJoinRequests([]);
+      return;
+    }
     const myMember = members.find(m => m.userId === profile.id);
     if (myMember?.role === ROLES.OWNER || myMember?.role === ROLES.ADMIN) {
       return watchJoinRequests(id, setJoinRequests);
     }
-  }, [id, club, members, profile.id]);
+    setJoinRequests([]);
+  }, [id, club, members, profile?.id]);
 
   // 5. Sync activeChannelId with URL
   useEffect(() => {
     if (routeChannelId && routeChannelId !== activeChannelId) {
       setActiveChannelId(routeChannelId);
     }
-  }, [routeChannelId]);
+  }, [routeChannelId, activeChannelId]);
 
   // Auto-scroll chat
   useEffect(() => {
@@ -96,7 +103,7 @@ export default function ClubDetail() {
   }, [messages.length]);
 
   if (!profile) return null;
-  if (club === null) return <div className="font-mono text-xs opacity-50 text-center py-20">LOADING…</div>;
+  if (club === undefined) return <div className="font-mono text-xs opacity-50 text-center py-20">LOADING...</div>;
   if (!club) return (
     <div className="text-center py-20">
       <div className="font-display italic opacity-50">Club not found</div>
@@ -104,6 +111,7 @@ export default function ClubDetail() {
     </div>
   );
 
+  const myMemberInfo = members.find(m => m.userId === profile.id);
   const isMember = !!myMemberInfo;
   const isPublic = club.isPublic;
   const canViewChat = isPublic || isMember;
@@ -118,12 +126,16 @@ export default function ClubDetail() {
       else toast(`Joined ${club.name}`, 'success');
       sfx.click();
     } catch (err) { toast(err.message, 'error'); }
-    setBusy(false);
+    finally { setBusy(false); }
   };
 
   const handleSendChat = async (e) => {
     e?.preventDefault();
     if (!chatInput.trim()) return;
+    if (!activeChannelId) {
+      toast('No channel is available yet.', 'error');
+      return;
+    }
     try {
       await sendClubChat(id, activeChannelId, profile, chatInput, replyTo?.id);
       setChatInput('');
@@ -162,7 +174,7 @@ export default function ClubDetail() {
     )}
     <div className="fade-in grid grid-cols-1 lg:grid-cols-[240px_1fr_260px] gap-0 h-[calc(100vh-160px)] border hairline overflow-hidden bg-[var(--paper-tint)] relative">
       
-      {/* ─── Sidebar: Channels ─── */}
+      {/* Sidebar: Channels */}
       <aside className={`
         ${showMobileSidebar ? 'fixed inset-y-0 left-0 z-[70] w-64 bg-[var(--paper-tint)] shadow-2xl' : 'hidden'} 
         lg:flex lg:relative lg:z-0 lg:shadow-none border-r hairline flex-col bg-black/[0.02]
@@ -223,7 +235,7 @@ export default function ClubDetail() {
         </div>
       </aside>
 
-      {/* ─── Main: Chat Area ─── */}
+      {/* Main: Chat Area */}
       <main className="flex flex-col min-w-0 bg-[var(--paper)]">
         {/* Header */}
         <div className="h-14 px-4 flex items-center justify-between border-b hairline shrink-0">
@@ -306,8 +318,9 @@ export default function ClubDetail() {
                   placeholder={`Message #${channels.find(c => c.id === activeChannelId)?.name || 'general'}`}
                   className="flex-1 bg-transparent resize-none py-1 px-2 outline-none font-display text-base min-h-[40px] max-h-[200px]"
                   rows={1}
+                  disabled={!activeChannelId}
                 />
-                <button type="submit" disabled={!chatInput.trim()} className="p-2 opacity-60 hover:opacity-100 disabled:opacity-20 transition-opacity">
+                <button type="submit" disabled={!activeChannelId || !chatInput.trim()} className="p-2 opacity-60 hover:opacity-100 disabled:opacity-20 transition-opacity">
                   <Send size={18} />
                 </button>
               </form>
@@ -324,13 +337,13 @@ export default function ClubDetail() {
         </div>
       </main>
 
-      {/* ─── Sidebar: Members ─── */}
+      {/* Sidebar: Members */}
       <aside className={`
         ${showMobileMembers ? 'fixed inset-y-0 right-0 z-[70] w-64 bg-[var(--paper-tint)] shadow-2xl overflow-y-auto' : 'hidden'} 
         lg:flex lg:relative lg:z-0 lg:shadow-none border-l hairline flex-col bg-black/[0.01]
       `}>
         <div className="h-14 px-4 flex items-center justify-between border-b hairline font-mono text-[0.65rem] uppercase tracking-widest opacity-50 shrink-0">
-          <span>Members — {members.length}</span>
+          <span>Members - {members.length}</span>
           <button onClick={() => setShowMobileMembers(false)} className="lg:hidden p-2 opacity-40"><X size={18}/></button>
         </div>
         <div className="flex-1 overflow-y-auto p-3 space-y-6 scrollbar-thin">
@@ -473,7 +486,7 @@ function SettingsModal({ club, members, channels, requests, onClose, currentUser
             <div className="space-y-6">
               <h2 className="font-display text-2xl">Members ({members.length})</h2>
               <div className="border hairline rounded-xl overflow-hidden divide-y divide-hairline">
-                {members.sort((a,b) => a.username.localeCompare(b.username)).map(m => (
+                {[...members].sort((a,b) => a.username.localeCompare(b.username)).map(m => (
                   <div key={m.userId} className="flex items-center justify-between p-4 bg-[var(--paper-tint)]">
                     <div className="flex items-center gap-3">
                       <span className="text-xl">{m.avatar}</span>
@@ -627,7 +640,7 @@ function MemberGroup({ title, members }) {
   return (
     <div>
       <div className="font-mono text-[0.6rem] opacity-40 uppercase tracking-widest mb-2 flex items-center gap-2">
-        {title} — {members.length}
+        {title} - {members.length}
       </div>
       <div className="space-y-1">
         {members.map(m => (
