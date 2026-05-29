@@ -50,6 +50,10 @@ export default function Notifications() {
       }
       isInitialSnapshot = false;
       setInvites(list);
+    }, (err) => {
+      console.warn('incoming invites listener failed:', err);
+      setInvites([]);
+      addToast('Unable to load invites right now', 'error');
     });
     return () => unsub();
   }, [profile?.id]);
