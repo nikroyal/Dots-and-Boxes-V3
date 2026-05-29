@@ -84,43 +84,51 @@ export async function sendInvite(fromUser, toUsername, rows, cols) {
 export async function acceptInvite(inviteId, currentUser) {
   guard(currentUser);
   const invRef = doc(db, 'invites', inviteId);
-  const invSnap = await getDoc(invRef);
-  if (!invSnap.exists()) throw new Error('Invite not found');
-  const inv = invSnap.data();
-  if (inv.toId !== currentUser.id) throw new Error('Not your invite');
-  if (inv.status !== 'pending') throw new Error('Invite already handled');
+  const matchRef = doc(collection(db, 'matches'));
 
-  // Create the match. `startsAtMs` is a client-side wall-clock time both
-  // players use to drive a synchronized pre-game countdown. We accept that
-  // network latency may shift each player's perceived countdown by ~100ms
-  // — fine for a 3-second UX, and `makeMove` enforces the gate server-side
-  // (well, transaction-side) anyway.
-  const playerIds = [inv.fromId, inv.toId];
-  const startsAtMs = Date.now() + PREGAME_COUNTDOWN_MS;
-  const matchRef = await addDoc(collection(db, 'matches'), {
-    players: playerIds,
-    playerInfo: {
-      [inv.fromId]: { username: inv.fromUsername, avatar: inv.fromAvatar, elo: inv.fromElo },
-      [inv.toId]:   { username: currentUser.username, avatar: currentUser.avatar || '◆', elo: currentUser.elo || 1000 },
-    },
-    rows: inv.rows,
-    cols: inv.cols,
-    game: createEmptyGame(inv.rows, inv.cols, playerIds),
-    status: 'active', // active | paused | finished
-    pauseRequest: null, // { byId, requestedAt }
-    pauseConcealed: false, // when paused, hide board
-    spectators: [],
-    chat: [],
-    winner: null,
-    startsAtMs, // pre-game countdown target
-    turnStartedAt: serverTimestamp(), // for per-turn timer
-    turnTimeoutMs: TURN_TIMEOUT_MS,
-    createdAt: serverTimestamp(),
-    finishedAt: null,
+  return await runTransaction(db, async (tx) => {
+    const invSnap = await tx.get(invRef);
+    if (!invSnap.exists()) throw new Error('Invite not found');
+    const inv = invSnap.data();
+    if (inv.toId !== currentUser.id) throw new Error('Not your invite');
+
+    // Idempotency for double-clicks, duplicate notification taps, and two tabs.
+    // Once an invite has an accepted matchId, every retry returns that same match
+    // instead of creating another game.
+    if (inv.status === 'accepted' && inv.matchId) return inv.matchId;
+    if (inv.status !== 'pending') throw new Error('Invite already handled');
+
+    // Create the match. `startsAtMs` is a client-side wall-clock time both
+    // players use to drive a synchronized pre-game countdown. We accept that
+    // network latency may shift each player's perceived countdown by ~100ms
+    // — fine for a 3-second UX, and `makeMove` enforces the gate transaction-side.
+    const playerIds = [inv.fromId, inv.toId];
+    const startsAtMs = Date.now() + PREGAME_COUNTDOWN_MS;
+    tx.set(matchRef, {
+      players: playerIds,
+      playerInfo: {
+        [inv.fromId]: { username: inv.fromUsername, avatar: inv.fromAvatar, elo: inv.fromElo },
+        [inv.toId]:   { username: currentUser.username, avatar: currentUser.avatar || '◆', elo: currentUser.elo || 1000 },
+      },
+      rows: inv.rows,
+      cols: inv.cols,
+      game: createEmptyGame(inv.rows, inv.cols, playerIds),
+      status: 'active', // active | paused | finished
+      pauseRequest: null, // { byId, requestedAt }
+      pauseConcealed: false, // when paused, hide board
+      spectators: [],
+      chat: [],
+      winner: null,
+      startsAtMs, // pre-game countdown target
+      turnStartedAt: serverTimestamp(), // for per-turn timer
+      turnTimeoutMs: TURN_TIMEOUT_MS,
+      createdAt: serverTimestamp(),
+      finishedAt: null,
+    });
+
+    tx.update(invRef, { status: 'accepted', matchId: matchRef.id });
+    return matchRef.id;
   });
-
-  await updateDoc(invRef, { status: 'accepted', matchId: matchRef.id });
-  return matchRef.id;
 }
 
 export async function declineInvite(inviteId, currentUser) {
@@ -156,7 +164,7 @@ export async function consumeAcceptedInvite(inviteId, currentUser) {
   await updateDoc(invRef, { status: 'consumed' }).catch(() => {});
 }
 
-// ─── Quick Match ──────────────────────────────────────────────────────────
+// ─── Quick Match ─────────────────────────────────────────────────────────
 // Find an online opponent within ±200 ELO and send them an invite.
 // Returns { ok: true, opponent } on success, or throws with a friendly
 // "no players found" message.
@@ -225,7 +233,7 @@ export async function quickMatch(currentUser, rows = 5, cols = 5) {
   return { ok: true, opponent: { username: target.username, elo: target.elo || 1000 } };
 }
 
-// ─── Rematch ──────────────────────────────────────────────────────────────
+// ─── Rematch ─────────────────────────────────────────────────────────────
 // After a finished match, send a fresh invite to the same opponent with the
 // same board size. Marks the invite with `isRematch: true` so the recipient
 // can see at a glance that this comes from a recently-finished game.
@@ -244,7 +252,7 @@ export async function requestRematch(match, currentUser) {
   return inviteId;
 }
 
-// ─── Matches ──────────────────────────────────────────────────────────────
+// ─── Matches ─────────────────────────────────────────────────────────────
 export function watchMatch(matchId, callback) {
   return onSnapshot(doc(db, 'matches', matchId), (snap) => {
     if (snap.exists()) callback({ id: snap.id, ...snap.data() });
@@ -473,7 +481,7 @@ export async function sendChatAs(matchId, currentUser, text, isSpectator) {
   }
 }
 
-// ─── Spectating ───────────────────────────────────────────────────────────
+// ─── Spectating ──────────────────────────────────────────────────────────
 export async function joinAsSpectator(matchId, currentUser) {
   guard(currentUser);
   const matchRef = doc(db, 'matches', matchId);
@@ -520,7 +528,7 @@ export async function leaveSpectator(matchId, currentUser) {
   await updateDoc(matchRef, { spectators: newSpecs });
 }
 
-// ─── Stats finalization (called when match finishes) ──────────────────────
+// ─── Stats finalization (called when match finishes) ─────────────────────
 //
 // Wrapped in a transaction so concurrent callers (two tabs, a refresh in the
 // middle of the win screen, Match.jsx and Replay.jsx both firing it) can't
@@ -534,6 +542,7 @@ export async function finalizeStats(matchId, currentUser) {
   if (!matchSnap.exists()) return;
   const m = matchSnap.data();
   if (m.status !== 'finished') return;
+  if (m.adminClosed) return;
   if (!m.players.includes(currentUser.id)) return;
 
   const userRef = doc(db, 'users', currentUser.id);
@@ -691,7 +700,7 @@ export async function finalizeStats(matchId, currentUser) {
   return txResult;
 }
 
-// ─── Friends / social ─────────────────────────────────────────────────────
+// ─── Friends / social ────────────────────────────────────────────────────
 export async function sendFriendRequest(currentUser, targetUsername) {
   guard(currentUser);
   const target = await lookupUserByUsername(targetUsername);
@@ -839,7 +848,7 @@ export async function unblockUser(currentUser, targetId) {
   });
 }
 
-// ─── Profile updates ──────────────────────────────────────────────────────
+// ─── Profile updates ─────────────────────────────────────────────────────
 export async function updateProfile(currentUser, updates) {
   guard(currentUser);
   const allowed = ['avatar', 'title', 'bio', 'displayName'];
@@ -848,7 +857,7 @@ export async function updateProfile(currentUser, updates) {
   await updateDoc(doc(db, 'users', currentUser.id), filtered);
 }
 
-// ─── Leaderboard ──────────────────────────────────────────────────────────
+// ─── Leaderboard ─────────────────────────────────────────────────────────
 export async function getLeaderboard(limitN = 50) {
   const q = query(collection(db, 'users'), orderBy('elo', 'desc'), limit(limitN));
   const snap = await getDocs(q);
