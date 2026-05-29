@@ -2,13 +2,13 @@ rules_version = '2';
 
 // ============================================================================
 // FIRESTORE SECURITY RULES
-// Paste these into Firebase Console → Firestore Database → Rules → Publish
+// Paste these into Firebase Console -> Firestore Database -> Rules -> Publish
 // ============================================================================
 
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // ─── Helpers ────────────────────────────────────────────────────────
+    // Helpers ----------------------------------------------------------------
     function isSignedIn() {
       return request.auth != null;
     }
@@ -26,7 +26,7 @@ service cloud.firestore {
       return changedKeys().hasAny(['role', 'status', 'chatMuted', 'moderationNote']);
     }
 
-    // ─── Username lookups ───────────────────────────────────────────────
+    // Username lookups --------------------------------------------------------
     match /usernames/{username} {
       allow read: if true;
       allow create: if isSignedIn()
@@ -35,7 +35,7 @@ service cloud.firestore {
       allow delete: if isSignedIn() && resource.data.uid == request.auth.uid;
     }
 
-    // ─── User profiles ──────────────────────────────────────────────────
+    // User profiles ----------------------------------------------------------
     match /users/{userId} {
       allow read: if isSignedIn();
 
@@ -72,7 +72,7 @@ service cloud.firestore {
       allow delete: if isSelf(userId) || isAdmin();
     }
 
-    // ─── Invites ────────────────────────────────────────────────────────
+    // Invites ----------------------------------------------------------------
     match /invites/{inviteId} {
       allow read: if isAdmin() || (isSignedIn() && (
         request.auth.uid == resource.data.fromId
@@ -89,7 +89,7 @@ service cloud.firestore {
     }
 
 
-    // ─── Matches ────────────────────────────────────────────────────────
+    // Matches ----------------------------------------------------------------
     match /matches/{matchId} {
       allow read: if isSignedIn();
 
@@ -118,7 +118,7 @@ service cloud.firestore {
       allow delete: if isAdmin();
     }
 
-    // ─── Direct Message Conversations ──────────────────────────────────
+    // Direct Message Conversations ------------------------------------------
     match /conversations/{convId} {
       allow read: if isAdmin() || (isSignedIn()
                   && request.auth.uid in resource.data.participants);
@@ -143,24 +143,24 @@ service cloud.firestore {
       }
     }
 
-    // ─── Clubs ──────────────────────────────────────────────────────────
+    // Clubs ------------------------------------------------------------------
     match /clubs/{clubId} {
       allow read: if isSignedIn();
       allow create: if isSignedIn()
                     && request.resource.data.ownerId == request.auth.uid;
-      
+
       function getMyRole() {
         return get(/databases/$(database)/documents/clubs/$(clubId)/members/$(request.auth.uid)).data.role;
       }
 
       // Metadata update (Owner/Admin) or Join/Leave (anyone)
-      allow update: if isAdmin() 
+      allow update: if isAdmin()
                     || (isSignedIn() && get(/databases/$(database)/documents/clubs/$(clubId)/members/$(request.auth.uid)).data.role in ['owner', 'admin'])
                     || (isSignedIn() && (
                          changedKeys().hasOnly(['memberCount', 'memberIds'])
                          || changedKeys().hasOnly(['memberCount', 'memberIds', 'joinRequests'])
                        ));
-      
+
       allow delete: if isAdmin() || (isSignedIn() && request.auth.uid == resource.data.ownerId);
 
       match /members/{userId} {
@@ -175,7 +175,7 @@ service cloud.firestore {
       match /channels/{channelId} {
         allow read: if isSignedIn();
         allow create: if isAdmin() || (isSignedIn() && (
-          get(/databases/$(database)/documents/clubs/$(clubId)).data.ownerId == request.auth.uid
+          getAfter(/databases/$(database)/documents/clubs/$(clubId)).data.ownerId == request.auth.uid
           || get(/databases/$(database)/documents/clubs/$(clubId)/members/$(request.auth.uid)).data.role in ['owner', 'admin']
         ));
         allow update, delete: if isAdmin() || (isSignedIn() && get(/databases/$(database)/documents/clubs/$(clubId)/members/$(request.auth.uid)).data.role in ['owner', 'admin']);
@@ -197,7 +197,7 @@ service cloud.firestore {
       }
     }
 
-    // ─── Activity feed entries ─────────────────────────────────────────
+    // Activity feed entries --------------------------------------------------
     match /activities/{activityId} {
       allow read: if isSignedIn();
       allow create: if isSignedIn()
@@ -205,7 +205,7 @@ service cloud.firestore {
       allow update, delete: if isAdmin();
     }
 
-    // ─── Admin audit log ───────────────────────────────────────────────
+    // Admin audit log --------------------------------------------------------
     match /adminAudit/{auditId} {
       allow read: if isAdmin();
       allow create: if isAdmin()
