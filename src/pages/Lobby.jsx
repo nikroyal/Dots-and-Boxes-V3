@@ -9,6 +9,7 @@ import { Eye, Users } from 'lucide-react';
 export default function Lobby() {
   const { profile } = useAuth();
   const [matches, setMatches] = useState([]);
+  const [loadError, setLoadError] = useState('');
 
   useEffect(() => {
     const q = query(
@@ -18,7 +19,12 @@ export default function Lobby() {
       limit(50)
     );
     const unsub = onSnapshot(q, (snap) => {
+      setLoadError('');
       setMatches(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+    }, (err) => {
+      console.warn('lobby listener failed:', err);
+      setMatches([]);
+      setLoadError('Unable to load live matches right now');
     });
     return () => unsub();
   }, []);
@@ -34,6 +40,10 @@ export default function Lobby() {
         <div className="font-mono text-[0.65rem] tracking-widest uppercase opacity-50 mb-2">Live Lobby</div>
         <h1 className="font-display text-4xl font-medium tracking-tight">Ongoing Matches</h1>
       </section>
+
+      {loadError && (
+        <div className="font-mono text-xs opacity-50 text-center py-8">{loadError}</div>
+      )}
 
       {yours.length > 0 && (
         <section>
