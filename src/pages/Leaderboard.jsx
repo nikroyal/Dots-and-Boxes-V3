@@ -9,9 +9,26 @@ export default function Leaderboard() {
   const { profile } = useAuth();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState('');
 
   useEffect(() => {
-    getLeaderboard(50).then(u => { setUsers(u); setLoading(false); });
+    let cancelled = false;
+    getLeaderboard(50)
+      .then(u => {
+        if (cancelled) return;
+        setUsers(u);
+        setLoadError('');
+      })
+      .catch(err => {
+        if (cancelled) return;
+        console.warn('leaderboard load failed:', err);
+        setUsers([]);
+        setLoadError('Unable to load leaderboard right now');
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => { cancelled = true; };
   }, []);
 
   // Hide users I've blocked, and users who have blocked me. The
@@ -33,6 +50,10 @@ export default function Leaderboard() {
 
       {loading ? (
         <div className="font-mono text-xs opacity-50 text-center py-12">LOADING…</div>
+      ) : loadError ? (
+        <div className="font-mono text-xs opacity-50 text-center py-12">{loadError}</div>
+      ) : visibleUsers.length === 0 ? (
+        <div className="font-display italic opacity-50 text-center py-12">No leaderboard entries yet</div>
       ) : (
         <section className="border hairline">
           {visibleUsers.map((u, i) => {
