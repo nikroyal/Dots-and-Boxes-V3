@@ -1,6 +1,6 @@
 import {
   collection, doc, getDoc, setDoc, updateDoc, addDoc,
-  query, where, limit, onSnapshot, serverTimestamp, increment,
+  query, where, orderBy, limit, onSnapshot, serverTimestamp, increment,
 } from 'firebase/firestore';
 import { db } from './firebase';
 
@@ -87,10 +87,11 @@ export function watchMyConversations(uid, callback) {
   });
 }
 
-// Subscribe to messages within a single conversation, oldest first.
+// Subscribe to the newest messages within a conversation, displayed oldest first.
 export function watchMessages(convId, callback) {
   const q = query(
     collection(db, 'conversations', convId, 'messages'),
+    orderBy('ts', 'desc'),
     limit(200)
   );
   return onSnapshot(q, (snap) => {
