@@ -147,7 +147,15 @@ service cloud.firestore {
     match /clubs/{clubId} {
       allow read: if isSignedIn();
       allow create: if isSignedIn()
-                    && request.resource.data.ownerId == request.auth.uid;
+                    && request.resource.data.ownerId == request.auth.uid
+                    && request.resource.data.memberIds.size() == 1
+                    && request.resource.data.memberIds[0] == request.auth.uid
+                    && request.resource.data.memberCount == 1
+                    && request.resource.data.isPublic is bool
+                    && (
+                      (request.resource.data.isPublic == true && request.resource.data.joinMode == 'open')
+                      || (request.resource.data.isPublic == false && request.resource.data.joinMode == 'approval')
+                    );
 
       function getMyRole() {
         return get(/databases/$(database)/documents/clubs/$(clubId)/members/$(request.auth.uid)).data.role;
