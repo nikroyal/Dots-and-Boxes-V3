@@ -52,7 +52,16 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     if (!user) return;
     const unsub = onSnapshot(doc(db, 'users', user.uid), (snap) => {
-      if (snap.exists()) setProfile({ id: snap.id, ...snap.data() });
+      if (snap.exists()) {
+        setProfile({ id: snap.id, ...snap.data() });
+      } else {
+        setProfile(null);
+        setImpersonatedProfile(null);
+      }
+    }, (err) => {
+      console.warn('profile subscription failed:', err);
+      setProfile(null);
+      setImpersonatedProfile(null);
     });
     return () => unsub();
   }, [user]);
