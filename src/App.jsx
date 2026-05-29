@@ -1,4 +1,5 @@
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Component } from 'react';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AuthProvider, useAuth } from './lib/AuthContext';
 import Header from './components/Header';
 import Notifications from './components/Notifications';
@@ -28,13 +29,47 @@ export default function App() {
 function LoadingScreen() {
   return (
     <div className="min-h-screen flex items-center justify-center">
-      <div className="font-mono text-xs tracking-widest opacity-50">LOADING…</div>
+      <div className="font-mono text-xs tracking-widest opacity-50">LOADING...</div>
     </div>
   );
 }
 
+class ErrorBoundary extends Component {
+  constructor(props) {
+    super(props);
+    this.state = { error: null };
+  }
+
+  static getDerivedStateFromError(error) {
+    return { error };
+  }
+
+  componentDidCatch(error, info) {
+    console.error('Route crashed:', error, info);
+  }
+
+  render() {
+    if (this.state.error) {
+      return (
+        <div className="text-center py-20 px-4">
+          <div className="font-display text-3xl mb-3">Something went wrong</div>
+          <p className="font-display text-sm opacity-60 max-w-md mx-auto mb-6">
+            This page hit an unexpected error. You can go back home and keep playing.
+          </p>
+          <button onClick={() => window.location.assign('/')} className="btn-primary">
+            Go Home
+          </button>
+        </div>
+      );
+    }
+
+    return this.props.children;
+  }
+}
+
 function Shell() {
   const { user, profile, realProfile, isImpersonating, stopImpersonation, loading } = useAuth();
+  const location = useLocation();
 
   if (loading) return <LoadingScreen />;
 
@@ -54,10 +89,12 @@ function Shell() {
     return (
       <div className="min-h-screen flex flex-col">
         <Notifications />
-        <Routes>
-          <Route path="/admin" element={<Admin />} />
-          <Route path="*" element={<Navigate to="/admin" />} />
-        </Routes>
+        <ErrorBoundary key={location.pathname}>
+          <Routes>
+            <Route path="/admin" element={<Admin />} />
+            <Route path="*" element={<Navigate to="/admin" />} />
+          </Routes>
+        </ErrorBoundary>
       </div>
     );
   }
@@ -79,24 +116,26 @@ function Shell() {
       <Header />
       <Notifications />
       <main className="flex-1 px-4 sm:px-6 py-8 max-w-6xl mx-auto w-full">
-        <Routes>
-          <Route path="/"               element={<Dashboard />} />
-          <Route path="/lobby"          element={<Lobby />} />
-          <Route path="/match/:id"      element={<Match />} />
-          <Route path="/profile/:username" element={<Profile />} />
-          <Route path="/profile"        element={<Profile />} />
-          <Route path="/leaderboard"    element={<Leaderboard />} />
-          <Route path="/friends"        element={<Friends />} />
-          <Route path="/achievements"   element={<Achievements />} />
-          <Route path="/history"        element={<History />} />
-          <Route path="/replay/:id"     element={<Replay />} />
-          <Route path="/messages"       element={<Messages />} />
-          <Route path="/messages/:convId" element={<Messages />} />
-          <Route path="/clubs"          element={<Clubs />} />
-          <Route path="/clubs/:id"      element={<ClubDetail />} />
-          <Route path="/clubs/:id/:channelId" element={<ClubDetail />} />
-          <Route path="*"               element={<Navigate to="/" />} />
-        </Routes>
+        <ErrorBoundary key={location.pathname}>
+          <Routes>
+            <Route path="/"               element={<Dashboard />} />
+            <Route path="/lobby"          element={<Lobby />} />
+            <Route path="/match/:id"      element={<Match />} />
+            <Route path="/profile/:username" element={<Profile />} />
+            <Route path="/profile"        element={<Profile />} />
+            <Route path="/leaderboard"    element={<Leaderboard />} />
+            <Route path="/friends"        element={<Friends />} />
+            <Route path="/achievements"   element={<Achievements />} />
+            <Route path="/history"        element={<History />} />
+            <Route path="/replay/:id"     element={<Replay />} />
+            <Route path="/messages"       element={<Messages />} />
+            <Route path="/messages/:convId" element={<Messages />} />
+            <Route path="/clubs"          element={<Clubs />} />
+            <Route path="/clubs/:id"      element={<ClubDetail />} />
+            <Route path="/clubs/:id/:channelId" element={<ClubDetail />} />
+            <Route path="*"               element={<Navigate to="/" />} />
+          </Routes>
+        </ErrorBoundary>
       </main>
     </div>
   );
