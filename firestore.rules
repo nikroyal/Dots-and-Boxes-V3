@@ -166,6 +166,12 @@ service cloud.firestore {
       function canManageMembers() {
         return isSignedIn() && getMyRole() in ['owner', 'admin', 'moderator'];
       }
+      function canReadClubMessages() {
+        return isSignedIn() && (
+          resource.data.isPublic == true
+          || exists(/databases/$(database)/documents/clubs/$(clubId)/members/$(request.auth.uid))
+        );
+      }
       function memberIdsBefore() {
         return resource.data.get('memberIds', []);
       }
@@ -269,7 +275,7 @@ service cloud.firestore {
         allow update, delete: if isAdmin() || (isSignedIn() && get(/databases/$(database)/documents/clubs/$(clubId)/members/$(request.auth.uid)).data.role in ['owner', 'admin']);
 
         match /messages/{msgId} {
-          allow read: if isSignedIn();
+          allow read: if isAdmin() || canReadClubMessages();
           allow create: if isSignedIn() && exists(/databases/$(database)/documents/clubs/$(clubId)/members/$(request.auth.uid));
           allow update, delete: if isAdmin() || (isSignedIn() && (
             request.auth.uid == resource.data.userId
