@@ -15,11 +15,12 @@ export default function Messages() {
   const { profile } = useAuth();
   const { convId: paramConvId } = useParams();
   const navigate = useNavigate();
-  const [conversations, setConversations] = useState([]);
+  const [conversations, setConversations] = useState(null);
   const [newChatInput, setNewChatInput] = useState('');
 
   useEffect(() => {
     if (!profile) return;
+    setConversations(null);
     const unsub = watchMyConversations(profile.id, setConversations);
     return () => unsub();
   }, [profile?.id]);
@@ -41,6 +42,8 @@ export default function Messages() {
       navigate(`/messages/${convId}`);
     } catch (err) { toast(err.message, 'error'); }
   };
+
+  const list = conversations || [];
 
   return (
     <div className="fade-in">
@@ -65,12 +68,16 @@ export default function Messages() {
             </form>
           </div>
           <div className="flex-1 overflow-y-auto scrollbar-thin">
-            {conversations.length === 0 && (
+            {conversations === null ? (
+              <div className="font-mono text-[0.65rem] opacity-40 text-center py-12 italic px-3">
+                Loading conversations…
+              </div>
+            ) : list.length === 0 && (
               <div className="font-mono text-[0.65rem] opacity-40 text-center py-12 italic px-3">
                 No conversations yet
               </div>
             )}
-            {conversations.map(c => {
+            {list.map(c => {
               const otherId = c.participants.find(p => p !== profile.id);
               const other = c.participantInfo?.[otherId] || { username: '?', avatar: '◆' };
               const unread = c.unreadFor?.[profile.id] || 0;
@@ -133,16 +140,21 @@ function ConversationView({ convId, profile, conversations, onBack }) {
   const [busy, setBusy] = useState(false);
   const endRef = useRef(null);
 
+  const conversationsLoaded = Array.isArray(conversations);
   // The conversation list is already live-watched in the parent — pluck the
   // one we want instead of doing a one-shot getDoc here. Bonus: any update
   // to participantInfo (avatar/username changes) shows up live.
-  const conv = conversations.find(c => c.id === convId) || null;
+  const conv = conversationsLoaded ? conversations.find(c => c.id === convId) || null : null;
 
-  // Watch messages
+  // Watch messages only after we know this user can actually see the conversation.
   useEffect(() => {
+    if (!conversationsLoaded || !conv) {
+      setMessages([]);
+      return;
+    }
     const unsub = watchMessages(convId, setMessages);
     return () => unsub();
-  }, [convId]);
+  }, [convId, conversationsLoaded, conv?.id]);
 
   // Mark read when this view is open and the unread count is actually >0.
   // Without this guard the effect would do a Firestore read on every single
@@ -150,9 +162,10 @@ function ConversationView({ convId, profile, conversations, onBack }) {
   const unreadHere = conv?.unreadFor?.[profile?.id] || 0;
   useEffect(() => {
     if (!profile) return;
+    if (!conv) return;
     if (unreadHere === 0) return;
     markConversationRead(convId, profile).catch(() => {});
-  }, [convId, unreadHere, profile?.id]);
+  }, [convId, unreadHere, profile?.id, conv?.id]);
 
   // Scroll to bottom on new messages
   useEffect(() => {
@@ -188,11 +201,18 @@ function ConversationView({ convId, profile, conversations, onBack }) {
     } catch (err) { toast(err.message, 'error'); }
   };
 
-  const otherId = conv?.participants?.find(p => p !== profile.id);
-  const other = conv?.participantInfo?.[otherId] || { username: '?', avatar: '◆' };
-  const isPending = conv?.status === 'pending';
-  const isDeclined = conv?.status === 'declined';
-  const isRequester = conv?.requestedBy === profile.id;
+  if (!conversationsLoaded) {
+    return <ConversationFallback onBack={onBack} text="Loading conversation…" />;
+  }
+  if (!conv) {
+    return <ConversationFallback onBack={onBack} text="Conversation not found" />;
+  }
+
+  const otherId = conv.participants?.find(p => p !== profile.id);
+  const other = conv.participantInfo?.[otherId] || { username: '?', avatar: '◆' };
+  const isPending = conv.status === 'pending';
+  const isDeclined = conv.status === 'declined';
+  const isRequester = conv.requestedBy === profile.id;
   const canMessage = !isPending && !isDeclined;
 
   return (
@@ -286,6 +306,22 @@ function ConversationView({ convId, profile, conversations, onBack }) {
           <Send size={14} aria-hidden="true" />
         </button>
       </form>
+    </>
+  );
+}
+
+function ConversationFallback({ onBack, text }) {
+  return (
+    <>
+      <div className="px-4 py-3 border-b hairline flex items-center gap-3">
+        <button onClick={onBack} className="md:hidden opacity-60 hover:opacity-100" aria-label="Back">
+          <ArrowLeft size={16} />
+        </button>
+        <div className="font-mono text-[0.65rem] tracking-widest uppercase opacity-50">Messages</div>
+      </div>
+      <div className="flex-1 flex items-center justify-center py-20 opacity-50 font-display italic">
+        {text}
+      </div>
     </>
   );
 }
