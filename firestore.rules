@@ -168,7 +168,7 @@ service cloud.firestore {
       }
       function canReadClubMessages() {
         return isSignedIn() && (
-          resource.data.isPublic == true
+          get(/databases/$(database)/documents/clubs/$(clubId)).data.isPublic == true
           || exists(/databases/$(database)/documents/clubs/$(clubId)/members/$(request.auth.uid))
         );
       }
