@@ -1,8 +1,8 @@
-import { Component } from 'react';
+import { Component, lazy, Suspense } from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AuthProvider, useAuth } from './lib/AuthContext';
 import Header from './components/Header';
-import Notifications from './components/Notifications';
+import Notifications, { toast } from './components/Notifications';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Lobby from './pages/Lobby';
@@ -16,7 +16,9 @@ import Replay from './pages/Replay';
 import Messages from './pages/Messages';
 import Clubs from './pages/Clubs';
 import ClubDetail from './pages/ClubDetail';
-import Admin from './pages/Admin';
+import LocalMatch from './pages/LocalMatch';
+
+const Admin = lazy(() => import('./pages/Admin'));
 
 export default function App() {
   return (
@@ -46,6 +48,7 @@ class ErrorBoundary extends Component {
 
   componentDidCatch(error, info) {
     console.error('Route crashed:', error, info);
+    toast('An unexpected error occurred. You can go back home and keep playing.', 'error');
   }
 
   render() {
@@ -77,6 +80,7 @@ function Shell() {
     return (
       <Routes>
         <Route path="/login" element={<Login />} />
+        <Route path="/local" element={<LocalMatch />} />
         <Route path="*" element={<Navigate to="/login" />} />
       </Routes>
     );
@@ -90,10 +94,12 @@ function Shell() {
       <div className="min-h-screen flex flex-col">
         <Notifications />
         <ErrorBoundary key={location.pathname}>
-          <Routes>
-            <Route path="/admin" element={<Admin />} />
-            <Route path="*" element={<Navigate to="/admin" />} />
-          </Routes>
+          <Suspense fallback={<LoadingScreen />}>
+            <Routes>
+              <Route path="/admin" element={<Admin />} />
+              <Route path="*" element={<Navigate to="/admin" />} />
+            </Routes>
+          </Suspense>
         </ErrorBoundary>
       </div>
     );
@@ -133,6 +139,7 @@ function Shell() {
             <Route path="/clubs"          element={<Clubs />} />
             <Route path="/clubs/:id"      element={<ClubDetail />} />
             <Route path="/clubs/:id/:channelId" element={<ClubDetail />} />
+            <Route path="/local"          element={<LocalMatch />} />
             <Route path="*"               element={<Navigate to="/" />} />
           </Routes>
         </ErrorBoundary>

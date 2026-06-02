@@ -273,14 +273,17 @@ export default function Match() {
     finally { setBusy(null); }
   };
 
-  const handleSendChat = async (e) => {
+  const handleSendChat = async (e, textOverride) => {
     e?.preventDefault();
-    if (!chatInput.trim()) return;
+    const text = textOverride ?? chatInput;
+    if (!text.trim()) return;
     try {
-      await sendChatAs(id, profile, chatInput, isSpectator);
-      setChatInput('');
+      await sendChatAs(id, profile, text, isSpectator);
+      if (!textOverride) setChatInput('');
     } catch (err) { toast(err.message, 'error'); }
   };
+
+  const EMOTES = ['👍', '🎯', '🔥', '😂', 'Oops!', 'GG!'];
 
   const handleRequestPause = wrap('pause', async () => {
     try { await requestPause(id, profile); toast('Pause requested', 'success'); }
@@ -523,6 +526,18 @@ export default function Match() {
             );
           })}
           <div ref={chatEndRef} />
+        </div>
+        <div className="border-t hairline px-2 py-1.5 flex gap-1 overflow-x-auto scrollbar-none" aria-label="Quick reactions">
+          {EMOTES.map(emote => (
+            <button
+              key={emote}
+              onClick={() => handleSendChat(null, emote)}
+              className="px-2 py-1 text-sm bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 rounded transition-colors whitespace-nowrap focus-ring"
+              title={`Send ${emote}`}
+            >
+              {emote}
+            </button>
+          ))}
         </div>
         <form onSubmit={handleSendChat} className="border-t hairline p-2 flex gap-2 items-center">
           <input
