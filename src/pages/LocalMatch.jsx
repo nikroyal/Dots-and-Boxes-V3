@@ -39,7 +39,7 @@ export default function LocalMatch() {
   };
 
   const quit = async () => {
-    if (!game.finished && await confirm('End this match?', 'Progress will be lost.', 'Quit')) {
+    if (!game.finished && await confirm({ title: 'End this match?', body: 'Progress will be lost.', confirmLabel: 'Quit' })) {
       setSetup(true);
       setGame(null);
     } else if (game.finished) {
