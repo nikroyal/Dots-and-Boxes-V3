@@ -168,7 +168,7 @@ export function AuthProvider({ children }) {
       }
       // deleteUser requires the user be the currently-signed-in subject (it
       // is — we just created them).
-      await cred.user.delete().catch(() => {});
+      await deleteUser(cred.user).catch(() => {});
       throw new Error('Signup failed — please try again. (' + (firestoreErr.message || 'unknown error') + ')');
     }
   };
