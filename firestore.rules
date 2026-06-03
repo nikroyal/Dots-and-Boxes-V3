@@ -88,11 +88,9 @@ service cloud.firestore {
                     && request.auth.uid == resource.data.fromId);
     }
 
-
     // Matches ----------------------------------------------------------------
     match /matches/{matchId} {
       allow read: if isSignedIn();
-
       allow create: if isSignedIn()
                     && request.auth.uid in request.resource.data.players;
 
@@ -122,13 +120,11 @@ service cloud.firestore {
     match /conversations/{convId} {
       allow read: if isAdmin() || (isSignedIn()
                   && request.auth.uid in resource.data.participants);
-
       allow create: if isSignedIn()
                     && request.auth.uid in request.resource.data.participants
                     && request.resource.data.participants.size() == 2
                     && request.resource.data.participants[0] < request.resource.data.participants[1]
                     && convId == (request.resource.data.participants[0] + '_' + request.resource.data.participants[1]);
-
       allow update: if isAdmin() || (isSignedIn()
                     && request.auth.uid in resource.data.participants);
       allow delete: if isAdmin();
@@ -150,12 +146,10 @@ service cloud.firestore {
                     && request.resource.data.ownerId == request.auth.uid
                     && request.resource.data.memberIds.size() == 1
                     && request.resource.data.memberIds[0] == request.auth.uid
+                    && request.resource.data.get('bannedIds', []).size() == 0
                     && request.resource.data.memberCount == 1
                     && request.resource.data.isPublic is bool
-                    && (
-                      (request.resource.data.isPublic == true && request.resource.data.joinMode == 'open')
-                      || (request.resource.data.isPublic == false && request.resource.data.joinMode == 'approval')
-                    );
+                    && request.resource.data.joinMode in ['open', 'approval'];
 
       function getMyRole() {
         return get(/databases/$(database)/documents/clubs/$(clubId)/members/$(request.auth.uid)).data.role;
@@ -167,10 +161,8 @@ service cloud.firestore {
         return isSignedIn() && getMyRole() in ['owner', 'admin', 'moderator'];
       }
       function canReadClubMessages() {
-        return isSignedIn() && (
-          get(/databases/$(database)/documents/clubs/$(clubId)).data.isPublic == true
-          || exists(/databases/$(database)/documents/clubs/$(clubId)/members/$(request.auth.uid))
-        );
+        return isSignedIn()
+          && exists(/databases/$(database)/documents/clubs/$(clubId)/members/$(request.auth.uid));
       }
       function memberIdsBefore() {
         return resource.data.get('memberIds', []);
@@ -178,16 +170,39 @@ service cloud.firestore {
       function memberIdsAfter() {
         return request.resource.data.memberIds;
       }
+      function isBanned(userId) {
+        return userId in resource.data.get('bannedIds', []);
+      }
       function validMetadataUpdate() {
         return canManageClub()
-          && changedKeys().hasOnly(['name', 'description', 'isPublic', 'joinMode']);
+          && changedKeys().hasOnly(['name', 'description', 'isPublic', 'joinMode'])
+          && request.resource.data.joinMode in ['open', 'approval'];
+      }
+      function validAnnouncementUpdate() {
+        return canManageClub()
+          && changedKeys().hasOnly(['announcements'])
+          && request.resource.data.announcements.size() == resource.data.get('announcements', []).size() + 1
+          && request.resource.data.announcements[request.resource.data.announcements.size() - 1].byId == request.auth.uid;
       }
       function validManagedMemberListUpdate() {
         return canManageMembers()
           && changedKeys().hasOnly(['memberCount', 'memberIds']);
       }
+      function validBanUpdate() {
+        return canManageMembers()
+          && changedKeys().hasAny(['bannedIds'])
+          && changedKeys().hasOnly(['memberCount', 'memberIds', 'bannedIds']);
+      }
+      function validOwnershipTransfer() {
+        return isSignedIn()
+          && getMyRole() == 'owner'
+          && changedKeys().hasOnly(['ownerId'])
+          && request.resource.data.ownerId in memberIdsBefore();
+      }
       function validJoinUpdate() {
         return isSignedIn()
+          && resource.data.get('joinMode', 'open') == 'open'
+          && !isBanned(request.auth.uid)
           && changedKeys().hasOnly(['memberCount', 'memberIds'])
           && !(request.auth.uid in memberIdsBefore())
           && request.auth.uid in memberIdsAfter()
@@ -211,7 +226,10 @@ service cloud.firestore {
 
       allow update: if isAdmin()
                     || validMetadataUpdate()
+                    || validAnnouncementUpdate()
                     || validManagedMemberListUpdate()
+                    || validBanUpdate()
+                    || validOwnershipTransfer()
                     || validJoinUpdate()
                     || validLeaveUpdate();
 
@@ -223,10 +241,14 @@ service cloud.firestore {
         function listedAfter() {
           return userId in getAfter(/databases/$(database)/documents/clubs/$(clubId)).data.get('memberIds', []);
         }
+        function myRole() {
+          return get(/databases/$(database)/documents/clubs/$(clubId)/members/$(request.auth.uid)).data.role;
+        }
         function validMemberCreate() {
           return isSignedIn()
             && request.resource.data.userId == userId
             && listedAfter()
+            && !(userId in get(/databases/$(database)/documents/clubs/$(clubId)).data.get('bannedIds', []))
             && (
               (
                 request.auth.uid == userId
@@ -235,21 +257,31 @@ service cloud.firestore {
               )
               || (
                 request.auth.uid == userId
+                && get(/databases/$(database)/documents/clubs/$(clubId)).data.get('joinMode', 'open') == 'open'
                 && request.resource.data.role == 'member'
               )
               || (
-                get(/databases/$(database)/documents/clubs/$(clubId)/members/$(request.auth.uid)).data.role in ['owner', 'admin']
+                myRole() in ['owner', 'admin']
                 && request.resource.data.role == 'member'
               )
             );
         }
         function validRoleUpdate() {
           return isSignedIn()
-            && get(/databases/$(database)/documents/clubs/$(clubId)/members/$(request.auth.uid)).data.role == 'owner'
+            && myRole() == 'owner'
             && request.auth.uid != userId
             && resource.data.role != 'owner'
             && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['role'])
             && request.resource.data.role in ['admin', 'moderator', 'member'];
+        }
+        function validOwnershipRoleUpdate() {
+          return isSignedIn()
+            && myRole() == 'owner'
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['role'])
+            && (
+              (request.resource.data.role == 'owner' && userId == getAfter(/databases/$(database)/documents/clubs/$(clubId)).data.ownerId)
+              || (request.auth.uid == userId && resource.data.role == 'owner' && request.resource.data.role == 'admin')
+            );
         }
         function validMemberDelete() {
           return isSignedIn()
@@ -257,12 +289,12 @@ service cloud.firestore {
             && !(userId in getAfter(/databases/$(database)/documents/clubs/$(clubId)).data.get('memberIds', []))
             && (
               request.auth.uid == userId
-              || get(/databases/$(database)/documents/clubs/$(clubId)/members/$(request.auth.uid)).data.role in ['owner', 'admin', 'moderator']
+              || myRole() in ['owner', 'admin', 'moderator']
             );
         }
 
         allow create: if isAdmin() || validMemberCreate();
-        allow update: if isAdmin() || validRoleUpdate();
+        allow update: if isAdmin() || validRoleUpdate() || validOwnershipRoleUpdate();
         allow delete: if isAdmin() || validMemberDelete();
       }
 
@@ -292,12 +324,43 @@ service cloud.firestore {
         allow create: if isSignedIn()
                       && request.auth.uid == userId
                       && request.resource.data.userId == userId
-                      && !(userId in get(/databases/$(database)/documents/clubs/$(clubId)).data.get('memberIds', []));
+                      && get(/databases/$(database)/documents/clubs/$(clubId)).data.get('joinMode', 'open') == 'approval'
+                      && !(userId in get(/databases/$(database)/documents/clubs/$(clubId)).data.get('memberIds', []))
+                      && !(userId in get(/databases/$(database)/documents/clubs/$(clubId)).data.get('bannedIds', []));
         allow delete: if isAdmin() || (isSignedIn() && (
           request.auth.uid == userId
           || get(/databases/$(database)/documents/clubs/$(clubId)/members/$(request.auth.uid)).data.role in ['owner', 'admin']
         ));
       }
+    }
+
+    // Club challenges --------------------------------------------------------
+    match /clubChallenges/{challengeId} {
+      function roleInClub(clubId) {
+        return get(/databases/$(database)/documents/clubs/$(clubId)/members/$(request.auth.uid)).data.role;
+      }
+      function managesClub(clubId) {
+        return isSignedIn() && roleInClub(clubId) in ['owner', 'admin'];
+      }
+
+      allow read: if isSignedIn() && (
+        request.auth.uid in get(/databases/$(database)/documents/clubs/$(resource.data.fromClubId)).data.memberIds
+        || request.auth.uid in get(/databases/$(database)/documents/clubs/$(resource.data.toClubId)).data.memberIds
+        || isAdmin()
+      );
+      allow create: if isSignedIn()
+                    && request.resource.data.status == 'pending'
+                    && request.resource.data.createdBy == request.auth.uid
+                    && managesClub(request.resource.data.fromClubId)
+                    && request.resource.data.toClubId is string
+                    && request.resource.data.fromClubId != request.resource.data.toClubId;
+      allow update: if isAdmin() || (
+        changedKeys().hasOnly(['status', 'respondedAt', 'respondedBy'])
+        && request.resource.data.status in ['accepted', 'declined']
+        && request.resource.data.respondedBy == request.auth.uid
+        && managesClub(resource.data.toClubId)
+      );
+      allow delete: if isAdmin() || managesClub(resource.data.fromClubId);
     }
 
     // Activity feed entries --------------------------------------------------
