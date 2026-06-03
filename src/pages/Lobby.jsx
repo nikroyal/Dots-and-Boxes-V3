@@ -16,7 +16,7 @@ export default function Lobby() {
       collection(db, 'matches'),
       where('status', 'in', ['active', 'paused']),
       orderBy('createdAt', 'desc'),
-      limit(50)
+      limit(20)
     );
     const unsub = onSnapshot(q, (snap) => {
       setLoadError('');

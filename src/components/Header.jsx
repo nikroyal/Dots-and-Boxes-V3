@@ -99,6 +99,7 @@ export default function Header() {
         <nav className="hidden md:flex items-center gap-1">
           {navItem('/', 'Home')}
           {navItem('/lobby', 'Lobby')}
+          {navItem('/local', 'Local')}
           {navItem('/leaderboard', 'Ranks')}
           {navItem('/friends', 'Friends')}
           {navItem('/messages', 'Msgs', unreadCount)}
@@ -186,6 +187,7 @@ export default function Header() {
       <nav className="md:hidden flex items-center justify-center gap-1 px-4 py-2 border-t hairline overflow-x-auto">
         {navItem('/', 'Home')}
         {navItem('/lobby', 'Lobby')}
+        {navItem('/local', 'Local')}
         {navItem('/leaderboard', 'Ranks')}
         {navItem('/friends', 'Friends')}
         {navItem('/messages', 'Msgs', unreadCount)}
