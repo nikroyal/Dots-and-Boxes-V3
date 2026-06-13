@@ -36,11 +36,25 @@ if (firebaseConfig.apiKey === "YOUR_API_KEY") {
   // Surface in the UI so a non-developer deployer sees it too.
   if (typeof document !== 'undefined') {
     document.addEventListener('DOMContentLoaded', () => {
-      document.body.innerHTML =
-        '<div style="font-family: system-ui; padding: 40px; max-width: 600px; margin: 0 auto; line-height: 1.6;">' +
-        '<h1 style="color: #B91C3C;">Firebase not configured</h1>' +
-        '<p>' + msg + '</p>' +
-        '</div>';
+      const container = document.createElement('div');
+      container.style.fontFamily = 'system-ui';
+      container.style.padding = '40px';
+      container.style.maxWidth = '600px';
+      container.style.margin = '0 auto';
+      container.style.lineHeight = '1.6';
+
+      const heading = document.createElement('h1');
+      heading.style.color = '#B91C3C';
+      heading.textContent = 'Firebase not configured';
+
+      const paragraph = document.createElement('p');
+      paragraph.textContent = msg;
+
+      container.appendChild(heading);
+      container.appendChild(paragraph);
+
+      document.body.innerHTML = '';
+      document.body.appendChild(container);
     });
   }
   throw new Error(msg);
