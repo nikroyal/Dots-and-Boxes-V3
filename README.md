@@ -44,12 +44,13 @@ Note: GitHub's repo page lists `.gitignore` (a dotfile) separately from the file
 
 1. Go to https://console.firebase.google.com → **Add project**
 2. Once created: in the project overview, click the `</>` icon to **add a Web app**. Name it whatever, skip Hosting setup.
-3. Copy the `firebaseConfig` object Firebase shows you, then paste it into `src/lib/firebase.js`, replacing the `YOUR_API_KEY` etc. placeholders. **If you forget this step the app will refuse to load and display a red error screen — that's intentional, so you don't accidentally use someone else's backend.**
-4. In the Firebase console sidebar:
+3. Create a `.env` file in the root directory by copying `.env.example`.
+4. Copy the `firebaseConfig` values Firebase shows you, then paste them into your `.env` file, replacing the `YOUR_API_KEY` etc. placeholders. **If you forget this step the app will refuse to load and display a red error screen — that's intentional, so you don't accidentally use someone else's backend.**
+5. In the Firebase console sidebar:
    - **Authentication → Get started → Sign-in method → Email/Password → Enable** (Email/Password only, not the link option)
    - **Authentication → Templates → Password reset** — customize the email if you'd like; the default works fine.
    - **Firestore Database → Create database → Start in production mode → pick a region close to your users**
-5. Once Firestore is created, go to its **Rules** tab. Delete what's there and paste the contents of `firestore.rules` from this folder. Click **Publish**.
+6. Once Firestore is created, go to its **Rules** tab. Delete what's there and paste the contents of `firestore.rules` from this folder. Click **Publish**.
 
 ### 3. Deploy to Netlify
 
