@@ -101,10 +101,10 @@ export function usePrompt() {
   const dialog = (
     <PromptDialog
       open={!!state}
-      title={state?.options.title}
-      defaultValue={state?.options.defaultValue}
-      confirmLabel={state?.options.confirmLabel}
-      cancelLabel={state?.options.cancelLabel}
+      title={state?.options?.title}
+      defaultValue={state?.options?.defaultValue}
+      confirmLabel={state?.options?.confirmLabel}
+      cancelLabel={state?.options?.cancelLabel}
       onConfirm={(val) => close(val)}
       onCancel={() => close(null)}
     />
