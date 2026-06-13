@@ -5,7 +5,7 @@ import { listPublicClubs, listMyClubs, createClub } from '../lib/clubs';
 import { recordActivity, ACTIVITY_TYPES } from '../lib/activity';
 import { toast } from '../components/Notifications';
 import { sfx } from '../lib/sound';
-import { Users, Plus, Compass, Layout, Search, ChevronRight, Hash } from 'lucide-react';
+import { Users, Plus, Compass, Layout, Search, ChevronRight } from 'lucide-react';
 
 export default function Clubs() {
   const { profile } = useAuth();
