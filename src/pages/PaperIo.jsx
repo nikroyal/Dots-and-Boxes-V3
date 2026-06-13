@@ -322,7 +322,7 @@ export default function PaperIo() {
       if (canvas && game) drawGame(canvas, game);
       if (screen === 'playing' && game) {
         const diff = DIFFICULTY[game.settings.difficulty];
-        const elapsed = lastFrameRef.current ? time - lastFrameRef.current : 0;
+        const elapsed = lastFrameRef.current ? Math.min(time - lastFrameRef.current, 200) : 0;
         tickRef.current += elapsed;
         while (tickRef.current >= diff.tickMs) {
           tickRef.current -= diff.tickMs;

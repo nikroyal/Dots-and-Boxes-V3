@@ -207,12 +207,29 @@ export default function CircuitMaker() {
     }));
   };
 
+  const handlePointerUp = () => {
+    if (drag) {
+      const lastState = history[historyIndex];
+      const currentComp = state.components.find(component => component.id === drag.id);
+      const lastComp = lastState?.components.find(component => component.id === drag.id);
+      if (currentComp && lastComp && (currentComp.x !== lastComp.x || currentComp.y !== lastComp.y)) {
+        commit(state);
+      }
+      setDrag(null);
+    }
+  };
+
   const saveProject = () => {
     const name = window.prompt('Project name', projectName || 'Untitled circuit');
     if (!name) return;
+    const trimmed = name.trim();
+    if (!trimmed) return;
     const all = readProjects();
-    all[name] = state;
-    if (writeProjects(all)) setProjectName(name);
+    if (all[trimmed] && !window.confirm(`A project named "${trimmed}" already exists. Overwrite?`)) {
+      return;
+    }
+    all[trimmed] = state;
+    if (writeProjects(all)) setProjectName(trimmed);
   };
 
   const openProject = (name) => {
@@ -228,6 +245,7 @@ export default function CircuitMaker() {
   };
 
   const deleteProject = (name) => {
+    if (!window.confirm(`Are you sure you want to delete "${name}"?`)) return;
     const all = readProjects();
     delete all[name];
     writeProjects(all);
@@ -336,8 +354,8 @@ export default function CircuitMaker() {
           className="relative border hairline min-h-[620px] overflow-hidden"
           style={{ background: 'linear-gradient(180deg, #071427, #041021)', touchAction: 'none' }}
           onPointerMove={onPointerMove}
-          onPointerUp={() => setDrag(null)}
-          onPointerCancel={() => setDrag(null)}
+          onPointerUp={handlePointerUp}
+          onPointerCancel={handlePointerUp}
         >
           <div className="absolute inset-0 opacity-40" style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px)', backgroundSize: '24px 24px' }} />
           <svg className="absolute inset-0 w-full h-full pointer-events-none" aria-hidden="true">
