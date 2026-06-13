@@ -4,7 +4,7 @@ import { collection, query, where, onSnapshot, orderBy, limit } from 'firebase/f
 import { db } from '../lib/firebase';
 import { useAuth } from '../lib/AuthContext';
 import { sfx } from '../lib/sound';
-import { Eye, Users } from 'lucide-react';
+import { Eye } from 'lucide-react';
 
 export default function Lobby() {
   const { profile } = useAuth();
