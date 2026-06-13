@@ -72,7 +72,7 @@ export default function Notifications() {
   };
 
   const addToast = (text, type) => {
-    const id = Math.random();
+    const id = crypto.randomUUID();
     setToasts(t => [...t, { id, text, type }]);
     setTimeout(() => setToasts(t => t.filter(x => x.id !== id)), 4000);
   };
