@@ -529,27 +529,8 @@ export async function leaveSpectator(matchId, currentUser) {
 }
 
 // ─── Stats finalization (called when match finishes) ─────────────────────
-//
-// Wrapped in a transaction so concurrent callers (two tabs, a refresh in the
-// middle of the win screen, Match.jsx and Replay.jsx both firing it) can't
-// double-credit stats. The pre-tx getDoc on the match is a cheap fast-path
-// to avoid opening a transaction at all when there's nothing to do — the
-// authoritative idempotency check lives inside the transaction below.
-export async function finalizeStats(matchId, currentUser) {
-  guard(currentUser);
-  const matchRef = doc(db, 'matches', matchId);
-  const matchSnap = await getDoc(matchRef);
-  if (!matchSnap.exists()) return;
-  const m = matchSnap.data();
-  if (m.status !== 'finished') return;
-  if (m.adminClosed) return;
-  if (!m.players.includes(currentUser.id)) return;
 
-  const userRef = doc(db, 'users', currentUser.id);
-
-  // Pre-compute match-derived values that don't depend on the user doc.
-  // These are pure functions of `m`, so they're safe to compute outside the
-  // transaction and use inside it.
+function computeMatchDerivedStats(m, currentUser) {
   const playerIds = m.players;
   const myIdx = playerIds.indexOf(currentUser.id);
   const oppId = playerIds[1 - myIdx];
@@ -561,7 +542,6 @@ export async function finalizeStats(matchId, currentUser) {
   else if (m.winner === currentUser.id) result = 'win';
   else result = 'loss';
 
-  // Biggest chain this match
   let myBiggestChain = 0;
   for (const mv of m.game.moves || []) {
     if (mv.by === currentUser.id && mv.claimed > myBiggestChain) myBiggestChain = mv.claimed;
@@ -589,103 +569,108 @@ export async function finalizeStats(matchId, currentUser) {
   const nowHour = new Date().getHours();
   const isNightOwl = nowHour >= 0 && nowHour < 4;
 
-  let txResult = null;
-  await runTransaction(db, async (tx) => {
-    const userSnap = await tx.get(userRef);
-    if (!userSnap.exists()) return;
-    const u = userSnap.data();
+  return {
+    oppId, myScore, oppScore, result, myBiggestChain, perfectWin, bigBoardWin,
+    comebackWin, duration, oppElo, scoreA, isNightOwl
+  };
+}
 
-    // The authoritative idempotency gate. Inside the transaction, this read
-    // is guaranteed to reflect any prior finalize that committed first.
-    const finalized = u.finalizedMatches || [];
-    if (finalized.includes(matchId)) return;
+function computeUpdatedUserStats(u, m, matchId, derivedStats) {
+  // The authoritative idempotency gate. Inside the transaction, this read
+  // is guaranteed to reflect any prior finalize that committed first.
+  const finalized = u.finalizedMatches || [];
+  if (finalized.includes(matchId)) return null;
 
-    const myElo = u.elo || 1000;
-    const { newA } = computeElo(myElo, oppElo, scoreA);
-    // computeElo already clamps to [100, 3500]; we don't need to re-clamp
-    // here. We keep the variable name `clampedElo` to make the intent at
-    // call sites obvious and to match the field name in match history.
-    const clampedElo = newA;
-    // Effective delta after the ELO floor clamp. Avoids showing "-20 ELO"
-    // in match history when the user actually only dropped to 100.
-    const effectiveDelta = clampedElo - myElo;
+  const {
+    oppId, myScore, oppScore, result, myBiggestChain, perfectWin, bigBoardWin,
+    comebackWin, duration, oppElo, scoreA, isNightOwl
+  } = derivedStats;
 
-    const fastestWin = result === 'win' && duration
-      ? Math.min(u.fastestWin || Infinity, duration)
-      : (u.fastestWin || null);
+  const myElo = u.elo || 1000;
+  const { newA } = computeElo(myElo, oppElo, scoreA);
+  // computeElo already clamps to [100, 3500]; we don't need to re-clamp
+  // here. We keep the variable name `clampedElo` to make the intent at
+  // call sites obvious and to match the field name in match history.
+  const clampedElo = newA;
+  // Effective delta after the ELO floor clamp. Avoids showing "-20 ELO"
+  // in match history when the user actually only dropped to 100.
+  const effectiveDelta = clampedElo - myElo;
 
-    const newWinStreak = result === 'win' ? (u.winStreak || 0) + 1 : 0;
-    const bestWinStreak = Math.max(u.bestWinStreak || 0, newWinStreak);
-    const playedAtMidnight = !!u.playedAtMidnight || isNightOwl;
+  const fastestWin = result === 'win' && duration
+    ? Math.min(u.fastestWin || Infinity, duration)
+    : (u.fastestWin || null);
 
-    const newStats = {
-      elo: clampedElo,
-      gamesPlayed: (u.gamesPlayed || 0) + 1,
-      wins: (u.wins || 0) + (result === 'win' ? 1 : 0),
-      losses: (u.losses || 0) + (result === 'loss' ? 1 : 0),
-      draws: (u.draws || 0) + (result === 'draw' ? 1 : 0),
-      totalBoxes: (u.totalBoxes || 0) + myScore,
-      biggestChain: Math.max(u.biggestChain || 0, myBiggestChain),
-      perfectWins: (u.perfectWins || 0) + (perfectWin ? 1 : 0),
-      bigBoardWins: (u.bigBoardWins || 0) + (bigBoardWin ? 1 : 0),
-      comebackWins: (u.comebackWins || 0) + (comebackWin ? 1 : 0),
-      winStreak: newWinStreak,
-      bestWinStreak,
-      fastestWin: fastestWin === Infinity ? null : fastestWin,
-      playedAtMidnight,
-    };
+  const newWinStreak = result === 'win' ? (u.winStreak || 0) + 1 : 0;
+  const bestWinStreak = Math.max(u.bestWinStreak || 0, newWinStreak);
+  const playedAtMidnight = !!u.playedAtMidnight || isNightOwl;
 
-    // Bounded rolloff for matchHistory and finalizedMatches. Firestore docs
-    // are capped at 1 MiB; without rolloff, a dedicated player exhausts that
-    // around 3500 finalized matches and every subsequent profile write fails.
-    // We keep the most recent MATCH_HISTORY_CAP entries and the most recent
-    // FINALIZED_MATCHES_CAP ids. The history is what users see on /history;
-    // finalizedMatches only serves the idempotency gate above, so it can
-    // safely roll faster.
-    const MATCH_HISTORY_CAP = 500;
-    const FINALIZED_MATCHES_CAP = 500;
+  const newStats = {
+    elo: clampedElo,
+    gamesPlayed: (u.gamesPlayed || 0) + 1,
+    wins: (u.wins || 0) + (result === 'win' ? 1 : 0),
+    losses: (u.losses || 0) + (result === 'loss' ? 1 : 0),
+    draws: (u.draws || 0) + (result === 'draw' ? 1 : 0),
+    totalBoxes: (u.totalBoxes || 0) + myScore,
+    biggestChain: Math.max(u.biggestChain || 0, myBiggestChain),
+    perfectWins: (u.perfectWins || 0) + (perfectWin ? 1 : 0),
+    bigBoardWins: (u.bigBoardWins || 0) + (bigBoardWin ? 1 : 0),
+    comebackWins: (u.comebackWins || 0) + (comebackWin ? 1 : 0),
+    winStreak: newWinStreak,
+    bestWinStreak,
+    fastestWin: fastestWin === Infinity ? null : fastestWin,
+    playedAtMidnight,
+  };
 
-    const newHistoryEntry = {
-      matchId,
-      opponent: m.playerInfo?.[oppId]?.username || 'unknown',
-      opponentAvatar: m.playerInfo?.[oppId]?.avatar || '◆',
-      myScore, oppScore,
-      result,
-      eloDelta: effectiveDelta,
-      eloAfter: clampedElo,
-      rows: m.rows, cols: m.cols,
-      finishedAt: Date.now(),
-    };
-    const existingHistory = u.matchHistory || [];
-    const trimmedHistory = existingHistory.length >= MATCH_HISTORY_CAP
-      ? [...existingHistory.slice(existingHistory.length - MATCH_HISTORY_CAP + 1), newHistoryEntry]
-      : [...existingHistory, newHistoryEntry];
-    newStats.matchHistory = trimmedHistory;
+  // Bounded rolloff for matchHistory and finalizedMatches. Firestore docs
+  // are capped at 1 MiB; without rolloff, a dedicated player exhausts that
+  // around 3500 finalized matches and every subsequent profile write fails.
+  // We keep the most recent MATCH_HISTORY_CAP entries and the most recent
+  // FINALIZED_MATCHES_CAP ids. The history is what users see on /history;
+  // finalizedMatches only serves the idempotency gate above, so it can
+  // safely roll faster.
+  const MATCH_HISTORY_CAP = 500;
+  const FINALIZED_MATCHES_CAP = 500;
 
-    const existingFinalized = u.finalizedMatches || [];
-    const trimmedFinalized = existingFinalized.length >= FINALIZED_MATCHES_CAP
-      ? [...existingFinalized.slice(existingFinalized.length - FINALIZED_MATCHES_CAP + 1), matchId]
-      : [...existingFinalized, matchId];
-    newStats.finalizedMatches = trimmedFinalized;
+  const newHistoryEntry = {
+    matchId,
+    opponent: m.playerInfo?.[oppId]?.username || 'unknown',
+    opponentAvatar: m.playerInfo?.[oppId]?.avatar || '◆',
+    myScore, oppScore,
+    result,
+    eloDelta: effectiveDelta,
+    eloAfter: clampedElo,
+    rows: m.rows, cols: m.cols,
+    finishedAt: Date.now(),
+  };
+  const existingHistory = u.matchHistory || [];
+  const trimmedHistory = existingHistory.length >= MATCH_HISTORY_CAP
+    ? [...existingHistory.slice(existingHistory.length - MATCH_HISTORY_CAP + 1), newHistoryEntry]
+    : [...existingHistory, newHistoryEntry];
+  newStats.matchHistory = trimmedHistory;
 
-    // Check achievements with the projected stats
-    const projectedStats = { ...u, ...newStats, friends: (u.friends || []).length };
-    const newlyUnlocked = checkUnlocks(projectedStats, u.unlockedAchievements || []);
-    if (newlyUnlocked.length > 0) {
-      // Achievements never roll off; there are only ~23 of them, so the array
-      // size is bounded by the catalog. Safe to arrayUnion.
-      newStats.unlockedAchievements = arrayUnion(...newlyUnlocked);
-    }
+  const existingFinalized = u.finalizedMatches || [];
+  const trimmedFinalized = existingFinalized.length >= FINALIZED_MATCHES_CAP
+    ? [...existingFinalized.slice(existingFinalized.length - FINALIZED_MATCHES_CAP + 1), matchId]
+    : [...existingFinalized, matchId];
+  newStats.finalizedMatches = trimmedFinalized;
 
-    tx.update(userRef, newStats);
-    txResult = { newlyUnlocked, deltaA: effectiveDelta, result };
-  });
+  // Check achievements with the projected stats
+  const projectedStats = { ...u, ...newStats, friends: (u.friends || []).length };
+  const newlyUnlocked = checkUnlocks(projectedStats, u.unlockedAchievements || []);
+  if (newlyUnlocked.length > 0) {
+    // Achievements never roll off; there are only ~23 of them, so the array
+    // size is bounded by the catalog. Safe to arrayUnion.
+    newStats.unlockedAchievements = arrayUnion(...newlyUnlocked);
+  }
 
-  if (!txResult) return; // nothing to do (already finalized, or no user doc)
+  return { newStats, txResult: { newlyUnlocked, deltaA: effectiveDelta, result } };
+}
 
+function recordPostMatchActivities(currentUser, m, matchId, derivedStats, txResult) {
   // Record activity entries outside the transaction (best-effort, must not
   // block the stats commit). One match-result entry, plus one per
   // achievement unlocked.
+  const { oppId, myScore, oppScore, result } = derivedStats;
   const oppUsername = m.playerInfo?.[oppId]?.username || 'unknown';
   const activityType = result === 'win' ? ACTIVITY_TYPES.WIN
                      : result === 'loss' ? ACTIVITY_TYPES.LOSS
@@ -696,6 +681,46 @@ export async function finalizeStats(matchId, currentUser) {
   for (const ach of txResult.newlyUnlocked) {
     recordActivity(currentUser, ACTIVITY_TYPES.ACHIEVEMENT, { achievementId: ach });
   }
+}
+
+// Wrapped in a transaction so concurrent callers (two tabs, a refresh in the
+// middle of the win screen, Match.jsx and Replay.jsx both firing it) can't
+// double-credit stats. The pre-tx getDoc on the match is a cheap fast-path
+// to avoid opening a transaction at all when there's nothing to do — the
+// authoritative idempotency check lives inside the transaction below.
+export async function finalizeStats(matchId, currentUser) {
+  guard(currentUser);
+  const matchRef = doc(db, 'matches', matchId);
+  const matchSnap = await getDoc(matchRef);
+  if (!matchSnap.exists()) return;
+  const m = matchSnap.data();
+  if (m.status !== 'finished') return;
+  if (m.adminClosed) return;
+  if (!m.players.includes(currentUser.id)) return;
+
+  const userRef = doc(db, 'users', currentUser.id);
+
+  // Pre-compute match-derived values that don't depend on the user doc.
+  // These are pure functions of `m`, so they're safe to compute outside the
+  // transaction and use inside it.
+  const derivedStats = computeMatchDerivedStats(m, currentUser);
+
+  let txResult = null;
+  await runTransaction(db, async (tx) => {
+    const userSnap = await tx.get(userRef);
+    if (!userSnap.exists()) return;
+    const u = userSnap.data();
+
+    const updateRes = computeUpdatedUserStats(u, m, matchId, derivedStats);
+    if (!updateRes) return;
+
+    tx.update(userRef, updateRes.newStats);
+    txResult = updateRes.txResult;
+  });
+
+  if (!txResult) return; // nothing to do (already finalized, or no user doc)
+
+  recordPostMatchActivities(currentUser, m, matchId, derivedStats, txResult);
 
   return txResult;
 }
