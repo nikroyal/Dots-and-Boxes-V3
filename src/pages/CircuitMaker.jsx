@@ -1,5 +1,7 @@
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { Download, FolderOpen, Plus, RotateCcw, Save, Trash2, Undo2, Zap } from 'lucide-react';
+import { useConfirm } from '../components/ConfirmDialog';
+import { usePrompt } from '../components/PromptDialog';
 
 const PROJECTS_KEY = 'axiom-circuit-projects';
 const GATE_TYPES = [
@@ -86,6 +88,8 @@ export default function CircuitMaker() {
   const [drag, setDrag] = useState(null);
   const [projectOpen, setProjectOpen] = useState(false);
   const [projectName, setProjectName] = useState('Untitled circuit');
+  const { confirm, dialog: confirmDialog } = useConfirm();
+  const { prompt, dialog: promptDialog } = usePrompt();
 
   const values = useMemo(() => evaluateCircuit(state), [state]);
   const projects = projectOpen ? readProjects() : {};
@@ -219,14 +223,15 @@ export default function CircuitMaker() {
     }
   };
 
-  const saveProject = () => {
-    const name = window.prompt('Project name', projectName || 'Untitled circuit');
+  const saveProject = async () => {
+    const name = await prompt({ title: 'Project name', defaultValue: projectName || 'Untitled circuit', confirmLabel: 'Save' });
     if (!name) return;
     const trimmed = name.trim();
     if (!trimmed) return;
     const all = readProjects();
-    if (all[trimmed] && !window.confirm(`A project named "${trimmed}" already exists. Overwrite?`)) {
-      return;
+    if (all[trimmed]) {
+      const ok = await confirm({ title: 'Overwrite project?', body: `A project named "${trimmed}" already exists. Overwrite?`, confirmLabel: 'Overwrite', danger: true });
+      if (!ok) return;
     }
     all[trimmed] = state;
     if (writeProjects(all)) setProjectName(trimmed);
@@ -244,8 +249,9 @@ export default function CircuitMaker() {
     setProjectOpen(false);
   };
 
-  const deleteProject = (name) => {
-    if (!window.confirm(`Are you sure you want to delete "${name}"?`)) return;
+  const deleteProject = async (name) => {
+    const ok = await confirm({ title: 'Delete project?', body: `Are you sure you want to delete "${name}"?`, confirmLabel: 'Delete', danger: true });
+    if (!ok) return;
     const all = readProjects();
     delete all[name];
     writeProjects(all);
@@ -305,6 +311,8 @@ export default function CircuitMaker() {
 
   return (
     <div className="fade-in space-y-6">
+      {confirmDialog}
+      {promptDialog}
       <section className="flex items-end justify-between gap-4 flex-wrap">
         <div>
           <div className="font-mono text-[0.65rem] tracking-widest uppercase opacity-50 mb-2">Circuit Maker</div>
