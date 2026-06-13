@@ -14,6 +14,12 @@ export default function Login() {
   const { login, signup, resetPassword } = useAuth();
   const navigate = useNavigate();
 
+  const switchMode = (nextMode) => {
+    setMode(nextMode);
+    setError('');
+    setInfo('');
+  };
+
   const submit = async (e) => {
     e?.preventDefault();
     setError('');
@@ -35,7 +41,6 @@ export default function Login() {
     } catch (err) {
       const msg = err.message || String(err);
       const code = err.code || '';
-      // Translate Firebase errors
       if (code === 'auth/invalid-credential' || msg.includes('auth/invalid-credential')
           || code === 'auth/wrong-password' || msg.includes('auth/wrong-password')
           || code === 'auth/user-not-found' || msg.includes('auth/user-not-found'))
@@ -47,7 +52,7 @@ export default function Login() {
       else if (code === 'auth/invalid-email' || msg.includes('auth/invalid-email'))
         setError('Please enter a valid email address');
       else if (code === 'auth/too-many-requests' || msg.includes('auth/too-many-requests'))
-        setError('Too many attempts — please wait a moment and try again');
+        setError('Too many attempts - please wait a moment and try again');
       else
         setError(msg);
     }
@@ -58,21 +63,25 @@ export default function Login() {
     <div className="min-h-screen flex items-center justify-center px-6">
       <form onSubmit={submit} className="w-full max-w-sm fade-in">
         <div className="text-center mb-12">
-          <div className="font-mono text-[0.65rem] tracking-[0.3em] opacity-50 mb-3">A PARLOR GAME</div>
-          <h1 className="font-display text-5xl font-medium tracking-tight leading-none">
-            Dots <em className="font-normal">&amp;</em> Boxes
-          </h1>
+          <div className="font-mono text-[0.65rem] tracking-[0.3em] opacity-50 mb-3">WELCOME TO</div>
+          <h1 className="font-display text-6xl font-medium tracking-tight leading-none">Axiom</h1>
+          <p className="font-display text-lg opacity-60 mt-5 leading-snug">
+            Games, builders, friends, clubs, and messages in one place.
+          </p>
           <div className="mt-6 mx-auto" style={{ width: 40, height: 1, background: 'var(--hairline-strong)' }} />
         </div>
 
         <div className="flex gap-1 mb-8" role="tablist" aria-label="Authentication mode">
-          {[['login', 'Sign In'], ['signup', 'Sign Up']].map(([m, label]) => (
+          {[
+            ['login', 'Sign In'],
+            ['signup', 'Sign Up'],
+          ].map(([m, label]) => (
             <button
               type="button"
               key={m}
               role="tab"
               aria-selected={mode === m}
-              onClick={() => { setMode(m); setError(''); setInfo(''); }}
+              onClick={() => switchMode(m)}
               className="flex-1 py-3 font-mono text-[0.7rem] tracking-widest uppercase transition-all focus-ring"
               style={{
                 borderBottom: `1px solid ${mode === m ? 'var(--ink)' : 'var(--hairline)'}`,
@@ -94,7 +103,7 @@ export default function Login() {
               className="input-field"
               value={username}
               onChange={(e) => setUsername(e.target.value.slice(0, 20))}
-              placeholder="—"
+              placeholder="-"
               autoComplete="username"
               autoFocus={!username}
             />
@@ -102,7 +111,9 @@ export default function Login() {
 
           {mode === 'signup' && (
             <div>
-              <label htmlFor="login-email" className="font-mono block mb-2 text-[0.65rem] tracking-widest uppercase opacity-55">Email <span className="opacity-50 normal-case tracking-normal">(for password recovery)</span></label>
+              <label htmlFor="login-email" className="font-mono block mb-2 text-[0.65rem] tracking-widest uppercase opacity-55">
+                Email <span className="opacity-50 normal-case tracking-normal">(for password recovery)</span>
+              </label>
               <input
                 id="login-email"
                 className="input-field"
@@ -124,7 +135,7 @@ export default function Login() {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="—"
+                placeholder="-"
                 autoComplete={mode === 'signup' ? 'new-password' : 'current-password'}
                 autoFocus={!!username && mode === 'login'}
               />
@@ -132,7 +143,7 @@ export default function Login() {
           )}
 
           <button type="submit" disabled={loading} className="btn-primary w-full">
-            {loading ? '…'
+            {loading ? '...'
               : mode === 'login' ? 'Sign In'
               : mode === 'signup' ? 'Create Account'
               : 'Send Reset Email'}
@@ -152,7 +163,7 @@ export default function Login() {
 
         {mode === 'login' && (
           <div className="text-center mt-6">
-            <button type="button" onClick={() => { setMode('reset'); setError(''); setInfo(''); }}
+            <button type="button" onClick={() => switchMode('reset')}
                     className="font-mono text-[0.65rem] tracking-widest uppercase opacity-50 hover:opacity-100 transition-opacity"
                     style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'inherit' }}>
               Forgot password?
@@ -162,10 +173,10 @@ export default function Login() {
 
         {mode === 'reset' && (
           <div className="text-center mt-6">
-            <button type="button" onClick={() => { setMode('login'); setError(''); setInfo(''); }}
+            <button type="button" onClick={() => switchMode('login')}
                     className="font-mono text-[0.65rem] tracking-widest uppercase opacity-50 hover:opacity-100 transition-opacity"
                     style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'inherit' }}>
-              ← Back to sign in
+              Back to sign in
             </button>
           </div>
         )}
@@ -174,7 +185,7 @@ export default function Login() {
           <div className="font-mono text-[0.65rem] mt-6 opacity-50 text-center leading-relaxed">
             Username: 3-20 chars, lowercase letters/numbers/underscore.<br/>
             Password: 6+ characters.<br/>
-            Email is only used for password reset — never displayed publicly.
+            Email is only used for password reset and never displayed publicly.
           </div>
         )}
       </form>
