@@ -4,7 +4,7 @@ import {
   arrayUnion, arrayRemove, increment,
 } from 'firebase/firestore';
 import { db } from './firebase';
-import { createEmptyGame, applyMove, computeElo, hKey, vKey } from './gameLogic';
+import { createEmptyGame, applyMove, computeElo } from './gameLogic';
 import { checkUnlocks } from './achievements';
 import { recordActivity, ACTIVITY_TYPES } from './activity';
 
