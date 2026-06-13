@@ -8,7 +8,7 @@ import { ACHIEVEMENTS, AVATAR_OPTIONS, TITLE_OPTIONS, getRankFromElo } from '../
 import { toast } from '../components/Notifications';
 import { useConfirm } from '../components/ConfirmDialog';
 import { sfx } from '../lib/sound';
-import { Edit2, UserPlus, UserMinus, Ban, Check } from 'lucide-react';
+import { Edit2, UserPlus, Ban, Check } from 'lucide-react';
 
 export default function Profile() {
   const { username } = useParams();
