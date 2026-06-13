@@ -36,18 +36,15 @@ export const EXPERIENCE_CATALOG = [
     kind: 'Arcade',
     status: 'Live',
     accent: 'var(--crimson)',
-    description: 'A territory-control arcade run with bots, modes, cosmetics, stats, achievements, and difficulty tuning.',
-    features: ['Classic and V2', 'Custom modes', 'Cosmetics', 'Stats'],
-    frameSrc: '/experiences/paper-io.html',
+    description: 'A native Axiom territory-control arcade run with bots, selectable modes, live stats, and local awards.',
+    features: ['Live bots', 'Modes', 'Stats', 'Awards'],
     navItems: [
       { to: '/paper-io', label: 'Play' },
       { to: '/paper-io#custom', label: 'Modes' },
-      { to: '/paper-io#cosm', label: 'Cosmetics' },
       { to: '/paper-io#stats', label: 'Stats' },
       { to: '/paper-io#ach', label: 'Awards' },
     ],
     routePrefixes: ['/paper-io'],
-    immersive: true,
   },
   {
     id: 'circuit-maker',
@@ -57,9 +54,8 @@ export const EXPERIENCE_CATALOG = [
     kind: 'Builder',
     status: 'Live',
     accent: 'var(--ochre)',
-    description: 'A logic-circuit workspace with drag-and-drop gates, saving, loading, samples, and PNG export.',
+    description: 'A native Axiom logic-circuit workspace with gates, switches, LEDs, saving, loading, samples, and PNG export.',
     features: ['Logic gates', 'Projects', 'Samples', 'PNG export'],
-    frameSrc: '/experiences/circuit-maker.html',
     navItems: [
       { to: '/circuit-maker', label: 'Builder' },
       { to: '/circuit-maker#palette', label: 'Palette' },
@@ -68,7 +64,6 @@ export const EXPERIENCE_CATALOG = [
       { to: '/circuit-maker#exportPng', label: 'Export' },
     ],
     routePrefixes: ['/circuit-maker'],
-    immersive: true,
   },
 ];
 
