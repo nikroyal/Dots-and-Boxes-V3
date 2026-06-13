@@ -449,7 +449,7 @@ export async function sendChatAs(matchId, currentUser, text, isSpectator) {
   if (!trimmed) return;
   const matchRef = doc(db, 'matches', matchId);
   const msg = {
-    id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+    id: crypto.randomUUID(),
     userId: currentUser.id,
     username: currentUser.username,
     avatar: currentUser.avatar || '◆',
