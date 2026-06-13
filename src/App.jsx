@@ -1,10 +1,13 @@
 import { Component, lazy, Suspense } from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AuthProvider, useAuth } from './lib/AuthContext';
+import { getExperienceById, isImmersivePath } from './lib/experiences';
 import Header from './components/Header';
 import Notifications, { toast } from './components/Notifications';
 import Login from './pages/Login';
-import Dashboard from './pages/Dashboard';
+import AxiomHub from './pages/AxiomHub';
+import DotsHome from './pages/Dashboard';
+import FrameExperience from './pages/FrameExperience';
 import Lobby from './pages/Lobby';
 import Match from './pages/Match';
 import Profile from './pages/Profile';
@@ -19,6 +22,8 @@ import ClubDetail from './pages/ClubDetail';
 import LocalMatch from './pages/LocalMatch';
 
 const Admin = lazy(() => import('./pages/Admin'));
+const PAPER_IO = getExperienceById('paper-io');
+const CIRCUIT_MAKER = getExperienceById('circuit-maker');
 
 export default function App() {
   return (
@@ -71,7 +76,7 @@ class ErrorBoundary extends Component {
 }
 
 function Shell() {
-  const { user, profile, realProfile, isImpersonating, stopImpersonation, loading } = useAuth();
+  const { user, profile, isImpersonating, stopImpersonation, loading } = useAuth();
   const location = useLocation();
 
   if (loading) return <LoadingScreen />;
@@ -88,30 +93,15 @@ function Shell() {
 
   if (!profile) return <LoadingScreen />;
 
-  // Admin Shell: Only if NOT impersonating and the real profile is admin.
-  if (profile.role === 'admin' && !isImpersonating) {
-    return (
-      <div className="min-h-screen flex flex-col">
-        <Notifications />
-        <ErrorBoundary key={location.pathname}>
-          <Suspense fallback={<LoadingScreen />}>
-            <Routes>
-              <Route path="/admin" element={<Admin />} />
-              <Route path="*" element={<Navigate to="/admin" />} />
-            </Routes>
-          </Suspense>
-        </ErrorBoundary>
-      </div>
-    );
-  }
+  const isAdmin = profile.role === 'admin' && !isImpersonating;
+  const immersive = isImmersivePath(location.pathname);
 
-  // Player Shell (or Impersonation Shell)
   return (
     <div className="min-h-screen flex flex-col">
       {isImpersonating && (
         <div className="bg-amber-600 text-white px-4 py-2 text-center text-sm font-mono flex items-center justify-center gap-4 sticky top-0 z-[60]">
           <span>You are impersonating <strong>{profile.username}</strong></span>
-          <button 
+          <button
             onClick={stopImpersonation}
             className="bg-white/20 hover:bg-white/30 px-2 py-1 rounded text-[0.7rem] uppercase tracking-wider transition-colors"
           >
@@ -121,27 +111,35 @@ function Shell() {
       )}
       <Header />
       <Notifications />
-      <main className="flex-1 px-4 sm:px-6 py-8 max-w-6xl mx-auto w-full">
+      <main className={immersive
+        ? 'flex-1 w-full min-h-0'
+        : 'flex-1 px-4 sm:px-6 py-8 max-w-6xl mx-auto w-full'}>
         <ErrorBoundary key={location.pathname}>
-          <Routes>
-            <Route path="/"               element={<Dashboard />} />
-            <Route path="/lobby"          element={<Lobby />} />
-            <Route path="/match/:id"      element={<Match />} />
-            <Route path="/profile/:username" element={<Profile />} />
-            <Route path="/profile"        element={<Profile />} />
-            <Route path="/leaderboard"    element={<Leaderboard />} />
-            <Route path="/friends"        element={<Friends />} />
-            <Route path="/achievements"   element={<Achievements />} />
-            <Route path="/history"        element={<History />} />
-            <Route path="/replay/:id"     element={<Replay />} />
-            <Route path="/messages"       element={<Messages />} />
-            <Route path="/messages/:convId" element={<Messages />} />
-            <Route path="/clubs"          element={<Clubs />} />
-            <Route path="/clubs/:id"      element={<ClubDetail />} />
-            <Route path="/clubs/:id/:channelId" element={<ClubDetail />} />
-            <Route path="/local"          element={<LocalMatch />} />
-            <Route path="*"               element={<Navigate to="/" />} />
-          </Routes>
+          <Suspense fallback={<LoadingScreen />}>
+            <Routes>
+              <Route path="/" element={<AxiomHub />} />
+              <Route path="/dots-and-boxes" element={<DotsHome />} />
+              <Route path="/paper-io" element={<FrameExperience experience={PAPER_IO} />} />
+              <Route path="/circuit-maker" element={<FrameExperience experience={CIRCUIT_MAKER} />} />
+              <Route path="/lobby" element={<Lobby />} />
+              <Route path="/match/:id" element={<Match />} />
+              <Route path="/profile/:username" element={<Profile />} />
+              <Route path="/profile" element={<Profile />} />
+              <Route path="/leaderboard" element={<Leaderboard />} />
+              <Route path="/friends" element={<Friends />} />
+              <Route path="/achievements" element={<Achievements />} />
+              <Route path="/history" element={<History />} />
+              <Route path="/replay/:id" element={<Replay />} />
+              <Route path="/messages" element={<Messages />} />
+              <Route path="/messages/:convId" element={<Messages />} />
+              <Route path="/clubs" element={<Clubs />} />
+              <Route path="/clubs/:id" element={<ClubDetail />} />
+              <Route path="/clubs/:id/:channelId" element={<ClubDetail />} />
+              <Route path="/local" element={<LocalMatch />} />
+              {isAdmin && <Route path="/admin" element={<Admin />} />}
+              <Route path="*" element={<Navigate to="/" />} />
+            </Routes>
+          </Suspense>
         </ErrorBoundary>
       </main>
     </div>
