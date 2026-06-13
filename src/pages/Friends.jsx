@@ -7,7 +7,7 @@ import { sendFriendRequest, removeFriend, unblockUser, acceptFriendRequest, decl
 import { toast } from '../components/Notifications';
 import { useConfirm } from '../components/ConfirmDialog';
 import { sfx } from '../lib/sound';
-import { UserPlus, UserMinus, Send } from 'lucide-react';
+import { UserMinus, Send } from 'lucide-react';
 
 // Subscribe to a set of user docs and return them as a map keyed by id.
 // We do this rather than getDoc-on-every-mount because the parent's
