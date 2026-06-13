@@ -4,10 +4,11 @@
 // 1. Go to https://console.firebase.google.com
 // 2. Create a new project
 // 3. Add a web app (the </> icon)
-// 4. Copy the firebaseConfig object Firebase shows and paste the values
-//    below, replacing every YOUR_... placeholder.
-// 5. Enable Authentication → Email/Password sign-in method
-// 6. Create Firestore Database (production mode, paste firestore.rules)
+// 4. Create a `.env` file in the root directory using `.env.example` as a template.
+// 5. Copy the firebaseConfig object Firebase shows and paste the values
+//    into your `.env` file, replacing every YOUR_... placeholder.
+// 6. Enable Authentication → Email/Password sign-in method
+// 7. Create Firestore Database (production mode, paste firestore.rules)
 //
 // If you skip this step the app fails fast with a console error on load
 // rather than silently using somebody else's backend.
@@ -18,21 +19,21 @@ import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBVGeK5bxFKRidj-UkNnTXlHmZ40A9_-2s",
-  authDomain: "dots-and-boxes-1a5f9.firebaseapp.com",
-  projectId: "dots-and-boxes-1a5f9",
-  storageBucket: "dots-and-boxes-1a5f9.firebasestorage.app",
-  messagingSenderId: "709974944953",
-  appId: "1:709974944953:web:9e1542ed1108723ec3ff68"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "YOUR_API_KEY",
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || "YOUR_AUTH_DOMAIN",
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || "YOUR_PROJECT_ID",
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || "YOUR_STORAGE_BUCKET",
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || "YOUR_MESSAGING_SENDER_ID",
+  appId: import.meta.env.VITE_FIREBASE_APP_ID || "YOUR_APP_ID"
 };
 
 // Fail loudly if the placeholder wasn't replaced. We check apiKey because
 // it's the most visible value and the one that's hardest to forget.
 if (firebaseConfig.apiKey === "YOUR_API_KEY") {
   const msg =
-    'firebase.js still has placeholder values. Open src/lib/firebase.js ' +
-    'and paste your own Firebase project config. See the comment at the ' +
-    'top of that file for steps.';
+    'Firebase is not configured. Create a .env file and paste your own ' +
+    'Firebase project config. See the comment at the ' +
+    'top of src/lib/firebase.js for steps.';
   // Surface in the UI so a non-developer deployer sees it too.
   if (typeof document !== 'undefined') {
     document.addEventListener('DOMContentLoaded', () => {
