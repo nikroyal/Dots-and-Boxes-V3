@@ -36,6 +36,7 @@ export const EXPERIENCE_CATALOG = [
     kind: 'Arcade',
     status: 'Live',
     accent: 'var(--crimson)',
+    immersive: true,
     description: 'A native Axiom territory-control arcade run with bots, selectable modes, live stats, and local awards.',
     features: ['Live bots', 'Modes', 'Stats', 'Awards'],
     navItems: [
@@ -54,6 +55,7 @@ export const EXPERIENCE_CATALOG = [
     kind: 'Builder',
     status: 'Live',
     accent: 'var(--ochre)',
+    immersive: true,
     description: 'A native Axiom logic-circuit workspace with gates, switches, LEDs, saving, loading, samples, and PNG export.',
     features: ['Logic gates', 'Projects', 'Samples', 'PNG export'],
     navItems: [
