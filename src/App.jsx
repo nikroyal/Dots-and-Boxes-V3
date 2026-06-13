@@ -1,13 +1,14 @@
 import { Component, lazy, Suspense } from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AuthProvider, useAuth } from './lib/AuthContext';
-import { getExperienceById, isImmersivePath } from './lib/experiences';
+import { isImmersivePath } from './lib/experiences';
 import Header from './components/Header';
 import Notifications, { toast } from './components/Notifications';
 import Login from './pages/Login';
 import AxiomHub from './pages/AxiomHub';
 import DotsHome from './pages/Dashboard';
-import FrameExperience from './pages/FrameExperience';
+import PaperIo from './pages/PaperIo';
+import CircuitMaker from './pages/CircuitMaker';
 import Lobby from './pages/Lobby';
 import Match from './pages/Match';
 import Profile from './pages/Profile';
@@ -22,8 +23,6 @@ import ClubDetail from './pages/ClubDetail';
 import LocalMatch from './pages/LocalMatch';
 
 const Admin = lazy(() => import('./pages/Admin'));
-const PAPER_IO = getExperienceById('paper-io');
-const CIRCUIT_MAKER = getExperienceById('circuit-maker');
 
 export default function App() {
   return (
@@ -119,8 +118,8 @@ function Shell() {
             <Routes>
               <Route path="/" element={<AxiomHub />} />
               <Route path="/dots-and-boxes" element={<DotsHome />} />
-              <Route path="/paper-io" element={<FrameExperience experience={PAPER_IO} />} />
-              <Route path="/circuit-maker" element={<FrameExperience experience={CIRCUIT_MAKER} />} />
+              <Route path="/paper-io" element={<PaperIo />} />
+              <Route path="/circuit-maker" element={<CircuitMaker />} />
               <Route path="/lobby" element={<Lobby />} />
               <Route path="/match/:id" element={<Match />} />
               <Route path="/profile/:username" element={<Profile />} />
