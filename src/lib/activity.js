@@ -44,15 +44,19 @@ export async function getActivityForUsers(userIds, max = 30) {
   for (let i = 0; i < userIds.length; i += 30) {
     chunks.push(userIds.slice(i, i + 30));
   }
-  const all = [];
-  for (const chunk of chunks) {
+  const promises = chunks.map(chunk => {
     const q = query(
       collection(db, 'activities'),
       where('userId', 'in', chunk),
       orderBy('ts', 'desc'),
       limit(max)
     );
-    const snap = await getDocs(q);
+    return getDocs(q);
+  });
+
+  const snaps = await Promise.all(promises);
+  const all = [];
+  for (const snap of snaps) {
     snap.docs.forEach(d => all.push({ id: d.id, ...d.data() }));
   }
   // Sort merged + cap
