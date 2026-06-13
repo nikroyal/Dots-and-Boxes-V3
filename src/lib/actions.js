@@ -824,17 +824,21 @@ export async function blockUser(currentUser, targetUsername) {
       where('status', 'in', ['active', 'paused']),
       limit(20),
     ));
+    const updatePromises = [];
     for (const d of myActive.docs) {
       const m = d.data();
       if (!m.players.includes(target.id)) continue;
       // Settle the match: blocker concedes, target wins.
-      await updateDoc(doc(db, 'matches', d.id), {
-        status: 'finished',
-        winner: target.id,
-        resignedBy: currentUser.id,
-        finishedAt: serverTimestamp(),
-      }).catch(() => {});
+      updatePromises.push(
+        updateDoc(doc(db, 'matches', d.id), {
+          status: 'finished',
+          winner: target.id,
+          resignedBy: currentUser.id,
+          finishedAt: serverTimestamp(),
+        }).catch(() => {})
+      );
     }
+    await Promise.all(updatePromises);
   } catch (e) {
     // Best-effort; matches list may need a composite index. Don't block
     // the block itself on this cleanup.
