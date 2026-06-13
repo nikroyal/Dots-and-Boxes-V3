@@ -9,6 +9,7 @@ import {
 } from '../lib/theme';
 import { watchTotalUnread } from '../lib/dms';
 import { startHeartbeat, stopHeartbeat } from '../lib/presence';
+import { findExperienceByPath, SHARED_NAV_ITEMS } from '../lib/experiences';
 
 export default function Header() {
   const { profile, isImpersonating, logout } = useAuth();
@@ -20,6 +21,12 @@ export default function Header() {
   const [unreadCount, setUnreadCount] = useState(0);
   const settingsRef = useRef(null);
   const isAdmin = profile?.role === 'admin';
+  const activeExperience = findExperienceByPath(loc.pathname);
+  const sectionNavItems = activeExperience.navItems || [];
+  const sharedNavItems = SHARED_NAV_ITEMS.map(item => ({
+    ...item,
+    badge: item.badge === 'unread' ? unreadCount : item.badge,
+  }));
 
   // Subscribe to total unread DM count
   useEffect(() => {
@@ -67,13 +74,22 @@ export default function Header() {
     sfx.click();
   };
 
-  const navItem = (to, label, badge = 0) => {
-    const active = loc.pathname === to || (to !== '/' && loc.pathname.startsWith(to));
+  const isNavActive = (to) => {
+    const hashIndex = to.indexOf('#');
+    const targetPath = hashIndex === -1 ? to : to.slice(0, hashIndex);
+    const targetHash = hashIndex === -1 ? '' : to.slice(hashIndex);
+    if (targetHash) return loc.pathname === targetPath && loc.hash === targetHash;
+    return loc.pathname === targetPath || (targetPath !== '/' && loc.pathname.startsWith(`${targetPath}/`));
+  };
+
+  const navItem = ({ to, label, badge = 0 }) => {
+    const active = isNavActive(to);
     return (
       <Link
+        key={`${to}-${label}`}
         to={to}
         onClick={sfx.click}
-        className="font-mono px-3 py-1 text-[0.7rem] tracking-widest uppercase transition-opacity inline-flex items-center gap-1.5"
+        className="font-mono px-3 py-1 text-[0.7rem] tracking-widest uppercase transition-opacity inline-flex items-center gap-1.5 whitespace-nowrap"
         style={{ opacity: active ? 1 : 0.5 }}
       >
         {label}
@@ -92,20 +108,20 @@ export default function Header() {
   return (
     <header className="border-b hairline sticky top-0 z-30" style={{ background: 'var(--header-bg)', backdropFilter: 'blur(8px)' }}>
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-4">
-        <Link to="/" className="font-display text-lg font-medium tracking-tight" onClick={sfx.click}>
-          Dots <em className="font-normal">&amp;</em> Boxes
+        <Link to="/" className="font-display text-lg font-medium tracking-tight flex items-baseline gap-2 min-w-0" onClick={sfx.click}>
+          <span>Axiom</span>
+          {activeExperience.id !== 'axiom' && (
+            <span className="font-mono text-[0.55rem] tracking-widest uppercase opacity-45 truncate hidden sm:inline">
+              / {activeExperience.shortName}
+            </span>
+          )}
         </Link>
 
-        <nav className="hidden md:flex items-center gap-1">
-          {navItem('/', 'Home')}
-          {navItem('/lobby', 'Lobby')}
-          {navItem('/local', 'Local')}
-          {navItem('/leaderboard', 'Ranks')}
-          {navItem('/friends', 'Friends')}
-          {navItem('/messages', 'Msgs', unreadCount)}
-          {navItem('/clubs', 'Clubs')}
-          {navItem('/history', 'History')}
-          {isAdmin && navItem('/admin', 'Admin')}
+        <nav className="hidden md:flex items-center gap-1 min-w-0 overflow-x-auto scrollbar-thin">
+          {sectionNavItems.map(navItem)}
+          <span aria-hidden="true" className="mx-1 h-4 w-px bg-current opacity-10" />
+          {sharedNavItems.map(navItem)}
+          {isAdmin && navItem({ to: '/admin', label: 'Admin' })}
         </nav>
 
         <div className="flex items-center gap-3">
@@ -184,16 +200,11 @@ export default function Header() {
       </div>
 
       {/* Mobile nav */}
-      <nav className="md:hidden flex items-center justify-center gap-1 px-4 py-2 border-t hairline overflow-x-auto">
-        {navItem('/', 'Home')}
-        {navItem('/lobby', 'Lobby')}
-        {navItem('/local', 'Local')}
-        {navItem('/leaderboard', 'Ranks')}
-        {navItem('/friends', 'Friends')}
-        {navItem('/messages', 'Msgs', unreadCount)}
-        {navItem('/clubs', 'Clubs')}
-        {navItem('/history', 'History')}
-        {isAdmin && navItem('/admin', 'Admin')}
+      <nav className="md:hidden flex items-center gap-1 px-4 py-2 border-t hairline overflow-x-auto scrollbar-thin">
+        {sectionNavItems.map(navItem)}
+        <span aria-hidden="true" className="mx-1 h-4 w-px bg-current opacity-10 shrink-0" />
+        {sharedNavItems.map(navItem)}
+        {isAdmin && navItem({ to: '/admin', label: 'Admin' })}
       </nav>
     </header>
   );
