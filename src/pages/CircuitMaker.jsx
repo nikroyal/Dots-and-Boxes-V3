@@ -572,7 +572,7 @@ function CircuitNode({ component, selected, value, onSelect, onDragStart, onTogg
       )}
 
       {component.type !== 'input' && (
-        hasTwoInputs(component.type) ? (
+        ['and', 'or', 'xor', 'nand', 'nor'].includes(component.type) ? (
           <>
             <span className="absolute left-[-7px] top-[22px] w-3 h-3 rounded-full bg-white/70" />
             <span className="absolute left-[-7px] top-[54px] w-3 h-3 rounded-full bg-white/70" />
