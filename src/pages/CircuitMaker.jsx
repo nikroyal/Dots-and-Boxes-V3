@@ -165,7 +165,7 @@ export default function CircuitMaker() {
     if (state.wires.some(wire => wire.from === source.id && wire.to === target.id)) return;
 
     const targetInputs = state.wires.filter(w => w.to === target.id).length;
-    const maxInputs = hasTwoInputs(target.type) ? 2 : 1;
+    const maxInputs = ['and', 'or', 'xor', 'nand', 'nor'].includes(target.type) ? 2 : 1;
     if (targetInputs >= maxInputs) return;
 
     commit({ ...state, wires: [...state.wires, { from: source.id, to: target.id }] });
