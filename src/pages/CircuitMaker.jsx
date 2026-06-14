@@ -430,7 +430,9 @@ export default function CircuitMaker() {
                 wireIndices3.set(to.id, count + 1);
 
                 const a = sourcePoint(from);
-                const b = targetPoint(to, count);
+                const isTwo = ['and', 'or', 'xor', 'nand', 'nor'].includes(to.type);
+                const targetY = isTwo ? (count === 0 ? to.y + 28 : to.y + 60) : to.y + 44;
+                const b = { x: to.x, y: targetY };
                 const live = values.get(from.id)?.out;
                 const wireId = `${wire.from}-${wire.to}`;
                 const isSelected = selected.includes(wireId);
