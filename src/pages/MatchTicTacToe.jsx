@@ -717,7 +717,7 @@ function Board({ game, players, playerInfo, isMyTurn, onPlay, lastMove }) {
           <line
             x1={strikeLine.x1} y1={strikeLine.y1}
             x2={strikeLine.x2} y2={strikeLine.y2}
-            stroke="var(--ochre)" strokeWidth="8" strokeLinecap="round"
+            stroke={PLAYER_COLORS[winnerIdx]?.hex || 'var(--ochre)'} strokeWidth="8" strokeLinecap="round"
             className="line-drawn"
             style={{
               filter: 'drop-shadow(0px 2px 4px rgba(0,0,0,0.2))',
