@@ -625,9 +625,7 @@ function TurnTimerBanner({ remainingMs, timeoutMs, isMyTurn, isPlayer, opponentD
 // barely notices, but they're meaningfully different up close.
 // Index matches PLAYER_COLORS order.
 function Board({ game, players, playerInfo, isMyTurn, onPlay, lastMove }) {
-  const { rows, cols, board, finished, winLine } = game;
-  const w = cols * 100;
-  const h = rows * 100;
+  const { rows, cols, board, finished, winLine, winnerIdx } = game;
 
   // Compute strike-through line if won
   let strikeLine = null;
