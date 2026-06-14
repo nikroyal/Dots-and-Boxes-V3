@@ -9,38 +9,52 @@ export function createEmptyGame(rows = 3, cols = 3, playerIds = ['p1', 'p2']) {
     moves: [], // { r, c, by, ts }
     finished: false,
     winnerIdx: null,
+    winLine: null,
   };
 }
 
 function checkWin(board, r, c, playerId, rows, cols) {
-  // Check row
-  if (board[r].every(cell => cell === playerId)) return true;
-  // Check col
-  let colWin = true;
-  for (let i = 0; i < rows; i++) {
-    if (board[i][c] !== playerId) {
-      colWin = false; break;
-    }
-  }
-  if (colWin) return true;
+  const winLength = Math.min(5, Math.max(3, Math.min(rows, cols)));
 
-  // Check diagonals (assuming square board)
-  if (r === c) {
-    let diag1Win = true;
-    for (let i = 0; i < rows; i++) {
-      if (board[i][i] !== playerId) { diag1Win = false; break; }
+  const dirs = [
+    [0, 1],  // horizontal
+    [1, 0],  // vertical
+    [1, 1],  // diagonal
+    [1, -1]  // anti-diagonal
+  ];
+
+  for (const [dr, dc] of dirs) {
+    let count = 1;
+    let line = [{ r, c }];
+
+    // Check in the positive direction
+    for (let i = 1; i < winLength; i++) {
+      const nr = r + i * dr;
+      const nc = c + i * dc;
+      if (nr < 0 || nr >= rows || nc < 0 || nc >= cols || board[nr][nc] !== playerId) break;
+      count++;
+      line.push({ r: nr, c: nc });
     }
-    if (diag1Win) return true;
-  }
-  if (r + c === rows - 1) {
-    let diag2Win = true;
-    for (let i = 0; i < rows; i++) {
-      if (board[i][rows - 1 - i] !== playerId) { diag2Win = false; break; }
+
+    // Check in the negative direction
+    for (let i = 1; i < winLength; i++) {
+      const nr = r - i * dr;
+      const nc = c - i * dc;
+      if (nr < 0 || nr >= rows || nc < 0 || nc >= cols || board[nr][nc] !== playerId) break;
+      count++;
+      line.push({ r: nr, c: nc });
     }
-    if (diag2Win) return true;
+
+    if (count >= winLength) {
+      line.sort((a, b) => {
+        if (a.r !== b.r) return a.r - b.r;
+        return a.c - b.c;
+      });
+      return { won: true, line };
+    }
   }
 
-  return false;
+  return { won: false, line: null };
 }
 
 export function applyMove(game, r, c, playerId, playerIds) {
@@ -58,12 +72,13 @@ export function applyMove(game, r, c, playerId, playerIds) {
   newGame.moveCount++;
   newGame.moves.push({ r, c, by: playerId, ts: Date.now() });
 
-  const won = checkWin(newGame.board, r, c, playerId, newGame.rows, newGame.cols);
+  const { won, line } = checkWin(newGame.board, r, c, playerId, newGame.rows, newGame.cols);
 
   if (won) {
     newGame.finished = true;
     newGame.winnerIdx = newGame.currentPlayerIdx;
     newGame.scores[playerId]++;
+    newGame.winLine = line;
   } else if (newGame.moveCount === newGame.rows * newGame.cols) {
     newGame.finished = true;
     newGame.winnerIdx = -1; // draw
