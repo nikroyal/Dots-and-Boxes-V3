@@ -1,8 +1,8 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createEmptyGame, applyMove } from '../lib/chessLogic';
 import { sfx } from '../lib/sound';
-import { X, Trophy, RefreshCcw } from 'lucide-react';
+import { X, Trophy, RefreshCcw, Clock } from 'lucide-react';
 import Confetti from '../components/Confetti';
 import { useConfirm } from '../components/ConfirmDialog';
 import { Chessboard } from 'react-chessboard';
@@ -14,17 +14,50 @@ export default function LocalChess() {
   const [p1Name, setP1Name] = useState('Player 1 (White)');
   const [p2Name, setP2Name] = useState('Player 2 (Black)');
   const [flipBoard, setFlipBoard] = useState(true);
+  const [useTimer, setUseTimer] = useState(false);
+  const [timerMins, setTimerMins] = useState(5);
 
   const [game, setGame] = useState(null);
+  const [selectedSquare, setSelectedSquare] = useState(null);
+  const [optionSquares, setOptionSquares] = useState({});
+  const [pendingGame, setPendingGame] = useState(null);
+  const pendingTimeoutRef = useRef(null);
   const { confirm, dialog } = useConfirm();
+
+  const [turnTimerMs, setTurnTimerMs] = useState(0);
+  const [now, setNow] = useState(Date.now());
+  const [turnStartedAtMs, setTurnStartedAtMs] = useState(0);
+
+  useEffect(() => {
+    if (!setup && useTimer && game && !game.finished && !pendingGame) {
+      const interval = setInterval(() => setNow(Date.now()), 1000);
+      return () => clearInterval(interval);
+    }
+  }, [setup, useTimer, game, pendingGame]);
+
+  useEffect(() => {
+    if (useTimer && game && !game.finished && !pendingGame) {
+      const turnTimeoutMs = timerMins * 60 * 1000;
+      const elapsed = Date.now() - turnStartedAtMs;
+      if (elapsed > turnTimeoutMs) {
+        // Time is up, current player loses
+        const newGame = { ...game, finished: true, winnerIdx: game.currentPlayerIdx === 0 ? 1 : 0 };
+        setGame(newGame);
+        sfx.win(); // or loss sound depending on who is playing
+      }
+    }
+  }, [now, useTimer, game, pendingGame, turnStartedAtMs, timerMins]);
 
   const handleStart = (e) => {
     e.preventDefault();
     setGame(createEmptyGame(['p1', 'p2']));
+    if (useTimer) {
+      setTurnStartedAtMs(Date.now());
+    }
     setSetup(false);
   };
 
-  const onDrop = (sourceSquare, targetSquare, piece) => {
+  const makeMoveObj = (sourceSquare, targetSquare, piece) => {
     if (!game || game.finished) return false;
     const playerIds = ['p1', 'p2'];
     const pid = playerIds[game.currentPlayerIdx];
@@ -32,7 +65,7 @@ export default function LocalChess() {
     const moveObj = {
       from: sourceSquare,
       to: targetSquare,
-      promotion: piece[1].toLowerCase() ?? 'q',
+      promotion: piece ? (piece[1].toLowerCase() === 'p' ? 'q' : piece[1].toLowerCase()) : 'q',
     };
 
     const { newGame, claimed, error } = applyMove(game, moveObj, pid, playerIds);
@@ -41,8 +74,63 @@ export default function LocalChess() {
     if (claimed > 0) sfx.win();
     else sfx.line();
 
-    setGame(newGame);
+    setPendingGame(newGame);
+    setSelectedSquare(null);
+    setOptionSquares({});
+
+    if (pendingTimeoutRef.current) clearTimeout(pendingTimeoutRef.current);
+    pendingTimeoutRef.current = setTimeout(() => {
+      setGame(newGame);
+      if (useTimer) {
+        setTurnStartedAtMs(Date.now());
+      }
+      setPendingGame(null);
+      pendingTimeoutRef.current = null;
+    }, 3000);
+
     return true;
+  };
+
+  const undoMove = () => {
+    if (pendingTimeoutRef.current) {
+      clearTimeout(pendingTimeoutRef.current);
+      pendingTimeoutRef.current = null;
+    }
+    setPendingGame(null);
+  };
+
+  const onDrop = (sourceSquare, targetSquare, piece) => {
+    if (pendingGame) return false;
+    return makeMoveObj(sourceSquare, targetSquare, piece);
+  };
+
+  const onSquareClick = (square, piece) => {
+    if (!game || game.finished) return;
+    if (pendingGame) return; // Prevent interaction during undo window
+
+    if (optionSquares[square]) {
+      makeMoveObj(selectedSquare, square, undefined); // If clicking an option, piece is not provided directly, logic infers 'q' for promotion.
+      return;
+    }
+
+    const chess = new Chess(game.fen);
+    const moves = chess.moves({ square, verbose: true });
+
+    if (moves.length === 0) {
+      setSelectedSquare(null);
+      setOptionSquares({});
+      return;
+    }
+
+    setSelectedSquare(square);
+    const newOptions = {};
+    moves.forEach(move => {
+      newOptions[move.to] = {
+        background: 'radial-gradient(circle, rgba(0,255,0,.2) 25%, transparent 30%)',
+        borderRadius: '50%'
+      };
+    });
+    setOptionSquares(newOptions);
   };
 
   const quit = async () => {
@@ -76,6 +164,20 @@ export default function LocalChess() {
               <input type="checkbox" checked={flipBoard} onChange={e => setFlipBoard(e.target.checked)} />
               <span className="font-mono text-[0.65rem] tracking-widest uppercase opacity-80">Auto-flip board each turn</span>
             </label>
+
+            <div className="border hairline p-3 space-y-3">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" checked={useTimer} onChange={e => setUseTimer(e.target.checked)} />
+                <span className="font-mono text-[0.65rem] tracking-widest uppercase opacity-80">Use Timer (per turn)</span>
+              </label>
+              {useTimer && (
+                <div>
+                  <label className="font-mono text-[0.65rem] tracking-widest uppercase opacity-60 mb-1 block">Minutes per turn</label>
+                  <input type="number" value={timerMins} onChange={e => setTimerMins(Math.max(1, parseInt(e.target.value) || 1))} className="w-full bg-black/5 dark:bg-white/5 border hairline px-3 py-2 font-display outline-none focus-ring" min={1} required />
+                </div>
+              )}
+              <div className="font-mono text-[0.55rem] tracking-widest uppercase opacity-50">Note: Both players should agree on the timer settings.</div>
+            </div>
           </div>
           <button type="submit" className="btn-primary w-full justify-center">Start Match</button>
         </form>
@@ -83,19 +185,31 @@ export default function LocalChess() {
     );
   }
 
-  const finished = game.finished;
-  const isDraw = finished && game.winnerIdx === -1;
-  const winnerName = isDraw ? 'Draw' : (game.winnerIdx === 0 ? p1Name : p2Name);
-  const p1Turn = game.currentPlayerIdx === 0;
+  const displayGame = pendingGame || game;
+  const finished = displayGame.finished;
+  const isDraw = finished && displayGame.winnerIdx === -1;
+  const winnerName = isDraw ? 'Draw' : (displayGame.winnerIdx === 0 ? p1Name : p2Name);
+  const p1Turn = displayGame.currentPlayerIdx === 0;
 
   const boardOrientation = flipBoard ? (p1Turn ? 'white' : 'black') : 'white';
+
+  const lastMove = displayGame.moves && displayGame.moves.length > 0 ? displayGame.moves[displayGame.moves.length - 1] : null;
+
+  const customSquareStyles = {
+    ...(lastMove ? {
+      [lastMove.from]: { backgroundColor: 'rgba(255, 255, 0, 0.4)' },
+      [lastMove.to]: { backgroundColor: 'rgba(255, 255, 0, 0.4)' }
+    } : {}),
+    ...optionSquares,
+    ...(selectedSquare ? { [selectedSquare]: { backgroundColor: 'rgba(255, 0, 0, 0.4)' } } : {})
+  };
 
   return (
     <div className="fade-in max-w-4xl mx-auto space-y-6">
       {dialog}
       {finished && !isDraw && <Confetti />}
 
-      <div className="flex items-center justify-between border-b hairline pb-4">
+      <div className="flex flex-col sm:flex-row items-center justify-between border-b hairline pb-4 gap-4">
         <div className="flex items-center gap-4">
           <button onClick={quit} className="btn-ghost" aria-label="Quit match">
             <X size={16} />
@@ -107,12 +221,26 @@ export default function LocalChess() {
           )}
         </div>
         {!finished && (
-          <div className="font-mono text-[0.65rem] tracking-widest uppercase px-3 py-1 rounded" style={{
-            background: p1Turn ? 'white' : 'black',
-            color: p1Turn ? 'black' : 'white',
-            border: '1px solid var(--hairline-strong)'
-          }}>
-            {p1Turn ? p1Name : p2Name}'s Turn
+          <div className="flex items-center gap-4">
+            {useTimer && (
+              <div className="flex items-center gap-2 font-mono text-sm tabular-nums" style={{ color: 'var(--ochre)' }}>
+                <Clock size={14} />
+                {(() => {
+                  const remainingMs = Math.max(0, timerMins * 60 * 1000 - (now - turnStartedAtMs));
+                  const secs = Math.ceil(remainingMs / 1000);
+                  const m = Math.floor(secs / 60);
+                  const s = secs % 60;
+                  return `${m}:${s.toString().padStart(2, '0')}`;
+                })()}
+              </div>
+            )}
+            <div className="font-mono text-[0.65rem] tracking-widest uppercase px-3 py-1 rounded" style={{
+              background: p1Turn ? 'white' : 'black',
+              color: p1Turn ? 'black' : 'white',
+              border: '1px solid var(--hairline-strong)'
+            }}>
+              {p1Turn ? p1Name : p2Name}'s Turn
+            </div>
           </div>
         )}
       </div>
@@ -120,16 +248,26 @@ export default function LocalChess() {
       <div className="flex justify-center py-8">
         <div className="w-full max-w-[500px]">
           <Chessboard
-            position={game.fen}
+            position={displayGame.fen}
             onPieceDrop={onDrop}
+            onSquareClick={onSquareClick}
             boardOrientation={boardOrientation}
             customDarkSquareStyle={{ backgroundColor: 'var(--ochre)' }}
             customLightSquareStyle={{ backgroundColor: 'var(--paper-tint)' }}
+            customSquareStyles={customSquareStyles}
           />
         </div>
       </div>
 
-      {finished && (
+      {pendingGame && (
+        <div className="flex justify-center mt-4 fade-in">
+          <button onClick={undoMove} className="btn-ghost text-sm py-1 px-3 border border-current rounded">
+            Undo Move (3s)
+          </button>
+        </div>
+      )}
+
+      {finished && !pendingGame && (
         <div className="card text-center max-w-sm mx-auto space-y-6 fade-up">
           <div>
             <Trophy size={32} className="mx-auto mb-3" style={{ color: 'var(--ochre)' }} />
