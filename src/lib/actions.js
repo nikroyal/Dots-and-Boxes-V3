@@ -5,6 +5,9 @@ import {
 } from 'firebase/firestore';
 import { db } from './firebase';
 import { createEmptyGame, applyMove, computeElo } from './gameLogic';
+import { createEmptyGame as createEmptyGameC4, applyMove as applyMoveC4 } from './connect4Logic';
+import { createEmptyGame as createEmptyGameTTT, applyMove as applyMoveTTT } from './tictactoeLogic';
+import { createEmptyGame as createEmptyGameChess, applyMove as applyMoveChess } from './chessLogic';
 import { checkUnlocks } from './achievements';
 import { recordActivity, ACTIVITY_TYPES } from './activity';
 
@@ -47,7 +50,7 @@ export async function lookupUserByUsername(username) {
 
 // ─── Invites ──────────────────────────────────────────────────────────────
 // invites collection: { fromId, fromUsername, toId, toUsername, rows, cols, status, createdAt, matchId? }
-export async function sendInvite(fromUser, toUsername, rows, cols) {
+export async function sendInvite(fromUser, toUsername, rows, cols, gameType = 'dots') {
   guard(fromUser);
   const target = await lookupUserByUsername(toUsername);
   if (!target) throw new Error('User not found');
@@ -75,6 +78,7 @@ export async function sendInvite(fromUser, toUsername, rows, cols) {
     toId: target.id,
     toUsername: target.username,
     rows, cols,
+    gameType,
     status: 'pending',
     createdAt: serverTimestamp(),
   });
@@ -104,6 +108,14 @@ export async function acceptInvite(inviteId, currentUser) {
     // — fine for a 3-second UX, and `makeMove` enforces the gate transaction-side.
     const playerIds = [inv.fromId, inv.toId];
     const startsAtMs = Date.now() + PREGAME_COUNTDOWN_MS;
+
+    const gType = inv.gameType || 'dots';
+    let newGame;
+    if (gType === 'connect4') newGame = createEmptyGameC4(inv.rows, inv.cols, playerIds);
+    else if (gType === 'tictactoe') newGame = createEmptyGameTTT(inv.rows, inv.cols, playerIds);
+    else if (gType === 'chess') newGame = createEmptyGameChess(playerIds);
+    else newGame = createEmptyGame(inv.rows, inv.cols, playerIds);
+
     tx.set(matchRef, {
       players: playerIds,
       playerInfo: {
@@ -112,7 +124,8 @@ export async function acceptInvite(inviteId, currentUser) {
       },
       rows: inv.rows,
       cols: inv.cols,
-      game: createEmptyGame(inv.rows, inv.cols, playerIds),
+      gameType: gType,
+      game: newGame,
       status: 'active', // active | paused | finished
       pauseRequest: null, // { byId, requestedAt }
       pauseConcealed: false, // when paused, hide board
@@ -168,7 +181,7 @@ export async function consumeAcceptedInvite(inviteId, currentUser) {
 // Find an online opponent within ±200 ELO and send them an invite.
 // Returns { ok: true, opponent } on success, or throws with a friendly
 // "no players found" message.
-export async function quickMatch(currentUser, rows = 5, cols = 5) {
+export async function quickMatch(currentUser, rows = 5, cols = 5, gameType = 'dots') {
   guard(currentUser);
   const myElo = currentUser.elo || 1000;
   const blockedByMe = currentUser.blocked || [];
@@ -229,7 +242,7 @@ export async function quickMatch(currentUser, rows = 5, cols = 5) {
   const target = candidates[0];
 
   // Reuse the regular invite flow.
-  await sendInvite(currentUser, target.username, rows, cols);
+  await sendInvite(currentUser, target.username, rows, cols, gameType);
   return { ok: true, opponent: { username: target.username, elo: target.elo || 1000 } };
 }
 
@@ -247,12 +260,82 @@ export async function requestRematch(match, currentUser) {
   // Reuse sendInvite then patch the resulting doc to add the rematch flag.
   // (Patching after the create is cheaper than threading a flag through
   // every call site of sendInvite.)
-  const inviteId = await sendInvite(currentUser, opponentUsername, match.rows, match.cols);
+  const inviteId = await sendInvite(currentUser, opponentUsername, match.rows, match.cols, match.gameType || 'dots');
   await updateDoc(doc(db, 'invites', inviteId), { isRematch: true, prevMatchId: match.id }).catch(() => {});
   return inviteId;
 }
 
 // ─── Matches ─────────────────────────────────────────────────────────────
+export async function hostGame(currentUser, gameType, rows, cols) {
+  guard(currentUser);
+  let game;
+  if (gameType === 'connect4') game = createEmptyGameC4(rows, cols, [currentUser.id]);
+  else if (gameType === 'tictactoe') game = createEmptyGameTTT(rows, cols, [currentUser.id]);
+  else if (gameType === 'chess') game = createEmptyGameChess([currentUser.id]);
+
+  const docRef = await addDoc(collection(db, 'matches'), {
+    gameType,
+    players: [currentUser.id],
+    playerInfo: {
+      [currentUser.id]: { username: currentUser.username, avatar: currentUser.avatar || '◆', elo: currentUser.elo || 1000 }
+    },
+    rows,
+    cols,
+    game,
+    status: 'waiting', // waiting | active | paused | finished
+    createdAt: serverTimestamp(),
+  });
+  return docRef.id;
+}
+
+export async function cancelGame(matchId, currentUser) {
+  guard(currentUser);
+  const matchRef = doc(db, 'matches', matchId);
+  await runTransaction(db, async (tx) => {
+    const snap = await tx.get(matchRef);
+    if (!snap.exists()) return;
+    const m = snap.data();
+    if (m.status !== 'waiting') throw new Error('Game already started');
+    if (!m.players.includes(currentUser.id)) throw new Error('Not your game');
+    tx.delete(matchRef);
+  });
+}
+
+export async function joinGame(matchId, currentUser) {
+  guard(currentUser);
+  const matchRef = doc(db, 'matches', matchId);
+  await runTransaction(db, async (tx) => {
+    const snap = await tx.get(matchRef);
+    if (!snap.exists()) throw new Error('Match not found');
+    const m = snap.data();
+    if (m.status !== 'waiting') throw new Error('Game already started');
+    if (m.players.includes(currentUser.id)) throw new Error('You are already in this game');
+
+    const playerIds = [m.players[0], currentUser.id];
+    let game;
+    if (m.gameType === 'connect4') game = createEmptyGameC4(m.rows, m.cols, playerIds);
+    else if (m.gameType === 'tictactoe') game = createEmptyGameTTT(m.rows, m.cols, playerIds);
+    else if (m.gameType === 'chess') game = createEmptyGameChess(playerIds);
+
+    const startsAtMs = Date.now() + PREGAME_COUNTDOWN_MS;
+
+    tx.update(matchRef, {
+      players: playerIds,
+      [`playerInfo.${currentUser.id}`]: { username: currentUser.username, avatar: currentUser.avatar || '◆', elo: currentUser.elo || 1000 },
+      game,
+      status: 'active',
+      pauseRequest: null,
+      pauseConcealed: false,
+      spectators: [],
+      chat: [],
+      winner: null,
+      startsAtMs,
+      turnStartedAt: serverTimestamp(),
+      turnTimeoutMs: TURN_TIMEOUT_MS,
+    });
+  });
+}
+
 export function watchMatch(matchId, callback) {
   return onSnapshot(doc(db, 'matches', matchId), (snap) => {
     if (snap.exists()) callback({ id: snap.id, ...snap.data() });
@@ -260,7 +343,7 @@ export function watchMatch(matchId, callback) {
   });
 }
 
-export async function makeMove(matchId, orientation, r, c, currentUser) {
+export async function makeMove(matchId, gameType, orientation, r, c, currentUser) {
   guard(currentUser);
   await runTransaction(db, async (tx) => {
 // ... (rest of makeMove)
@@ -281,7 +364,17 @@ export async function makeMove(matchId, orientation, r, c, currentUser) {
     if (playerIdx === -1) throw new Error('Not a player');
     if (m.game.currentPlayerIdx !== playerIdx) throw new Error('Not your turn');
 
-    const result = applyMove(m.game, orientation, r, c, currentUser.id, m.players);
+    let result;
+    if (gameType === 'connect4') {
+      result = applyMoveC4(m.game, c, currentUser.id, m.players);
+    } else if (gameType === 'tictactoe') {
+      result = applyMoveTTT(m.game, r, c, currentUser.id, m.players);
+    } else if (gameType === 'chess') {
+      result = applyMoveChess(m.game, r, currentUser.id, m.players); // r contains moveObj
+    } else {
+      result = applyMove(m.game, orientation, r, c, currentUser.id, m.players);
+    }
+
     if (result.error) throw new Error(result.error);
 
     const update = { game: result.newGame };
