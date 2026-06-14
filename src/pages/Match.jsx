@@ -184,6 +184,7 @@ export default function Match() {
     const startedAtMs = effectiveStartsAtMs
       ? Math.max(rawStartedAtMs, effectiveStartsAtMs)
       : rawStartedAtMs;
+    if (match.turnTimeoutMs === -1) return;
     const timeoutMs = match.turnTimeoutMs || 60000;
     const expired = Date.now() > startedAtMs + timeoutMs;
     if (!expired) return;
