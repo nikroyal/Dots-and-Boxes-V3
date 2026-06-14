@@ -16,8 +16,9 @@ import Confetti from '../components/Confetti';
 import { useConfirm } from '../components/ConfirmDialog';
 import { isDisconnected } from '../lib/presence';
 import { Pause, Play, Flag, Send, Eye, Trophy, RotateCcw, Home, Repeat, Clock, WifiOff, Handshake } from 'lucide-react';
+import { Chessboard } from 'react-chessboard';
 
-export default function Match() {
+export default function MatchChess() {
   const { id } = useParams();
   const { profile } = useAuth();
   const navigate = useNavigate();
@@ -264,13 +265,27 @@ export default function Match() {
     finally { setBusy(null); }
   };
 
-  const handleMove = async (orient, r, c) => {
-    if (!isMyTurn) return;
-    if (busy === 'move') return;
+  const onDrop = async (sourceSquare, targetSquare, piece) => {
+    if (!isMyTurn) return false;
+    if (busy === 'move') return false;
     setBusy('move');
-    try { await makeMove(id, 'dots', orient, r, c, profile); }
-    catch (err) { toast(err.message, 'error'); }
-    finally { setBusy(null); }
+
+    const moveObj = {
+      from: sourceSquare,
+      to: targetSquare,
+      promotion: piece[1].toLowerCase() ?? 'q',
+    };
+
+    try {
+      await makeMove(id, 'chess', null, moveObj, null, profile);
+      setBusy(null);
+      return true;
+    }
+    catch (err) {
+      toast(err.message, 'error');
+      setBusy(null);
+      return false;
+    }
   };
 
   const handleSendChat = async (e, textOverride) => {
@@ -435,10 +450,17 @@ export default function Match() {
         {/* Board */}
         <div className="flex justify-center">
           {concealBoard ? (
-            <ConcealedBoard rows={match.rows} cols={match.cols} />
+            <div className="text-center italic opacity-50 py-10">Board hidden while paused</div>
           ) : (
-            <Board game={match.game} players={match.players} playerInfo={match.playerInfo}
-                   isMyTurn={isMyTurn} onPlay={handleMove} lastMove={lastMove} />
+            <div className="w-full max-w-[500px]">
+              <Chessboard
+                position={match.game.fen}
+                onPieceDrop={onDrop}
+                boardOrientation={match.players.indexOf(profile?.id) === 1 ? 'black' : 'white'}
+                customDarkSquareStyle={{ backgroundColor: 'var(--ochre)' }}
+                customLightSquareStyle={{ backgroundColor: 'var(--paper-tint)' }}
+              />
+            </div>
           )}
         </div>
 
@@ -630,216 +652,6 @@ const PLAYER_STROKE_PATTERNS = [
   '2 3',               // P3: dotted
   '8 3 2 3',           // P4: dash-dot
 ];
-
-function Board({ game, players, playerInfo, isMyTurn, onPlay, lastMove }) {
-  const { rows, cols, hLines, vLines, boxes } = game;
-  // Larger minimum tap target on small cells (D41). The hit area below the
-  // visible line is at least max(44, cell*0.4) — iOS HIG's 44pt minimum.
-  const cell = Math.min(70, Math.max(28, 520 / Math.max(rows, cols)));
-  const dotR = Math.max(2.5, cell / 18);
-  const padding = 30;
-  const w = cols * cell + padding * 2;
-  const h = rows * cell + padding * 2;
-  const hitWidth = Math.max(44, cell * 0.4);
-
-  // Hover state managed in React rather than via DOM e.target.previousSibling
-  // — that was fragile against SVG re-ordering and worked in only one
-  // direction. (D21)
-  const [hover, setHover] = useState(null); // null | { orient, r, c }
-  // Keyboard focus position. Lets keyboard-only users play by tabbing in,
-  // then arrow-keying to the desired line and pressing Enter/Space. (D53)
-  // We always have one undrawn line focused (if any exist).
-  const [keyboardFocus, setKeyboardFocus] = useState(null); // null | { orient, r, c }
-  const svgRef = useRef(null);
-
-  const playerColor = (id) => {
-    const idx = players.indexOf(id);
-    return idx === -1 ? null : PLAYER_COLORS[idx]?.hex;
-  };
-  const playerSoft = (id) => {
-    const idx = players.indexOf(id);
-    return idx === -1 ? null : PLAYER_COLORS[idx]?.soft;
-  };
-  const playerStrokePattern = (id) => {
-    const idx = players.indexOf(id);
-    return idx === -1 ? undefined : PLAYER_STROKE_PATTERNS[idx];
-  };
-  const playerInitial = (id) => {
-    return playerInfo?.[id]?.username?.[0]?.toUpperCase() || '·';
-  };
-
-  const isLastMove = (orient, r, c) =>
-    !!lastMove && lastMove.type === orient && lastMove.r === r && lastMove.c === c;
-
-  // Move keyboard focus to the next undrawn line in a given direction.
-  // Wraps around. If no undrawn lines exist, the focus is cleared.
-  const moveFocus = (dir) => {
-    setKeyboardFocus(prev => {
-      // Build a flat list of all undrawn line positions, sorted spatially.
-      const undrawn = [];
-      for (let r = 0; r <= rows; r++) {
-        for (let c = 0; c < cols; c++) {
-          if (hLines[hKey(r, c)] == null) undrawn.push({ orient: 'h', r, c });
-        }
-      }
-      for (let r = 0; r < rows; r++) {
-        for (let c = 0; c <= cols; c++) {
-          if (vLines[vKey(r, c)] == null) undrawn.push({ orient: 'v', r, c });
-        }
-      }
-      if (undrawn.length === 0) return null;
-      if (!prev) return undrawn[0];
-      const idx = undrawn.findIndex(p => p.orient === prev.orient && p.r === prev.r && p.c === prev.c);
-      if (idx === -1) return undrawn[0];
-      const delta = dir === 'next' ? 1 : -1;
-      return undrawn[(idx + delta + undrawn.length) % undrawn.length];
-    });
-  };
-
-  const onSvgKeyDown = (e) => {
-    if (!isMyTurn) return;
-    if (e.key === 'Tab') return; // let Tab move focus out of the SVG
-    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
-      e.preventDefault();
-      moveFocus('next');
-    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
-      e.preventDefault();
-      moveFocus('prev');
-    } else if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
-      if (keyboardFocus) {
-        onPlay(keyboardFocus.orient, keyboardFocus.r, keyboardFocus.c);
-        setKeyboardFocus(null);
-      } else {
-        moveFocus('next');
-      }
-    }
-  };
-
-  const isHovering = (orient, r, c) =>
-    (hover && hover.orient === orient && hover.r === r && hover.c === c)
-    || (keyboardFocus && keyboardFocus.orient === orient && keyboardFocus.r === r && keyboardFocus.c === c);
-
-  return (
-    <svg
-      ref={svgRef}
-      width={w} height={h}
-      style={{ overflow: 'visible', maxWidth: '100%', height: 'auto', touchAction: 'manipulation' }}
-      role="application"
-      aria-label={`Dots and Boxes game board, ${rows} by ${cols}. ${isMyTurn ? 'Your turn.' : 'Waiting for opponent.'} Use arrow keys to move between empty edges, Enter to play.`}
-      tabIndex={isMyTurn ? 0 : -1}
-      onKeyDown={onSvgKeyDown}
-      onBlur={() => setKeyboardFocus(null)}
-    >
-      {/* Filled boxes */}
-      {Array.from({ length: rows }).map((_, r) =>
-        Array.from({ length: cols }).map((_, c) => {
-          const owner = boxes[bKey(r, c)];
-          if (!owner) return null;
-          const x = padding + c * cell;
-          const y = padding + r * cell;
-          return (
-            <g key={`b-${r}-${c}`} className="box-filled">
-              <rect x={x + 2} y={y + 2} width={cell - 4} height={cell - 4} fill={playerSoft(owner)} />
-              <text x={x + cell / 2} y={y + cell / 2 + cell * 0.13} textAnchor="middle"
-                    aria-label={`Box at row ${r+1}, column ${c+1}, claimed by ${playerInfo?.[owner]?.username || 'a player'}`}
-                    style={{ fontFamily: 'EB Garamond, serif', fontSize: cell * 0.4, fontWeight: 500, fill: playerColor(owner) }}>
-                {playerInitial(owner)}
-              </text>
-            </g>
-          );
-        })
-      )}
-
-      {/* Horizontal lines */}
-      {Array.from({ length: rows + 1 }).map((_, r) =>
-        Array.from({ length: cols }).map((_, c) => {
-          const owner = hLines[hKey(r, c)];
-          const drawn = owner != null;
-          const x1 = padding + c * cell, x2 = padding + (c + 1) * cell, y = padding + r * cell;
-          const drawnStroke = drawn ? playerColor(owner) : 'currentColor';
-          const pattern = drawn ? playerStrokePattern(owner) : undefined;
-          const isLM = drawn && isLastMove('h', r, c);
-          const showHover = !drawn && isHovering('h', r, c);
-          return (
-            <g key={`h-${r}-${c}`}>
-              <line x1={x1 + 6} y1={y} x2={x2 - 6} y2={y}
-                stroke={drawnStroke}
-                strokeDasharray={pattern}
-                strokeWidth={drawn ? 3 : 2}
-                strokeLinecap="round"
-                style={{
-                  opacity: drawn ? 1 : (showHover ? 0.35 : 0),
-                  pointerEvents: 'none',
-                  color: drawnStroke,
-                  transition: 'opacity 120ms',
-                }}
-                className={`${drawn ? 'line-drawn' : ''} ${isLM ? 'last-move-line' : ''}`}
-              />
-              {!drawn && (
-                <line x1={x1 + 6} y1={y} x2={x2 - 6} y2={y}
-                  stroke="transparent" strokeWidth={hitWidth}
-                  style={{ cursor: isMyTurn ? 'pointer' : 'default' }}
-                  onClick={() => isMyTurn && onPlay('h', r, c)}
-                  onMouseEnter={() => isMyTurn && setHover({ orient: 'h', r, c })}
-                  onMouseLeave={() => setHover(null)}
-                />
-              )}
-            </g>
-          );
-        })
-      )}
-
-      {/* Vertical lines */}
-      {Array.from({ length: rows }).map((_, r) =>
-        Array.from({ length: cols + 1 }).map((_, c) => {
-          const owner = vLines[vKey(r, c)];
-          const drawn = owner != null;
-          const x = padding + c * cell, y1 = padding + r * cell, y2 = padding + (r + 1) * cell;
-          const drawnStroke = drawn ? playerColor(owner) : 'currentColor';
-          const pattern = drawn ? playerStrokePattern(owner) : undefined;
-          const isLM = drawn && isLastMove('v', r, c);
-          const showHover = !drawn && isHovering('v', r, c);
-          return (
-            <g key={`v-${r}-${c}`}>
-              <line x1={x} y1={y1 + 6} x2={x} y2={y2 - 6}
-                stroke={drawnStroke}
-                strokeDasharray={pattern}
-                strokeWidth={drawn ? 3 : 2}
-                strokeLinecap="round"
-                style={{
-                  opacity: drawn ? 1 : (showHover ? 0.35 : 0),
-                  pointerEvents: 'none',
-                  color: drawnStroke,
-                  transition: 'opacity 120ms',
-                }}
-                className={`${drawn ? 'line-drawn' : ''} ${isLM ? 'last-move-line' : ''}`}
-              />
-              {!drawn && (
-                <line x1={x} y1={y1 + 6} x2={x} y2={y2 - 6}
-                  stroke="transparent" strokeWidth={hitWidth}
-                  style={{ cursor: isMyTurn ? 'pointer' : 'default' }}
-                  onClick={() => isMyTurn && onPlay('v', r, c)}
-                  onMouseEnter={() => isMyTurn && setHover({ orient: 'v', r, c })}
-                  onMouseLeave={() => setHover(null)}
-                />
-              )}
-            </g>
-          );
-        })
-      )}
-
-      {/* Dots — use currentColor so they pick up the theme's --ink */}
-      {Array.from({ length: rows + 1 }).map((_, r) =>
-        Array.from({ length: cols + 1 }).map((_, c) => (
-          <circle key={`d-${r}-${c}`}
-            cx={padding + c * cell} cy={padding + r * cell}
-            r={dotR} fill="currentColor" />
-        ))
-      )}
-    </svg>
-  );
-}
 
 function ConcealedBoard({ rows, cols }) {
   const cell = Math.min(70, Math.max(28, 520 / Math.max(rows, cols)));

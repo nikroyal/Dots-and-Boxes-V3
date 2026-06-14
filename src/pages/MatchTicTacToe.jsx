@@ -17,7 +17,7 @@ import { useConfirm } from '../components/ConfirmDialog';
 import { isDisconnected } from '../lib/presence';
 import { Pause, Play, Flag, Send, Eye, Trophy, RotateCcw, Home, Repeat, Clock, WifiOff, Handshake } from 'lucide-react';
 
-export default function Match() {
+export default function MatchTicTacToe() {
   const { id } = useParams();
   const { profile } = useAuth();
   const navigate = useNavigate();
@@ -264,11 +264,11 @@ export default function Match() {
     finally { setBusy(null); }
   };
 
-  const handleMove = async (orient, r, c) => {
+  const handleMove = async (r, c) => {
     if (!isMyTurn) return;
     if (busy === 'move') return;
     setBusy('move');
-    try { await makeMove(id, 'dots', orient, r, c, profile); }
+    try { await makeMove(id, "tictactoe", null, r, c, profile); }
     catch (err) { toast(err.message, 'error'); }
     finally { setBusy(null); }
   };

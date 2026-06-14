@@ -21,6 +21,15 @@ import Messages from './pages/Messages';
 import Clubs from './pages/Clubs';
 import ClubDetail from './pages/ClubDetail';
 import LocalMatch from './pages/LocalMatch';
+import Connect4Hub from './pages/Connect4Hub';
+import LocalConnect4 from './pages/LocalConnect4';
+import MatchConnect4 from './pages/MatchConnect4';
+import TicTacToeHub from './pages/TicTacToeHub';
+import LocalTicTacToe from './pages/LocalTicTacToe';
+import MatchTicTacToe from './pages/MatchTicTacToe';
+import ChessHub from './pages/ChessHub';
+import LocalChess from './pages/LocalChess';
+import MatchChess from './pages/MatchChess';
 
 const Admin = lazy(() => import('./pages/Admin'));
 
@@ -85,6 +94,9 @@ function Shell() {
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/local" element={<LocalMatch />} />
+        <Route path="/connect4/local" element={<LocalConnect4 />} />
+        <Route path="/tictactoe/local" element={<LocalTicTacToe />} />
+        <Route path="/chess/local" element={<LocalChess />} />
         <Route path="*" element={<Navigate to="/login" />} />
       </Routes>
     );
@@ -118,10 +130,16 @@ function Shell() {
             <Routes>
               <Route path="/" element={<AxiomHub />} />
               <Route path="/dots-and-boxes" element={<DotsHome />} />
+              <Route path="/connect4" element={<Connect4Hub />} />
+              <Route path="/tictactoe" element={<TicTacToeHub />} />
+              <Route path="/chess" element={<ChessHub />} />
               <Route path="/paper-io" element={<PaperIo />} />
               <Route path="/circuit-maker" element={<CircuitMaker />} />
               <Route path="/lobby" element={<Lobby />} />
               <Route path="/match/:id" element={<Match />} />
+              <Route path="/connect4/match/:id" element={<MatchConnect4 />} />
+              <Route path="/tictactoe/match/:id" element={<MatchTicTacToe />} />
+              <Route path="/chess/match/:id" element={<MatchChess />} />
               <Route path="/profile/:username" element={<Profile />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/leaderboard" element={<Leaderboard />} />
@@ -135,6 +153,9 @@ function Shell() {
               <Route path="/clubs/:id" element={<ClubDetail />} />
               <Route path="/clubs/:id/:channelId" element={<ClubDetail />} />
               <Route path="/local" element={<LocalMatch />} />
+              <Route path="/connect4/local" element={<LocalConnect4 />} />
+              <Route path="/tictactoe/local" element={<LocalTicTacToe />} />
+              <Route path="/chess/local" element={<LocalChess />} />
               {isAdmin && <Route path="/admin" element={<Admin />} />}
               <Route path="*" element={<Navigate to="/" />} />
             </Routes>
