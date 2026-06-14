@@ -84,6 +84,7 @@ export default function CircuitMaker() {
   const [historyIndex, setHistoryIndex] = useState(0);
   const [selected, setSelected] = useState([]);
   const [drag, setDrag] = useState(null);
+  const [wireDrag, setWireDrag] = useState(null);
   const [projectOpen, setProjectOpen] = useState(false);
   const [projectName, setProjectName] = useState('Untitled circuit');
 
@@ -162,6 +163,11 @@ export default function CircuitMaker() {
     const target = source.id === first.id ? second : first;
     if (source.type === 'output' || target.type === 'input') return;
     if (state.wires.some(wire => wire.from === source.id && wire.to === target.id)) return;
+
+    const targetInputs = state.wires.filter(w => w.to === target.id).length;
+    const maxInputs = hasTwoInputs(target.type) ? 2 : 1;
+    if (targetInputs >= maxInputs) return;
+
     commit({ ...state, wires: [...state.wires, { from: source.id, to: target.id }] });
     setSelected([target.id]);
   };
@@ -195,19 +201,73 @@ export default function CircuitMaker() {
   };
 
   const onPointerMove = (event) => {
-    if (!drag || !boardRef.current) return;
+    if (!boardRef.current) return;
+    if (!drag && !wireDrag) return;
+
     const rect = boardRef.current.getBoundingClientRect();
-    const x = Math.max(8, event.clientX - rect.left - drag.offsetX);
-    const y = Math.max(8, event.clientY - rect.top - drag.offsetY);
-    setState(current => ({
-      ...current,
-      components: current.components.map(component => (
-        component.id === drag.id ? { ...component, x, y } : component
-      )),
-    }));
+    const x = Math.max(8, event.clientX - rect.left);
+    const y = Math.max(8, event.clientY - rect.top);
+
+    if (wireDrag) {
+      setWireDrag(current => ({ ...current, toX: x, toY: y }));
+      return;
+    }
+
+    if (drag) {
+      const dragX = Math.max(8, x - drag.offsetX);
+      const dragY = Math.max(8, y - drag.offsetY);
+      setState(current => ({
+        ...current,
+        components: current.components.map(component => (
+          component.id === drag.id ? { ...component, x: dragX, y: dragY } : component
+        )),
+      }));
+    }
   };
 
-  const handlePointerUp = () => {
+  const handlePointerUp = (event) => {
+    if (wireDrag) {
+      if (boardRef.current) {
+        const rect = boardRef.current.getBoundingClientRect();
+        const dropX = event.clientX - rect.left;
+        const dropY = event.clientY - rect.top;
+
+        let bestTarget = null;
+        let bestDist = Infinity;
+
+        const wireIndices = new Map();
+        for (const wire of state.wires) {
+           const count = wireIndices.get(wire.to) || 0;
+           wireIndices.set(wire.to, count + 1);
+        }
+
+        for (const component of state.components) {
+          if (component.id === wireDrag.fromId || component.type === 'input') continue;
+
+          const maxInputs = hasTwoInputs(component.type) ? 2 : 1;
+          const currentInputs = wireIndices.get(component.id) || 0;
+          if (currentInputs >= maxInputs) continue;
+
+          const target = targetPoint(component, currentInputs);
+          const dist = Math.hypot(target.x - dropX, target.y - dropY);
+
+          if (dist < 30 && dist < bestDist) {
+            bestDist = dist;
+            bestTarget = component;
+          }
+        }
+
+        if (bestTarget) {
+          const exists = state.wires.some(w => w.from === wireDrag.fromId && w.to === bestTarget.id);
+          if (!exists) {
+            const next = { ...state, wires: [...state.wires, { from: wireDrag.fromId, to: bestTarget.id }] };
+            commit(next);
+          }
+        }
+      }
+      setWireDrag(null);
+    }
+
     if (drag) {
       const lastState = history[historyIndex];
       const currentComp = state.components.find(component => component.id === drag.id);
@@ -358,25 +418,55 @@ export default function CircuitMaker() {
           onPointerCancel={handlePointerUp}
         >
           <div className="absolute inset-0 opacity-40" style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px)', backgroundSize: '24px 24px' }} />
-          <svg className="absolute inset-0 w-full h-full pointer-events-none" aria-hidden="true">
-            {state.wires.map((wire, index) => {
-              const from = state.components.find(component => component.id === wire.from);
-              const to = state.components.find(component => component.id === wire.to);
-              if (!from || !to) return null;
-              const a = sourcePoint(from);
-              const b = targetPoint(to);
-              const live = values.get(from.id)?.out;
-              return (
-                <path
-                  key={`${wire.from}-${wire.to}-${index}`}
-                  d={`M ${a.x} ${a.y} C ${a.x + 80} ${a.y}, ${b.x - 80} ${b.y}, ${b.x} ${b.y}`}
-                  fill="none"
-                  stroke={live ? '#35d399' : 'rgba(255,255,255,0.28)'}
-                  strokeWidth="3"
-                  strokeLinecap="round"
-                />
-              );
-            })}
+          <svg className="absolute inset-0 w-full h-full pointer-events-none" aria-hidden="true" style={{ zIndex: 0 }}>
+            {(() => {
+              const wireIndices3 = new Map();
+              const paths = state.wires.map((wire, index) => {
+                const from = state.components.find(component => component.id === wire.from);
+                const to = state.components.find(component => component.id === wire.to);
+                if (!from || !to) return null;
+
+                const count = wireIndices3.get(to.id) || 0;
+                wireIndices3.set(to.id, count + 1);
+
+                const a = sourcePoint(from);
+                const b = targetPoint(to, count);
+                const live = values.get(from.id)?.out;
+                const wireId = `${wire.from}-${wire.to}`;
+                const isSelected = selected.includes(wireId);
+                return (
+                  <path
+                    key={`${wireId}-${index}`}
+                    d={`M ${a.x} ${a.y} C ${a.x + 80} ${a.y}, ${b.x - 80} ${b.y}, ${b.x} ${b.y}`}
+                    fill="none"
+                    stroke={isSelected ? '#f8d35c' : live ? '#35d399' : 'rgba(255,255,255,0.28)'}
+                    strokeWidth="8"
+                    strokeLinecap="round"
+                    style={{ pointerEvents: 'auto', cursor: 'pointer', transition: 'stroke 0.2s' }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      toggleSelected(wireId, e.shiftKey);
+                    }}
+                  />
+                );
+              });
+
+              if (wireDrag) {
+                 paths.push(
+                   <path
+                     key="wire-drag"
+                     d={`M ${wireDrag.startX} ${wireDrag.startY} C ${wireDrag.startX + 80} ${wireDrag.startY}, ${wireDrag.toX - 80} ${wireDrag.toY}, ${wireDrag.toX} ${wireDrag.toY}`}
+                     fill="none"
+                     stroke="rgba(255,255,255,0.4)"
+                     strokeWidth="3"
+                     strokeLinecap="round"
+                     strokeDasharray="6 6"
+                   />
+                 );
+              }
+
+              return paths;
+            })()}
           </svg>
 
           {state.components.map(component => (
@@ -392,6 +482,18 @@ export default function CircuitMaker() {
                 event.currentTarget.setPointerCapture?.(event.pointerId);
               }}
               onToggle={() => toggleSwitch(component.id)}
+              onWireStart={(event) => {
+                event.stopPropagation();
+                const start = sourcePoint(component);
+                setWireDrag({
+                   fromId: component.id,
+                   startX: start.x,
+                   startY: start.y,
+                   toX: start.x,
+                   toY: start.y,
+                });
+                event.currentTarget.setPointerCapture?.(event.pointerId);
+              }}
             />
           ))}
 
@@ -427,7 +529,7 @@ export default function CircuitMaker() {
   );
 }
 
-function CircuitNode({ component, selected, value, onSelect, onDragStart, onToggle }) {
+function CircuitNode({ component, selected, value, onSelect, onDragStart, onToggle, onWireStart }) {
   const live = !!value?.out;
   return (
     <div
@@ -469,8 +571,23 @@ function CircuitNode({ component, selected, value, onSelect, onDragStart, onTogg
         </div>
       )}
 
-      {component.type !== 'input' && <span className="absolute left-[-7px] top-[38px] w-3 h-3 rounded-full bg-white/70" />}
-      {component.type !== 'output' && <span className="absolute right-[-7px] top-[38px] w-3 h-3 rounded-full" style={{ background: live ? '#35d399' : 'rgba(255,255,255,0.7)' }} />}
+      {component.type !== 'input' && (
+        hasTwoInputs(component.type) ? (
+          <>
+            <span className="absolute left-[-7px] top-[22px] w-3 h-3 rounded-full bg-white/70" />
+            <span className="absolute left-[-7px] top-[54px] w-3 h-3 rounded-full bg-white/70" />
+          </>
+        ) : (
+          <span className="absolute left-[-7px] top-[38px] w-3 h-3 rounded-full bg-white/70" />
+        )
+      )}
+      {component.type !== 'output' && (
+        <span
+          className="absolute right-[-7px] top-[38px] w-3 h-3 rounded-full"
+          style={{ background: live ? '#35d399' : 'rgba(255,255,255,0.7)', cursor: 'crosshair', pointerEvents: 'auto' }}
+          onPointerDown={onWireStart}
+        />
+      )}
     </div>
   );
 }
