@@ -18,6 +18,7 @@ export default function Profile() {
   const [editAvatar, setEditAvatar] = useState('');
   const [editTitle, setEditTitle] = useState('');
   const [editBio, setEditBio] = useState('');
+  const [editLineStyle, setEditLineStyle] = useState('solid');
 
   const isMe = !username || (me && username === me.username);
 
@@ -31,6 +32,7 @@ export default function Profile() {
       setEditAvatar(me.avatar || AVATAR_OPTIONS[0]);
       setEditTitle(me.title || '');
       setEditBio(me.bio || '');
+      setEditLineStyle(me.lineStyle || 'solid');
       setLoading(false);
       return;
     }
@@ -65,7 +67,7 @@ export default function Profile() {
 
   const saveProfile = async () => {
     try {
-      await updateProfile(me, { avatar: editAvatar, title: editTitle, bio: editBio });
+      await updateProfile(me, { avatar: editAvatar, title: editTitle, bio: editBio, lineStyle: editLineStyle });
       toast('Profile updated', 'success');
       setEditing(false);
     } catch (e) { toast(e.message, 'error'); }
@@ -184,6 +186,16 @@ export default function Profile() {
                       style={{ minHeight: 80, borderBottom: '1px solid var(--hairline-strong)', resize: 'vertical' }}
                       placeholder="A few words…" />
             <div className="font-mono text-[0.6rem] opacity-50 mt-1">{editBio.length}/200</div>
+          </div>
+          <div className="pt-2">
+            <label htmlFor="profile-line-style" className="font-mono block mb-2 text-[0.65rem] tracking-widest uppercase opacity-55">Dots & Boxes Line Style</label>
+            <select id="profile-line-style" value={editLineStyle} onChange={e => setEditLineStyle(e.target.value)}
+                    className="input-field font-display text-base"
+                    style={{ borderBottom: '1px solid var(--hairline-strong)', background: 'transparent' }}>
+              <option value="solid">Solid</option>
+              <option value="neon">Neon</option>
+              <option value="sketch">Sketch</option>
+            </select>
           </div>
           <button onClick={saveProfile} className="btn-primary">Save Changes</button>
 
