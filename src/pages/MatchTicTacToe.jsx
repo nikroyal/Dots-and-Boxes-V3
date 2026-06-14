@@ -8,7 +8,7 @@ import {
   sendChatAs, joinAsSpectator, leaveSpectator, finalizeStats, requestRematch,
   forfeitOnTimeout,
 } from '../lib/actions';
-import { PLAYER_COLORS, hKey, vKey, bKey } from '../lib/gameLogic';
+import { PLAYER_COLORS } from '../lib/gameLogic';
 import { sfx } from '../lib/sound';
 import { toast } from '../components/Notifications';
 import { ACHIEVEMENTS } from '../lib/achievements';
@@ -624,238 +624,113 @@ function TurnTimerBanner({ remainingMs, timeoutMs, isMyTurn, isPlayer, opponentD
 // tell players apart. The patterns are subtle enough that everyone else
 // barely notices, but they're meaningfully different up close.
 // Index matches PLAYER_COLORS order.
-const PLAYER_STROKE_PATTERNS = [
-  undefined,           // P1: solid
-  '6 3',               // P2: short dash
-  '2 3',               // P3: dotted
-  '8 3 2 3',           // P4: dash-dot
-];
-
 function Board({ game, players, playerInfo, isMyTurn, onPlay, lastMove }) {
-  const { rows, cols, hLines, vLines, boxes } = game;
-  // Larger minimum tap target on small cells (D41). The hit area below the
-  // visible line is at least max(44, cell*0.4) — iOS HIG's 44pt minimum.
-  const cell = Math.min(70, Math.max(28, 520 / Math.max(rows, cols)));
-  const dotR = Math.max(2.5, cell / 18);
-  const padding = 30;
-  const w = cols * cell + padding * 2;
-  const h = rows * cell + padding * 2;
-  const hitWidth = Math.max(44, cell * 0.4);
+  const { rows, cols, board, finished, winLine, winnerIdx } = game;
 
-  // Hover state managed in React rather than via DOM e.target.previousSibling
-  // — that was fragile against SVG re-ordering and worked in only one
-  // direction. (D21)
-  const [hover, setHover] = useState(null); // null | { orient, r, c }
-  // Keyboard focus position. Lets keyboard-only users play by tabbing in,
-  // then arrow-keying to the desired line and pressing Enter/Space. (D53)
-  // We always have one undrawn line focused (if any exist).
-  const [keyboardFocus, setKeyboardFocus] = useState(null); // null | { orient, r, c }
-  const svgRef = useRef(null);
+  // Compute strike-through line if won
+  let strikeLine = null;
+  if (winLine && winLine.length > 0) {
+    const first = winLine[0];
+    const last = winLine[winLine.length - 1];
 
-  const playerColor = (id) => {
-    const idx = players.indexOf(id);
-    return idx === -1 ? null : PLAYER_COLORS[idx]?.hex;
-  };
-  const playerSoft = (id) => {
-    const idx = players.indexOf(id);
-    return idx === -1 ? null : PLAYER_COLORS[idx]?.soft;
-  };
-  const playerStrokePattern = (id) => {
-    const idx = players.indexOf(id);
-    return idx === -1 ? undefined : PLAYER_STROKE_PATTERNS[idx];
-  };
-  const playerInitial = (id) => {
-    return playerInfo?.[id]?.username?.[0]?.toUpperCase() || '·';
-  };
+    // Convert to relative coordinates inside the grid (0 to 1)
+    const x1 = (first.c + 0.5) / cols;
+    const y1 = (first.r + 0.5) / rows;
+    const x2 = (last.c + 0.5) / cols;
+    const y2 = (last.r + 0.5) / rows;
 
-  const isLastMove = (orient, r, c) =>
-    !!lastMove && lastMove.type === orient && lastMove.r === r && lastMove.c === c;
+    // Extend the line slightly past the center of the cells
+    const dx = x2 - x1;
+    const dy = y2 - y1;
+    const len = Math.sqrt(dx*dx + dy*dy);
+    if (len > 0) {
+      const extX = (dx / len) * (0.25 / cols);
+      const extY = (dy / len) * (0.25 / rows);
 
-  // Move keyboard focus to the next undrawn line in a given direction.
-  // Wraps around. If no undrawn lines exist, the focus is cleared.
-  const moveFocus = (dir) => {
-    setKeyboardFocus(prev => {
-      // Build a flat list of all undrawn line positions, sorted spatially.
-      const undrawn = [];
-      for (let r = 0; r <= rows; r++) {
-        for (let c = 0; c < cols; c++) {
-          if (hLines[hKey(r, c)] == null) undrawn.push({ orient: 'h', r, c });
-        }
-      }
-      for (let r = 0; r < rows; r++) {
-        for (let c = 0; c <= cols; c++) {
-          if (vLines[vKey(r, c)] == null) undrawn.push({ orient: 'v', r, c });
-        }
-      }
-      if (undrawn.length === 0) return null;
-      if (!prev) return undrawn[0];
-      const idx = undrawn.findIndex(p => p.orient === prev.orient && p.r === prev.r && p.c === prev.c);
-      if (idx === -1) return undrawn[0];
-      const delta = dir === 'next' ? 1 : -1;
-      return undrawn[(idx + delta + undrawn.length) % undrawn.length];
-    });
-  };
+      strikeLine = {
+        x1: (x1 - extX) * 100 + "%",
+        y1: (y1 - extY) * 100 + "%",
+        x2: (x2 + extX) * 100 + "%",
+        y2: (y2 + extY) * 100 + "%"
+      };
+    }
+  }
 
-  const onSvgKeyDown = (e) => {
-    if (!isMyTurn) return;
-    if (e.key === 'Tab') return; // let Tab move focus out of the SVG
-    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+  const [hover, setHover] = useState(null); // {r, c}
+
+  const handleKeyDown = (e, r, c) => {
+    if (!isMyTurn || finished) return;
+    if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
-      moveFocus('next');
-    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
-      e.preventDefault();
-      moveFocus('prev');
-    } else if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
-      if (keyboardFocus) {
-        onPlay(keyboardFocus.orient, keyboardFocus.r, keyboardFocus.c);
-        setKeyboardFocus(null);
-      } else {
-        moveFocus('next');
-      }
+      onPlay(r, c);
     }
   };
 
-  const isHovering = (orient, r, c) =>
-    (hover && hover.orient === orient && hover.r === r && hover.c === c)
-    || (keyboardFocus && keyboardFocus.orient === orient && keyboardFocus.r === r && keyboardFocus.c === c);
-
   return (
-    <svg
-      ref={svgRef}
-      width={w} height={h}
-      style={{ overflow: 'visible', maxWidth: '100%', height: 'auto', touchAction: 'manipulation' }}
-      role="application"
-      aria-label={`Dots and Boxes game board, ${rows} by ${cols}. ${isMyTurn ? 'Your turn.' : 'Waiting for opponent.'} Use arrow keys to move between empty edges, Enter to play.`}
-      tabIndex={isMyTurn ? 0 : -1}
-      onKeyDown={onSvgKeyDown}
-      onBlur={() => setKeyboardFocus(null)}
-    >
-      {/* Filled boxes */}
-      {Array.from({ length: rows }).map((_, r) =>
-        Array.from({ length: cols }).map((_, c) => {
-          const owner = boxes[bKey(r, c)];
-          if (!owner) return null;
-          const x = padding + c * cell;
-          const y = padding + r * cell;
-          return (
-            <g key={`b-${r}-${c}`} className="box-filled">
-              <rect x={x + 2} y={y + 2} width={cell - 4} height={cell - 4} fill={playerSoft(owner)} />
-              <text x={x + cell / 2} y={y + cell / 2 + cell * 0.13} textAnchor="middle"
-                    aria-label={`Box at row ${r+1}, column ${c+1}, claimed by ${playerInfo?.[owner]?.username || 'a player'}`}
-                    style={{ fontFamily: 'EB Garamond, serif', fontSize: cell * 0.4, fontWeight: 500, fill: playerColor(owner) }}>
-                {playerInitial(owner)}
-              </text>
-            </g>
-          );
-        })
-      )}
+    <div className="relative inline-block" style={{ touchAction: 'manipulation' }}>
+      <div
+        className="grid gap-2 bg-[var(--hairline-strong)] p-2"
+        style={{
+          gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`,
+          gridTemplateRows: `repeat(${rows}, minmax(0, 1fr))`
+        }}
+      >
+        {Array(rows).fill(null).map((_, r) =>
+          Array(cols).fill(null).map((_, c) => {
+            const pid = board[r][c];
+            const isLM = lastMove && lastMove.r === r && lastMove.c === c;
+            const pIdx = players.indexOf(pid);
+            const color = pIdx !== -1 ? PLAYER_COLORS[pIdx]?.hex : 'inherit';
+            const initial = pIdx !== -1 ? (pIdx === 0 ? 'X' : 'O') : '';
 
-      {/* Horizontal lines */}
-      {Array.from({ length: rows + 1 }).map((_, r) =>
-        Array.from({ length: cols }).map((_, c) => {
-          const owner = hLines[hKey(r, c)];
-          const drawn = owner != null;
-          const x1 = padding + c * cell, x2 = padding + (c + 1) * cell, y = padding + r * cell;
-          const drawnStroke = drawn ? playerColor(owner) : 'currentColor';
-          const pattern = drawn ? playerStrokePattern(owner) : undefined;
-          const isLM = drawn && isLastMove('h', r, c);
-          const showHover = !drawn && isHovering('h', r, c);
-          return (
-            <g key={`h-${r}-${c}`}>
-              <line x1={x1 + 6} y1={y} x2={x2 - 6} y2={y}
-                stroke={drawnStroke}
-                strokeDasharray={pattern}
-                strokeWidth={drawn ? 3 : 2}
-                strokeLinecap="round"
-                style={{
-                  opacity: drawn ? 1 : (showHover ? 0.35 : 0),
-                  pointerEvents: 'none',
-                  color: drawnStroke,
-                  transition: 'opacity 120ms',
-                }}
-                className={`${drawn ? 'line-drawn' : ''} ${isLM ? 'last-move-line' : ''}`}
-              />
-              {!drawn && (
-                <line x1={x1 + 6} y1={y} x2={x2 - 6} y2={y}
-                  stroke="transparent" strokeWidth={hitWidth}
-                  style={{ cursor: isMyTurn ? 'pointer' : 'default' }}
-                  onClick={() => isMyTurn && onPlay('h', r, c)}
-                  onMouseEnter={() => isMyTurn && setHover({ orient: 'h', r, c })}
-                  onMouseLeave={() => setHover(null)}
-                />
-              )}
-            </g>
-          );
-        })
-      )}
+            // Interactive state
+            const playable = isMyTurn && !finished && pid === null;
 
-      {/* Vertical lines */}
-      {Array.from({ length: rows }).map((_, r) =>
-        Array.from({ length: cols + 1 }).map((_, c) => {
-          const owner = vLines[vKey(r, c)];
-          const drawn = owner != null;
-          const x = padding + c * cell, y1 = padding + r * cell, y2 = padding + (r + 1) * cell;
-          const drawnStroke = drawn ? playerColor(owner) : 'currentColor';
-          const pattern = drawn ? playerStrokePattern(owner) : undefined;
-          const isLM = drawn && isLastMove('v', r, c);
-          const showHover = !drawn && isHovering('v', r, c);
-          return (
-            <g key={`v-${r}-${c}`}>
-              <line x1={x} y1={y1 + 6} x2={x} y2={y2 - 6}
-                stroke={drawnStroke}
-                strokeDasharray={pattern}
-                strokeWidth={drawn ? 3 : 2}
-                strokeLinecap="round"
-                style={{
-                  opacity: drawn ? 1 : (showHover ? 0.35 : 0),
-                  pointerEvents: 'none',
-                  color: drawnStroke,
-                  transition: 'opacity 120ms',
-                }}
-                className={`${drawn ? 'line-drawn' : ''} ${isLM ? 'last-move-line' : ''}`}
-              />
-              {!drawn && (
-                <line x1={x} y1={y1 + 6} x2={x} y2={y2 - 6}
-                  stroke="transparent" strokeWidth={hitWidth}
-                  style={{ cursor: isMyTurn ? 'pointer' : 'default' }}
-                  onClick={() => isMyTurn && onPlay('v', r, c)}
-                  onMouseEnter={() => isMyTurn && setHover({ orient: 'v', r, c })}
-                  onMouseLeave={() => setHover(null)}
-                />
-              )}
-            </g>
-          );
-        })
-      )}
+            return (
+              <div
+                key={`cell-${r}-${c}`}
+                tabIndex={playable ? 0 : -1}
+                className={`w-16 h-16 sm:w-24 sm:h-24 md:w-32 md:h-32 bg-[var(--paper)] flex items-center justify-center text-5xl sm:text-6xl font-display transition-colors outline-none
+                  ${playable ? 'cursor-pointer hover:bg-[var(--bg-hover)] focus:ring-2 focus:ring-inset focus:ring-[var(--ochre)]' : ''}
+                  ${isLM ? 'bg-black/5 dark:bg-white/5' : ''}
+                `}
+                onClick={() => playable && onPlay(r, c)}
+                onKeyDown={(e) => handleKeyDown(e, r, c)}
+                aria-label={`Row ${r+1}, Col ${c+1}. ${pid ? 'Played by ' + (playerInfo[pid]?.username || pid) : (playable ? 'Empty, playable' : 'Empty')}`}
+              >
+                {pid && (
+                  <span className="fade-in" style={{ color }}>{initial}</span>
+                )}
+              </div>
+            );
+          })
+        )}
+      </div>
 
-      {/* Dots — use currentColor so they pick up the theme's --ink */}
-      {Array.from({ length: rows + 1 }).map((_, r) =>
-        Array.from({ length: cols + 1 }).map((_, c) => (
-          <circle key={`d-${r}-${c}`}
-            cx={padding + c * cell} cy={padding + r * cell}
-            r={dotR} fill="currentColor" />
-        ))
+      {strikeLine && (
+        <svg
+          className="absolute inset-0 pointer-events-none z-10 w-full h-full"
+          style={{ overflow: 'visible' }}
+        >
+          <line
+            x1={strikeLine.x1} y1={strikeLine.y1}
+            x2={strikeLine.x2} y2={strikeLine.y2}
+            stroke={PLAYER_COLORS[winnerIdx]?.hex || 'var(--ochre)'} strokeWidth="8" strokeLinecap="round"
+            className="line-drawn"
+            style={{
+              filter: 'drop-shadow(0px 2px 4px rgba(0,0,0,0.2))',
+            }}
+          />
+        </svg>
       )}
-    </svg>
+    </div>
   );
 }
 
 function ConcealedBoard({ rows, cols }) {
-  const cell = Math.min(70, Math.max(28, 520 / Math.max(rows, cols)));
-  const padding = 30;
-  const w = cols * cell + padding * 2;
-  const h = rows * cell + padding * 2;
   return (
-    <div className="relative" style={{ width: w, maxWidth: '100%', height: h }}>
-      <svg width="100%" height="100%" viewBox={`0 0 ${w} ${h}`} style={{ filter: 'blur(12px)', opacity: 0.4 }}>
-        {Array.from({ length: rows + 1 }).map((_, r) =>
-          Array.from({ length: cols + 1 }).map((_, c) => (
-            <circle key={`d-${r}-${c}`} cx={padding + c * cell} cy={padding + r * cell} r={3} fill="currentColor" />
-          ))
-        )}
-      </svg>
-      <div className="absolute inset-0 flex flex-col items-center justify-center">
+    <div className="relative inline-block w-full max-w-sm aspect-square bg-[var(--hairline-strong)] p-2 blur-md opacity-50">
+       <div className="absolute inset-0 flex flex-col items-center justify-center">
         <Pause size={36} style={{ opacity: 0.4 }} />
         <div className="font-mono text-[0.7rem] tracking-widest uppercase opacity-50 mt-3">Board hidden</div>
       </div>

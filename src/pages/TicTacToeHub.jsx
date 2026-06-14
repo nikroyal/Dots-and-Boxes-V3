@@ -18,8 +18,8 @@ export default function TicTacToeHub() {
   const { profile } = useAuth();
   const navigate = useNavigate();
   const [target, setTarget] = useState('');
-  const [rows, setRows] = useState(5);
-  const [cols, setCols] = useState(5);
+  const [rows, setRows] = useState(3);
+  const [cols, setCols] = useState(3);
   const [sending, setSending] = useState(false);
   const [outgoingInvites, setOutgoingInvites] = useState([]);
   const [findingMatch, setFindingMatch] = useState(false);
@@ -206,6 +206,14 @@ export default function TicTacToeHub() {
               autoComplete="off"
             />
           </div>
+
+          <div className="flex justify-center mb-6">
+            <SizeSelector
+              value={rows}
+              onChange={(val) => { setRows(val); setCols(val); }}
+              label="Board Size"
+            />
+          </div>
           <div className="flex flex-wrap gap-3">
             <button type="submit" disabled={sending} className="btn-primary">
               <Send size={14} /> Send Challenge
@@ -305,10 +313,10 @@ function SizeSelector({ value, onChange, label }) {
   return (
     <div className="flex flex-col items-center">
       <div className="flex items-center gap-3">
-        <button type="button" onClick={() => onChange(Math.max(2, value - 1))}
+        <button type="button" onClick={() => onChange(Math.max(3, value - 1))}
                 className="font-display text-2xl opacity-40 hover:opacity-100 transition-opacity w-6">−</button>
         <span className="font-display text-3xl tabular-nums" style={{ minWidth: 50, textAlign: 'center' }}>{value}</span>
-        <button type="button" onClick={() => onChange(Math.min(15, value + 1))}
+        <button type="button" onClick={() => onChange(Math.min(10, value + 1))}
                 className="font-display text-2xl opacity-40 hover:opacity-100 transition-opacity w-6">+</button>
       </div>
       <div className="font-mono mt-1 text-[0.6rem] tracking-widest uppercase opacity-50">{label}</div>

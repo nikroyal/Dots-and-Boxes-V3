@@ -95,23 +95,57 @@ export default function LocalTicTacToe() {
         )}
       </div>
 
-      <div className="flex justify-center py-8">
-        <div className="grid grid-cols-3 gap-2 bg-[var(--hairline-strong)] p-2">
-          {Array(game.rows).fill(null).map((_, r) =>
-            Array(game.cols).fill(null).map((_, c) => {
-              const pid = game.board[r][c];
-              return (
-                <div key={`cell-${r}-${c}`}
-                     className="w-24 h-24 sm:w-32 sm:h-32 bg-[var(--paper)] flex items-center justify-center text-6xl font-display cursor-pointer hover:bg-[var(--bg-hover)] transition-colors"
-                     onClick={() => !finished && handleMove(r, c)}>
-                  {pid === 'p1' && <span style={{ color: 'var(--crimson)' }}>X</span>}
-                  {pid === 'p2' && <span style={{ color: 'var(--ochre)' }}>O</span>}
-                </div>
-              );
-            })
-          )}
+
+      <div className="flex justify-center py-8 relative">
+        <div className="relative inline-block">
+          <div className="grid gap-2 bg-[var(--hairline-strong)] p-2" style={{ gridTemplateColumns: `repeat(${game.cols}, minmax(0, 1fr))` }}>
+            {Array(game.rows).fill(null).map((_, r) =>
+              Array(game.cols).fill(null).map((_, c) => {
+                const pid = game.board[r][c];
+                return (
+                  <div key={`cell-${r}-${c}`}
+                       className="w-20 h-20 sm:w-32 sm:h-32 bg-[var(--paper)] flex items-center justify-center text-6xl font-display cursor-pointer hover:bg-[var(--bg-hover)] transition-colors"
+                       onClick={() => !finished && handleMove(r, c)}>
+                    {pid === 'p1' && <span className="fade-in" style={{ color: 'var(--crimson)' }}>X</span>}
+                    {pid === 'p2' && <span className="fade-in" style={{ color: 'var(--ochre)' }}>O</span>}
+                  </div>
+                );
+              })
+            )}
+          </div>
+          {finished && game.winLine && (() => {
+            const first = game.winLine[0];
+            const last = game.winLine[game.winLine.length - 1];
+            const x1 = (first.c + 0.5) / game.cols;
+            const y1 = (first.r + 0.5) / game.rows;
+            const x2 = (last.c + 0.5) / game.cols;
+            const y2 = (last.r + 0.5) / game.rows;
+
+            const dx = x2 - x1;
+            const dy = y2 - y1;
+            const len = Math.sqrt(dx*dx + dy*dy);
+            let extX = 0, extY = 0;
+            if (len > 0) {
+              extX = (dx / len) * (0.25 / game.cols);
+              extY = (dy / len) * (0.25 / game.rows);
+            }
+
+            return (
+              <svg className="absolute inset-0 pointer-events-none z-10 w-full h-full" style={{ overflow: 'visible' }}>
+                <line
+                  x1={`${(x1 - extX) * 100}%`} y1={`${(y1 - extY) * 100}%`}
+                  x2={`${(x2 + extX) * 100}%`} y2={`${(y2 + extY) * 100}%`}
+                  stroke={game.winnerIdx === 0 ? 'var(--crimson)' : 'var(--ochre)'}
+                  strokeWidth="8" strokeLinecap="round"
+                  className="line-drawn"
+                  style={{ filter: 'drop-shadow(0px 2px 4px rgba(0,0,0,0.2))' }}
+                />
+              </svg>
+            );
+          })()}
         </div>
       </div>
+
 
       {finished && (
         <div className="card text-center max-w-sm mx-auto space-y-6 fade-up">
