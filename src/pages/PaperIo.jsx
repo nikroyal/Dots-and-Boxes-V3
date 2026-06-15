@@ -67,8 +67,8 @@ function createGame(settings) {
   const bots = Array.from({ length: customBots }, (_, i) => {
     const side = i % 4;
     // Spread bots out roughly based on the customSize
-    const x = Math.floor(crypto.getRandomValues(new Uint32Array(1))[0] / 4294967296 * (customSize - 10)) + 5;
-    const y = Math.floor(crypto.getRandomValues(new Uint32Array(1))[0] / 4294967296 * (customSize - 10)) + 5;
+    const x = Math.floor(secureRandom() * (customSize - 10)) + 5;
+    const y = Math.floor(secureRandom() * (customSize - 10)) + 5;
     fillRect(grid, i + 1, x - 1, y - 1, x + 1, y + 1, customSize);
     return {
       id: i + 1,
