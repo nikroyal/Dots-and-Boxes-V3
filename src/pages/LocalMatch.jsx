@@ -4,6 +4,7 @@ import { createEmptyGame, applyMove, PLAYER_COLORS } from '../lib/gameLogic';
 import { sfx } from '../lib/sound';
 import { X, Trophy, RotateCcw } from 'lucide-react';
 import Confetti from '../components/Confetti';
+import BoxParticles from '../components/BoxParticles';
 import { useConfirm } from '../components/ConfirmDialog';
 
 export default function LocalMatch() {
@@ -13,6 +14,10 @@ export default function LocalMatch() {
   const [cols, setCols] = useState(5);
   const [p1Name, setP1Name] = useState('Player 1');
   const [p2Name, setP2Name] = useState('Player 2');
+  const [p1Avatar, setP1Avatar] = useState('🐶');
+  const [p2Avatar, setP2Avatar] = useState('🐱');
+  const [p1LineStyle, setP1LineStyle] = useState('solid');
+  const [p2LineStyle, setP2LineStyle] = useState('solid');
 
   const [game, setGame] = useState(null);
   const { confirm, dialog } = useConfirm();
@@ -57,13 +62,41 @@ export default function LocalMatch() {
         </div>
         <form onSubmit={handleStart} className="card space-y-6">
           <div className="space-y-4">
-            <div>
-              <label className="font-mono text-[0.65rem] tracking-widest uppercase opacity-60 mb-1 block">Player 1 Name</label>
-              <input value={p1Name} onChange={e => setP1Name(e.target.value)} className="w-full bg-black/5 dark:bg-white/5 border hairline px-3 py-2 font-display outline-none focus-ring" required maxLength={15} />
+            <div className="flex gap-2">
+              <div className="flex-1">
+                <label className="font-mono text-[0.65rem] tracking-widest uppercase opacity-60 mb-1 block">Player 1 Name</label>
+                <input value={p1Name} onChange={e => setP1Name(e.target.value)} className="w-full bg-black/5 dark:bg-white/5 border hairline px-3 py-2 font-display outline-none focus-ring" required maxLength={15} />
+              </div>
+              <div className="w-16">
+                <label className="font-mono text-[0.65rem] tracking-widest uppercase opacity-60 mb-1 block">Avatar</label>
+                <input value={p1Avatar} onChange={e => setP1Avatar(e.target.value)} className="w-full bg-black/5 dark:bg-white/5 border hairline px-3 py-2 font-display outline-none focus-ring text-center" maxLength={8} />
+              </div>
+              <div className="w-24">
+                <label className="font-mono text-[0.65rem] tracking-widest uppercase opacity-60 mb-1 block">Line</label>
+                <select value={p1LineStyle} onChange={e => setP1LineStyle(e.target.value)} className="w-full bg-black/5 dark:bg-white/5 border hairline px-3 py-2 font-display outline-none focus-ring">
+                  <option value="solid">Solid</option>
+                  <option value="neon">Neon</option>
+                  <option value="sketch">Sketch</option>
+                </select>
+              </div>
             </div>
-            <div>
-              <label className="font-mono text-[0.65rem] tracking-widest uppercase opacity-60 mb-1 block">Player 2 Name</label>
-              <input value={p2Name} onChange={e => setP2Name(e.target.value)} className="w-full bg-black/5 dark:bg-white/5 border hairline px-3 py-2 font-display outline-none focus-ring" required maxLength={15} />
+            <div className="flex gap-2">
+              <div className="flex-1">
+                <label className="font-mono text-[0.65rem] tracking-widest uppercase opacity-60 mb-1 block">Player 2 Name</label>
+                <input value={p2Name} onChange={e => setP2Name(e.target.value)} className="w-full bg-black/5 dark:bg-white/5 border hairline px-3 py-2 font-display outline-none focus-ring" required maxLength={15} />
+              </div>
+              <div className="w-16">
+                <label className="font-mono text-[0.65rem] tracking-widest uppercase opacity-60 mb-1 block">Avatar</label>
+                <input value={p2Avatar} onChange={e => setP2Avatar(e.target.value)} className="w-full bg-black/5 dark:bg-white/5 border hairline px-3 py-2 font-display outline-none focus-ring text-center" maxLength={8} />
+              </div>
+              <div className="w-24">
+                <label className="font-mono text-[0.65rem] tracking-widest uppercase opacity-60 mb-1 block">Line</label>
+                <select value={p2LineStyle} onChange={e => setP2LineStyle(e.target.value)} className="w-full bg-black/5 dark:bg-white/5 border hairline px-3 py-2 font-display outline-none focus-ring">
+                  <option value="solid">Solid</option>
+                  <option value="neon">Neon</option>
+                  <option value="sketch">Sketch</option>
+                </select>
+              </div>
             </div>
             <div className="flex gap-4">
                <div className="flex-1">
@@ -132,20 +165,42 @@ export default function LocalMatch() {
           height={rows * 60 + 20}
           className="select-none touch-none"
         >
+          {/* Filters for Line Styles */}
+          <defs>
+            <filter id="style-neon" x="-50%" y="-50%" width="200%" height="200%">
+              <feGaussianBlur in="SourceGraphic" stdDeviation="2" result="blur" />
+              <feMerge>
+                <feMergeNode in="blur" />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
+            <filter id="style-sketch" x="-20%" y="-20%" width="140%" height="140%">
+              <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="3" result="noise" />
+              <feDisplacementMap in="SourceGraphic" in2="noise" scale="3" xChannelSelector="R" yChannelSelector="G" />
+            </filter>
+          </defs>
+
           {/* Boxes */}
           {Array.from({ length: rows }).map((_, r) =>
             Array.from({ length: cols }).map((_, c) => {
               const owner = game.boxes[`${r},${c}`];
               if (!owner) return null;
               const color = owner === 'p1' ? PLAYER_COLORS[0] : PLAYER_COLORS[1];
+              const lastMove = game.moves[game.moves.length - 1];
+              const isJustClaimed = !!lastMove && lastMove.claimedBoxes?.some(b => b.r === r && b.c === c);
               return (
-                <rect
-                  key={`b-${r}-${c}`}
-                  x={c * 60 + 10} y={r * 60 + 10}
-                  width={60} height={60}
-                  fill={color.soft}
-                  className="fade-in"
-                />
+                <g key={`b-${r}-${c}`} className="box-filled">
+                  <rect
+                    x={c * 60 + 10} y={r * 60 + 10}
+                    width={60} height={60}
+                    fill={color.soft}
+                  />
+                  <text x={c * 60 + 40} y={r * 60 + 45} textAnchor="middle"
+                        style={{ fontFamily: 'EB Garamond, serif', fontSize: 24, fontWeight: 500, fill: color.hex }}>
+                    {owner === 'p1' ? p1Avatar || p1Name[0].toUpperCase() : p2Avatar || p2Name[0].toUpperCase()}
+                  </text>
+                  {isJustClaimed && <BoxParticles x={c * 60 + 40} y={r * 60 + 40} color={color.hex} />}
+                </g>
               );
             })
           )}
@@ -162,6 +217,7 @@ export default function LocalMatch() {
             Array.from({ length: cols }).map((_, c) => {
               const owner = game.hLines[`${r},${c}`];
               const color = owner ? (owner === 'p1' ? PLAYER_COLORS[0].hex : PLAYER_COLORS[1].hex) : 'transparent';
+              const lineStyle = owner ? (owner === 'p1' ? p1LineStyle : p2LineStyle) : null;
               return (
                 <g key={`h-${r}-${c}`} onClick={() => !owner && handleMove('h', r, c)} className={!owner && !finished ? 'cursor-pointer group' : ''}>
                   <rect x={c * 60 + 14} y={r * 60 - 4 + 10} width={52} height={16} fill="transparent" />
@@ -169,7 +225,8 @@ export default function LocalMatch() {
                     x1={c * 60 + 10} y1={r * 60 + 10}
                     x2={(c + 1) * 60 + 10} y2={r * 60 + 10}
                     stroke={color} strokeWidth={owner ? 6 : 4} strokeLinecap="round"
-                    className={!owner && !finished ? 'stroke-black/10 dark:stroke-white/10 opacity-0 group-hover:opacity-100 transition-opacity' : ''}
+                    filter={owner && lineStyle !== 'solid' ? `url(#style-${lineStyle})` : undefined}
+                    className={owner ? 'line-drawn-h' : (!finished ? 'stroke-black/10 dark:stroke-white/10 opacity-0 group-hover:opacity-100 transition-opacity' : '')}
                   />
                 </g>
               );
@@ -180,6 +237,7 @@ export default function LocalMatch() {
             Array.from({ length: cols + 1 }).map((_, c) => {
               const owner = game.vLines[`${r},${c}`];
               const color = owner ? (owner === 'p1' ? PLAYER_COLORS[0].hex : PLAYER_COLORS[1].hex) : 'transparent';
+              const lineStyle = owner ? (owner === 'p1' ? p1LineStyle : p2LineStyle) : null;
               return (
                 <g key={`v-${r}-${c}`} onClick={() => !owner && handleMove('v', r, c)} className={!owner && !finished ? 'cursor-pointer group' : ''}>
                   <rect x={c * 60 - 4 + 10} y={r * 60 + 14} width={16} height={52} fill="transparent" />
@@ -187,7 +245,8 @@ export default function LocalMatch() {
                     x1={c * 60 + 10} y1={r * 60 + 10}
                     x2={c * 60 + 10} y2={(r + 1) * 60 + 10}
                     stroke={color} strokeWidth={owner ? 6 : 4} strokeLinecap="round"
-                    className={!owner && !finished ? 'stroke-black/10 dark:stroke-white/10 opacity-0 group-hover:opacity-100 transition-opacity' : ''}
+                    filter={owner && lineStyle !== 'solid' ? `url(#style-${lineStyle})` : undefined}
+                    className={owner ? 'line-drawn-v' : (!finished ? 'stroke-black/10 dark:stroke-white/10 opacity-0 group-hover:opacity-100 transition-opacity' : '')}
                   />
                 </g>
               );

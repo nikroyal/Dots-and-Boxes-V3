@@ -21,8 +21,8 @@ const PALETTE = {
   line: 'rgba(255,255,255,0.08)',
 };
 
-function indexOf(x, y) {
-  return y * SIZE + x;
+function indexOf(x, y, size = SIZE) {
+  return y * size + x;
 }
 
 function clamp(value, min, max) {
@@ -39,10 +39,10 @@ function saveBest(value) {
   catch {}
 }
 
-function fillRect(grid, owner, x1, y1, x2, y2) {
-  for (let y = clamp(y1, 0, SIZE - 1); y <= clamp(y2, 0, SIZE - 1); y++) {
-    for (let x = clamp(x1, 0, SIZE - 1); x <= clamp(x2, 0, SIZE - 1); x++) {
-      grid[indexOf(x, y)] = owner;
+function fillRect(grid, owner, x1, y1, x2, y2, size = SIZE) {
+  for (let y = clamp(y1, 0, size - 1); y <= clamp(y2, 0, size - 1); y++) {
+    for (let x = clamp(x1, 0, size - 1); x <= clamp(x2, 0, size - 1); x++) {
+      grid[indexOf(x, y, size)] = owner;
     }
   }
 }
@@ -54,15 +54,22 @@ function countOwner(grid, owner) {
 }
 
 function createGame(settings) {
-  const config = DIFFICULTY[settings.difficulty];
-  const grid = new Array(SIZE * SIZE).fill(EMPTY);
-  fillRect(grid, 0, 4, 19, 10, 25);
+  const isCustom = settings.mode === 'custom';
+  const difficultyConfig = DIFFICULTY[settings.difficulty] || DIFFICULTY.normal;
+  const customBots = isCustom ? Number(settings.customBots) : difficultyConfig.bots;
+  const customSize = isCustom ? Number(settings.customSize) : SIZE;
 
-  const bots = Array.from({ length: config.bots }, (_, i) => {
+  const grid = new Array(customSize * customSize).fill(EMPTY);
+  const midX = Math.floor(customSize / 2);
+  const midY = Math.floor(customSize / 2);
+  fillRect(grid, 0, midX - 3, midY - 3, midX + 3, midY + 3, customSize);
+
+  const bots = Array.from({ length: customBots }, (_, i) => {
     const side = i % 4;
-    const x = side === 0 ? 34 : side === 1 ? 32 : 12 + (i * 5) % 24;
-    const y = side === 2 ? 10 : side === 3 ? 35 : 8 + (i * 7) % 28;
-    fillRect(grid, i + 1, x - 1, y - 1, x + 1, y + 1);
+    // Spread bots out roughly based on the customSize
+    const x = Math.floor(Math.random() * (customSize - 10)) + 5;
+    const y = Math.floor(Math.random() * (customSize - 10)) + 5;
+    fillRect(grid, i + 1, x - 1, y - 1, x + 1, y + 1, customSize);
     return {
       id: i + 1,
       x,
@@ -75,16 +82,17 @@ function createGame(settings) {
 
   return {
     grid,
-    player: { x: 7, y: 22, dx: 1, dy: 0, nextDx: 1, nextDy: 0, trail: [] },
+    player: { x: midX, y: midY, dx: 1, dy: 0, nextDx: 1, nextDy: 0, trail: [] },
     bots,
     captured: 0,
     startedAt: Date.now(),
     overReason: '',
     settings,
+    size: customSize
   };
 }
 
-function turnBot(bot, drift) {
+function turnBot(bot, drift, game) {
   if (Math.random() > drift) return;
   const turns = [
     { dx: 1, dy: 0 },
@@ -92,12 +100,52 @@ function turnBot(bot, drift) {
     { dx: 0, dy: 1 },
     { dx: 0, dy: -1 },
   ].filter(dir => !(dir.dx === -bot.dx && dir.dy === -bot.dy));
-  const pick = turns[Math.floor(Math.random() * turns.length)];
+
+  // Smarter Bot logic: Assign weights to directions
+  let bestTurns = [];
+  let bestScore = -Infinity;
+
+  for (const turn of turns) {
+    const nx = bot.x + turn.dx;
+    const ny = bot.y + turn.dy;
+
+    // Default low weight
+    let score = 0;
+
+    const customSize = game.size || SIZE;
+
+    if (nx <= 0 || nx >= customSize - 1 || ny <= 0 || ny >= customSize - 1) {
+      score = -100; // Penalize moving out of bounds
+    } else {
+      const idx = indexOf(nx, ny, customSize);
+      const cellOwner = game.grid[idx];
+
+      if (cellOwner === bot.id) {
+        score = -10; // Avoid staying inside their own captured territory unnecessarily
+      } else if (cellOwner === TRAIL) {
+        score = 50;  // High value to hunting enemy trail
+      } else if (cellOwner === EMPTY) {
+        score = 20;  // Medium value for capturing empty space
+      } else if (cellOwner === 0) {
+        score = 10;  // Okay value for attacking player's territory
+      }
+    }
+
+    if (score > bestScore) {
+      bestScore = score;
+      bestTurns = [turn];
+    } else if (score === bestScore) {
+      bestTurns.push(turn);
+    }
+  }
+
+  const pick = bestTurns[Math.floor(Math.random() * bestTurns.length)];
   bot.dx = pick.dx;
   bot.dy = pick.dy;
 }
 
 function closeLoop(game) {
+  const customSize = game.size || SIZE;
   const { grid, player } = game;
   if (!player.trail.length) return 0;
   let minX = player.x;
@@ -106,8 +154,8 @@ function closeLoop(game) {
   let maxY = player.y;
 
   for (const cell of player.trail) {
-    const x = cell % SIZE;
-    const y = Math.floor(cell / SIZE);
+    const x = cell % customSize;
+    const y = Math.floor(cell / customSize);
     minX = Math.min(minX, x);
     maxX = Math.max(maxX, x);
     minY = Math.min(minY, y);
@@ -116,9 +164,9 @@ function closeLoop(game) {
   }
 
   let gained = 0;
-  for (let y = clamp(minY, 0, SIZE - 1); y <= clamp(maxY, 0, SIZE - 1); y++) {
-    for (let x = clamp(minX, 0, SIZE - 1); x <= clamp(maxX, 0, SIZE - 1); x++) {
-      const idx = indexOf(x, y);
+  for (let y = clamp(minY, 0, customSize - 1); y <= clamp(maxY, 0, customSize - 1); y++) {
+    for (let x = clamp(minX, 0, customSize - 1); x <= clamp(maxX, 0, customSize - 1); x++) {
+      const idx = indexOf(x, y, customSize);
       if (grid[idx] !== 0) {
         grid[idx] = 0;
         gained++;
@@ -132,6 +180,7 @@ function closeLoop(game) {
 
 function stepGame(game) {
   const config = DIFFICULTY[game.settings.difficulty];
+  const customSize = game.size || SIZE;
   const { grid, player } = game;
 
   if (!(player.nextDx === -player.dx && player.nextDy === -player.dy)) {
@@ -141,12 +190,12 @@ function stepGame(game) {
 
   const nx = player.x + player.dx;
   const ny = player.y + player.dy;
-  if (nx < 0 || nx >= SIZE || ny < 0 || ny >= SIZE) {
+  if (nx < 0 || nx >= customSize || ny < 0 || ny >= customSize) {
     game.overReason = 'You ran into the edge of the arena.';
     return false;
   }
 
-  const nextIdx = indexOf(nx, ny);
+  const nextIdx = indexOf(nx, ny, customSize);
   if (grid[nextIdx] === TRAIL) {
     game.overReason = 'You crossed your own trail.';
     return false;
@@ -164,21 +213,21 @@ function stepGame(game) {
   }
 
   for (const bot of game.bots) {
-    turnBot(bot, config.drift);
+    turnBot(bot, config.drift, game);
     let bx = bot.x + bot.dx;
     let by = bot.y + bot.dy;
-    if (bx <= 0 || bx >= SIZE - 1) {
+    if (bx <= 0 || bx >= customSize - 1) {
       bot.dx *= -1;
       bx = bot.x + bot.dx;
     }
-    if (by <= 0 || by >= SIZE - 1) {
+    if (by <= 0 || by >= customSize - 1) {
       bot.dy *= -1;
       by = bot.y + bot.dy;
     }
     bot.x = bx;
     bot.y = by;
-    const botIdx = indexOf(bot.x, bot.y);
-    if (botIdx === indexOf(player.x, player.y) || grid[botIdx] === TRAIL) {
+    const botIdx = indexOf(bot.x, bot.y, customSize);
+    if (botIdx === indexOf(player.x, player.y, customSize) || grid[botIdx] === TRAIL) {
       game.overReason = 'A bot cut your trail.';
       return false;
     }
@@ -199,15 +248,28 @@ function drawGame(canvas, game) {
     canvas.height = height;
   }
 
-  const cell = Math.min(width, height) / SIZE;
-  const ox = (width - cell * SIZE) / 2;
-  const oy = (height - cell * SIZE) / 2;
+  const customSize = game.size || SIZE;
+
+  // Base scale on a standard 46-cell size so the player remains the same physical size,
+  // even if the grid is massive (like 150x150).
+  const cell = Math.min(width, height) / Math.min(customSize, 46);
+
+  // Center the camera on the player
+  const ox = (width / 2) - ((game.player.x + 0.5) * cell);
+  const oy = (height / 2) - ((game.player.y + 0.5) * cell);
+
   ctx.fillStyle = PALETTE.bg;
   ctx.fillRect(0, 0, width, height);
 
-  for (let y = 0; y < SIZE; y++) {
-    for (let x = 0; x < SIZE; x++) {
-      const owner = game.grid[indexOf(x, y)];
+  // Calculate visible bounds to optimize rendering
+  const minVisX = Math.max(0, Math.floor(-ox / cell));
+  const minVisY = Math.max(0, Math.floor(-oy / cell));
+  const maxVisX = Math.min(customSize, Math.ceil((width - ox) / cell));
+  const maxVisY = Math.min(customSize, Math.ceil((height - oy) / cell));
+
+  for (let y = minVisY; y < maxVisY; y++) {
+    for (let x = minVisX; x < maxVisX; x++) {
+      const owner = game.grid[indexOf(x, y, customSize)];
       if (owner === EMPTY) continue;
       if (owner === TRAIL) ctx.fillStyle = PALETTE.trail;
       else if (owner === 0) ctx.fillStyle = PALETTE.player;
@@ -220,15 +282,31 @@ function drawGame(canvas, game) {
 
   ctx.strokeStyle = PALETTE.line;
   ctx.lineWidth = 1;
-  for (let i = 0; i <= SIZE; i += 2) {
-    ctx.beginPath();
-    ctx.moveTo(ox + i * cell, oy);
-    ctx.lineTo(ox + i * cell, oy + SIZE * cell);
-    ctx.moveTo(ox, oy + i * cell);
-    ctx.lineTo(ox + SIZE * cell, oy + i * cell);
-    ctx.stroke();
+
+  for (let i = (minVisX % 2 === 0 ? minVisX : minVisX - 1); i <= maxVisX; i += 2) {
+      if (i >= 0 && i <= customSize) {
+        ctx.beginPath();
+        ctx.moveTo(ox + i * cell, oy + minVisY * cell);
+        ctx.lineTo(ox + i * cell, oy + maxVisY * cell);
+        ctx.stroke();
+      }
   }
 
+  for (let i = (minVisY % 2 === 0 ? minVisY : minVisY - 1); i <= maxVisY; i += 2) {
+      if (i >= 0 && i <= customSize) {
+        ctx.beginPath();
+        ctx.moveTo(ox + minVisX * cell, oy + i * cell);
+        ctx.lineTo(ox + maxVisX * cell, oy + i * cell);
+        ctx.stroke();
+      }
+  }
+
+  // Draw Arena Bounds
+  ctx.strokeStyle = 'rgba(255,50,50,0.5)';
+  ctx.lineWidth = 3;
+  ctx.strokeRect(ox, oy, customSize * cell, customSize * cell);
+
+  // Draw Player
   ctx.fillStyle = '#f8fafc';
   ctx.beginPath();
   ctx.arc(ox + (game.player.x + 0.5) * cell, oy + (game.player.y + 0.5) * cell, cell * 0.58, 0, Math.PI * 2);
@@ -238,19 +316,23 @@ function drawGame(canvas, game) {
   ctx.arc(ox + (game.player.x + 0.5) * cell, oy + (game.player.y + 0.5) * cell, cell * 0.34, 0, Math.PI * 2);
   ctx.fill();
 
+  // Draw Bots
   for (const bot of game.bots) {
-    ctx.fillStyle = bot.color;
-    ctx.beginPath();
-    ctx.arc(ox + (bot.x + 0.5) * cell, oy + (bot.y + 0.5) * cell, cell * 0.46, 0, Math.PI * 2);
-    ctx.fill();
+    if (bot.x >= minVisX - 1 && bot.x <= maxVisX + 1 && bot.y >= minVisY - 1 && bot.y <= maxVisY + 1) {
+      ctx.fillStyle = bot.color;
+      ctx.beginPath();
+      ctx.arc(ox + (bot.x + 0.5) * cell, oy + (bot.y + 0.5) * cell, cell * 0.46, 0, Math.PI * 2);
+      ctx.fill();
+    }
   }
 }
 
 function makeHud(game) {
+  const customSize = game.size || SIZE;
   const playerCells = countOwner(game.grid, 0);
   const botAreas = game.bots.map(bot => countOwner(game.grid, bot.id));
   const rank = 1 + botAreas.filter(area => area > playerCells).length;
-  const pct = (playerCells / (SIZE * SIZE)) * 100;
+  const pct = (playerCells / (customSize * customSize)) * 100;
   return {
     territory: pct,
     captured: game.captured,
@@ -266,7 +348,7 @@ export default function PaperIo() {
   const lastFrameRef = useRef(0);
   const tickRef = useRef(0);
   const [screen, setScreen] = useState('menu');
-  const [settings, setSettings] = useState({ version: '2', mode: 'classic', difficulty: 'normal' });
+  const [settings, setSettings] = useState({ version: '2', mode: 'classic', difficulty: 'normal', customSize: 46, customBots: 8, customSpeed: 125 });
   const [hud, setHud] = useState({ territory: 0, captured: 0, rank: '-', exposure: 'Safe', best: readBest() });
   const [reason, setReason] = useState('');
 
@@ -310,8 +392,45 @@ export default function PaperIo() {
         game.player.nextDy = dir.dy;
       }
     };
+
+    let touchStartX = 0;
+    let touchStartY = 0;
+
+    const onTouchStart = (e) => {
+      touchStartX = e.changedTouches[0].screenX;
+      touchStartY = e.changedTouches[0].screenY;
+    };
+
+    const onTouchEnd = (e) => {
+      const game = gameRef.current;
+      if (!game || screen !== 'playing') return;
+
+      const touchEndX = e.changedTouches[0].screenX;
+      const touchEndY = e.changedTouches[0].screenY;
+      const dx = touchEndX - touchStartX;
+      const dy = touchEndY - touchStartY;
+
+      if (Math.abs(dx) > Math.abs(dy)) {
+        if (Math.abs(dx) > 30) {
+          game.player.nextDx = dx > 0 ? 1 : -1;
+          game.player.nextDy = 0;
+        }
+      } else {
+        if (Math.abs(dy) > 30) {
+          game.player.nextDx = 0;
+          game.player.nextDy = dy > 0 ? 1 : -1;
+        }
+      }
+    };
+
     window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
+    window.addEventListener('touchstart', onTouchStart);
+    window.addEventListener('touchend', onTouchEnd);
+    return () => {
+      window.removeEventListener('keydown', onKey);
+      window.removeEventListener('touchstart', onTouchStart);
+      window.removeEventListener('touchend', onTouchEnd);
+    };
   }, [screen]);
 
   useEffect(() => {
@@ -321,11 +440,11 @@ export default function PaperIo() {
       const game = gameRef.current;
       if (canvas && game) drawGame(canvas, game);
       if (screen === 'playing' && game) {
-        const diff = DIFFICULTY[game.settings.difficulty];
+        const diffMs = game.settings.mode === 'custom' ? Number(game.settings.customSpeed) : DIFFICULTY[game.settings.difficulty].tickMs;
         const elapsed = lastFrameRef.current ? Math.min(time - lastFrameRef.current, 200) : 0;
         tickRef.current += elapsed;
-        while (tickRef.current >= diff.tickMs) {
-          tickRef.current -= diff.tickMs;
+        while (tickRef.current >= diffMs) {
+          tickRef.current -= diffMs;
           if (!stepGame(game)) {
             stopRun(game);
             break;
@@ -391,6 +510,22 @@ export default function PaperIo() {
             <Segment label="Version" value={settings.version} onChange={version => setSettings(s => ({ ...s, version }))} options={[['1', 'Classic'], ['2', 'Paper.io 2']]} />
             <Segment label="Mode" value={settings.mode} onChange={mode => setSettings(s => ({ ...s, mode }))} options={[['classic', 'Classic'], ['custom', 'Custom']]} />
             <Segment label="Difficulty" value={settings.difficulty} onChange={difficulty => setSettings(s => ({ ...s, difficulty }))} options={Object.keys(DIFFICULTY).map(key => [key, key])} />
+            {settings.mode === 'custom' && (
+              <>
+                <div>
+                  <div className="font-mono text-[0.6rem] tracking-widest uppercase opacity-50 mb-2">Map Size ({settings.customSize}x{settings.customSize})</div>
+                  <input type="range" min="20" max="150" value={settings.customSize} onChange={e => setSettings(s => ({ ...s, customSize: Number(e.target.value) }))} className="w-full accent-[var(--ink)]" />
+                </div>
+                <div>
+                  <div className="font-mono text-[0.6rem] tracking-widest uppercase opacity-50 mb-2">Bot Count ({settings.customBots})</div>
+                  <input type="range" min="0" max="40" value={settings.customBots} onChange={e => setSettings(s => ({ ...s, customBots: Number(e.target.value) }))} className="w-full accent-[var(--ink)]" />
+                </div>
+                <div>
+                  <div className="font-mono text-[0.6rem] tracking-widest uppercase opacity-50 mb-2">Game Speed ({settings.customSpeed}ms)</div>
+                  <input type="range" min="20" max="300" value={settings.customSpeed} onChange={e => setSettings(s => ({ ...s, customSpeed: Number(e.target.value) }))} className="w-full accent-[var(--ink)]" />
+                </div>
+              </>
+            )}
           </div>
           <div id="stats" className="card">
             <div className="flex items-center gap-2 font-mono text-[0.65rem] tracking-widest uppercase opacity-60 mb-3">

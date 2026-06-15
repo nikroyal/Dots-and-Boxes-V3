@@ -75,6 +75,7 @@ export async function sendInvite(fromUser, toUsername, rows, cols, gameType = 'd
     fromUsername: fromUser.username,
     fromAvatar: fromUser.avatar || '◆',
     fromElo: fromUser.elo || 1000,
+    fromLineStyle: fromUser.lineStyle || 'solid',
     toId: target.id,
     toUsername: target.username,
     rows, cols,
@@ -116,27 +117,31 @@ export async function acceptInvite(inviteId, currentUser) {
     else if (gType === 'chess') newGame = createEmptyGameChess(playerIds);
     else newGame = createEmptyGame(inv.rows, inv.cols, playerIds);
 
+    const isChess = gType === 'chess';
     tx.set(matchRef, {
       players: playerIds,
       playerInfo: {
-        [inv.fromId]: { username: inv.fromUsername, avatar: inv.fromAvatar, elo: inv.fromElo },
-        [inv.toId]:   { username: currentUser.username, avatar: currentUser.avatar || '◆', elo: currentUser.elo || 1000 },
+        [inv.fromId]: { username: inv.fromUsername, avatar: inv.fromAvatar, elo: inv.fromElo, lineStyle: inv.fromLineStyle },
+        [inv.toId]:   { username: currentUser.username, avatar: currentUser.avatar || '◆', elo: currentUser.elo || 1000, lineStyle: currentUser.lineStyle || 'solid' },
       },
       rows: inv.rows,
       cols: inv.cols,
       gameType: gType,
       game: newGame,
-      status: 'active', // active | paused | finished
-      pauseRequest: null, // { byId, requestedAt }
-      pauseConcealed: false, // when paused, hide board
+      status: isChess ? 'timer_negotiation' : 'active',
+      pauseRequest: null,
+      pauseConcealed: false,
       spectators: [],
       chat: [],
       winner: null,
-      startsAtMs, // pre-game countdown target
-      turnStartedAt: serverTimestamp(), // for per-turn timer
+      ...(isChess ? {} : { startsAtMs }),
+      ...(isChess ? {} : { turnStartedAt: serverTimestamp() }),
       turnTimeoutMs: TURN_TIMEOUT_MS,
       createdAt: serverTimestamp(),
       finishedAt: null,
+      timerConfig: null,
+      timerProposer: null,
+      timerRejectReason: null,
     });
 
     tx.update(invRef, { status: 'accepted', matchId: matchRef.id });
@@ -277,13 +282,16 @@ export async function hostGame(currentUser, gameType, rows, cols) {
     gameType,
     players: [currentUser.id],
     playerInfo: {
-      [currentUser.id]: { username: currentUser.username, avatar: currentUser.avatar || '◆', elo: currentUser.elo || 1000 }
+      [currentUser.id]: { username: currentUser.username, avatar: currentUser.avatar || '◆', elo: currentUser.elo || 1000, lineStyle: currentUser.lineStyle || 'solid' }
     },
     rows,
     cols,
     game,
     status: 'waiting', // waiting | active | paused | finished
     createdAt: serverTimestamp(),
+    timerConfig: null,
+    timerProposer: null,
+    timerRejectReason: null,
   });
   return docRef.id;
 }
@@ -319,19 +327,23 @@ export async function joinGame(matchId, currentUser) {
 
     const startsAtMs = Date.now() + PREGAME_COUNTDOWN_MS;
 
+    const isChess = m.gameType === 'chess';
     tx.update(matchRef, {
       players: playerIds,
-      [`playerInfo.${currentUser.id}`]: { username: currentUser.username, avatar: currentUser.avatar || '◆', elo: currentUser.elo || 1000 },
+      [`playerInfo.${currentUser.id}`]: { username: currentUser.username, avatar: currentUser.avatar || '◆', elo: currentUser.elo || 1000, lineStyle: currentUser.lineStyle || 'solid' },
       game,
-      status: 'active',
+      status: isChess ? 'timer_negotiation' : 'active',
       pauseRequest: null,
       pauseConcealed: false,
       spectators: [],
       chat: [],
       winner: null,
-      startsAtMs,
-      turnStartedAt: serverTimestamp(),
+      ...(isChess ? {} : { startsAtMs }),
+      ...(isChess ? {} : { turnStartedAt: serverTimestamp() }),
       turnTimeoutMs: TURN_TIMEOUT_MS,
+      timerConfig: null,
+      timerProposer: null,
+      timerRejectReason: null,
     });
   });
 }
@@ -510,7 +522,13 @@ export async function forfeitOnTimeout(matchId, currentUser) {
     const effectiveStartedAtMs = effectiveStartsAtMs
       ? Math.max(rawStartedAtMs, effectiveStartsAtMs)
       : rawStartedAtMs;
-    const timeoutMs = m.turnTimeoutMs || 60000;
+    const timeoutMs = m.turnTimeoutMs !== undefined ? m.turnTimeoutMs : 60000;
+
+    // If timeoutMs is -1, it means no timer was agreed upon. Don't forfeit.
+    if (timeoutMs === -1) {
+      return;
+    }
+
     const expired = Date.now() - effectiveStartedAtMs > timeoutMs + 5000;
     if (!expired) return;
 
@@ -973,7 +991,7 @@ export async function unblockUser(currentUser, targetId) {
 // ─── Profile updates ─────────────────────────────────────────────────────
 export async function updateProfile(currentUser, updates) {
   guard(currentUser);
-  const allowed = ['avatar', 'title', 'bio', 'displayName'];
+  const allowed = ['avatar', 'title', 'bio', 'displayName', 'lineStyle'];
   const filtered = {};
   for (const k of allowed) if (k in updates) filtered[k] = updates[k];
   await updateDoc(doc(db, 'users', currentUser.id), filtered);
@@ -984,4 +1002,38 @@ export async function getLeaderboard(limitN = 50) {
   const q = query(collection(db, 'users'), orderBy('elo', 'desc'), limit(limitN));
   const snap = await getDocs(q);
   return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+}
+
+
+// ─── Timer Negotiation ───────────────────────────────────────────────────
+
+export async function proposeTimer(matchId, currentUser, useTimer, timerMins) {
+  guard(currentUser);
+  const matchRef = doc(db, 'matches', matchId);
+  await updateDoc(matchRef, {
+    timerConfig: { useTimer, timerMins },
+    timerProposer: currentUser.id,
+    timerRejectReason: null,
+  });
+}
+
+export async function rejectTimer(matchId, currentUser, reason) {
+  guard(currentUser);
+  const matchRef = doc(db, 'matches', matchId);
+  await updateDoc(matchRef, {
+    timerConfig: null,
+    timerProposer: null,
+    timerRejectReason: reason || 'Rejected without reason',
+  });
+}
+
+export async function acceptTimer(matchId, currentUser, useTimer, timerMins) {
+  guard(currentUser);
+  const matchRef = doc(db, 'matches', matchId);
+  await updateDoc(matchRef, {
+    status: 'active',
+    startsAtMs: Date.now() + 3500, // PREGAME_COUNTDOWN_MS
+    turnStartedAt: serverTimestamp(),
+    turnTimeoutMs: useTimer ? timerMins * 60 * 1000 : -1,
+  });
 }

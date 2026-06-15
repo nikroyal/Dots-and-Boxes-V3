@@ -99,17 +99,18 @@ export function applyMove(game, orientation, r, c, playerId, playerIds) {
 
   // Check box completion
   let claimed = 0;
+  let claimedBoxes = [];
   if (orientation === 'h') {
-    if (r > 0           && checkBoxComplete(newGame, r - 1, c)) { newGame.boxes[bKey(r - 1, c)] = playerId; claimed++; }
-    if (r < newGame.rows && checkBoxComplete(newGame, r,     c)) { newGame.boxes[bKey(r, c)]     = playerId; claimed++; }
+    if (r > 0           && checkBoxComplete(newGame, r - 1, c)) { newGame.boxes[bKey(r - 1, c)] = playerId; claimed++; claimedBoxes.push({r: r - 1, c}); }
+    if (r < newGame.rows && checkBoxComplete(newGame, r,     c)) { newGame.boxes[bKey(r, c)]     = playerId; claimed++; claimedBoxes.push({r, c}); }
   } else {
-    if (c > 0           && checkBoxComplete(newGame, r, c - 1)) { newGame.boxes[bKey(r, c - 1)] = playerId; claimed++; }
-    if (c < newGame.cols && checkBoxComplete(newGame, r, c))     { newGame.boxes[bKey(r, c)]     = playerId; claimed++; }
+    if (c > 0           && checkBoxComplete(newGame, r, c - 1)) { newGame.boxes[bKey(r, c - 1)] = playerId; claimed++; claimedBoxes.push({r, c: c - 1}); }
+    if (c < newGame.cols && checkBoxComplete(newGame, r, c))     { newGame.boxes[bKey(r, c)]     = playerId; claimed++; claimedBoxes.push({r, c}); }
   }
 
   newGame.scores[playerId] = (newGame.scores[playerId] || 0) + claimed;
   newGame.moveCount++;
-  newGame.moves.push({ type: orientation, r, c, by: playerId, claimed, ts: Date.now() });
+  newGame.moves.push({ type: orientation, r, c, by: playerId, claimed, claimedBoxes, ts: Date.now() });
 
   // Advance turn unless they claimed a box (extra turn rule)
   if (claimed === 0) {
