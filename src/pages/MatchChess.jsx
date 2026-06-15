@@ -20,6 +20,7 @@ import { isDisconnected } from '../lib/presence';
 import { Pause, Play, Flag, Send, Eye, Trophy, RotateCcw, Home, Repeat, Clock, WifiOff, Handshake } from 'lucide-react';
 import { Chessboard } from 'react-chessboard';
 import { Chess } from 'chess.js';
+import { applyMove } from '../lib/chessLogic.js';
 
 export default function MatchChess() {
   const { id } = useParams();
@@ -296,7 +297,6 @@ export default function MatchChess() {
     };
 
     // Calculate pending state
-    const { applyMove } = await import('../lib/chessLogic');
     const { newGame, error } = applyMove(match.game, moveObj, profile.id, match.players);
     if (error) return false;
 
@@ -337,26 +337,24 @@ export default function MatchChess() {
       return;
     }
 
-    import('chess.js').then(({ Chess }) => {
-      const chess = new Chess(match.game.fen);
-      const moves = chess.moves({ square, verbose: true });
+    const chess = new Chess(match.game.fen);
+    const moves = chess.moves({ square, verbose: true });
 
-      if (moves.length === 0) {
-        setSelectedSquare(null);
-        setOptionSquares({});
-        return;
-      }
+    if (moves.length === 0) {
+      setSelectedSquare(null);
+      setOptionSquares({});
+      return;
+    }
 
-      setSelectedSquare(square);
-      const newOptions = {};
-      moves.forEach(move => {
-        newOptions[move.to] = {
-          background: 'radial-gradient(circle, rgba(0,255,0,.2) 25%, transparent 30%)',
-          borderRadius: '50%'
-        };
-      });
-      setOptionSquares(newOptions);
+    setSelectedSquare(square);
+    const newOptions = {};
+    moves.forEach(move => {
+      newOptions[move.to] = {
+        background: 'radial-gradient(circle, rgba(0,255,0,.2) 25%, transparent 30%)',
+        borderRadius: '50%'
+      };
     });
+    setOptionSquares(newOptions);
   };
 
   const handleSendChat = async (e, textOverride) => {
