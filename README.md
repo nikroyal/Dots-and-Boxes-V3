@@ -1,10 +1,11 @@
-# Dots & Boxes — online multiplayer
+# Axiom Hub
 
-A real-time online Dots & Boxes game. React + Vite + Firebase (Auth + Firestore), deployed to Netlify.
+A collection of real-time online multiplayer games and interactive experiences, including Dots & Boxes, Connect 4, Tic-Tac-Toe, Chess, Paper.io, and Circuit Maker. React + Vite + Firebase (Auth + Firestore), deployed to Netlify.
 
 ## Features
 
-- **Real-time multiplayer matches** with live board sync
+- **Axiom Hub** with multiple distinct experiences: Dots & Boxes, Connect 4, Tic-Tac-Toe, Chess, Paper.io, and Circuit Maker
+- **Real-time multiplayer matches** with live board sync for supported games
 - **ELO rating system** with leaderboard, clamped to [100, 3500] so a bad streak can't push you to nonsense
 - **Pre-game 3-2-1 countdown** synchronized between players (server-timestamp-based, immune to clock skew)
 - **Per-turn 60-second timer** with claim-victory-on-timeout; timer resets after each box claim so long chains don't self-forfeit
@@ -116,9 +117,22 @@ npm run dev
     │   └── ActivityFeed.jsx
     └── pages/
         ├── Login.jsx
+        ├── AxiomHub.jsx         # The main hub linking all experiences
         ├── Dashboard.jsx
         ├── Lobby.jsx
         ├── Match.jsx            # Live match — countdown, board, timer, chat
+        ├── LocalMatch.jsx
+        ├── ChessHub.jsx
+        ├── LocalChess.jsx
+        ├── MatchChess.jsx
+        ├── Connect4Hub.jsx
+        ├── LocalConnect4.jsx
+        ├── MatchConnect4.jsx
+        ├── TicTacToeHub.jsx
+        ├── LocalTicTacToe.jsx
+        ├── MatchTicTacToe.jsx
+        ├── PaperIo.jsx          # Territory-control arcade
+        ├── CircuitMaker.jsx     # Logic-circuit workspace
         ├── Replay.jsx
         ├── Profile.jsx
         ├── Friends.jsx
