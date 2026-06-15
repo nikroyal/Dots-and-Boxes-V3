@@ -40,18 +40,23 @@ function writeProjects(projects) {
   catch { return false; }
 }
 
-function orderedInputs(component, state, values) {
-  return state.wires
-    .filter(wire => wire.to === component.id)
-    .map(wire => values.get(wire.from)?.out || false);
-}
-
 function evaluateCircuit(state) {
   let values = new Map(state.components.map(component => [component.id, { in: false, out: component.type === 'input' ? !!component.value : false }]));
+
+  // Pre-compute incoming connections to avoid O(N) filter per component per tick
+  const inputsByComponent = new Map();
+  for (const wire of state.wires) {
+    if (!inputsByComponent.has(wire.to)) {
+      inputsByComponent.set(wire.to, []);
+    }
+    inputsByComponent.get(wire.to).push(wire.from);
+  }
+
   for (let i = 0; i < 8; i++) {
     const next = new Map(values);
     for (const component of state.components) {
-      const inputValues = orderedInputs(component, state, values);
+      const incomingIds = inputsByComponent.get(component.id) || [];
+      const inputValues = incomingIds.map(fromId => values.get(fromId)?.out || false);
       const a = !!inputValues[0];
       const b = !!inputValues[1];
       let out = false;
