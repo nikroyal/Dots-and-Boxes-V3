@@ -299,7 +299,7 @@ export default function MatchChess() {
     const moveObj = {
       from: sourceSquare,
       to: targetSquare,
-      promotion: piece ? (piece[1].toLowerCase() === 'p' ? 'q' : piece[1].toLowerCase()) : 'q',
+      promotion: piece?.[1]?.toLowerCase() === 'p' ? 'q' : piece?.[1]?.toLowerCase() || 'q',
     };
 
     // Calculate pending state
