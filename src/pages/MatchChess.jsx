@@ -288,10 +288,10 @@ export default function MatchChess() {
     makeMove(id, 'chess', null, moveObj, null, profile)
       .catch((err) => {
         toast(err.message, 'error');
+        setPendingGame(null);
       })
       .finally(() => {
         setBusy(null);
-        setPendingGame(null);
       });
 
     return true;
