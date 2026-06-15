@@ -59,7 +59,7 @@ function createGame(settings) {
   const customSize = isCustom ? Number(settings.customSize) : SIZE;
 
   const grid = new Array(customSize * customSize).fill(EMPTY);
-  const midX = Math.floor(customSize / 2) - 16;
+  const midX = Math.floor(customSize / 2);
   const midY = Math.floor(customSize / 2);
   fillRect(grid, 0, midX - 3, midY - 3, midX + 3, midY + 3, customSize);
 
