@@ -276,7 +276,7 @@ export default function MatchChess() {
     const moveObj = {
       from: sourceSquare,
       to: targetSquare,
-      promotion: piece ? (piece[1].toLowerCase() === 'p' ? 'q' : piece[1].toLowerCase()) : 'q',
+      promotion: (piece && piece[1]) ? (piece[1].toLowerCase() === 'p' ? 'q' : piece[1].toLowerCase()) : 'q',
     };
 
     const { newGame, error } = applyChessMove(match.game, moveObj, profile.id, match.players);
