@@ -65,7 +65,7 @@ export default function LocalChess() {
     const moveObj = {
       from: sourceSquare,
       to: targetSquare,
-      promotion: piece ? (piece[1].toLowerCase() === 'p' ? 'q' : piece[1].toLowerCase()) : 'q',
+      promotion: piece?.[1]?.toLowerCase() === 'p' ? 'q' : piece?.[1]?.toLowerCase() || 'q',
     };
 
     const { newGame, claimed, error } = applyMove(game, moveObj, pid, playerIds);
