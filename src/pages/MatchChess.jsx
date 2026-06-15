@@ -9,6 +9,7 @@ import {
   forfeitOnTimeout,
 } from '../lib/actions';
 import { PLAYER_COLORS, hKey, vKey, bKey } from '../lib/gameLogic';
+import { applyMove as applyChessMove } from '../lib/chessLogic';
 import { sfx } from '../lib/sound';
 import { toast } from '../components/Notifications';
 import { ACHIEVEMENTS } from '../lib/achievements';
@@ -29,6 +30,8 @@ export default function MatchChess() {
   const [achievementToasts, setAchievementToasts] = useState([]);
   const [now, setNow] = useState(Date.now()); // drives ticker
   const [opponentDoc, setOpponentDoc] = useState(null); // for disconnect detection
+  const [pendingGame, setPendingGame] = useState(null);
+
   // Track which action button is currently in-flight so we can disable it
   // (prevents spam-clicking Resign / Claim Victory / Pause etc. firing
   // multiple round-trips while the first is still pending).
@@ -265,27 +268,33 @@ export default function MatchChess() {
     finally { setBusy(null); }
   };
 
-  const onDrop = async (sourceSquare, targetSquare, piece) => {
+  const onDrop = (sourceSquare, targetSquare, piece) => {
     if (!isMyTurn) return false;
     if (busy === 'move') return false;
-    setBusy('move');
+    if (pendingGame) return false;
 
     const moveObj = {
       from: sourceSquare,
       to: targetSquare,
-      promotion: piece[1].toLowerCase() ?? 'q',
+      promotion: piece ? (piece[1].toLowerCase() === 'p' ? 'q' : piece[1].toLowerCase()) : 'q',
     };
 
-    try {
-      await makeMove(id, 'chess', null, moveObj, null, profile);
-      setBusy(null);
-      return true;
-    }
-    catch (err) {
-      toast(err.message, 'error');
-      setBusy(null);
-      return false;
-    }
+    const { newGame, error } = applyChessMove(match.game, moveObj, profile.id, match.players);
+    if (error) return false;
+
+    setPendingGame(newGame);
+    setBusy('move');
+
+    makeMove(id, 'chess', null, moveObj, null, profile)
+      .catch((err) => {
+        toast(err.message, 'error');
+      })
+      .finally(() => {
+        setBusy(null);
+        setPendingGame(null);
+      });
+
+    return true;
   };
 
   const handleSendChat = async (e, textOverride) => {
@@ -454,7 +463,7 @@ export default function MatchChess() {
           ) : (
             <div className="w-full max-w-[500px]">
               <Chessboard
-                position={match.game.fen}
+                position={(pendingGame || match.game).fen}
                 onPieceDrop={onDrop}
                 boardOrientation={match.players.indexOf(profile?.id) === 1 ? 'black' : 'white'}
                 customDarkSquareStyle={{ backgroundColor: 'var(--ochre)' }}
