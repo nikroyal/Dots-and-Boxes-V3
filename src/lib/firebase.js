@@ -55,8 +55,7 @@ if (firebaseConfig.apiKey === "YOUR_API_KEY") {
       container.appendChild(heading);
       container.appendChild(paragraph);
 
-      document.body.textContent = '';
-      document.body.appendChild(container);
+      document.body.replaceChildren(container);
     });
   }
   throw new Error(msg);
