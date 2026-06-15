@@ -295,7 +295,6 @@ export default function MatchChess() {
     };
 
     // Calculate pending state
-    const { applyMove } = await import('../lib/chessLogic');
     const { newGame, error } = applyMove(match.game, moveObj, profile.id, match.players);
     if (error) return false;
 
