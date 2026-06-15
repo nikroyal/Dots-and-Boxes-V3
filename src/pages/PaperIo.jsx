@@ -139,7 +139,7 @@ function turnBot(bot, drift, game) {
     }
   }
 
-  const pick = bestTurns[Math.floor(crypto.getRandomValues(new Uint32Array(1))[0] / 4294967296 * bestTurns.length)];
+  const pick = bestTurns[Math.floor(secureRandom() * bestTurns.length)];
   bot.dx = pick.dx;
   bot.dy = pick.dy;
 }
