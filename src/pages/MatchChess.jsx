@@ -5,6 +5,7 @@ import { db } from '../lib/firebase';
 import { useAuth } from '../lib/AuthContext';
 import {
   watchMatch, makeMove, requestPause, respondToPause, resumeMatch, resignMatch,
+  proposeTimer, acceptTimer, rejectTimer,
   sendChatAs, joinAsSpectator, leaveSpectator, finalizeStats, requestRematch,
   forfeitOnTimeout,
 } from '../lib/actions';
@@ -14,9 +15,11 @@ import { toast } from '../components/Notifications';
 import { ACHIEVEMENTS } from '../lib/achievements';
 import Confetti from '../components/Confetti';
 import { useConfirm } from '../components/ConfirmDialog';
+import { usePrompt } from '../components/PromptDialog';
 import { isDisconnected } from '../lib/presence';
 import { Pause, Play, Flag, Send, Eye, Trophy, RotateCcw, Home, Repeat, Clock, WifiOff, Handshake } from 'lucide-react';
 import { Chessboard } from 'react-chessboard';
+import { Chess } from 'chess.js';
 
 export default function MatchChess() {
   const { id } = useParams();
@@ -35,6 +38,10 @@ export default function MatchChess() {
   // MUST be declared before any conditional early-return below — React's
   // rules-of-hooks require a stable hook order across renders.
   const [busy, setBusy] = useState(null); // null | 'move' | 'pause' | 'resign' | 'claim' | 'resume'
+  const [selectedSquare, setSelectedSquare] = useState(null);
+  const [optionSquares, setOptionSquares] = useState({});
+  const [pendingGame, setPendingGame] = useState(null);
+  const pendingTimeoutRef = useRef(null);
   const prevMoveCount = useRef(-1); // -1 sentinel: no snapshot yet
   const prevStatus = useRef(null);
   const hasSubscribed = useRef(false);
@@ -43,6 +50,11 @@ export default function MatchChess() {
   // Themed confirm dialog (replaces browser confirm). See ConfirmDialog.jsx.
   // Also a hook — must run unconditionally before any early return.
   const { confirm, dialog: confirmDialogEl } = useConfirm();
+  const { prompt, dialog: promptDialogEl } = usePrompt();
+
+  const [timerMins, setTimerMins] = useState(5);
+  const [useTimer, setUseTimer] = useState(false);
+  const [proposingTimer, setProposingTimer] = useState(false);
 
   // Keep a live ref to the current profile so the match-subscribe callback
   // (which we deliberately don't re-create on every profile snapshot — see
@@ -238,11 +250,16 @@ export default function MatchChess() {
   const turnStartedAtMs = rawTurnStartedAtMs && effectiveStartsAtMs
     ? Math.max(rawTurnStartedAtMs, effectiveStartsAtMs)
     : rawTurnStartedAtMs;
-  const turnTimeoutMs = match.turnTimeoutMs || 60000;
-  const turnRemainingMs = (turnStartedAtMs && match.status === 'active' && !inCountdown)
+  const turnTimeoutMs = match.turnTimeoutMs !== undefined ? match.turnTimeoutMs : 60000;
+  const isTimerNegotiation = match.status === 'timer_negotiation';
+  const hasTimerConfig = !!match.timerConfig;
+  const amIProposer = match.timerProposer === profile.id;
+  const opponentNameObj = match.players.find(id => id !== profile.id);
+  const oppNameTimer = match.playerInfo?.[opponentNameObj]?.username || 'Opponent';
+  const turnRemainingMs = (turnStartedAtMs && match.status === 'active' && !inCountdown && turnTimeoutMs > 0)
     ? Math.max(0, turnStartedAtMs + turnTimeoutMs - now)
     : null;
-  const turnExpiredWithGrace = turnStartedAtMs
+  const turnExpiredWithGrace = (turnStartedAtMs && turnTimeoutMs > 0)
     ? now > turnStartedAtMs + turnTimeoutMs + 5000
     : false;
 
@@ -268,24 +285,75 @@ export default function MatchChess() {
   const onDrop = async (sourceSquare, targetSquare, piece) => {
     if (!isMyTurn) return false;
     if (busy === 'move') return false;
-    setBusy('move');
+    if (pendingGame) return false;
+    // Don't set busy immediately, we will wait 3 seconds first.
 
     const moveObj = {
       from: sourceSquare,
       to: targetSquare,
-      promotion: piece[1].toLowerCase() ?? 'q',
+      promotion: piece ? (piece[1].toLowerCase() === 'p' ? 'q' : piece[1].toLowerCase()) : 'q',
     };
 
-    try {
-      await makeMove(id, 'chess', null, moveObj, null, profile);
-      setBusy(null);
-      return true;
+    // Calculate pending state
+    const { applyMove } = await import('../lib/chessLogic');
+    const { newGame, error } = applyMove(match.game, moveObj, profile.id, match.players);
+    if (error) return false;
+
+    setPendingGame(newGame);
+    setSelectedSquare(null);
+    setOptionSquares({});
+
+    if (pendingTimeoutRef.current) clearTimeout(pendingTimeoutRef.current);
+    pendingTimeoutRef.current = setTimeout(async () => {
+      setBusy('move');
+      try {
+        await makeMove(id, 'chess', null, moveObj, null, profile);
+      } catch (err) {
+        toast(err.message, 'error');
+      } finally {
+        setBusy(null);
+        setPendingGame(null);
+        pendingTimeoutRef.current = null;
+      }
+    }, 3000);
+
+    return true;
+  };
+
+  const undoMove = () => {
+    if (pendingTimeoutRef.current) {
+      clearTimeout(pendingTimeoutRef.current);
+      pendingTimeoutRef.current = null;
     }
-    catch (err) {
-      toast(err.message, 'error');
-      setBusy(null);
-      return false;
+    setPendingGame(null);
+  };
+
+  const onSquareClick = (square, piece) => {
+    if (!isMyTurn || match.status !== 'active') return;
+
+    if (optionSquares[square]) {
+      onDrop(selectedSquare, square, undefined);
+      return;
     }
+
+    const chess = new Chess(match.game.fen);
+    const moves = chess.moves({ square, verbose: true });
+
+    if (moves.length === 0) {
+      setSelectedSquare(null);
+      setOptionSquares({});
+      return;
+    }
+
+    setSelectedSquare(square);
+    const newOptions = {};
+    moves.forEach(move => {
+      newOptions[move.to] = {
+        background: 'radial-gradient(circle, rgba(0,255,0,.2) 25%, transparent 30%)',
+        borderRadius: '50%'
+      };
+    });
+    setOptionSquares(newOptions);
   };
 
   const handleSendChat = async (e, textOverride) => {
@@ -338,15 +406,117 @@ export default function MatchChess() {
   });
 
   // ─── Render ─────────────────────────────────────────────────────────────
+
+  if (isTimerNegotiation) {
+    return (
+      <div className="fade-in max-w-xl mx-auto py-10 px-4">
+        <div className="card text-center">
+          <h2 className="font-display text-2xl mb-4">Timer Settings</h2>
+          {!hasTimerConfig ? (
+            <div className="space-y-4 text-left">
+              <p className="font-mono text-[0.7rem] uppercase tracking-widest opacity-60 mb-4">Propose Timer Settings</p>
+
+              {match.timerRejectReason && (
+                 <div className="bg-red-500/10 border border-red-500/20 p-3 mb-4 text-sm">
+                   <strong className="text-red-400">Rejected:</strong> {match.timerRejectReason}
+                 </div>
+              )}
+
+              <label className="flex items-center gap-2 cursor-pointer mb-2">
+                <input type="checkbox" checked={useTimer} onChange={e => setUseTimer(e.target.checked)} />
+                <span className="font-mono text-[0.65rem] tracking-widest uppercase opacity-80">Use Timer (per turn)</span>
+              </label>
+              {useTimer && (
+                <div className="mb-4">
+                  <label className="font-mono text-[0.65rem] tracking-widest uppercase opacity-60 mb-1 block">Minutes per turn</label>
+                  <input type="number" value={timerMins} onChange={e => setTimerMins(Math.max(1, parseInt(e.target.value) || 1))} className="w-full bg-black/5 dark:bg-white/5 border hairline px-3 py-2 font-display outline-none focus-ring" min={1} required />
+                </div>
+              )}
+              <div className="font-mono text-[0.55rem] tracking-widest uppercase opacity-50 mb-4">Note: Both players should agree on the timer settings.</div>
+              <button
+                className="btn-primary w-full justify-center"
+                onClick={async () => {
+                  setProposingTimer(true);
+                  try {
+                    await proposeTimer(id, profile, useTimer, useTimer ? timerMins : null);
+                  } catch (e) {
+                    toast(e.message, 'error');
+                  }
+                  setProposingTimer(false);
+                }}
+                disabled={proposingTimer}
+              >
+                Propose Timer
+              </button>
+            </div>
+          ) : (
+            <div className="space-y-4">
+               {amIProposer ? (
+                 <div>
+                   <p className="mb-4">Waiting for {oppNameTimer} to accept timer settings...</p>
+                   <div className="font-mono text-xs opacity-70">
+                     {match.timerConfig.useTimer ? `${match.timerConfig.timerMins} minutes per turn` : 'No timer'}
+                   </div>
+                 </div>
+               ) : (
+                 <div>
+                   <p className="mb-4">{oppNameTimer} proposed the following timer settings:</p>
+                   <div className="font-mono text-sm font-bold mb-6">
+                     {match.timerConfig.useTimer ? `${match.timerConfig.timerMins} minutes per turn` : 'No timer'}
+                   </div>
+                   <div className="flex gap-3 justify-center">
+                     <button className="btn-primary" onClick={async () => {
+                       try {
+                         await acceptTimer(id, profile, match.timerConfig.useTimer, match.timerConfig.timerMins);
+                       } catch (e) { toast(e.message, 'error'); }
+                     }}>Accept</button>
+
+                     <button className="btn-ghost" onClick={async () => {
+                       const reason = await prompt({
+                         title: 'Reject Timer',
+                         body: 'Why are you rejecting these settings?',
+                         confirmLabel: 'Reject',
+                         cancelLabel: 'Cancel',
+                         danger: true
+                       });
+                       if (reason !== null) {
+                         try {
+                           await rejectTimer(id, profile, reason);
+                         } catch (e) { toast(e.message, 'error'); }
+                       }
+                     }}>Reject</button>
+                   </div>
+                 </div>
+               )}
+            </div>
+          )}
+        </div>
+        {confirmDialogEl}
+        {promptDialogEl}
+      </div>
+    );
+  }
+
   if (match.status === 'finished') {
     return <WinScreen match={match} profile={profile} achievementToasts={achievementToasts}
                       onHome={() => navigate('/')}
                       onReplay={() => navigate(`/replay/${id}`)} />;
   }
 
+  const displayGame = pendingGame || match.game;
+
   // Pause concealment - hide board if paused
   const concealBoard = match.status === 'paused' && match.pauseConcealed;
-  const lastMove = (match.game.moves || [])[(match.game.moves || []).length - 1];
+  const lastMove = (displayGame.moves || [])[(displayGame.moves || []).length - 1];
+
+  const customSquareStyles = {
+    ...(lastMove ? {
+      [lastMove.from]: { backgroundColor: 'rgba(255, 255, 0, 0.4)' },
+      [lastMove.to]: { backgroundColor: 'rgba(255, 255, 0, 0.4)' }
+    } : {}),
+    ...optionSquares,
+    ...(selectedSquare ? { [selectedSquare]: { backgroundColor: 'rgba(255, 0, 0, 0.4)' } } : {})
+  };
 
   return (
     <>
@@ -420,7 +590,7 @@ export default function MatchChess() {
         <div className="grid grid-cols-2 gap-3">
           {match.players.map((pid, i) => {
             const info = match.playerInfo?.[pid] || { username: '?', avatar: '?' };
-            const isCurrent = match.game.currentPlayerIdx === i && match.status === 'active' && !inCountdown;
+            const isCurrent = displayGame.currentPlayerIdx === i && match.status === 'active' && !inCountdown;
             return (
               <div key={pid}
                 className="border p-4 transition-all"
@@ -440,7 +610,7 @@ export default function MatchChess() {
                   )}
                 </div>
                 <div className="font-display text-3xl font-medium tabular-nums" style={{ color: PLAYER_COLORS[i].hex }}>
-                  {match.game.scores[pid] || 0}
+                  {displayGame.scores[pid] || 0}
                 </div>
               </div>
             );
@@ -454,15 +624,25 @@ export default function MatchChess() {
           ) : (
             <div className="w-full max-w-[500px]">
               <Chessboard
-                position={match.game.fen}
+                position={displayGame.fen}
                 onPieceDrop={onDrop}
+                onSquareClick={onSquareClick}
                 boardOrientation={match.players.indexOf(profile?.id) === 1 ? 'black' : 'white'}
                 customDarkSquareStyle={{ backgroundColor: 'var(--ochre)' }}
                 customLightSquareStyle={{ backgroundColor: 'var(--paper-tint)' }}
+                customSquareStyles={customSquareStyles}
               />
             </div>
           )}
         </div>
+
+        {pendingGame && (
+          <div className="flex justify-center fade-in">
+            <button onClick={undoMove} className="btn-ghost text-sm py-1 px-3 border border-current rounded">
+              Undo Move (3s)
+            </button>
+          </div>
+        )}
 
         {/* Controls */}
         <div className="flex items-center justify-between flex-wrap gap-3">
