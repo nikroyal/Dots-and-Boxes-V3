@@ -19,6 +19,7 @@ import { usePrompt } from '../components/PromptDialog';
 import { isDisconnected } from '../lib/presence';
 import { Pause, Play, Flag, Send, Eye, Trophy, RotateCcw, Home, Repeat, Clock, WifiOff, Handshake } from 'lucide-react';
 import { Chessboard } from 'react-chessboard';
+import { Chess } from 'chess.js';
 
 export default function MatchChess() {
   const { id } = useParams();
