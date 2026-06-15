@@ -114,7 +114,7 @@ function turnBot(bot, drift, game) {
 
     const customSize = game.size || SIZE;
 
-    if (nx < 0 || nx >= customSize || ny < 0 || ny >= customSize) {
+    if (nx <= 0 || nx >= customSize - 1 || ny <= 0 || ny >= customSize - 1) {
       score = -100; // Penalize moving out of bounds
     } else {
       const idx = indexOf(nx, ny, customSize);
