@@ -15,7 +15,7 @@ export default function LocalConnect4() {
   const [p2Color, setP2Color] = useState('#D9A85A'); // ochre
 
   const [game, setGame] = useState(null);
-  const { confirm, dialog } = useConfirm();
+  const { confirm, dialog: confirmDialogEl } = useConfirm();
 
   const handleStart = (e) => {
     e.preventDefault();
@@ -84,7 +84,7 @@ export default function LocalConnect4() {
 
   return (
     <div className="fade-in max-w-4xl mx-auto space-y-6">
-      {dialog}
+      {confirmDialogEl}
       {finished && !isDraw && <Confetti />}
 
       <div className="flex items-center justify-between border-b hairline pb-4">

@@ -54,7 +54,7 @@ export default function Profile() {
   }, [me, username, isMe]);
 
   // Hooks must run unconditionally before any early returns.
-  const { confirm, dialog: confirmEl } = useConfirm();
+  const { confirm, dialog: confirmDialogEl } = useConfirm();
 
   if (!me) return null;
   if (loading) return <div className="font-mono text-xs opacity-50 text-center py-20">LOADING…</div>;
@@ -100,7 +100,7 @@ export default function Profile() {
 
   return (
     <>
-    {confirmEl}
+    {confirmDialogEl}
     <div className="fade-in space-y-10">
       {/* Hero */}
       <section className="flex items-start gap-6 flex-wrap">

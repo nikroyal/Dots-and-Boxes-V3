@@ -49,7 +49,7 @@ export default function Friends() {
   const [addInput, setAddInput] = useState('');
   const [tab, setTab] = useState('friends');
 
-  const { confirm, dialog: confirmEl } = useConfirm();
+  const { confirm, dialog: confirmDialogEl } = useConfirm();
 
   if (!profile) return null;
   const requests = profile.friendRequests || [];
@@ -66,7 +66,7 @@ export default function Friends() {
 
   return (
     <>
-    {confirmEl}
+    {confirmDialogEl}
     <div className="fade-in space-y-8">
       <section>
         <div className="font-mono text-[0.65rem] tracking-widest uppercase opacity-50 mb-2">Social</div>

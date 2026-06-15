@@ -20,7 +20,7 @@ export default function LocalMatch() {
   const [p2LineStyle, setP2LineStyle] = useState('solid');
 
   const [game, setGame] = useState(null);
-  const { confirm, dialog } = useConfirm();
+  const { confirm, dialog: confirmDialogEl } = useConfirm();
 
   const handleStart = (e) => {
     e.preventDefault();
@@ -123,7 +123,7 @@ export default function LocalMatch() {
 
   return (
     <div className="fade-in max-w-4xl mx-auto space-y-6">
-      {dialog}
+      {confirmDialogEl}
       {finished && !isDraw && <Confetti />}
 
       {/* Header */}
