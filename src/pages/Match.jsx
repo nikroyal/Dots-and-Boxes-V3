@@ -13,6 +13,7 @@ import { sfx } from '../lib/sound';
 import { toast } from '../components/Notifications';
 import { ACHIEVEMENTS } from '../lib/achievements';
 import Confetti from '../components/Confetti';
+import BoxParticles from '../components/BoxParticles';
 import { useConfirm } from '../components/ConfirmDialog';
 import { isDisconnected } from '../lib/presence';
 import { Pause, Play, Flag, Send, Eye, Trophy, RotateCcw, Home, Repeat, Clock, WifiOff, Handshake } from 'lucide-react';
@@ -665,7 +666,7 @@ function Board({ game, players, playerInfo, isMyTurn, onPlay, lastMove }) {
     return idx === -1 ? undefined : PLAYER_STROKE_PATTERNS[idx];
   };
   const playerInitial = (id) => {
-    return playerInfo?.[id]?.username?.[0]?.toUpperCase() || '·';
+    return playerInfo?.[id]?.avatar || playerInfo?.[id]?.username?.[0]?.toUpperCase() || '·';
   };
 
   const isLastMove = (orient, r, c) =>
@@ -731,6 +732,21 @@ function Board({ game, players, playerInfo, isMyTurn, onPlay, lastMove }) {
       onKeyDown={onSvgKeyDown}
       onBlur={() => setKeyboardFocus(null)}
     >
+      {/* Filters for Line Styles */}
+      <defs>
+        <filter id="style-neon" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur in="SourceGraphic" stdDeviation="2" result="blur" />
+          <feMerge>
+            <feMergeNode in="blur" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
+        <filter id="style-sketch" x="-20%" y="-20%" width="140%" height="140%">
+          <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="3" result="noise" />
+          <feDisplacementMap in="SourceGraphic" in2="noise" scale="3" xChannelSelector="R" yChannelSelector="G" />
+        </filter>
+      </defs>
+
       {/* Filled boxes */}
       {Array.from({ length: rows }).map((_, r) =>
         Array.from({ length: cols }).map((_, c) => {
@@ -738,6 +754,7 @@ function Board({ game, players, playerInfo, isMyTurn, onPlay, lastMove }) {
           if (!owner) return null;
           const x = padding + c * cell;
           const y = padding + r * cell;
+          const isJustClaimed = !!lastMove && lastMove.claimedBoxes?.some(b => b.r === r && b.c === c);
           return (
             <g key={`b-${r}-${c}`} className="box-filled">
               <rect x={x + 2} y={y + 2} width={cell - 4} height={cell - 4} fill={playerSoft(owner)} />
@@ -746,6 +763,7 @@ function Board({ game, players, playerInfo, isMyTurn, onPlay, lastMove }) {
                     style={{ fontFamily: 'EB Garamond, serif', fontSize: cell * 0.4, fontWeight: 500, fill: playerColor(owner) }}>
                 {playerInitial(owner)}
               </text>
+              {isJustClaimed && <BoxParticles x={x + cell / 2} y={y + cell / 2} color={playerColor(owner)} />}
             </g>
           );
         })
@@ -768,13 +786,14 @@ function Board({ game, players, playerInfo, isMyTurn, onPlay, lastMove }) {
                 strokeDasharray={pattern}
                 strokeWidth={drawn ? 3 : 2}
                 strokeLinecap="round"
+                filter={drawn && playerInfo?.[owner]?.lineStyle && playerInfo[owner].lineStyle !== 'solid' ? `url(#style-${playerInfo[owner].lineStyle})` : undefined}
                 style={{
                   opacity: drawn ? 1 : (showHover ? 0.35 : 0),
                   pointerEvents: 'none',
                   color: drawnStroke,
                   transition: 'opacity 120ms',
                 }}
-                className={`${drawn ? 'line-drawn' : ''} ${isLM ? 'last-move-line' : ''}`}
+                className={`${drawn ? 'line-drawn-h' : ''} ${isLM ? 'last-move-line' : ''}`}
               />
               {!drawn && (
                 <line x1={x1 + 6} y1={y} x2={x2 - 6} y2={y}
@@ -807,13 +826,14 @@ function Board({ game, players, playerInfo, isMyTurn, onPlay, lastMove }) {
                 strokeDasharray={pattern}
                 strokeWidth={drawn ? 3 : 2}
                 strokeLinecap="round"
+                filter={drawn && playerInfo?.[owner]?.lineStyle && playerInfo[owner].lineStyle !== 'solid' ? `url(#style-${playerInfo[owner].lineStyle})` : undefined}
                 style={{
                   opacity: drawn ? 1 : (showHover ? 0.35 : 0),
                   pointerEvents: 'none',
                   color: drawnStroke,
                   transition: 'opacity 120ms',
                 }}
-                className={`${drawn ? 'line-drawn' : ''} ${isLM ? 'last-move-line' : ''}`}
+                className={`${drawn ? 'line-drawn-v' : ''} ${isLM ? 'last-move-line' : ''}`}
               />
               {!drawn && (
                 <line x1={x} y1={y1 + 6} x2={x} y2={y2 - 6}

@@ -75,6 +75,7 @@ export async function sendInvite(fromUser, toUsername, rows, cols, gameType = 'd
     fromUsername: fromUser.username,
     fromAvatar: fromUser.avatar || '◆',
     fromElo: fromUser.elo || 1000,
+    fromLineStyle: fromUser.lineStyle || 'solid',
     toId: target.id,
     toUsername: target.username,
     rows, cols,
@@ -120,8 +121,8 @@ export async function acceptInvite(inviteId, currentUser) {
     tx.set(matchRef, {
       players: playerIds,
       playerInfo: {
-        [inv.fromId]: { username: inv.fromUsername, avatar: inv.fromAvatar, elo: inv.fromElo },
-        [inv.toId]:   { username: currentUser.username, avatar: currentUser.avatar || '◆', elo: currentUser.elo || 1000 },
+        [inv.fromId]: { username: inv.fromUsername, avatar: inv.fromAvatar, elo: inv.fromElo, lineStyle: inv.fromLineStyle },
+        [inv.toId]:   { username: currentUser.username, avatar: currentUser.avatar || '◆', elo: currentUser.elo || 1000, lineStyle: currentUser.lineStyle || 'solid' },
       },
       rows: inv.rows,
       cols: inv.cols,
@@ -281,7 +282,7 @@ export async function hostGame(currentUser, gameType, rows, cols) {
     gameType,
     players: [currentUser.id],
     playerInfo: {
-      [currentUser.id]: { username: currentUser.username, avatar: currentUser.avatar || '◆', elo: currentUser.elo || 1000 }
+      [currentUser.id]: { username: currentUser.username, avatar: currentUser.avatar || '◆', elo: currentUser.elo || 1000, lineStyle: currentUser.lineStyle || 'solid' }
     },
     rows,
     cols,
@@ -329,7 +330,7 @@ export async function joinGame(matchId, currentUser) {
     const isChess = m.gameType === 'chess';
     tx.update(matchRef, {
       players: playerIds,
-      [`playerInfo.${currentUser.id}`]: { username: currentUser.username, avatar: currentUser.avatar || '◆', elo: currentUser.elo || 1000 },
+      [`playerInfo.${currentUser.id}`]: { username: currentUser.username, avatar: currentUser.avatar || '◆', elo: currentUser.elo || 1000, lineStyle: currentUser.lineStyle || 'solid' },
       game,
       status: isChess ? 'timer_negotiation' : 'active',
       pauseRequest: null,
@@ -990,7 +991,7 @@ export async function unblockUser(currentUser, targetId) {
 // ─── Profile updates ─────────────────────────────────────────────────────
 export async function updateProfile(currentUser, updates) {
   guard(currentUser);
-  const allowed = ['avatar', 'title', 'bio', 'displayName'];
+  const allowed = ['avatar', 'title', 'bio', 'displayName', 'lineStyle'];
   const filtered = {};
   for (const k of allowed) if (k in updates) filtered[k] = updates[k];
   await updateDoc(doc(db, 'users', currentUser.id), filtered);
