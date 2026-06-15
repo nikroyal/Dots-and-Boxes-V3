@@ -42,6 +42,14 @@ export default function MatchChess() {
   const [optionSquares, setOptionSquares] = useState({});
   const [pendingGame, setPendingGame] = useState(null);
   const pendingTimeoutRef = useRef(null);
+
+  useEffect(() => {
+    return () => {
+      if (pendingTimeoutRef.current) {
+        clearTimeout(pendingTimeoutRef.current);
+      }
+    };
+  }, []);
   const prevMoveCount = useRef(-1); // -1 sentinel: no snapshot yet
   const prevStatus = useRef(null);
   const hasSubscribed = useRef(false);
