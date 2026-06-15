@@ -22,7 +22,7 @@ export default function LocalChess() {
   const [optionSquares, setOptionSquares] = useState({});
   const [pendingGame, setPendingGame] = useState(null);
   const pendingTimeoutRef = useRef(null);
-  const { confirm, dialog } = useConfirm();
+  const { confirm, dialog: confirmDialogEl } = useConfirm();
 
   const [turnTimerMs, setTurnTimerMs] = useState(0);
   const [now, setNow] = useState(Date.now());
@@ -206,7 +206,7 @@ export default function LocalChess() {
 
   return (
     <div className="fade-in max-w-4xl mx-auto space-y-6">
-      {dialog}
+      {confirmDialogEl}
       {finished && !isDraw && <Confetti />}
 
       <div className="flex flex-col sm:flex-row items-center justify-between border-b hairline pb-4 gap-4">
