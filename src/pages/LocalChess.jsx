@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { createEmptyGame, applyMove } from '../lib/chessLogic';
+import { createEmptyGame, applyMove } from '../lib/chessLogic.js';
 import { sfx } from '../lib/sound';
 import { X, Trophy, RefreshCcw, Clock } from 'lucide-react';
 import Confetti from '../components/Confetti';
@@ -23,30 +23,6 @@ export default function LocalChess() {
   const [pendingGame, setPendingGame] = useState(null);
   const pendingTimeoutRef = useRef(null);
   const { confirm, dialog: confirmDialogEl } = useConfirm();
-
-  const [turnTimerMs, setTurnTimerMs] = useState(0);
-  const [now, setNow] = useState(Date.now());
-  const [turnStartedAtMs, setTurnStartedAtMs] = useState(0);
-
-  useEffect(() => {
-    if (!setup && useTimer && game && !game.finished && !pendingGame) {
-      const interval = setInterval(() => setNow(Date.now()), 1000);
-      return () => clearInterval(interval);
-    }
-  }, [setup, useTimer, game, pendingGame]);
-
-  useEffect(() => {
-    if (useTimer && game && !game.finished && !pendingGame) {
-      const turnTimeoutMs = timerMins * 60 * 1000;
-      const elapsed = Date.now() - turnStartedAtMs;
-      if (elapsed > turnTimeoutMs) {
-        // Time is up, current player loses
-        const newGame = { ...game, finished: true, winnerIdx: game.currentPlayerIdx === 0 ? 1 : 0 };
-        setGame(newGame);
-        sfx.win(); // or loss sound depending on who is playing
-      }
-    }
-  }, [now, useTimer, game, pendingGame, turnStartedAtMs, timerMins]);
 
   const [turnTimerMs, setTurnTimerMs] = useState(0);
   const [now, setNow] = useState(Date.now());

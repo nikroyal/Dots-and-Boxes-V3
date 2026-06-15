@@ -7,7 +7,7 @@ import { db } from './firebase';
 import { createEmptyGame, applyMove, computeElo } from './gameLogic';
 import { createEmptyGame as createEmptyGameC4, applyMove as applyMoveC4 } from './connect4Logic';
 import { createEmptyGame as createEmptyGameTTT, applyMove as applyMoveTTT } from './tictactoeLogic';
-import { createEmptyGame as createEmptyGameChess, applyMove as applyMoveChess } from './chessLogic';
+import { createEmptyGame as createEmptyGameChess, applyMove as applyMoveChess } from './chessLogic.js';
 import { checkUnlocks } from './achievements';
 import { recordActivity, ACTIVITY_TYPES } from './activity';
 
