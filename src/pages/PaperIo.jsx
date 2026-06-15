@@ -55,7 +55,8 @@ function countOwner(grid, owner) {
 
 function createGame(settings) {
   const isCustom = settings.mode === 'custom';
-  const customBots = isCustom ? Number(settings.customBots) : DIFFICULTY[settings.difficulty].bots;
+  const difficultyConfig = DIFFICULTY[settings.difficulty] || DIFFICULTY.normal;
+  const customBots = isCustom ? Number(settings.customBots) : difficultyConfig.bots;
   const customSize = isCustom ? Number(settings.customSize) : SIZE;
 
   const grid = new Array(customSize * customSize).fill(EMPTY);
