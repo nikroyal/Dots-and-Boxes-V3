@@ -69,7 +69,7 @@ export default function LocalMatch() {
               </div>
               <div className="w-16">
                 <label className="font-mono text-[0.65rem] tracking-widest uppercase opacity-60 mb-1 block">Avatar</label>
-                <input value={p1Avatar} onChange={e => setP1Avatar(e.target.value)} className="w-full bg-black/5 dark:bg-white/5 border hairline px-3 py-2 font-display outline-none focus-ring text-center" maxLength={2} />
+                <input value={p1Avatar} onChange={e => setP1Avatar(e.target.value)} className="w-full bg-black/5 dark:bg-white/5 border hairline px-3 py-2 font-display outline-none focus-ring text-center" maxLength={8} />
               </div>
               <div className="w-24">
                 <label className="font-mono text-[0.65rem] tracking-widest uppercase opacity-60 mb-1 block">Line</label>
