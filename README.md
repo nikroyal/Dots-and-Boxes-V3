@@ -121,16 +121,16 @@ npm run dev
         ├── Dashboard.jsx
         ├── Lobby.jsx
         ├── Match.jsx            # Live match — countdown, board, timer, chat
-        ├── LocalMatch.jsx
-        ├── ChessHub.jsx
-        ├── LocalChess.jsx
-        ├── MatchChess.jsx
-        ├── Connect4Hub.jsx
-        ├── LocalConnect4.jsx
-        ├── MatchConnect4.jsx
-        ├── TicTacToeHub.jsx
-        ├── LocalTicTacToe.jsx
-        ├── MatchTicTacToe.jsx
+        ├── LocalMatch.jsx       # Local Dots & Boxes match
+        ├── ChessHub.jsx         # Chess lobby / home
+        ├── LocalChess.jsx       # Local Chess match
+        ├── MatchChess.jsx       # Live Chess match
+        ├── Connect4Hub.jsx      # Connect 4 lobby / home
+        ├── LocalConnect4.jsx    # Local Connect 4 match
+        ├── MatchConnect4.jsx    # Live Connect 4 match
+        ├── TicTacToeHub.jsx     # Tic-Tac-Toe lobby / home
+        ├── LocalTicTacToe.jsx   # Local Tic-Tac-Toe match
+        ├── MatchTicTacToe.jsx   # Live Tic-Tac-Toe match
         ├── PaperIo.jsx          # Territory-control arcade
         ├── CircuitMaker.jsx     # Logic-circuit workspace
         ├── Replay.jsx
