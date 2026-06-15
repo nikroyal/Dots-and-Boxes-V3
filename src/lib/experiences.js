@@ -102,6 +102,21 @@ export const EXPERIENCE_CATALOG = [
     routePrefixes: ['/paper-io'],
   },
   {
+    id: 'memory-match',
+    name: 'Memory Match',
+    shortName: 'Memory',
+    path: '/memory-match',
+    kind: 'Puzzle',
+    status: 'Live',
+    accent: 'var(--ochre)',
+    description: 'A classic memory game. Flip cards to find matching pairs.',
+    features: ['Local play', 'Move tracking'],
+    navItems: [
+      { to: '/memory-match', label: 'Play' },
+    ],
+    routePrefixes: ['/memory-match'],
+  },
+  {
     id: 'circuit-maker',
     name: 'Circuit Maker',
     shortName: 'Circuits',

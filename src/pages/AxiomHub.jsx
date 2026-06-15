@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Play, Star, Target, Trophy, Users, Zap } from 'lucide-react';
+import { Play, Star, Target, Trophy, Users, Zap, LayoutGrid } from 'lucide-react';
 import { EXPERIENCE_CATALOG } from '../lib/experiences';
 import { useAuth } from '../lib/AuthContext';
 import { sfx } from '../lib/sound';
@@ -11,6 +11,7 @@ const iconByExperience = {
   'dots-and-boxes': Trophy,
   'paper-io': Zap,
   'circuit-maker': Target,
+  'memory-match': LayoutGrid,
 };
 
 function readFavorites() {
