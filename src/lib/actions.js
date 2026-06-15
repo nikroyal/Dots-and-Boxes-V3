@@ -1,7 +1,7 @@
 import {
   collection, doc, addDoc, setDoc, getDoc, getDocs, updateDoc, deleteDoc,
   query, where, orderBy, limit, onSnapshot, serverTimestamp, runTransaction,
-  arrayUnion, arrayRemove, increment,
+  arrayUnion, arrayRemove, increment, writeBatch,
 } from 'firebase/firestore';
 import { db } from './firebase';
 import { createEmptyGame, applyMove, computeElo } from './gameLogic';
@@ -242,7 +242,7 @@ export async function quickMatch(currentUser, rows = 5, cols = 5, gameType = 'do
     const da = Math.abs((a.elo || 1000) - myElo);
     const db_ = Math.abs((b.elo || 1000) - myElo);
     if (da !== db_) return da - db_;
-    return Math.random() - 0.5;
+    return crypto.getRandomValues(new Uint32Array(1))[0] / 4294967296 - 0.5;
   });
   const target = candidates[0];
 
@@ -960,21 +960,23 @@ export async function blockUser(currentUser, targetUsername) {
       where('status', 'in', ['active', 'paused']),
       limit(20),
     ));
-    const updatePromises = [];
+    const batch = writeBatch(db);
+    let count = 0;
     for (const d of myActive.docs) {
       const m = d.data();
       if (!m.players.includes(target.id)) continue;
       // Settle the match: blocker concedes, target wins.
-      updatePromises.push(
-        updateDoc(doc(db, 'matches', d.id), {
-          status: 'finished',
-          winner: target.id,
-          resignedBy: currentUser.id,
-          finishedAt: serverTimestamp(),
-        }).catch(() => {})
-      );
+      batch.update(doc(db, 'matches', d.id), {
+        status: 'finished',
+        winner: target.id,
+        resignedBy: currentUser.id,
+        finishedAt: serverTimestamp(),
+      });
+      count++;
     }
-    await Promise.all(updatePromises);
+    if (count > 0) {
+      await batch.commit();
+    }
   } catch (e) {
     // Best-effort; matches list may need a composite index. Don't block
     // the block itself on this cleanup.

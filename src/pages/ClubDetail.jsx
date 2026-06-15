@@ -24,7 +24,7 @@ export default function ClubDetail() {
   const { id, channelId: routeChannelId } = useParams();
   const { profile } = useAuth();
   const navigate = useNavigate();
-  const { confirm, dialog: confirmEl } = useConfirm();
+  const { confirm, dialog: confirmDialogEl } = useConfirm();
 
   const [club, setClub] = useState(undefined);
   const [members, setMembers] = useState([]);
@@ -160,7 +160,7 @@ export default function ClubDetail() {
 
   return (
     <>
-    {confirmEl}
+    {confirmDialogEl}
     {showSettings && (
       <SettingsModal 
         club={club} 
@@ -370,7 +370,7 @@ function SettingsModal({ club, members, channels, requests, onClose, currentUser
   // Channel State
   const [newChanName, setNewChanName] = useState('');
 
-  const { confirm, dialog: confirmEl } = useConfirm();
+  const { confirm, dialog: confirmDialogEl2 } = useConfirm();
 
   const handleUpdateGeneral = async () => {
     setBusy(true);
@@ -401,7 +401,7 @@ function SettingsModal({ club, members, channels, requests, onClose, currentUser
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm fade-in">
-      {confirmEl}
+      {confirmDialogEl2}
       <div className="bg-[var(--paper-tint)] border hairline w-full max-w-4xl h-[80vh] shadow-2xl rounded-2xl flex overflow-hidden">
         {/* Sidebar */}
         <div className="w-56 border-r hairline bg-black/[0.02] p-4 space-y-1">

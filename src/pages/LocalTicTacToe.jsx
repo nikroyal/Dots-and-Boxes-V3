@@ -13,7 +13,7 @@ export default function LocalTicTacToe() {
   const [p2Name, setP2Name] = useState('Player 2');
 
   const [game, setGame] = useState(null);
-  const { confirm, dialog } = useConfirm();
+  const { confirm, dialog: confirmDialogEl } = useConfirm();
 
   const handleStart = (e) => {
     e.preventDefault();
@@ -76,7 +76,7 @@ export default function LocalTicTacToe() {
 
   return (
     <div className="fade-in max-w-4xl mx-auto space-y-6">
-      {dialog}
+      {confirmDialogEl}
       {finished && !isDraw && <Confetti />}
 
       <div className="flex items-center justify-between border-b hairline pb-4">

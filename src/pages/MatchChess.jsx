@@ -257,10 +257,10 @@ export default function MatchChess() {
   const amIProposer = match.timerProposer === profile.id;
   const opponentNameObj = match.players.find(id => id !== profile.id);
   const oppNameTimer = match.playerInfo?.[opponentNameObj]?.username || 'Opponent';
-  const turnRemainingMs = (turnStartedAtMs && match.status === 'active' && !inCountdown && turnTimeoutMs > 0)
+  const turnRemainingMs = (turnStartedAtMs && match.status === 'active' && !inCountdown && match.turnTimeoutMs !== -1)
     ? Math.max(0, turnStartedAtMs + turnTimeoutMs - now)
     : null;
-  const turnExpiredWithGrace = (turnStartedAtMs && turnTimeoutMs > 0)
+  const turnExpiredWithGrace = (turnStartedAtMs && match.turnTimeoutMs !== -1)
     ? now > turnStartedAtMs + turnTimeoutMs + 5000
     : false;
 

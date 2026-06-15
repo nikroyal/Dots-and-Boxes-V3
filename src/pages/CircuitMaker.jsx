@@ -89,8 +89,8 @@ export default function CircuitMaker() {
   const [wireDrag, setWireDrag] = useState(null);
   const [projectOpen, setProjectOpen] = useState(false);
   const [projectName, setProjectName] = useState('Untitled circuit');
-  const { confirm, dialog: confirmDialog } = useConfirm();
-  const { prompt, dialog: promptDialog } = usePrompt();
+  const { confirm, dialog: confirmDialogEl } = useConfirm();
+  const { prompt, dialog: promptDialogEl } = usePrompt();
 
   const values = useMemo(() => evaluateCircuit(state), [state]);
   const projects = projectOpen ? readProjects() : {};
@@ -230,6 +230,9 @@ export default function CircuitMaker() {
   };
 
   const handlePointerUp = (event) => {
+    if (event.currentTarget && event.currentTarget.releasePointerCapture) {
+      try { event.currentTarget.releasePointerCapture(event.pointerId); } catch (e) {}
+    }
     if (wireDrag) {
       if (boardRef.current) {
         const rect = boardRef.current.getBoundingClientRect();
@@ -371,8 +374,8 @@ export default function CircuitMaker() {
 
   return (
     <div className="fade-in space-y-6">
-      {confirmDialog}
-      {promptDialog}
+      {confirmDialogEl}
+      {promptDialogEl}
       <section className="flex items-end justify-between gap-4 flex-wrap">
         <div>
           <div className="font-mono text-[0.65rem] tracking-widest uppercase opacity-50 mb-2">Circuit Maker</div>
