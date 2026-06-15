@@ -22,7 +22,31 @@ export default function LocalChess() {
   const [optionSquares, setOptionSquares] = useState({});
   const [pendingGame, setPendingGame] = useState(null);
   const pendingTimeoutRef = useRef(null);
-  const { confirm, dialog } = useConfirm();
+  const { confirm, dialog: confirmDialogEl } = useConfirm();
+
+  const [turnTimerMs, setTurnTimerMs] = useState(0);
+  const [now, setNow] = useState(Date.now());
+  const [turnStartedAtMs, setTurnStartedAtMs] = useState(0);
+
+  useEffect(() => {
+    if (!setup && useTimer && game && !game.finished && !pendingGame) {
+      const interval = setInterval(() => setNow(Date.now()), 1000);
+      return () => clearInterval(interval);
+    }
+  }, [setup, useTimer, game, pendingGame]);
+
+  useEffect(() => {
+    if (useTimer && game && !game.finished && !pendingGame) {
+      const turnTimeoutMs = timerMins * 60 * 1000;
+      const elapsed = Date.now() - turnStartedAtMs;
+      if (elapsed > turnTimeoutMs) {
+        // Time is up, current player loses
+        const newGame = { ...game, finished: true, winnerIdx: game.currentPlayerIdx === 0 ? 1 : 0 };
+        setGame(newGame);
+        sfx.win(); // or loss sound depending on who is playing
+      }
+    }
+  }, [now, useTimer, game, pendingGame, turnStartedAtMs, timerMins]);
 
   const [turnTimerMs, setTurnTimerMs] = useState(0);
   const [now, setNow] = useState(Date.now());
@@ -65,7 +89,7 @@ export default function LocalChess() {
     const moveObj = {
       from: sourceSquare,
       to: targetSquare,
-      promotion: piece?.[1]?.toLowerCase() === 'p' ? 'q' : piece?.[1]?.toLowerCase() || 'q',
+      promotion: piece ? (piece[1].toLowerCase() === 'p' ? 'q' : piece[1].toLowerCase()) : 'q',
     };
 
     const { newGame, claimed, error } = applyMove(game, moveObj, pid, playerIds);
@@ -206,7 +230,7 @@ export default function LocalChess() {
 
   return (
     <div className="fade-in max-w-4xl mx-auto space-y-6">
-      {dialog}
+      {confirmDialogEl}
       {finished && !isDraw && <Confetti />}
 
       <div className="flex flex-col sm:flex-row items-center justify-between border-b hairline pb-4 gap-4">

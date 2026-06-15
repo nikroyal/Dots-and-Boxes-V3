@@ -184,6 +184,7 @@ export default function MatchTicTacToe() {
     const startedAtMs = effectiveStartsAtMs
       ? Math.max(rawStartedAtMs, effectiveStartsAtMs)
       : rawStartedAtMs;
+    if (match.turnTimeoutMs === -1) return;
     const timeoutMs = match.turnTimeoutMs || 60000;
     const expired = Date.now() > startedAtMs + timeoutMs;
     if (!expired) return;
@@ -238,10 +239,10 @@ export default function MatchTicTacToe() {
     ? Math.max(rawTurnStartedAtMs, effectiveStartsAtMs)
     : rawTurnStartedAtMs;
   const turnTimeoutMs = match.turnTimeoutMs || 60000;
-  const turnRemainingMs = (turnStartedAtMs && match.status === 'active' && !inCountdown)
+  const turnRemainingMs = (turnStartedAtMs && match.status === 'active' && !inCountdown && match.turnTimeoutMs !== -1)
     ? Math.max(0, turnStartedAtMs + turnTimeoutMs - now)
     : null;
-  const turnExpiredWithGrace = turnStartedAtMs
+  const turnExpiredWithGrace = (turnStartedAtMs && match.turnTimeoutMs !== -1)
     ? now > turnStartedAtMs + turnTimeoutMs + 5000
     : false;
 

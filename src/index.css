@@ -145,14 +145,24 @@ textarea:focus-visible,
 @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 .fade-in { animation: fadeIn 0.4s ease forwards; }
 
-@keyframes drawLine {
-  from { opacity: 0; stroke-width: 1; }
-  to   { opacity: 1; stroke-width: 3; }
+@keyframes drawLineH {
+  from { clip-path: inset(0 100% 0 0); opacity: 0; stroke-width: 1; }
+  to   { clip-path: inset(0 0 0 0); opacity: 1; stroke-width: 3; }
 }
-.line-drawn { animation: drawLine 0.3s ease forwards; }
+.line-drawn-h { animation: drawLineH 0.3s ease forwards; }
 
-@keyframes fillBox { from { opacity: 0; transform: scale(0.85); } to { opacity: 1; transform: scale(1); } }
-.box-filled { animation: fillBox 0.4s ease forwards; transform-origin: center; }
+@keyframes drawLineV {
+  from { clip-path: inset(0 0 100% 0); opacity: 0; stroke-width: 1; }
+  to   { clip-path: inset(0 0 0 0); opacity: 1; stroke-width: 3; }
+}
+.line-drawn-v { animation: drawLineV 0.3s ease forwards; }
+
+@keyframes fillBox {
+  0%   { opacity: 0; transform: scale(0.5); }
+  70%  { opacity: 1; transform: scale(1.05); }
+  100% { opacity: 1; transform: scale(1); }
+}
+.box-filled { animation: fillBox 0.4s ease forwards; transform-origin: center; transform-box: fill-box; }
 
 @keyframes pulse-soft { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
 .pulse-soft { animation: pulse-soft 2s ease-in-out infinite; }
@@ -167,6 +177,11 @@ textarea:focus-visible,
 .scrollbar-thin::-webkit-scrollbar { width: 4px; }
 .scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
 .scrollbar-thin::-webkit-scrollbar-thumb { background: var(--hairline-strong); border-radius: 2px; }
+
+@keyframes boxParticleBurst {
+  0% { transform: translate(0, 0) rotate(0deg) scale(1); opacity: 1; }
+  100% { transform: translate(var(--dx), var(--dy)) rotate(var(--rot)) scale(0); opacity: 0; }
+}
 
 /* ─── Confetti (victory only) ─────────────────────────────────────────── */
 .confetti-root {
@@ -185,7 +200,8 @@ textarea:focus-visible,
 
 /* ─── Reduced motion: kill animations site-wide ───────────────────────── */
 [data-reduced-motion='true'] .fade-in,
-[data-reduced-motion='true'] .line-drawn,
+[data-reduced-motion='true'] .line-drawn-h,
+[data-reduced-motion='true'] .line-drawn-v,
 [data-reduced-motion='true'] .box-filled,
 [data-reduced-motion='true'] .pulse-soft,
 [data-reduced-motion='true'] .last-move-line,

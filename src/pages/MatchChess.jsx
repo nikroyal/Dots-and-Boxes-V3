@@ -42,14 +42,6 @@ export default function MatchChess() {
   const [optionSquares, setOptionSquares] = useState({});
   const [pendingGame, setPendingGame] = useState(null);
   const pendingTimeoutRef = useRef(null);
-
-  useEffect(() => {
-    return () => {
-      if (pendingTimeoutRef.current) {
-        clearTimeout(pendingTimeoutRef.current);
-      }
-    };
-  }, []);
   const prevMoveCount = useRef(-1); // -1 sentinel: no snapshot yet
   const prevStatus = useRef(null);
   const hasSubscribed = useRef(false);
@@ -205,6 +197,7 @@ export default function MatchChess() {
     const startedAtMs = effectiveStartsAtMs
       ? Math.max(rawStartedAtMs, effectiveStartsAtMs)
       : rawStartedAtMs;
+    if (match.turnTimeoutMs === -1) return;
     const timeoutMs = match.turnTimeoutMs || 60000;
     const expired = Date.now() > startedAtMs + timeoutMs;
     if (!expired) return;
@@ -264,10 +257,10 @@ export default function MatchChess() {
   const amIProposer = match.timerProposer === profile.id;
   const opponentNameObj = match.players.find(id => id !== profile.id);
   const oppNameTimer = match.playerInfo?.[opponentNameObj]?.username || 'Opponent';
-  const turnRemainingMs = (turnStartedAtMs && match.status === 'active' && !inCountdown && turnTimeoutMs > 0)
+  const turnRemainingMs = (turnStartedAtMs && match.status === 'active' && !inCountdown && match.turnTimeoutMs !== -1)
     ? Math.max(0, turnStartedAtMs + turnTimeoutMs - now)
     : null;
-  const turnExpiredWithGrace = (turnStartedAtMs && turnTimeoutMs > 0)
+  const turnExpiredWithGrace = (turnStartedAtMs && match.turnTimeoutMs !== -1)
     ? now > turnStartedAtMs + turnTimeoutMs + 5000
     : false;
 
@@ -299,10 +292,11 @@ export default function MatchChess() {
     const moveObj = {
       from: sourceSquare,
       to: targetSquare,
-      promotion: piece?.[1]?.toLowerCase() === 'p' ? 'q' : piece?.[1]?.toLowerCase() || 'q',
+      promotion: piece ? (piece[1].toLowerCase() === 'p' ? 'q' : piece[1].toLowerCase()) : 'q',
     };
 
     // Calculate pending state
+    const { applyMove } = await import('../lib/chessLogic');
     const { newGame, error } = applyMove(match.game, moveObj, profile.id, match.players);
     if (error) return false;
 
@@ -343,24 +337,26 @@ export default function MatchChess() {
       return;
     }
 
-    const chess = new Chess(match.game.fen);
-    const moves = chess.moves({ square, verbose: true });
+    import('chess.js').then(({ Chess }) => {
+      const chess = new Chess(match.game.fen);
+      const moves = chess.moves({ square, verbose: true });
 
-    if (moves.length === 0) {
-      setSelectedSquare(null);
-      setOptionSquares({});
-      return;
-    }
+      if (moves.length === 0) {
+        setSelectedSquare(null);
+        setOptionSquares({});
+        return;
+      }
 
-    setSelectedSquare(square);
-    const newOptions = {};
-    moves.forEach(move => {
-      newOptions[move.to] = {
-        background: 'radial-gradient(circle, rgba(0,255,0,.2) 25%, transparent 30%)',
-        borderRadius: '50%'
-      };
+      setSelectedSquare(square);
+      const newOptions = {};
+      moves.forEach(move => {
+        newOptions[move.to] = {
+          background: 'radial-gradient(circle, rgba(0,255,0,.2) 25%, transparent 30%)',
+          borderRadius: '50%'
+        };
+      });
+      setOptionSquares(newOptions);
     });
-    setOptionSquares(newOptions);
   };
 
   const handleSendChat = async (e, textOverride) => {
@@ -474,7 +470,7 @@ export default function MatchChess() {
                    <div className="flex gap-3 justify-center">
                      <button className="btn-primary" onClick={async () => {
                        try {
-                         await acceptTimer(id, profile);
+                         await acceptTimer(id, profile, match.timerConfig.useTimer, match.timerConfig.timerMins);
                        } catch (e) { toast(e.message, 'error'); }
                      }}>Accept</button>
 

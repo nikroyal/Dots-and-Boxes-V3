@@ -1,7 +1,7 @@
 import {
   collection, doc, addDoc, setDoc, getDoc, getDocs, updateDoc, deleteDoc,
   query, where, orderBy, limit, onSnapshot, serverTimestamp, runTransaction,
-  arrayUnion, arrayRemove, increment,
+  arrayUnion, arrayRemove, increment, writeBatch,
 } from 'firebase/firestore';
 import { db } from './firebase';
 import { createEmptyGame, applyMove, computeElo } from './gameLogic';
@@ -75,6 +75,7 @@ export async function sendInvite(fromUser, toUsername, rows, cols, gameType = 'd
     fromUsername: fromUser.username,
     fromAvatar: fromUser.avatar || '◆',
     fromElo: fromUser.elo || 1000,
+    fromLineStyle: fromUser.lineStyle || 'solid',
     toId: target.id,
     toUsername: target.username,
     rows, cols,
@@ -120,8 +121,8 @@ export async function acceptInvite(inviteId, currentUser) {
     tx.set(matchRef, {
       players: playerIds,
       playerInfo: {
-        [inv.fromId]: { username: inv.fromUsername, avatar: inv.fromAvatar, elo: inv.fromElo },
-        [inv.toId]:   { username: currentUser.username, avatar: currentUser.avatar || '◆', elo: currentUser.elo || 1000 },
+        [inv.fromId]: { username: inv.fromUsername, avatar: inv.fromAvatar, elo: inv.fromElo, lineStyle: inv.fromLineStyle },
+        [inv.toId]:   { username: currentUser.username, avatar: currentUser.avatar || '◆', elo: currentUser.elo || 1000, lineStyle: currentUser.lineStyle || 'solid' },
       },
       rows: inv.rows,
       cols: inv.cols,
@@ -241,7 +242,7 @@ export async function quickMatch(currentUser, rows = 5, cols = 5, gameType = 'do
     const da = Math.abs((a.elo || 1000) - myElo);
     const db_ = Math.abs((b.elo || 1000) - myElo);
     if (da !== db_) return da - db_;
-    return Math.random() - 0.5;
+    return crypto.getRandomValues(new Uint32Array(1))[0] / 4294967296 - 0.5;
   });
   const target = candidates[0];
 
@@ -281,7 +282,7 @@ export async function hostGame(currentUser, gameType, rows, cols) {
     gameType,
     players: [currentUser.id],
     playerInfo: {
-      [currentUser.id]: { username: currentUser.username, avatar: currentUser.avatar || '◆', elo: currentUser.elo || 1000 }
+      [currentUser.id]: { username: currentUser.username, avatar: currentUser.avatar || '◆', elo: currentUser.elo || 1000, lineStyle: currentUser.lineStyle || 'solid' }
     },
     rows,
     cols,
@@ -329,7 +330,7 @@ export async function joinGame(matchId, currentUser) {
     const isChess = m.gameType === 'chess';
     tx.update(matchRef, {
       players: playerIds,
-      [`playerInfo.${currentUser.id}`]: { username: currentUser.username, avatar: currentUser.avatar || '◆', elo: currentUser.elo || 1000 },
+      [`playerInfo.${currentUser.id}`]: { username: currentUser.username, avatar: currentUser.avatar || '◆', elo: currentUser.elo || 1000, lineStyle: currentUser.lineStyle || 'solid' },
       game,
       status: isChess ? 'timer_negotiation' : 'active',
       pauseRequest: null,
@@ -959,21 +960,23 @@ export async function blockUser(currentUser, targetUsername) {
       where('status', 'in', ['active', 'paused']),
       limit(20),
     ));
-    const updatePromises = [];
+    const batch = writeBatch(db);
+    let count = 0;
     for (const d of myActive.docs) {
       const m = d.data();
       if (!m.players.includes(target.id)) continue;
       // Settle the match: blocker concedes, target wins.
-      updatePromises.push(
-        updateDoc(doc(db, 'matches', d.id), {
-          status: 'finished',
-          winner: target.id,
-          resignedBy: currentUser.id,
-          finishedAt: serverTimestamp(),
-        }).catch(() => {})
-      );
+      batch.update(doc(db, 'matches', d.id), {
+        status: 'finished',
+        winner: target.id,
+        resignedBy: currentUser.id,
+        finishedAt: serverTimestamp(),
+      });
+      count++;
     }
-    await Promise.all(updatePromises);
+    if (count > 0) {
+      await batch.commit();
+    }
   } catch (e) {
     // Best-effort; matches list may need a composite index. Don't block
     // the block itself on this cleanup.
@@ -990,7 +993,7 @@ export async function unblockUser(currentUser, targetId) {
 // ─── Profile updates ─────────────────────────────────────────────────────
 export async function updateProfile(currentUser, updates) {
   guard(currentUser);
-  const allowed = ['avatar', 'title', 'bio', 'displayName'];
+  const allowed = ['avatar', 'title', 'bio', 'displayName', 'lineStyle'];
   const filtered = {};
   for (const k of allowed) if (k in updates) filtered[k] = updates[k];
   await updateDoc(doc(db, 'users', currentUser.id), filtered);
