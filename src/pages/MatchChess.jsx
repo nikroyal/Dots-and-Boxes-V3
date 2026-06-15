@@ -467,7 +467,7 @@ export default function MatchChess() {
                    <div className="flex gap-3 justify-center">
                      <button className="btn-primary" onClick={async () => {
                        try {
-                         await acceptTimer(id, profile, match.timerConfig.useTimer, match.timerConfig.timerMins);
+                         await acceptTimer(id, profile);
                        } catch (e) { toast(e.message, 'error'); }
                      }}>Accept</button>
 
