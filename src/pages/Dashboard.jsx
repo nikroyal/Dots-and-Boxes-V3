@@ -9,7 +9,7 @@ import {
 } from '../lib/actions';
 import { toast } from '../components/Notifications';
 import { sfx } from '../lib/sound';
-import { getRankFromElo, ACHIEVEMENTS } from '../lib/achievements';
+import { getRankInfo, ACHIEVEMENTS } from '../lib/achievements';
 import EloChart from '../components/EloChart';
 import ActivityFeed from '../components/ActivityFeed';
 import { Send, X, Trophy, Target, TrendingUp, Users, Zap } from 'lucide-react';
@@ -127,7 +127,10 @@ export default function Dashboard() {
   }, [profile?.id, navigate]);
 
   if (!profile) return null;
-  const rank = getRankFromElo(profile.elo || 1000);
+  const rankInfo = getRankInfo(profile.elo ?? 1000);
+  const rank = rankInfo.rank;
+  const nextRank = rankInfo.nextRank;
+  const rankProgress = rankInfo.progress;
   const winRate = profile.gamesPlayed > 0
     ? Math.round((profile.wins / profile.gamesPlayed) * 100)
     : 0;
@@ -170,9 +173,31 @@ export default function Dashboard() {
         <h1 className="font-display text-5xl font-medium tracking-tight leading-none">
           {profile.displayName || profile.username}
         </h1>
-        <div className="mt-2 font-mono text-xs tracking-widest uppercase" style={{ color: rank.color }}>
-          {rank.name} · {profile.elo || 1000} ELO
+        <div className="mt-4 max-w-sm">
+          <div className="flex justify-between items-end mb-2">
+            <div className="font-mono text-xs tracking-widest uppercase" style={{ color: rank.color }}>
+              {rank.name} · {profile.elo ?? 1000} ELO
+            </div>
+            {nextRank && (
+              <div className="font-mono text-[0.6rem] tracking-widest uppercase opacity-50">
+                Next: {nextRank.name} ({nextRank.min})
+              </div>
+            )}
+          </div>
+          {nextRank && (
+            <div className="h-1.5 w-full bg-black/5 rounded-full overflow-hidden">
+              <div
+                className="h-full transition-all duration-1000 ease-out"
+                style={{ width: `${rankProgress}%`, background: rank.color }}
+              />
+            </div>
+          )}
         </div>
+        {(profile.winStreak || 0) >= 3 && (
+          <div className="mt-4 font-mono text-[0.7rem] tracking-widest uppercase" style={{ color: 'var(--ochre)' }}>
+            🔥 {profile.winStreak} Win Streak
+          </div>
+        )}
       </section>
 
       {/* Stat cards */}

@@ -3,7 +3,7 @@ import { useAuth } from '../lib/AuthContext';
 import { Volume2, VolumeX, LogOut, Settings, Sun, Moon, BookOpen } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { isSoundEnabled, setSoundEnabled, sfx } from '../lib/sound';
-import { getRankFromElo } from '../lib/achievements';
+import { getRankInfo } from '../lib/achievements';
 import {
   getTheme, setTheme, getReducedMotion, setReducedMotion, THEMES,
 } from '../lib/theme';
@@ -103,7 +103,7 @@ export default function Header() {
     );
   };
 
-  const rank = profile ? getRankFromElo(profile.elo || 1000) : null;
+  const rank = profile ? getRankInfo(profile.elo ?? 1000).rank : null;
 
   return (
     <header className="border-b hairline sticky top-0 z-30" style={{ background: 'var(--header-bg)', backdropFilter: 'blur(8px)' }}>

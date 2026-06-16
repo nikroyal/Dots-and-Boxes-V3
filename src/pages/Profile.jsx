@@ -60,7 +60,10 @@ export default function Profile() {
   if (loading) return <div className="font-mono text-xs opacity-50 text-center py-20">LOADING…</div>;
   if (!target) return <div className="font-mono text-sm opacity-60 text-center py-20">User not found</div>;
 
-  const rank = getRankFromElo(target.elo || 1000);
+  const rankInfo = getRankInfo(target.elo ?? 1000);
+  const rank = rankInfo.rank;
+  const nextRank = rankInfo.nextRank;
+  const rankProgress = rankInfo.progress;
   const winRate = target.gamesPlayed > 0 ? Math.round((target.wins / target.gamesPlayed) * 100) : 0;
   const isFriend = (me.friends || []).includes(target.id);
   const isBlocked = (me.blocked || []).includes(target.id);
@@ -116,9 +119,31 @@ export default function Profile() {
           {target.title && (
             <div className="font-display italic mt-2 opacity-80">{target.title}</div>
           )}
-          <div className="mt-4 font-mono text-xs tracking-widest uppercase" style={{ color: rank.color }}>
-            {rank.name} · {target.elo || 1000} ELO
+          <div className="mt-4 max-w-sm">
+            <div className="flex justify-between items-end mb-2">
+              <div className="font-mono text-xs tracking-widest uppercase" style={{ color: rank.color }}>
+                {rank.name} · {target.elo ?? 1000} ELO
+              </div>
+              {nextRank && (
+                <div className="font-mono text-[0.6rem] tracking-widest uppercase opacity-50">
+                  Next: {nextRank.name} ({nextRank.min})
+                </div>
+              )}
+            </div>
+            {nextRank && (
+              <div className="h-1.5 w-full bg-black/5 rounded-full overflow-hidden">
+                <div
+                  className="h-full transition-all duration-1000 ease-out"
+                  style={{ width: `${rankProgress}%`, background: rank.color }}
+                />
+              </div>
+            )}
           </div>
+          {(target.winStreak || 0) >= 3 && (
+            <div className="mt-4 font-mono text-[0.7rem] tracking-widest uppercase" style={{ color: 'var(--ochre)' }}>
+              🔥 {target.winStreak} Win Streak
+            </div>
+          )}
           {target.bio && (
             <div className="font-display mt-4 max-w-md leading-relaxed opacity-80" style={{ whiteSpace: 'pre-wrap' }}>{target.bio}</div>
           )}
