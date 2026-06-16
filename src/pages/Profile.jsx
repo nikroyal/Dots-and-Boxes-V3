@@ -60,7 +60,7 @@ export default function Profile() {
   if (loading) return <div className="font-mono text-xs opacity-50 text-center py-20">LOADING…</div>;
   if (!target) return <div className="font-mono text-sm opacity-60 text-center py-20">User not found</div>;
 
-  const rankInfo = getRankInfo(target.elo || 1000);
+  const rankInfo = getRankInfo(target.elo ?? 1000);
   const rank = rankInfo.rank;
   const nextRank = rankInfo.nextRank;
   const rankProgress = rankInfo.progress;
