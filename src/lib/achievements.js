@@ -76,11 +76,36 @@ export const TITLE_OPTIONS = [
   'Master', 'Grandmaster', 'Legend', 'The Patient', 'The Bold',
 ];
 
+export const RANKS = [
+  { name: 'Novice',  min: 0,    color: '#999' },
+  { name: 'Player',  min: 1000, color: '#666' },
+  { name: 'Rated',   min: 1200, color: '#1A1A1A' },
+  { name: 'Skilled', min: 1500, color: '#2F6B3F' },
+  { name: 'Expert',  min: 1800, color: '#B7791F' },
+  { name: 'Master',  min: 2000, color: '#B91C3C' },
+];
+
+export function getRankInfo(elo) {
+  let currentRank = RANKS[0];
+  let nextRank = null;
+  let progress = 100;
+
+  for (let i = 0; i < RANKS.length; i++) {
+    if (elo >= RANKS[i].min) {
+      currentRank = RANKS[i];
+      nextRank = RANKS[i + 1] || null;
+    }
+  }
+
+  if (nextRank) {
+    const range = nextRank.min - currentRank.min;
+    const into = elo - currentRank.min;
+    progress = Math.max(0, Math.min(100, Math.round((into / range) * 100)));
+  }
+
+  return { rank: currentRank, nextRank, progress };
+}
+
 export function getRankFromElo(elo) {
-  if (elo >= 2000) return { name: 'Master',      color: '#B91C3C' };
-  if (elo >= 1800) return { name: 'Expert',      color: '#B7791F' };
-  if (elo >= 1500) return { name: 'Skilled',     color: '#2F6B3F' };
-  if (elo >= 1200) return { name: 'Rated',       color: '#1A1A1A' };
-  if (elo >= 1000) return { name: 'Player',      color: '#666' };
-  return { name: 'Novice', color: '#999' };
+  return getRankInfo(elo).rank;
 }
