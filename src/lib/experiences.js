@@ -117,6 +117,21 @@ export const EXPERIENCE_CATALOG = [
     routePrefixes: ['/memory-match'],
   },
   {
+    id: 'reaction-timer',
+    name: 'Reaction Timer',
+    shortName: 'Reaction',
+    path: '/reaction-timer',
+    kind: 'Arcade',
+    status: 'Live',
+    accent: 'var(--crimson)',
+    description: 'Test your reflexes. Click as fast as you can when the color changes.',
+    features: ['Local play', 'Best times'],
+    navItems: [
+      { to: '/reaction-timer', label: 'Play' },
+    ],
+    routePrefixes: ['/reaction-timer'],
+  },
+  {
     id: 'circuit-maker',
     name: 'Circuit Maker',
     shortName: 'Circuits',
