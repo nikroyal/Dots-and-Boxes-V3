@@ -176,7 +176,7 @@ export default function Dashboard() {
         <div className="mt-4 max-w-sm">
           <div className="flex justify-between items-end mb-2">
             <div className="font-mono text-xs tracking-widest uppercase" style={{ color: rank.color }}>
-              {rank.name} · {profile.elo || 1000} ELO
+              {rank.name} · {profile.elo ?? 1000} ELO
             </div>
             {nextRank && (
               <div className="font-mono text-[0.6rem] tracking-widest uppercase opacity-50">
