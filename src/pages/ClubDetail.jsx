@@ -188,12 +188,12 @@ export default function ClubDetail() {
           </div>
           <div className="flex items-center">
             {isAdmin && (
-              <button onClick={() => setShowSettings(true)} className="p-2 opacity-40 hover:opacity-100 transition-opacity relative">
+              <button onClick={() => setShowSettings(true)} className="p-2 opacity-40 hover:opacity-100 transition-opacity relative" aria-label="Settings">
                 <Settings size={18} />
                 {joinRequests.length > 0 && <span className="absolute top-1 right-1 w-2 h-2 bg-[var(--crimson)] rounded-full" />}
               </button>
             )}
-            <button onClick={() => setShowMobileSidebar(false)} className="lg:hidden p-2 opacity-40"><X size={18}/></button>
+            <button onClick={() => setShowMobileSidebar(false)} className="lg:hidden p-2 opacity-40" aria-label="Close sidebar"><X size={18}/></button>
           </div>
         </div>
         
@@ -207,6 +207,7 @@ export default function ClubDetail() {
                 <button 
                   key={chan.id}
                   onClick={() => { setActiveChannelId(chan.id); navigate(`/clubs/${id}/${chan.id}`); setShowMobileSidebar(false); }}
+                  aria-label={`Go to channel ${chan.name}`}
                   className={`w-full flex items-center gap-2 px-3 py-1.5 rounded transition-colors text-sm font-display ${activeChannelId === chan.id ? 'bg-black/10 font-medium' : 'hover:bg-black/5 opacity-70'}`}
                 >
                   <Hash size={14} className="opacity-40" />
@@ -229,7 +230,7 @@ export default function ClubDetail() {
                 <div className="text-xs font-mono truncate">{profile.username}</div>
                 <div className="text-[0.55rem] font-mono opacity-50 uppercase tracking-tighter">{myRole}</div>
               </div>
-              <button onClick={() => navigate('/clubs')} title="Leave view" className="opacity-40 hover:opacity-100"><LogOut size={14}/></button>
+              <button onClick={() => navigate('/clubs')} title="Leave view" className="opacity-40 hover:opacity-100" aria-label="Leave view"><LogOut size={14}/></button>
             </div>
           )}
         </div>
@@ -240,13 +241,13 @@ export default function ClubDetail() {
         {/* Header */}
         <div className="h-14 px-4 flex items-center justify-between border-b hairline shrink-0">
           <div className="flex items-center gap-2 font-display text-lg font-medium">
-            <button onClick={() => setShowMobileSidebar(true)} className="lg:hidden p-2 -ml-2 opacity-50"><MoreVertical size={18}/></button>
+            <button onClick={() => setShowMobileSidebar(true)} className="lg:hidden p-2 -ml-2 opacity-50" aria-label="Open sidebar"><MoreVertical size={18}/></button>
             <Hash size={18} className="opacity-40" />
             <span className="truncate">{channels.find(c => c.id === activeChannelId)?.name || 'general'}</span>
           </div>
           <div className="flex items-center gap-4">
-            <button className="opacity-40 hover:opacity-100" title="Pinned Messages"><Pin size={16}/></button>
-            <button onClick={() => setShowMobileMembers(true)} className="opacity-40 hover:opacity-100 lg:hidden" title="Members List"><Users size={16} /></button>
+            <button className="opacity-40 hover:opacity-100" title="Pinned Messages" aria-label="Pinned Messages"><Pin size={16}/></button>
+            <button onClick={() => setShowMobileMembers(true)} className="opacity-40 hover:opacity-100 lg:hidden" title="Members List" aria-label="Members List"><Users size={16} /></button>
           </div>
         </div>
 
@@ -302,7 +303,7 @@ export default function ClubDetail() {
                   <div className="flex items-center gap-2 truncate">
                     <Reply size={12} /> Replying to <strong>{replyTo.username}</strong>
                   </div>
-                  <button onClick={() => setReplyTo(null)} className="hover:opacity-100"><X size={12}/></button>
+                  <button onClick={() => setReplyTo(null)} className="hover:opacity-100" aria-label="Cancel reply"><X size={12}/></button>
                 </div>
               )}
               <form onSubmit={handleSendChat} className="flex items-end p-2 gap-2">
@@ -320,7 +321,7 @@ export default function ClubDetail() {
                   rows={1}
                   disabled={!activeChannelId}
                 />
-                <button type="submit" disabled={!activeChannelId || !chatInput.trim()} className="p-2 opacity-60 hover:opacity-100 disabled:opacity-20 transition-opacity">
+                <button type="submit" disabled={!activeChannelId || !chatInput.trim()} className="p-2 opacity-60 hover:opacity-100 disabled:opacity-20 transition-opacity" aria-label="Send message">
                   <Send size={18} />
                 </button>
               </form>
@@ -344,7 +345,7 @@ export default function ClubDetail() {
       `}>
         <div className="h-14 px-4 flex items-center justify-between border-b hairline font-mono text-[0.65rem] uppercase tracking-widest opacity-50 shrink-0">
           <span>Members - {members.length}</span>
-          <button onClick={() => setShowMobileMembers(false)} className="lg:hidden p-2 opacity-40"><X size={18}/></button>
+          <button onClick={() => setShowMobileMembers(false)} className="lg:hidden p-2 opacity-40" aria-label="Close members list"><X size={18}/></button>
         </div>
         <div className="flex-1 overflow-y-auto p-3 space-y-6 scrollbar-thin">
           <MemberGroup title="Owner" members={members.filter(m => m.role === ROLES.OWNER)} />
@@ -415,6 +416,7 @@ function SettingsModal({ club, members, channels, requests, onClose, currentUser
             <button 
               key={t.id} 
               onClick={() => setTab(t.id)}
+              aria-label={t.label}
               className={`w-full flex items-center gap-3 px-3 py-2 rounded font-display text-sm transition-colors ${tab === t.id ? 'bg-[var(--ink)] text-[var(--paper)]' : 'hover:bg-black/5 opacity-70'}`}
             >
               <t.icon size={16} />
@@ -423,7 +425,7 @@ function SettingsModal({ club, members, channels, requests, onClose, currentUser
             </button>
           ))}
           <div className="pt-4 mt-4 border-t hairline">
-            <button onClick={onClose} className="w-full flex items-center gap-3 px-3 py-2 rounded font-display text-sm text-[var(--crimson)] hover:bg-[var(--crimson)]/5">
+            <button onClick={onClose} className="w-full flex items-center gap-3 px-3 py-2 rounded font-display text-sm text-[var(--crimson)] hover:bg-[var(--crimson)]/5" aria-label="Close Settings">
               <LogOut size={16} /> Close Settings
             </button>
           </div>
@@ -461,7 +463,7 @@ function SettingsModal({ club, members, channels, requests, onClose, currentUser
                     onChange={e => setNewChanName(e.target.value)}
                     className="bg-black/5 border hairline rounded px-3 py-1.5 text-sm outline-none focus:border-[var(--ink)]"
                   />
-                  <button type="submit" disabled={busy || !newChanName.trim()} className="btn-primary text-xs py-1.5 px-3"><Plus size={14}/></button>
+                  <button type="submit" disabled={busy || !newChanName.trim()} className="btn-primary text-xs py-1.5 px-3" aria-label="Create channel"><Plus size={14}/></button>
                 </form>
               </div>
               <div className="border hairline rounded-xl overflow-hidden divide-y divide-hairline">
@@ -472,7 +474,7 @@ function SettingsModal({ club, members, channels, requests, onClose, currentUser
                       <span className="font-display font-medium">#{c.name}</span>
                     </div>
                     {c.name !== 'general' && (
-                      <button onClick={() => handleDeleteChan(c.id)} className="p-2 text-[var(--crimson)] hover:bg-[var(--crimson)]/5 rounded transition-colors">
+                      <button onClick={() => handleDeleteChan(c.id)} className="p-2 text-[var(--crimson)] hover:bg-[var(--crimson)]/5 rounded transition-colors" aria-label={`Delete channel ${c.name}`}>
                         <Trash2 size={16} />
                       </button>
                     )}
@@ -506,7 +508,7 @@ function SettingsModal({ club, members, channels, requests, onClose, currentUser
                           <option value={ROLES.MODERATOR}>Moderator</option>
                           <option value={ROLES.MEMBER}>Member</option>
                         </select>
-                        <button onClick={() => kickMember(club.id, m.userId, currentUser)} className="p-2 text-[var(--crimson)] hover:bg-[var(--crimson)]/5 rounded transition-colors" title="Kick">
+                        <button onClick={() => kickMember(club.id, m.userId, currentUser)} className="p-2 text-[var(--crimson)] hover:bg-[var(--crimson)]/5 rounded transition-colors" title="Kick" aria-label={`Kick ${m.username}`}>
                           <UserMinus size={16} />
                         </button>
                       </div>
@@ -534,10 +536,10 @@ function SettingsModal({ club, members, channels, requests, onClose, currentUser
                         </div>
                       </div>
                       <div className="flex gap-2">
-                        <button onClick={() => acceptJoinRequest(club.id, r, currentUser)} className="p-2 bg-[var(--forest)]/10 text-[var(--forest)] hover:bg-[var(--forest)]/20 rounded transition-colors">
+                        <button onClick={() => acceptJoinRequest(club.id, r, currentUser)} className="p-2 bg-[var(--forest)]/10 text-[var(--forest)] hover:bg-[var(--forest)]/20 rounded transition-colors" aria-label={`Accept join request from ${r.username}`}>
                           <Check size={18} />
                         </button>
-                        <button onClick={() => rejectJoinRequest(club.id, r.userId, currentUser)} className="p-2 bg-[var(--crimson)]/10 text-[var(--crimson)] hover:bg-[var(--crimson)]/20 rounded transition-colors">
+                        <button onClick={() => rejectJoinRequest(club.id, r.userId, currentUser)} className="p-2 bg-[var(--crimson)]/10 text-[var(--crimson)] hover:bg-[var(--crimson)]/20 rounded transition-colors" aria-label={`Reject join request from ${r.username}`}>
                           <X size={18} />
                         </button>
                       </div>
@@ -623,11 +625,11 @@ function MessageItem({
         {/* Message Actions */}
         {!editing && (
           <div className="absolute top-[-10px] right-4 opacity-0 group-hover:opacity-100 transition-opacity flex bg-[var(--paper-tint)] border hairline rounded shadow-sm overflow-hidden z-10">
-            <button onClick={onReply} className="p-1.5 hover:bg-black/5" title="Reply"><Reply size={14}/></button>
-            <button onClick={onForward} className="p-1.5 hover:bg-black/5" title="Forward"><ChevronRight size={14}/></button>
-            {isOwn && <button onClick={onEdit} className="p-1.5 hover:bg-black/5" title="Edit"><Edit3 size={14}/></button>}
-            {(isOwn || isAdmin) && <button onClick={onDelete} className="p-1.5 hover:bg-black/5 text-[var(--crimson)]" title="Delete"><Trash2 size={14}/></button>}
-            <button className="p-1.5 hover:bg-black/5" title="More"><MoreVertical size={14}/></button>
+            <button onClick={onReply} className="p-1.5 hover:bg-black/5" title="Reply" aria-label="Reply"><Reply size={14}/></button>
+            <button onClick={onForward} className="p-1.5 hover:bg-black/5" title="Forward" aria-label="Forward"><ChevronRight size={14}/></button>
+            {isOwn && <button onClick={onEdit} className="p-1.5 hover:bg-black/5" title="Edit" aria-label="Edit"><Edit3 size={14}/></button>}
+            {(isOwn || isAdmin) && <button onClick={onDelete} className="p-1.5 hover:bg-black/5 text-[var(--crimson)]" title="Delete" aria-label="Delete"><Trash2 size={14}/></button>}
+            <button className="p-1.5 hover:bg-black/5" title="More" aria-label="More actions"><MoreVertical size={14}/></button>
           </div>
         )}
       </div>

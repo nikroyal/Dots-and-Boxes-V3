@@ -184,19 +184,19 @@ export default function Replay() {
       {/* Controls */}
       <div className="space-y-4 max-w-md mx-auto w-full">
         <div className="flex items-center gap-2">
-          <button onClick={() => { setStep(0); setPlaying(false); }} className="p-2 hover:bg-black/5">
+          <button onClick={() => { setStep(0); setPlaying(false); }} className="p-2 hover:bg-black/5" aria-label="Go to start">
             <SkipBack size={16} />
           </button>
-          <button onClick={() => setStep(s => Math.max(0, s - 1))} className="p-2 hover:bg-black/5">
+          <button onClick={() => setStep(s => Math.max(0, s - 1))} className="p-2 hover:bg-black/5" aria-label="Step backward">
             <ChevronLeft size={16} />
           </button>
-          <button onClick={() => setPlaying(!playing)} className="btn-primary flex-1">
+          <button onClick={() => setPlaying(!playing)} className="btn-primary flex-1" aria-label={playing ? "Pause" : "Play"}>
             {playing ? <Pause size={14} /> : <Play size={14} />} {playing ? 'Pause' : 'Play'}
           </button>
-          <button onClick={() => setStep(s => Math.min(totalSteps, s + 1))} className="p-2 hover:bg-black/5">
+          <button onClick={() => setStep(s => Math.min(totalSteps, s + 1))} className="p-2 hover:bg-black/5" aria-label="Step forward">
             <ChevronRight size={16} />
           </button>
-          <button onClick={() => { setStep(totalSteps); setPlaying(false); }} className="p-2 hover:bg-black/5">
+          <button onClick={() => { setStep(totalSteps); setPlaying(false); }} className="p-2 hover:bg-black/5" aria-label="Go to end">
             <SkipForward size={16} />
           </button>
         </div>
