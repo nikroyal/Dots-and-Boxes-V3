@@ -27,6 +27,18 @@ import MatchConnect4 from './pages/MatchConnect4';
 import TicTacToeHub from './pages/TicTacToeHub';
 import LocalTicTacToe from './pages/LocalTicTacToe';
 import MatchTicTacToe from './pages/MatchTicTacToe';
+import GomokuHub from './pages/GomokuHub';
+import LocalGomoku from './pages/LocalGomoku';
+import MatchGomoku from './pages/MatchGomoku';
+import OthelloHub from './pages/OthelloHub';
+import LocalOthello from './pages/LocalOthello';
+import MatchOthello from './pages/MatchOthello';
+import MancalaHub from './pages/MancalaHub';
+import LocalMancala from './pages/LocalMancala';
+import MatchMancala from './pages/MatchMancala';
+import RpsHub from './pages/RpsHub';
+import LocalRps from './pages/LocalRps';
+import MatchRps from './pages/MatchRps';
 import ChessHub from './pages/ChessHub';
 import LocalChess from './pages/LocalChess';
 import MatchChess from './pages/MatchChess';
@@ -96,6 +108,10 @@ function Shell() {
         <Route path="/local" element={<LocalMatch />} />
         <Route path="/connect4/local" element={<LocalConnect4 />} />
         <Route path="/tictactoe/local" element={<LocalTicTacToe />} />
+        <Route path="/gomoku/local" element={<LocalGomoku />} />
+        <Route path="/othello/local" element={<LocalOthello />} />
+        <Route path="/mancala/local" element={<LocalMancala />} />
+        <Route path="/rps/local" element={<LocalRps />} />
         <Route path="/chess/local" element={<LocalChess />} />
         <Route path="*" element={<Navigate to="/login" />} />
       </Routes>
@@ -132,6 +148,10 @@ function Shell() {
               <Route path="/dots-and-boxes" element={<DotsHome />} />
               <Route path="/connect4" element={<Connect4Hub />} />
               <Route path="/tictactoe" element={<TicTacToeHub />} />
+              <Route path="/gomoku" element={<GomokuHub />} />
+              <Route path="/othello" element={<OthelloHub />} />
+              <Route path="/mancala" element={<MancalaHub />} />
+              <Route path="/rps" element={<RpsHub />} />
               <Route path="/chess" element={<ChessHub />} />
               <Route path="/paper-io" element={<PaperIo />} />
               <Route path="/circuit-maker" element={<CircuitMaker />} />
@@ -139,6 +159,10 @@ function Shell() {
               <Route path="/match/:id" element={<Match />} />
               <Route path="/connect4/match/:id" element={<MatchConnect4 />} />
               <Route path="/tictactoe/match/:id" element={<MatchTicTacToe />} />
+              <Route path="/gomoku/match/:id" element={<MatchGomoku />} />
+              <Route path="/othello/match/:id" element={<MatchOthello />} />
+              <Route path="/mancala/match/:id" element={<MatchMancala />} />
+              <Route path="/rps/match/:id" element={<MatchRps />} />
               <Route path="/chess/match/:id" element={<MatchChess />} />
               <Route path="/profile/:username" element={<Profile />} />
               <Route path="/profile" element={<Profile />} />
@@ -155,6 +179,10 @@ function Shell() {
               <Route path="/local" element={<LocalMatch />} />
               <Route path="/connect4/local" element={<LocalConnect4 />} />
               <Route path="/tictactoe/local" element={<LocalTicTacToe />} />
+              <Route path="/gomoku/local" element={<LocalGomoku />} />
+              <Route path="/othello/local" element={<LocalOthello />} />
+              <Route path="/mancala/local" element={<LocalMancala />} />
+              <Route path="/rps/local" element={<LocalRps />} />
               <Route path="/chess/local" element={<LocalChess />} />
               {isAdmin && <Route path="/admin" element={<Admin />} />}
               <Route path="*" element={<Navigate to="/" />} />

@@ -115,6 +115,10 @@ export async function acceptInvite(inviteId, currentUser) {
     if (gType === 'connect4') newGame = createEmptyGameC4(inv.rows, inv.cols, playerIds);
     else if (gType === 'tictactoe') newGame = createEmptyGameTTT(inv.rows, inv.cols, playerIds);
     else if (gType === 'chess') newGame = createEmptyGameChess(playerIds);
+    else if (gType === 'gomoku') newGame = createEmptyGameGomoku(inv.rows, inv.cols, playerIds);
+    else if (gType === 'othello') newGame = createEmptyGameOthello(inv.rows, inv.cols, playerIds);
+    else if (gType === 'mancala') newGame = createEmptyGameMancala(inv.rows, inv.cols, playerIds);
+    else if (gType === 'rps') newGame = createEmptyGameRps(inv.rows, inv.cols, playerIds);
     else newGame = createEmptyGame(inv.rows, inv.cols, playerIds);
 
     const isChess = gType === 'chess';
@@ -277,6 +281,11 @@ export async function hostGame(currentUser, gameType, rows, cols) {
   if (gameType === 'connect4') game = createEmptyGameC4(rows, cols, [currentUser.id]);
   else if (gameType === 'tictactoe') game = createEmptyGameTTT(rows, cols, [currentUser.id]);
   else if (gameType === 'chess') game = createEmptyGameChess([currentUser.id]);
+  else if (gameType === 'gomoku') game = createEmptyGameGomoku(rows, cols, [currentUser.id]);
+  else if (gameType === 'othello') game = createEmptyGameOthello(rows, cols, [currentUser.id]);
+  else if (gameType === 'mancala') game = createEmptyGameMancala(rows, cols, [currentUser.id]);
+  else if (gameType === 'rps') game = createEmptyGameRps(rows, cols, [currentUser.id]);
+  else game = createEmptyGame(rows, cols, [currentUser.id]);
 
   const docRef = await addDoc(collection(db, 'matches'), {
     gameType,
@@ -324,6 +333,11 @@ export async function joinGame(matchId, currentUser) {
     if (m.gameType === 'connect4') game = createEmptyGameC4(m.rows, m.cols, playerIds);
     else if (m.gameType === 'tictactoe') game = createEmptyGameTTT(m.rows, m.cols, playerIds);
     else if (m.gameType === 'chess') game = createEmptyGameChess(playerIds);
+    else if (m.gameType === 'gomoku') game = createEmptyGameGomoku(m.rows, m.cols, playerIds);
+    else if (m.gameType === 'othello') game = createEmptyGameOthello(m.rows, m.cols, playerIds);
+    else if (m.gameType === 'mancala') game = createEmptyGameMancala(m.rows, m.cols, playerIds);
+    else if (m.gameType === 'rps') game = createEmptyGameRps(m.rows, m.cols, playerIds);
+    else game = createEmptyGame(m.rows, m.cols, playerIds);
 
     const startsAtMs = Date.now() + PREGAME_COUNTDOWN_MS;
 
@@ -381,6 +395,14 @@ export async function makeMove(matchId, gameType, orientation, r, c, currentUser
       result = applyMoveC4(m.game, c, currentUser.id, m.players);
     } else if (gameType === 'tictactoe') {
       result = applyMoveTTT(m.game, r, c, currentUser.id, m.players);
+    } else if (gameType === 'gomoku') {
+      result = applyMoveGomoku(m.game, r, c, currentUser.id, m.players);
+    } else if (gameType === 'othello') {
+      result = applyMoveOthello(m.game, r, c, currentUser.id, m.players);
+    } else if (gameType === 'mancala') {
+      result = applyMoveMancala(m.game, r, currentUser.id, m.players);
+    } else if (gameType === 'rps') {
+      result = applyMoveRps(m.game, r, currentUser.id, m.players);
     } else if (gameType === 'chess') {
       result = applyMoveChess(m.game, r, currentUser.id, m.players); // r contains moveObj
     } else {
