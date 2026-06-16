@@ -53,12 +53,11 @@ function evaluateCircuit(state) {
   }
 
   for (let i = 0; i < 8; i++) {
-    const next = new Map(values);
+    const next = new Map();
     for (const component of state.components) {
-      const incomingIds = inputsByComponent.get(component.id) || [];
-      const inputValues = incomingIds.map(fromId => values.get(fromId)?.out || false);
-      const a = !!inputValues[0];
-      const b = !!inputValues[1];
+      const incomingIds = inputsByComponent.get(component.id);
+      const a = incomingIds?.[0] ? !!values.get(incomingIds[0])?.out : false;
+      const b = incomingIds?.[1] ? !!values.get(incomingIds[1])?.out : false;
       let out = false;
       if (component.type === 'input') out = !!component.value;
       else if (component.type === 'output') out = a;
