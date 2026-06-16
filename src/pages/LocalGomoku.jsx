@@ -155,7 +155,7 @@ export default function LocalGomoku() {
             <p className="font-mono text-[0.65rem] tracking-widest uppercase opacity-60">Match Over</p>
           </div>
           <div className="flex gap-3 justify-center">
-             <button onClick={() => setGame(createEmptyGame(3, 3, ['p1', 'p2']))} className="btn-primary">
+             <button onClick={() => setGame(createEmptyGame(15, 15, ['p1', 'p2']))} className="btn-primary">
                Rematch
              </button>
              <button onClick={() => setSetup(true)} className="btn-ghost">
