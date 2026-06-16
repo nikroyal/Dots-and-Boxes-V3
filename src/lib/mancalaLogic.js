@@ -5,9 +5,9 @@ export function createEmptyGame(rows = 2, cols = 6, playerIds = ['p1', 'p2']) { 
     rows: 2,
     cols,
     board, // index 0 is player 2's pits, index 1 is player 1's pits.
-    stores: { 'p1': 0, 'p2': 0 }, // Mancala stores
+    stores: Object.fromEntries(playerIds.map(id => [id, 0])),
     currentPlayerIdx: 0,
-    scores: { 'p1': 0, 'p2': 0 }, // scores can be synced to stores
+    scores: Object.fromEntries(playerIds.map(id => [id, 0])),
     moveCount: 0,
     moves: [], // { pit, by, ts }
     finished: false,
