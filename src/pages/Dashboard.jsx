@@ -127,7 +127,7 @@ export default function Dashboard() {
   }, [profile?.id, navigate]);
 
   if (!profile) return null;
-  const rankInfo = getRankInfo(profile.elo || 1000);
+  const rankInfo = getRankInfo(profile.elo ?? 1000);
   const rank = rankInfo.rank;
   const nextRank = rankInfo.nextRank;
   const rankProgress = rankInfo.progress;
