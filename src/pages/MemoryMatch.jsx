@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Star, Zap, Play, Target, Trophy, Send, Users, Shield } from 'lucide-react';
 import { sfx } from '../lib/sound';
 
