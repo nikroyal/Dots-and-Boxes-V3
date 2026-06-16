@@ -103,7 +103,7 @@ export default function Header() {
     );
   };
 
-  const rank = profile ? getRankInfo(profile.elo || 1000).rank : null;
+  const rank = profile ? getRankInfo(profile.elo ?? 1000).rank : null;
 
   return (
     <header className="border-b hairline sticky top-0 z-30" style={{ background: 'var(--header-bg)', backdropFilter: 'blur(8px)' }}>
