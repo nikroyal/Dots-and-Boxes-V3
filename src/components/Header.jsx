@@ -132,11 +132,12 @@ export default function Header() {
                     title="Settings"
                     aria-label="Settings"
                     aria-expanded={settingsOpen}
+                    aria-controls="settings-menu"
                     aria-haspopup="true">
               <Settings size={16} aria-hidden="true" />
             </button>
             {settingsOpen && (
-              <div className="absolute right-0 mt-2 w-56 border hairline z-40"
+              <div id="settings-menu" className="absolute right-0 mt-2 w-56 border hairline z-40"
                    role="menu"
                    style={{ background: 'var(--paper-tint)', boxShadow: 'var(--shadow)' }}>
                 <div className="p-3 space-y-3">

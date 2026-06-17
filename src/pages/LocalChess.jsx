@@ -153,27 +153,27 @@ export default function LocalChess() {
         <form onSubmit={handleStart} className="card space-y-6">
           <div className="space-y-4">
             <div>
-              <label className="font-mono text-[0.65rem] tracking-widest uppercase opacity-60 mb-1 block">Player 1 Name (White)</label>
-              <input value={p1Name} onChange={e => setP1Name(e.target.value)} className="w-full bg-black/5 dark:bg-white/5 border hairline px-3 py-2 font-display outline-none focus-ring" required maxLength={15} />
+              <label htmlFor="p1-name" className="font-mono text-[0.65rem] tracking-widest uppercase opacity-60 mb-1 block">Player 1 Name (White)</label>
+              <input id="p1-name" value={p1Name} onChange={e => setP1Name(e.target.value)} className="w-full bg-black/5 dark:bg-white/5 border hairline px-3 py-2 font-display outline-none focus-ring" required maxLength={15} />
             </div>
             <div>
-              <label className="font-mono text-[0.65rem] tracking-widest uppercase opacity-60 mb-1 block">Player 2 Name (Black)</label>
-              <input value={p2Name} onChange={e => setP2Name(e.target.value)} className="w-full bg-black/5 dark:bg-white/5 border hairline px-3 py-2 font-display outline-none focus-ring" required maxLength={15} />
+              <label htmlFor="p2-name" className="font-mono text-[0.65rem] tracking-widest uppercase opacity-60 mb-1 block">Player 2 Name (Black)</label>
+              <input id="p2-name" value={p2Name} onChange={e => setP2Name(e.target.value)} className="w-full bg-black/5 dark:bg-white/5 border hairline px-3 py-2 font-display outline-none focus-ring" required maxLength={15} />
             </div>
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input type="checkbox" checked={flipBoard} onChange={e => setFlipBoard(e.target.checked)} />
+            <label htmlFor="flip-board" className="flex items-center gap-2 cursor-pointer">
+              <input id="flip-board" type="checkbox" checked={flipBoard} onChange={e => setFlipBoard(e.target.checked)} />
               <span className="font-mono text-[0.65rem] tracking-widest uppercase opacity-80">Auto-flip board each turn</span>
             </label>
 
             <div className="border hairline p-3 space-y-3">
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input type="checkbox" checked={useTimer} onChange={e => setUseTimer(e.target.checked)} />
+              <label htmlFor="use-timer" className="flex items-center gap-2 cursor-pointer">
+                <input id="use-timer" type="checkbox" checked={useTimer} onChange={e => setUseTimer(e.target.checked)} />
                 <span className="font-mono text-[0.65rem] tracking-widest uppercase opacity-80">Use Timer (per turn)</span>
               </label>
               {useTimer && (
                 <div>
-                  <label className="font-mono text-[0.65rem] tracking-widest uppercase opacity-60 mb-1 block">Minutes per turn</label>
-                  <input type="number" value={timerMins} onChange={e => setTimerMins(Math.max(1, parseInt(e.target.value) || 1))} className="w-full bg-black/5 dark:bg-white/5 border hairline px-3 py-2 font-display outline-none focus-ring" min={1} required />
+                  <label htmlFor="timer-mins" className="font-mono text-[0.65rem] tracking-widest uppercase opacity-60 mb-1 block">Minutes per turn</label>
+                  <input id="timer-mins" type="number" value={timerMins} onChange={e => setTimerMins(Math.max(1, parseInt(e.target.value) || 1))} className="w-full bg-black/5 dark:bg-white/5 border hairline px-3 py-2 font-display outline-none focus-ring" min={1} required />
                 </div>
               )}
               <div className="font-mono text-[0.55rem] tracking-widest uppercase opacity-50">Note: Both players should agree on the timer settings.</div>
