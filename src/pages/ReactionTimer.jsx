@@ -17,6 +17,7 @@ export default function ReactionTimer() {
 
   const timerRef = useRef(null);
   const startTimeRef = useRef(null);
+  const gameStateRef = useRef('waiting');
 
   useEffect(() => {
     return () => {
@@ -27,6 +28,7 @@ export default function ReactionTimer() {
   const startGame = () => {
     sfx.click();
     setGameState('ready');
+    gameStateRef.current = 'ready';
     setMessage('Wait for green...');
     setReactionTime(null);
 
@@ -35,6 +37,7 @@ export default function ReactionTimer() {
 
     timerRef.current = setTimeout(() => {
       setGameState('now');
+      gameStateRef.current = 'now';
       setMessage('CLICK NOW!');
       startTimeRef.current = performance.now();
       sfx.notify();
@@ -45,6 +48,7 @@ export default function ReactionTimer() {
     if (timerRef.current) clearTimeout(timerRef.current);
     sfx.loss();
     setGameState('finished');
+    gameStateRef.current = 'finished';
     setMessage('Too early! Click to try again.');
   };
 
@@ -55,6 +59,7 @@ export default function ReactionTimer() {
     sfx.win();
     setReactionTime(time);
     setGameState('finished');
+    gameStateRef.current = 'finished';
     setMessage(`Your time: ${time.toFixed(0)} ms`);
 
     if (!bestTime || time < bestTime) {
@@ -65,12 +70,12 @@ export default function ReactionTimer() {
     }
   };
 
-  const handleTrigger = () => {
-    if (gameState === 'waiting' || gameState === 'finished') {
+  const handleClick = () => {
+    if (gameStateRef.current === 'waiting' || gameStateRef.current === 'finished') {
       startGame();
-    } else if (gameState === 'ready') {
+    } else if (gameStateRef.current === 'ready') {
       handleEarlyClick();
-    } else if (gameState === 'now') {
+    } else if (gameStateRef.current === 'now') {
       handleValidClick();
     }
   };
