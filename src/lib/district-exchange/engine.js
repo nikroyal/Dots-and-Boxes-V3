@@ -334,7 +334,8 @@ export function passAuction(state, playerId) {
   let newState = { ...state };
   if (newState.auctionState) {
     newState.auctionState.activeBidders = newState.auctionState.activeBidders.filter(id => id !== playerId);
-    if (newState.auctionState.activeBidders.length <= 1) {
+    const hasBids = newState.auctionState.highestBidder !== null;
+    if (newState.auctionState.activeBidders.length === 0 || (newState.auctionState.activeBidders.length === 1 && hasBids)) {
        newState = resolveAuction(newState);
     }
   }
