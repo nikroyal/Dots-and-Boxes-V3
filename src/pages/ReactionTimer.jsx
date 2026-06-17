@@ -80,6 +80,14 @@ export default function ReactionTimer() {
     }
   };
 
+  const handleKeyDown = (e) => {
+    if (e.key === ' ' || e.key === 'Enter') {
+      if (e.repeat) return;
+      e.preventDefault();
+      handleTrigger();
+    }
+  };
+
   // Determine background color based on state
   let bgColor = 'var(--paper-tint)';
   let textColor = 'var(--ink)';
@@ -107,7 +115,9 @@ export default function ReactionTimer() {
       </section>
 
       <button
+        onPointerDown={handlePointerDown}
         onClick={handleClick}
+        onKeyDown={handleKeyDown}
         className="w-full max-w-md aspect-video border hairline card transition-colors duration-150 flex flex-col items-center justify-center focus-ring select-none"
         style={{ background: bgColor, color: textColor }}
         aria-label="Reaction timer area"
