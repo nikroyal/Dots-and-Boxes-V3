@@ -1,3 +1,4 @@
+import { finalizeStats } from '../lib/stats';
 import { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { doc, onSnapshot } from 'firebase/firestore';
@@ -6,7 +7,7 @@ import { useAuth } from '../lib/AuthContext';
 import {
   watchMatch, makeMove, requestPause, respondToPause, resumeMatch, resignMatch,
   proposeTimer, acceptTimer, rejectTimer,
-  sendChatAs, joinAsSpectator, leaveSpectator, finalizeStats, requestRematch,
+  sendChatAs, joinAsSpectator, leaveSpectator, requestRematch,
   forfeitOnTimeout,
 } from '../lib/actions';
 import { PLAYER_COLORS, hKey, vKey, bKey } from '../lib/gameLogic';
