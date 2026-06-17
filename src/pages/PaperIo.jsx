@@ -329,9 +329,26 @@ function drawGame(canvas, game) {
 
 function makeHud(game) {
   const customSize = game.size || SIZE;
-  const playerCells = countOwner(game.grid, 0);
-  const botAreas = game.bots.map(bot => countOwner(game.grid, bot.id));
-  const rank = 1 + botAreas.filter(area => area > playerCells).length;
+
+  let maxId = 0;
+  for (let i = 0; i < game.bots.length; i++) {
+    if (game.bots[i].id > maxId) maxId = game.bots[i].id;
+  }
+
+  const counts = new Array(maxId + 1).fill(0);
+  for (let i = 0; i < game.grid.length; i++) {
+    const cell = game.grid[i];
+    if (cell >= 0 && cell <= maxId) {
+      counts[cell]++;
+    }
+  }
+
+  const playerCells = counts[0];
+  let rank = 1;
+  for (let i = 0; i < game.bots.length; i++) {
+    if (counts[game.bots[i].id] > playerCells) rank++;
+  }
+
   const pct = (playerCells / (customSize * customSize)) * 100;
   return {
     territory: pct,
