@@ -263,9 +263,19 @@ export default function Profile() {
           {ACHIEVEMENTS.map(a => {
             const unlocked = (target.unlockedAchievements || []).includes(a.id);
             return (
-              <div key={a.id} className="border hairline p-3" style={{ opacity: unlocked ? 1 : 0.35 }}>
+              <div key={a.id} className="border hairline p-3" style={{ opacity: unlocked ? 1 : 0.5 }}>
                 <div className="font-display text-base">{a.name}</div>
                 <div className="font-mono text-[0.65rem] tracking-wide opacity-70 mt-1 leading-relaxed">{a.desc}</div>
+                {!unlocked && a.progress && (() => {
+                  const [curr, max, min = 0] = a.progress(target);
+                  const pct = max === min ? 0 : Math.min(100, Math.max(0, ((curr - min) / (max - min)) * 100));
+                  if (pct === 0 && max === 1) return null; // Hide 0/1 binary progress
+                  return (
+                    <div className="mt-2 h-1 w-full bg-black/10 rounded-full overflow-hidden">
+                      <div className="h-full bg-current opacity-40 transition-all duration-500" style={{ width: `${pct}%` }} />
+                    </div>
+                  );
+                })()}
               </div>
             );
           })}
