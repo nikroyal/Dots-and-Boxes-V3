@@ -845,7 +845,8 @@ export async function sendFriendRequest(currentUser, targetUsername) {
   if ((currentUser.friends || []).includes(target.id)) throw new Error('Already friends');
   if ((target.blocked || []).includes(currentUser.id)) throw new Error('Cannot send request');
 
-  await updateDoc(doc(db, 'users', target.id), {
+  const batch = writeBatch(db);
+  batch.update(doc(db, 'users', target.id), {
     friendRequests: arrayUnion({
       fromId: currentUser.id,
       fromUsername: currentUser.username,
@@ -853,6 +854,10 @@ export async function sendFriendRequest(currentUser, targetUsername) {
       ts: Date.now(),
     }),
   });
+  batch.update(doc(db, 'users', currentUser.id), {
+    outgoingFriendRequests: arrayUnion(target.id),
+  });
+  await batch.commit();
 }
 
 export async function acceptFriendRequest(currentUser, fromId) {
@@ -891,6 +896,7 @@ export async function acceptFriendRequest(currentUser, fromId) {
   // arrayUnion shape exactly matches the rule's expectation.
   await updateDoc(doc(db, 'users', fromId), {
     friends: arrayUnion(currentUser.id),
+    outgoingFriendRequests: arrayRemove(currentUser.id),
   }).catch(() => {});
 
   recordActivity(currentUser, ACTIVITY_TYPES.FRIEND_ADDED, {
@@ -912,6 +918,12 @@ export async function declineFriendRequest(currentUser, fromId) {
     const newReqs = currentReqs.filter(r => r.fromId !== fromId);
     tx.update(myRef, { friendRequests: newReqs });
   });
+
+  // Clean up the sender's outgoing requests so they can request again later
+  // if they want. Rule permits this symmetric removal.
+  await updateDoc(doc(db, 'users', fromId), {
+    outgoingFriendRequests: arrayRemove(currentUser.id),
+  }).catch(() => {});
 }
 
 export async function removeFriend(currentUser, friendId) {
