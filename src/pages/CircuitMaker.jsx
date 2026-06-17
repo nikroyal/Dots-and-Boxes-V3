@@ -436,7 +436,6 @@ export default function CircuitMaker() {
           <div className="absolute inset-0 opacity-40" style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px)', backgroundSize: '24px 24px' }} />
           <svg className="absolute inset-0 w-full h-full pointer-events-none" aria-hidden="true" style={{ zIndex: 0 }}>
             {(() => {
-              const componentMap = new Map(state.components.map(c => [c.id, c]));
               const wireIndices3 = new Map();
               const paths = state.wires.map((wire, index) => {
                 const from = componentMap.get(wire.from);
