@@ -30,7 +30,7 @@ export const ACHIEVEMENTS = [
   { id: 'perfectionist',  name: 'Perfectionist',  desc: 'Win without giving up a single box',
     check: s => (s.perfectWins || 0) >= 1, progress: s => [s.perfectWins || 0, 1] },
   { id: 'social_butterfly', name: 'Social Butterfly', desc: 'Add 5 friends',
-    check: s => (s.friends || 0) >= 5, progress: s => [s.friends || 0, 5] },
+    check: s => (Array.isArray(s.friends) ? s.friends.length : (s.friends || 0)) >= 5, progress: s => [Array.isArray(s.friends) ? s.friends.length : (s.friends || 0), 5] },
   { id: 'rated_1200',     name: 'Rated',          desc: 'Reach 1200 ELO',
     check: s => (s.elo || 1000) >= 1200, progress: s => [Math.max(1000, s.elo || 1000), 1200, 1000] },
   { id: 'rated_1500',     name: 'Skilled',        desc: 'Reach 1500 ELO',

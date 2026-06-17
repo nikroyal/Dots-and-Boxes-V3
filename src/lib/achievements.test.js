@@ -1,7 +1,33 @@
 import { describe, it, expect } from 'vitest';
-import { getRankFromElo } from './achievements';
+import { getRankFromElo, checkUnlocks, ACHIEVEMENTS } from './achievements';
 
 describe('achievements', () => {
+  describe('social_butterfly', () => {
+    const ach = ACHIEVEMENTS.find((a) => a.id === 'social_butterfly');
+
+    it('handles numeric values', () => {
+      expect(ach.check({ friends: 5 })).toBe(true);
+      expect(ach.check({ friends: 4 })).toBe(false);
+      expect(ach.progress({ friends: 5 })).toEqual([5, 5]);
+      expect(ach.progress({ friends: 4 })).toEqual([4, 5]);
+    });
+
+    it('handles arrays', () => {
+      expect(ach.check({ friends: ['a', 'b', 'c', 'd', 'e'] })).toBe(true);
+      expect(ach.check({ friends: ['a', 'b'] })).toBe(false);
+      expect(ach.progress({ friends: ['a', 'b', 'c', 'd', 'e'] })).toEqual([5, 5]);
+      expect(ach.progress({ friends: ['a', 'b'] })).toEqual([2, 5]);
+    });
+
+    it('handles undefined/null/empty', () => {
+      expect(ach.check({})).toBe(false);
+      expect(ach.check({ friends: null })).toBe(false);
+      expect(ach.progress({})).toEqual([0, 5]);
+      expect(ach.progress({ friends: null })).toEqual([0, 5]);
+      expect(ach.progress({ friends: [] })).toEqual([0, 5]);
+    });
+  });
+
   describe('getRankFromElo', () => {
     it('returns Master for elo >= 2000', () => {
       expect(getRankFromElo(2000)).toEqual({ name: 'Master', color: '#B91C3C', min: 2000 });
