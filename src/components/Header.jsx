@@ -132,7 +132,7 @@ export default function Header() {
                     title="Settings"
                     aria-label="Settings"
                     aria-expanded={settingsOpen}
-                    aria-controls="settings-menu"
+                    aria-controls={settingsOpen ? "settings-menu" : undefined}
                     aria-haspopup="true">
               <Settings size={16} aria-hidden="true" />
             </button>
