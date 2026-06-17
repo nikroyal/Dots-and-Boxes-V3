@@ -65,13 +65,21 @@ export default function ReactionTimer() {
     }
   };
 
-  const handleClick = () => {
+  const handleTrigger = () => {
     if (gameState === 'waiting' || gameState === 'finished') {
       startGame();
     } else if (gameState === 'ready') {
       handleEarlyClick();
     } else if (gameState === 'now') {
       handleValidClick();
+    }
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === ' ' || e.key === 'Enter') {
+      if (e.repeat) return;
+      e.preventDefault();
+      handleTrigger();
     }
   };
 
@@ -102,7 +110,8 @@ export default function ReactionTimer() {
       </section>
 
       <button
-        onClick={handleClick}
+        onPointerDown={handleTrigger}
+        onKeyDown={handleKeyDown}
         className="w-full max-w-md aspect-video border hairline card transition-colors duration-150 flex flex-col items-center justify-center focus-ring select-none"
         style={{ background: bgColor, color: textColor }}
         aria-label="Reaction timer area"
