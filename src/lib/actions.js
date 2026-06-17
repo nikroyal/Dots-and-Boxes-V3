@@ -654,20 +654,23 @@ function computeMatchDerivedStats(m, currentUser) {
   else result = 'loss';
 
   let myBiggestChain = 0;
+  let comebackWin = false;
+  const checkComeback = result === 'win';
+  let myRunning = 0, oppRunning = 0, wasBehind5 = false;
+
   for (const mv of m.game.moves || []) {
-    if (mv.by === currentUser.id && mv.claimed > myBiggestChain) myBiggestChain = mv.claimed;
+    if (mv.by === currentUser.id) {
+      if (mv.claimed > myBiggestChain) myBiggestChain = mv.claimed;
+      if (checkComeback) myRunning += mv.claimed;
+    } else {
+      if (checkComeback) oppRunning += mv.claimed;
+    }
+    if (checkComeback && oppRunning - myRunning >= 5) wasBehind5 = true;
   }
 
   const perfectWin = result === 'win' && oppScore === 0;
   const bigBoardWin = result === 'win' && (m.rows >= 10 || m.cols >= 10);
-  let comebackWin = false;
-  if (result === 'win' && m.game.moves) {
-    let myRunning = 0, oppRunning = 0, wasBehind5 = false;
-    for (const mv of m.game.moves) {
-      if (mv.by === currentUser.id) myRunning += mv.claimed;
-      else oppRunning += mv.claimed;
-      if (oppRunning - myRunning >= 5) wasBehind5 = true;
-    }
+  if (checkComeback) {
     comebackWin = wasBehind5;
   }
 

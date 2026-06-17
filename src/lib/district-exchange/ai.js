@@ -226,7 +226,8 @@ export function playAIAuction(state) {
     }
 
     // Crucial fix: resolve auction if only 1 (or 0) bidders remain after AIs pass
-    if (newState.auctionState.activeBidders.length <= 1) {
+    const hasBids = newState.auctionState.highestBidder !== null;
+    if (newState.auctionState.activeBidders.length === 0 || (newState.auctionState.activeBidders.length === 1 && hasBids)) {
       newState = resolveAuction(newState);
     }
   }
