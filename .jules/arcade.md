@@ -1,0 +1,3 @@
+## 2024-11-20 - Reaction Timer
+**Learning:** React state changes should be scheduled properly for precision games, using `performance.now()` offers significantly better accuracy than `Date.now()` for measuring raw milliseconds. Also, React's `useRef` for timeouts prevents side effects when components unmount.
+**Action:** Use `performance.now()` to record high-resolution timestamps, and always clear timers in `useEffect` cleanup.
