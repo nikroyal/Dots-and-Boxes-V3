@@ -162,6 +162,7 @@ function Shell() {
               <Route path="/connect4/local" element={<LocalConnect4 />} />
               <Route path="/tictactoe/local" element={<LocalTicTacToe />} />
               <Route path="/chess/local" element={<LocalChess />} />
+              <Route path="/district-exchange/local" element={<LocalDistrictExchange />} />
               {isAdmin && <Route path="/admin" element={<Admin />} />}
               <Route path="*" element={<Navigate to="/" />} />
             </Routes>
