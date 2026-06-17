@@ -430,7 +430,7 @@ export default function MatchChess() {
               {useTimer && (
                 <div className="mb-4">
                   <label htmlFor="timer-mins" className="font-mono text-[0.65rem] tracking-widest uppercase opacity-60 mb-1 block">Minutes per turn</label>
-                  <input id="timer-mins" type="number" value={timerMins} onChange={e => setTimerMins(Math.max(1, parseInt(e.target.value) || 1))} className="w-full bg-black/5 dark:bg-white/5 border hairline px-3 py-2 font-display outline-none focus-ring" min={1} required />
+                  <input id="timer-mins" type="number" value={timerMins} onChange={e => setTimerMins(Math.max(1, parseInt(e.target.value, 10) || 1))} className="w-full bg-black/5 dark:bg-white/5 border hairline px-3 py-2 font-display outline-none focus-ring" min={1} required />
                 </div>
               )}
               <div className="font-mono text-[0.55rem] tracking-widest uppercase opacity-50 mb-4">Note: Both players should agree on the timer settings.</div>
