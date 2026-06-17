@@ -328,6 +328,7 @@ export function ControlsPanel({ gameState, currentPlayerId, onAction }) {
 
 function MortgageDialog({ gameState, currentPlayerId, onClose, onAction }) {
   const me = gameState.players.find(p => p.id === currentPlayerId);
+  if (!me) return null;
 
   return (
     <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
