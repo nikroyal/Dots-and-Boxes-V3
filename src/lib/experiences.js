@@ -117,6 +117,24 @@ export const EXPERIENCE_CATALOG = [
     routePrefixes: ['/memory-match'],
   },
   {
+    id: 'district-exchange',
+    name: 'District Exchange',
+    shortName: 'Districts',
+    path: '/district-exchange',
+    kind: 'Board',
+    status: 'Live',
+    accent: 'var(--forest)',
+    description: 'Buy, trade, and upgrade districts in a classic property trading experience.',
+    features: ['Local play', 'AI bots', 'Auctions'],
+    navItems: [
+      { to: '/district-exchange', label: 'Home' },
+      { to: '/district-exchange/local', label: 'Local' },
+    ],
+    routePrefixes: [
+      '/district-exchange',
+    ],
+  },
+  {
     id: 'circuit-maker',
     name: 'Circuit Maker',
     shortName: 'Circuits',

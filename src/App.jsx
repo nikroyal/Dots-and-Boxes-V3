@@ -31,6 +31,8 @@ import ChessHub from './pages/ChessHub';
 import LocalChess from './pages/LocalChess';
 import MatchChess from './pages/MatchChess';
 import MemoryMatch from './pages/MemoryMatch';
+import DistrictExchangeHub from './pages/DistrictExchangeHub';
+import LocalDistrictExchange from './pages/LocalDistrictExchange';
 
 const Admin = lazy(() => import('./pages/Admin'));
 
@@ -99,6 +101,7 @@ function Shell() {
         <Route path="/tictactoe/local" element={<LocalTicTacToe />} />
         <Route path="/chess/local" element={<LocalChess />} />
         <Route path="/memory-match" element={<MemoryMatch />} />
+        <Route path="/district-exchange/local" element={<LocalDistrictExchange />} />
         <Route path="*" element={<Navigate to="/login" />} />
       </Routes>
     );
@@ -138,6 +141,7 @@ function Shell() {
               <Route path="/paper-io" element={<PaperIo />} />
               <Route path="/circuit-maker" element={<CircuitMaker />} />
               <Route path="/memory-match" element={<MemoryMatch />} />
+              <Route path="/district-exchange" element={<DistrictExchangeHub />} />
               <Route path="/lobby" element={<Lobby />} />
               <Route path="/match/:id" element={<Match />} />
               <Route path="/connect4/match/:id" element={<MatchConnect4 />} />
@@ -159,6 +163,7 @@ function Shell() {
               <Route path="/connect4/local" element={<LocalConnect4 />} />
               <Route path="/tictactoe/local" element={<LocalTicTacToe />} />
               <Route path="/chess/local" element={<LocalChess />} />
+              <Route path="/district-exchange/local" element={<LocalDistrictExchange />} />
               {isAdmin && <Route path="/admin" element={<Admin />} />}
               <Route path="*" element={<Navigate to="/" />} />
             </Routes>
