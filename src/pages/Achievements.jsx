@@ -23,11 +23,27 @@ export default function Achievements() {
         {ACHIEVEMENTS.map(a => {
           const got = unlocked.includes(a.id);
           return (
-            <div key={a.id} className="border hairline p-4 transition-all" style={{ opacity: got ? 1 : 0.4 }}>
+            <div key={a.id} className="border hairline p-4 transition-all" style={{ opacity: got ? 1 : 0.6 }}>
               <div className="flex items-start justify-between gap-3">
-                <div>
+                <div className="flex-1">
                   <div className="font-display text-lg font-medium">{a.name}</div>
                   <div className="font-mono text-[0.7rem] tracking-wide opacity-70 mt-1 leading-relaxed">{a.desc}</div>
+                  {!got && a.progress && (() => {
+                    const [curr, max, min = 0] = a.progress(profile);
+                    const pct = Math.min(100, Math.max(0, ((curr - min) / (max - min)) * 100));
+                    if (pct === 0 && max === 1) return null; // Hide 0/1 binary progress
+                    return (
+                      <div className="mt-3 max-w-xs">
+                        <div className="flex justify-between font-mono text-[0.55rem] tracking-widest uppercase opacity-50 mb-1">
+                          <span>Progress</span>
+                          <span>{Math.floor(curr)} / {max}</span>
+                        </div>
+                        <div className="h-1 w-full bg-black/10 rounded-full overflow-hidden">
+                          <div className="h-full bg-current opacity-40 transition-all duration-500" style={{ width: `${pct}%` }} />
+                        </div>
+                      </div>
+                    );
+                  })()}
                 </div>
                 {got && (
                   <div className="font-mono text-[0.6rem] tracking-widest uppercase shrink-0" style={{ color: 'var(--forest)' }}>
