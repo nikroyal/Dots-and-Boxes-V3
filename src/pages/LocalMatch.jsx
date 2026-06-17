@@ -64,16 +64,16 @@ export default function LocalMatch() {
           <div className="space-y-4">
             <div className="flex gap-2">
               <div className="flex-1">
-                <label className="font-mono text-[0.65rem] tracking-widest uppercase opacity-60 mb-1 block">Player 1 Name</label>
-                <input value={p1Name} onChange={e => setP1Name(e.target.value)} className="w-full bg-black/5 dark:bg-white/5 border hairline px-3 py-2 font-display outline-none focus-ring" required maxLength={15} />
+                <label htmlFor="p1-name" className="font-mono text-[0.65rem] tracking-widest uppercase opacity-60 mb-1 block">Player 1 Name</label>
+                <input id="p1-name" value={p1Name} onChange={e => setP1Name(e.target.value)} className="w-full bg-black/5 dark:bg-white/5 border hairline px-3 py-2 font-display outline-none focus-ring" required maxLength={15} />
               </div>
               <div className="w-16">
-                <label className="font-mono text-[0.65rem] tracking-widest uppercase opacity-60 mb-1 block">Avatar</label>
-                <input value={p1Avatar} onChange={e => setP1Avatar(e.target.value)} className="w-full bg-black/5 dark:bg-white/5 border hairline px-3 py-2 font-display outline-none focus-ring text-center" maxLength={8} />
+                <label htmlFor="p1-avatar" className="font-mono text-[0.65rem] tracking-widest uppercase opacity-60 mb-1 block">Avatar</label>
+                <input id="p1-avatar" value={p1Avatar} onChange={e => setP1Avatar(e.target.value)} className="w-full bg-black/5 dark:bg-white/5 border hairline px-3 py-2 font-display outline-none focus-ring text-center" maxLength={8} />
               </div>
               <div className="w-24">
-                <label className="font-mono text-[0.65rem] tracking-widest uppercase opacity-60 mb-1 block">Line</label>
-                <select value={p1LineStyle} onChange={e => setP1LineStyle(e.target.value)} className="w-full bg-black/5 dark:bg-white/5 border hairline px-3 py-2 font-display outline-none focus-ring">
+                <label htmlFor="p1-line" className="font-mono text-[0.65rem] tracking-widest uppercase opacity-60 mb-1 block">Line</label>
+                <select id="p1-line" value={p1LineStyle} onChange={e => setP1LineStyle(e.target.value)} className="w-full bg-black/5 dark:bg-white/5 border hairline px-3 py-2 font-display outline-none focus-ring">
                   <option value="solid">Solid</option>
                   <option value="neon">Neon</option>
                   <option value="sketch">Sketch</option>
@@ -82,16 +82,16 @@ export default function LocalMatch() {
             </div>
             <div className="flex gap-2">
               <div className="flex-1">
-                <label className="font-mono text-[0.65rem] tracking-widest uppercase opacity-60 mb-1 block">Player 2 Name</label>
-                <input value={p2Name} onChange={e => setP2Name(e.target.value)} className="w-full bg-black/5 dark:bg-white/5 border hairline px-3 py-2 font-display outline-none focus-ring" required maxLength={15} />
+                <label htmlFor="p2-name" className="font-mono text-[0.65rem] tracking-widest uppercase opacity-60 mb-1 block">Player 2 Name</label>
+                <input id="p2-name" value={p2Name} onChange={e => setP2Name(e.target.value)} className="w-full bg-black/5 dark:bg-white/5 border hairline px-3 py-2 font-display outline-none focus-ring" required maxLength={15} />
               </div>
               <div className="w-16">
-                <label className="font-mono text-[0.65rem] tracking-widest uppercase opacity-60 mb-1 block">Avatar</label>
-                <input value={p2Avatar} onChange={e => setP2Avatar(e.target.value)} className="w-full bg-black/5 dark:bg-white/5 border hairline px-3 py-2 font-display outline-none focus-ring text-center" maxLength={8} />
+                <label htmlFor="p2-avatar" className="font-mono text-[0.65rem] tracking-widest uppercase opacity-60 mb-1 block">Avatar</label>
+                <input id="p2-avatar" value={p2Avatar} onChange={e => setP2Avatar(e.target.value)} className="w-full bg-black/5 dark:bg-white/5 border hairline px-3 py-2 font-display outline-none focus-ring text-center" maxLength={8} />
               </div>
               <div className="w-24">
-                <label className="font-mono text-[0.65rem] tracking-widest uppercase opacity-60 mb-1 block">Line</label>
-                <select value={p2LineStyle} onChange={e => setP2LineStyle(e.target.value)} className="w-full bg-black/5 dark:bg-white/5 border hairline px-3 py-2 font-display outline-none focus-ring">
+                <label htmlFor="p2-line" className="font-mono text-[0.65rem] tracking-widest uppercase opacity-60 mb-1 block">Line</label>
+                <select id="p2-line" value={p2LineStyle} onChange={e => setP2LineStyle(e.target.value)} className="w-full bg-black/5 dark:bg-white/5 border hairline px-3 py-2 font-display outline-none focus-ring">
                   <option value="solid">Solid</option>
                   <option value="neon">Neon</option>
                   <option value="sketch">Sketch</option>
@@ -100,12 +100,12 @@ export default function LocalMatch() {
             </div>
             <div className="flex gap-4">
                <div className="flex-1">
-                 <label className="font-mono text-[0.65rem] tracking-widest uppercase opacity-60 mb-1 block">Rows</label>
-                 <input type="number" min="2" max="10" value={rows} onChange={e => setRows(Number(e.target.value))} className="w-full bg-black/5 dark:bg-white/5 border hairline px-3 py-2 font-display outline-none focus-ring" required />
+                 <label htmlFor="board-rows" className="font-mono text-[0.65rem] tracking-widest uppercase opacity-60 mb-1 block">Rows</label>
+                 <input id="board-rows" type="number" min="2" max="10" value={rows} onChange={e => setRows(Number(e.target.value))} className="w-full bg-black/5 dark:bg-white/5 border hairline px-3 py-2 font-display outline-none focus-ring" required />
                </div>
                <div className="flex-1">
-                 <label className="font-mono text-[0.65rem] tracking-widest uppercase opacity-60 mb-1 block">Cols</label>
-                 <input type="number" min="2" max="10" value={cols} onChange={e => setCols(Number(e.target.value))} className="w-full bg-black/5 dark:bg-white/5 border hairline px-3 py-2 font-display outline-none focus-ring" required />
+                 <label htmlFor="board-cols" className="font-mono text-[0.65rem] tracking-widest uppercase opacity-60 mb-1 block">Cols</label>
+                 <input id="board-cols" type="number" min="2" max="10" value={cols} onChange={e => setCols(Number(e.target.value))} className="w-full bg-black/5 dark:bg-white/5 border hairline px-3 py-2 font-display outline-none focus-ring" required />
                </div>
             </div>
           </div>
