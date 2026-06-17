@@ -30,7 +30,7 @@ export default function Achievements() {
                   <div className="font-mono text-[0.7rem] tracking-wide opacity-70 mt-1 leading-relaxed">{a.desc}</div>
                   {!got && a.progress && (() => {
                     const [curr, max, min = 0] = a.progress(profile);
-                    const pct = Math.min(100, Math.max(0, ((curr - min) / (max - min)) * 100));
+                    const pct = max === min ? 0 : Math.min(100, Math.max(0, ((curr - min) / (max - min)) * 100));
                     if (pct === 0 && max === 1) return null; // Hide 0/1 binary progress
                     return (
                       <div className="mt-3 max-w-xs">
