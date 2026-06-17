@@ -9,12 +9,28 @@ export default function MemoryMatch() {
   const [flipped, setFlipped] = useState([]);
   const [matched, setMatched] = useState([]);
   const [moves, setMoves] = useState(0);
+  const [bestMoves, setBestMoves] = useState(() => {
+    const saved = localStorage.getItem('memory-match-best');
+    return saved ? parseInt(saved, 10) : null;
+  });
   const [isGameWon, setIsGameWon] = useState(false);
 
   // Initialize game
   useEffect(() => {
     initializeGame();
   }, []);
+
+  useEffect(() => {
+    if (isGameWon) {
+      setBestMoves((currentBest) => {
+        if (currentBest === null || moves < currentBest) {
+          localStorage.setItem('memory-match-best', moves.toString());
+          return moves;
+        }
+        return currentBest;
+      });
+    }
+  }, [isGameWon, moves]);
 
   const initializeGame = () => {
     // Generate a secure random sort
@@ -72,7 +88,9 @@ export default function MemoryMatch() {
     <div className="fade-in space-y-10 max-w-2xl mx-auto">
       <section className="text-center">
         <h1 className="font-display text-5xl font-medium tracking-tight mb-2">Memory Match</h1>
-        <p className="font-mono text-sm tracking-widest uppercase opacity-60 mb-2">Moves: {moves}</p>
+        <p className="font-mono text-sm tracking-widest uppercase opacity-60 mb-2">
+          Moves: {moves} {bestMoves !== null && <span className="ml-4">Best: {bestMoves}</span>}
+        </p>
         {isGameWon && (
           <p className="font-display text-2xl text-[var(--forest)] pulse-soft">You Win!</p>
         )}

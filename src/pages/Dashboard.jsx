@@ -137,6 +137,25 @@ export default function Dashboard() {
   const recentAchievements = (profile.unlockedAchievements || []).slice(-3).reverse();
   const friendRequests = profile.friendRequests || [];
 
+  // Find the locked achievement with the highest progress percentage
+  const upNextAchievement = (() => {
+    let best = null;
+    let highestPct = -1;
+    const unlocked = profile.unlockedAchievements || [];
+    for (const a of ACHIEVEMENTS) {
+      if (!unlocked.includes(a.id) && a.progress) {
+        const [curr, max, min = 0] = a.progress(profile);
+        const pct = max === min ? 0 : Math.min(100, Math.max(0, ((curr - min) / (max - min)) * 100));
+        // Only show if it has some progress (not 0/1 binary)
+        if (pct > 0 && max > 1 && pct > highestPct) {
+          highestPct = pct;
+          best = { a, curr, max, pct };
+        }
+      }
+    }
+    return best;
+  })();
+
   const handleInvite = async (e) => {
     e.preventDefault();
     if (!target.trim()) return;
@@ -295,16 +314,32 @@ export default function Dashboard() {
         </section>
       )}
 
-      {/* Recent achievements */}
-      {recentAchievements.length > 0 && (
+      {/* Achievements overview */}
+      {(recentAchievements.length > 0 || upNextAchievement) && (
         <section>
-          <div className="font-mono text-[0.65rem] tracking-widest uppercase opacity-50 mb-3">Recent Achievements</div>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+          <div className="font-mono text-[0.65rem] tracking-widest uppercase opacity-50 mb-3">Achievements</div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
+            {upNextAchievement && (
+              <div className="border hairline p-3" style={{ background: 'var(--bg-soft)', borderColor: 'var(--ochre)' }}>
+                <div className="font-mono text-[0.55rem] tracking-widest uppercase mb-1" style={{ color: 'var(--ochre)' }}>Up Next</div>
+                <div className="font-display text-base">{upNextAchievement.a.name}</div>
+                <div className="font-mono text-[0.65rem] tracking-wide opacity-60 mt-1 leading-relaxed">{upNextAchievement.a.desc}</div>
+                <div className="mt-3">
+                  <div className="flex justify-between font-mono text-[0.55rem] tracking-widest uppercase opacity-50 mb-1">
+                    <span>Progress</span>
+                    <span>{Math.floor(upNextAchievement.curr)} / {upNextAchievement.max}</span>
+                  </div>
+                  <div className="h-1 w-full bg-black/10 rounded-full overflow-hidden">
+                    <div className="h-full transition-all duration-500" style={{ width: `${upNextAchievement.pct}%`, background: 'var(--ochre)' }} />
+                  </div>
+                </div>
+              </div>
+            )}
             {recentAchievements.map(id => {
               const a = ACHIEVEMENTS.find(x => x.id === id);
               if (!a) return null;
               return (
-                <div key={id} className="border hairline p-3">
+                <div key={id} className="border hairline p-3 opacity-80">
                   <div className="font-display text-base">{a.name}</div>
                   <div className="font-mono text-[0.65rem] tracking-wide opacity-60 mt-1 leading-relaxed">{a.desc}</div>
                 </div>
@@ -338,10 +373,10 @@ function SizeSelector({ value, onChange, label }) {
   return (
     <div className="flex flex-col items-center">
       <div className="flex items-center gap-3">
-        <button type="button" onClick={() => onChange(Math.max(2, value - 1))}
+        <button type="button" aria-label={`Decrease ${label}`} onClick={() => onChange(Math.max(2, value - 1))}
                 className="font-display text-2xl opacity-40 hover:opacity-100 transition-opacity w-6">−</button>
         <span className="font-display text-3xl tabular-nums" style={{ minWidth: 50, textAlign: 'center' }}>{value}</span>
-        <button type="button" onClick={() => onChange(Math.min(15, value + 1))}
+        <button type="button" aria-label={`Increase ${label}`} onClick={() => onChange(Math.min(15, value + 1))}
                 className="font-display text-2xl opacity-40 hover:opacity-100 transition-opacity w-6">+</button>
       </div>
       <div className="font-mono mt-1 text-[0.6rem] tracking-widest uppercase opacity-50">{label}</div>

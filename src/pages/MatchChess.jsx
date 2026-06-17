@@ -423,14 +423,14 @@ export default function MatchChess() {
                  </div>
               )}
 
-              <label className="flex items-center gap-2 cursor-pointer mb-2">
-                <input type="checkbox" checked={useTimer} onChange={e => setUseTimer(e.target.checked)} />
+              <label htmlFor="use-timer" className="flex items-center gap-2 cursor-pointer mb-2">
+                <input id="use-timer" type="checkbox" checked={useTimer} onChange={e => setUseTimer(e.target.checked)} />
                 <span className="font-mono text-[0.65rem] tracking-widest uppercase opacity-80">Use Timer (per turn)</span>
               </label>
               {useTimer && (
                 <div className="mb-4">
-                  <label className="font-mono text-[0.65rem] tracking-widest uppercase opacity-60 mb-1 block">Minutes per turn</label>
-                  <input type="number" value={timerMins} onChange={e => setTimerMins(Math.max(1, parseInt(e.target.value) || 1))} className="w-full bg-black/5 dark:bg-white/5 border hairline px-3 py-2 font-display outline-none focus-ring" min={1} required />
+                  <label htmlFor="timer-mins" className="font-mono text-[0.65rem] tracking-widest uppercase opacity-60 mb-1 block">Minutes per turn</label>
+                  <input id="timer-mins" type="number" value={timerMins} onChange={e => setTimerMins(Math.max(1, parseInt(e.target.value, 10) || 1))} className="w-full bg-black/5 dark:bg-white/5 border hairline px-3 py-2 font-display outline-none focus-ring" min={1} required />
                 </div>
               )}
               <div className="font-mono text-[0.55rem] tracking-widest uppercase opacity-50 mb-4">Note: Both players should agree on the timer settings.</div>

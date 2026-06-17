@@ -11,6 +11,8 @@ export default function LocalTicTacToe() {
   const [setup, setSetup] = useState(true);
   const [p1Name, setP1Name] = useState('Player 1');
   const [p2Name, setP2Name] = useState('Player 2');
+  const [p1Wins, setP1Wins] = useState(0);
+  const [p2Wins, setP2Wins] = useState(0);
 
   const [game, setGame] = useState(null);
   const { confirm, dialog: confirmDialogEl } = useConfirm();
@@ -18,6 +20,8 @@ export default function LocalTicTacToe() {
   const handleStart = (e) => {
     e.preventDefault();
     setGame(createEmptyGame(3, 3, ['p1', 'p2']));
+    setP1Wins(0);
+    setP2Wins(0);
     setSetup(false);
   };
 
@@ -33,15 +37,24 @@ export default function LocalTicTacToe() {
     else sfx.line();
 
     setGame(newGame);
+
+    if (newGame.finished) {
+      if (newGame.winnerIdx === 0) setP1Wins(w => w + 1);
+      else if (newGame.winnerIdx === 1) setP2Wins(w => w + 1);
+    }
   };
 
   const quit = async () => {
     if (!game.finished && await confirm({ title: 'End this match?', body: 'Progress will be lost.', confirmLabel: 'Quit' })) {
       setSetup(true);
       setGame(null);
+      setP1Wins(0);
+      setP2Wins(0);
     } else if (game.finished) {
       setSetup(true);
       setGame(null);
+      setP1Wins(0);
+      setP2Wins(0);
     }
   };
 
@@ -55,12 +68,12 @@ export default function LocalTicTacToe() {
         <form onSubmit={handleStart} className="card space-y-6">
           <div className="space-y-4">
             <div>
-              <label className="font-mono text-[0.65rem] tracking-widest uppercase opacity-60 mb-1 block">Player 1 Name (X)</label>
-              <input value={p1Name} onChange={e => setP1Name(e.target.value)} className="w-full bg-black/5 dark:bg-white/5 border hairline px-3 py-2 font-display outline-none focus-ring" required maxLength={15} />
+              <label htmlFor="p1-name" className="font-mono text-[0.65rem] tracking-widest uppercase opacity-60 mb-1 block">Player 1 Name (X)</label>
+              <input id="p1-name" value={p1Name} onChange={e => setP1Name(e.target.value)} className="w-full bg-black/5 dark:bg-white/5 border hairline px-3 py-2 font-display outline-none focus-ring" required maxLength={15} />
             </div>
             <div>
-              <label className="font-mono text-[0.65rem] tracking-widest uppercase opacity-60 mb-1 block">Player 2 Name (O)</label>
-              <input value={p2Name} onChange={e => setP2Name(e.target.value)} className="w-full bg-black/5 dark:bg-white/5 border hairline px-3 py-2 font-display outline-none focus-ring" required maxLength={15} />
+              <label htmlFor="p2-name" className="font-mono text-[0.65rem] tracking-widest uppercase opacity-60 mb-1 block">Player 2 Name (O)</label>
+              <input id="p2-name" value={p2Name} onChange={e => setP2Name(e.target.value)} className="w-full bg-black/5 dark:bg-white/5 border hairline px-3 py-2 font-display outline-none focus-ring" required maxLength={15} />
             </div>
           </div>
           <button type="submit" className="btn-primary w-full justify-center">Start Match</button>
@@ -93,6 +106,17 @@ export default function LocalTicTacToe() {
             {p1Turn ? p1Name : p2Name}'s Turn
           </div>
         )}
+      </div>
+
+      <div className="flex justify-between items-center max-w-sm mx-auto px-4 mt-4 mb-2">
+         <div className={`text-center ${p1Turn && !finished ? 'scale-110' : 'opacity-60'} transition-transform duration-300`}>
+           <div className="font-display text-lg" style={{ color: 'var(--crimson)' }}>{p1Name}</div>
+           <div className="font-mono text-sm">{p1Wins} Wins</div>
+         </div>
+         <div className={`text-center ${!p1Turn && !finished ? 'scale-110' : 'opacity-60'} transition-transform duration-300`}>
+           <div className="font-display text-lg" style={{ color: 'var(--ochre)' }}>{p2Name}</div>
+           <div className="font-mono text-sm">{p2Wins} Wins</div>
+         </div>
       </div>
 
 

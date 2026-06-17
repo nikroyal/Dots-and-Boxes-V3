@@ -31,8 +31,7 @@ import ChessHub from './pages/ChessHub';
 import LocalChess from './pages/LocalChess';
 import MatchChess from './pages/MatchChess';
 import MemoryMatch from './pages/MemoryMatch';
-import DistrictExchangeHub from './pages/DistrictExchangeHub';
-import LocalDistrictExchange from './pages/LocalDistrictExchange';
+import ReactionTimer from './pages/ReactionTimer';
 
 const Admin = lazy(() => import('./pages/Admin'));
 
@@ -101,7 +100,7 @@ function Shell() {
         <Route path="/tictactoe/local" element={<LocalTicTacToe />} />
         <Route path="/chess/local" element={<LocalChess />} />
         <Route path="/memory-match" element={<MemoryMatch />} />
-        <Route path="/district-exchange/local" element={<LocalDistrictExchange />} />
+        <Route path="/reaction-timer" element={<ReactionTimer />} />
         <Route path="*" element={<Navigate to="/login" />} />
       </Routes>
     );
@@ -141,7 +140,7 @@ function Shell() {
               <Route path="/paper-io" element={<PaperIo />} />
               <Route path="/circuit-maker" element={<CircuitMaker />} />
               <Route path="/memory-match" element={<MemoryMatch />} />
-              <Route path="/district-exchange" element={<DistrictExchangeHub />} />
+              <Route path="/reaction-timer" element={<ReactionTimer />} />
               <Route path="/lobby" element={<Lobby />} />
               <Route path="/match/:id" element={<Match />} />
               <Route path="/connect4/match/:id" element={<MatchConnect4 />} />

@@ -12,6 +12,7 @@ const iconByExperience = {
   'paper-io': Zap,
   'circuit-maker': Target,
   'memory-match': LayoutGrid,
+  'reaction-timer': Zap,
 };
 
 function readFavorites() {

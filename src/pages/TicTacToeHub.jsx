@@ -313,10 +313,10 @@ function SizeSelector({ value, onChange, label }) {
   return (
     <div className="flex flex-col items-center">
       <div className="flex items-center gap-3">
-        <button type="button" onClick={() => onChange(Math.max(3, value - 1))}
+        <button type="button" aria-label={`Decrease ${label}`} onClick={() => onChange(Math.max(3, value - 1))}
                 className="font-display text-2xl opacity-40 hover:opacity-100 transition-opacity w-6">−</button>
         <span className="font-display text-3xl tabular-nums" style={{ minWidth: 50, textAlign: 'center' }}>{value}</span>
-        <button type="button" onClick={() => onChange(Math.min(10, value + 1))}
+        <button type="button" aria-label={`Increase ${label}`} onClick={() => onChange(Math.min(10, value + 1))}
                 className="font-display text-2xl opacity-40 hover:opacity-100 transition-opacity w-6">+</button>
       </div>
       <div className="font-mono mt-1 text-[0.6rem] tracking-widest uppercase opacity-50">{label}</div>

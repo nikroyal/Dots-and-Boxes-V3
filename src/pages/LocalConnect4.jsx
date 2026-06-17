@@ -13,6 +13,8 @@ export default function LocalConnect4() {
   const [p2Name, setP2Name] = useState('Player 2');
   const [p1Color, setP1Color] = useState('#E25C7A'); // crimson
   const [p2Color, setP2Color] = useState('#D9A85A'); // ochre
+  const [p1Wins, setP1Wins] = useState(0);
+  const [p2Wins, setP2Wins] = useState(0);
 
   const [game, setGame] = useState(null);
   const { confirm, dialog: confirmDialogEl } = useConfirm();
@@ -20,6 +22,8 @@ export default function LocalConnect4() {
   const handleStart = (e) => {
     e.preventDefault();
     setGame(createEmptyGame(6, 7, ['p1', 'p2']));
+    setP1Wins(0);
+    setP2Wins(0);
     setSetup(false);
   };
 
@@ -35,15 +39,24 @@ export default function LocalConnect4() {
     else sfx.line();
 
     setGame(newGame);
+
+    if (newGame.finished) {
+      if (newGame.winnerIdx === 0) setP1Wins(w => w + 1);
+      else if (newGame.winnerIdx === 1) setP2Wins(w => w + 1);
+    }
   };
 
   const quit = async () => {
     if (!game.finished && await confirm({ title: 'End this match?', body: 'Progress will be lost.', confirmLabel: 'Quit' })) {
       setSetup(true);
       setGame(null);
+      setP1Wins(0);
+      setP2Wins(0);
     } else if (game.finished) {
       setSetup(true);
       setGame(null);
+      setP1Wins(0);
+      setP2Wins(0);
     }
   };
 
@@ -59,15 +72,15 @@ export default function LocalConnect4() {
             <div className="flex items-center gap-4">
               <input type="color" value={p1Color} onChange={e => setP1Color(e.target.value)} className="w-10 h-10 p-0 border-0 cursor-pointer" />
               <div className="flex-1">
-                <label className="font-mono text-[0.65rem] tracking-widest uppercase opacity-60 mb-1 block">Player 1 Name</label>
-                <input value={p1Name} onChange={e => setP1Name(e.target.value)} className="w-full bg-black/5 dark:bg-white/5 border hairline px-3 py-2 font-display outline-none focus-ring" required maxLength={15} />
+                <label htmlFor="p1-name" className="font-mono text-[0.65rem] tracking-widest uppercase opacity-60 mb-1 block">Player 1 Name</label>
+                <input id="p1-name" value={p1Name} onChange={e => setP1Name(e.target.value)} className="w-full bg-black/5 dark:bg-white/5 border hairline px-3 py-2 font-display outline-none focus-ring" required maxLength={15} />
               </div>
             </div>
             <div className="flex items-center gap-4">
               <input type="color" value={p2Color} onChange={e => setP2Color(e.target.value)} className="w-10 h-10 p-0 border-0 cursor-pointer" />
               <div className="flex-1">
-                <label className="font-mono text-[0.65rem] tracking-widest uppercase opacity-60 mb-1 block">Player 2 Name</label>
-                <input value={p2Name} onChange={e => setP2Name(e.target.value)} className="w-full bg-black/5 dark:bg-white/5 border hairline px-3 py-2 font-display outline-none focus-ring" required maxLength={15} />
+                <label htmlFor="p2-name" className="font-mono text-[0.65rem] tracking-widest uppercase opacity-60 mb-1 block">Player 2 Name</label>
+                <input id="p2-name" value={p2Name} onChange={e => setP2Name(e.target.value)} className="w-full bg-black/5 dark:bg-white/5 border hairline px-3 py-2 font-display outline-none focus-ring" required maxLength={15} />
               </div>
             </div>
           </div>
@@ -102,6 +115,18 @@ export default function LocalConnect4() {
           </div>
         )}
       </div>
+
+      <div className="flex justify-between items-center max-w-sm mx-auto px-4 mt-4 mb-2">
+         <div className={`text-center ${p1Turn && !finished ? 'scale-110' : 'opacity-60'} transition-transform duration-300`}>
+           <div className="font-display text-lg" style={{ color: p1Color }}>{p1Name}</div>
+           <div className="font-mono text-sm">{p1Wins} Wins</div>
+         </div>
+         <div className={`text-center ${!p1Turn && !finished ? 'scale-110' : 'opacity-60'} transition-transform duration-300`}>
+           <div className="font-display text-lg" style={{ color: p2Color }}>{p2Name}</div>
+           <div className="font-mono text-sm">{p2Wins} Wins</div>
+         </div>
+      </div>
+
 
       <div className="flex justify-center py-8">
         <div className="bg-blue-600 p-4 rounded-xl shadow-xl flex gap-2">
