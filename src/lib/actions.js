@@ -972,25 +972,40 @@ export async function blockUser(currentUser, targetUsername) {
     const myActive = await getDocs(query(
       collection(db, 'matches'),
       where('players', 'array-contains', currentUser.id),
-      where('status', 'in', ['active', 'paused']),
-      limit(20),
+      where('status', 'in', ['active', 'paused'])
     ));
-    const batch = writeBatch(db);
-    let count = 0;
-    for (const d of myActive.docs) {
+
+    const matchesToSettle = myActive.docs.filter(d => {
       const m = d.data();
-      if (!m.players.includes(target.id)) continue;
-      // Settle the match: blocker concedes, target wins.
-      batch.update(doc(db, 'matches', d.id), {
-        status: 'finished',
-        winner: target.id,
-        resignedBy: currentUser.id,
-        finishedAt: serverTimestamp(),
-      });
-      count++;
+      return m.players.includes(target.id);
+    });
+
+    const CHUNK_SIZE = 500;
+    const promises = [];
+
+    for (let i = 0; i < matchesToSettle.length; i += CHUNK_SIZE) {
+      const chunk = matchesToSettle.slice(i, i + CHUNK_SIZE);
+      const batch = writeBatch(db);
+      let count = 0;
+
+      for (const d of chunk) {
+        // Settle the match: blocker concedes, target wins.
+        batch.update(doc(db, 'matches', d.id), {
+          status: 'finished',
+          winner: target.id,
+          resignedBy: currentUser.id,
+          finishedAt: serverTimestamp(),
+        });
+        count++;
+      }
+
+      if (count > 0) {
+        promises.push(batch.commit());
+      }
     }
-    if (count > 0) {
-      await batch.commit();
+
+    if (promises.length > 0) {
+      await Promise.all(promises);
     }
   } catch (e) {
     // Best-effort; matches list may need a composite index. Don't block
