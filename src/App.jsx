@@ -33,6 +33,8 @@ import MatchChess from './pages/MatchChess';
 import MemoryMatch from './pages/MemoryMatch';
 import ReactionTimer from './pages/ReactionTimer';
 
+import LocalDistrictExchange from './pages/LocalDistrictExchange';
+import DistrictExchangeHub from './pages/DistrictExchangeHub';
 const Admin = lazy(() => import('./pages/Admin'));
 
 export default function App() {
@@ -137,6 +139,7 @@ function Shell() {
               <Route path="/connect4" element={<Connect4Hub />} />
               <Route path="/tictactoe" element={<TicTacToeHub />} />
               <Route path="/chess" element={<ChessHub />} />
+              <Route path="/district-exchange" element={<DistrictExchangeHub />} />
               <Route path="/paper-io" element={<PaperIo />} />
               <Route path="/circuit-maker" element={<CircuitMaker />} />
               <Route path="/memory-match" element={<MemoryMatch />} />
