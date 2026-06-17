@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, memo } from 'react';
 import { Link } from 'react-router-dom';
 import { collection, query, where, onSnapshot, orderBy, limit } from 'firebase/firestore';
 import { db } from '../lib/firebase';
@@ -72,7 +72,10 @@ export default function Lobby() {
   );
 }
 
-function MatchCard({ match, youAreIn }) {
+// Optimization (Bolt): React.memo prevents this individual match card from re-rendering
+// when other matches in the Lobby update the parent component's state.
+// Impact: Reduces re-renders significantly in active lobbies with many concurrent matches.
+const MatchCard = memo(function MatchCard({ match, youAreIn }) {
   const players = match.players.map(id => match.playerInfo?.[id] || { username: '?', avatar: '?' });
   const scores = match.players.map(id => match.game?.scores?.[id] || 0);
   const totalBoxes = match.rows * match.cols;
@@ -113,4 +116,4 @@ function MatchCard({ match, youAreIn }) {
       )}
     </Link>
   );
-}
+});
