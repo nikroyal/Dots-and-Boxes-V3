@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, memo } from 'react';
 import { Link } from 'react-router-dom';
 import { getActivityForUsers, ACTIVITY_TYPES } from '../lib/activity';
 import { ACHIEVEMENTS } from '../lib/achievements';
@@ -41,7 +41,11 @@ export default function ActivityFeed({ profile }) {
   );
 }
 
-function ActivityRow({ item, isMe }) {
+// Optimization (Bolt): React.memo prevents all rows from re-rendering when
+// the ActivityFeed parent updates (e.g., when the profile object changes),
+// saving compute for rows whose activity item hasn't changed.
+// Impact: Reduces row re-renders to near zero for existing feed items.
+const ActivityRow = memo(function ActivityRow({ item, isMe }) {
   const when = item.ts?.toMillis ? timeAgo(item.ts.toMillis()) : '';
   const subject = isMe ? 'You' : item.username || '?';
 
@@ -110,7 +114,7 @@ function ActivityRow({ item, isMe }) {
       <div className="font-mono text-[0.6rem] tracking-widest uppercase opacity-50 shrink-0">{when}</div>
     </div>
   );
-}
+});
 
 function fmtElo(d) {
   if (d == null) return '';
