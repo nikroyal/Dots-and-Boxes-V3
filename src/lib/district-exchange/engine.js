@@ -585,6 +585,7 @@ export function acceptTrade(state, playerId) {
   const { proposerId, targetId, offer, request } = newState.tradeState;
   const p1 = newState.players.findIndex(p => p.id === proposerId);
   const p2 = newState.players.findIndex(p => p.id === targetId);
+  if (p1 === -1 || p2 === -1) return newState;
 
   // Validate one last time
   if (newState.players[p1].cash < offer.cash || newState.players[p2].cash < request.cash) return newState;
