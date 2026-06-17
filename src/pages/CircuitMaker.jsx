@@ -345,9 +345,10 @@ export default function CircuitMaker() {
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     ctx.strokeStyle = 'rgba(255,255,255,0.55)';
     ctx.lineWidth = 4;
+    const componentMap = new Map(state.components.map(c => [c.id, c]));
     for (const wire of state.wires) {
-      const from = state.components.find(component => component.id === wire.from);
-      const to = state.components.find(component => component.id === wire.to);
+      const from = componentMap.get(wire.from);
+      const to = componentMap.get(wire.to);
       if (!from || !to) continue;
       const a = sourcePoint(from);
       const b = targetPoint(to);
@@ -435,10 +436,11 @@ export default function CircuitMaker() {
           <div className="absolute inset-0 opacity-40" style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px)', backgroundSize: '24px 24px' }} />
           <svg className="absolute inset-0 w-full h-full pointer-events-none" aria-hidden="true" style={{ zIndex: 0 }}>
             {(() => {
+              const componentMap = new Map(state.components.map(c => [c.id, c]));
               const wireIndices3 = new Map();
               const paths = state.wires.map((wire, index) => {
-                const from = state.components.find(component => component.id === wire.from);
-                const to = state.components.find(component => component.id === wire.to);
+                const from = componentMap.get(wire.from);
+                const to = componentMap.get(wire.to);
                 if (!from || !to) return null;
 
                 const count = wireIndices3.get(to.id) || 0;
