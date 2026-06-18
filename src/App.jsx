@@ -105,6 +105,7 @@ function Shell() {
         <Route path="/memory-match" element={<MemoryMatch />} />
         <Route path="/reaction-timer" element={<ReactionTimer />} />
         <Route path="/snake" element={<Snake />} />
+        <Route path="/paper-io" element={<PaperIo />} />
         <Route path="*" element={<Navigate to="/login" />} />
       </Routes>
     );
