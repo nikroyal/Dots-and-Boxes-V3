@@ -117,6 +117,21 @@ export const EXPERIENCE_CATALOG = [
     routePrefixes: ['/memory-match'],
   },
   {
+    id: 'snake',
+    name: 'Snake',
+    shortName: 'Snake',
+    path: '/snake',
+    kind: 'Arcade',
+    status: 'Live',
+    accent: 'var(--forest)',
+    description: 'Classic Snake game. Eat food, grow longer, avoid walls and yourself.',
+    features: ['Local play', 'High score'],
+    navItems: [
+      { to: '/snake', label: 'Play' },
+    ],
+    routePrefixes: ['/snake'],
+  },
+  {
     id: 'reaction-timer',
     name: 'Reaction Timer',
     shortName: 'Reaction',
