@@ -70,7 +70,7 @@ export default function AxiomHub() {
           <div className="grid grid-cols-3 gap-2 text-center">
             <MiniStat label="Things" value={EXPERIENCE_CATALOG.length} />
             <MiniStat label="Favorites" value={favoriteIds.length} />
-            <MiniStat label="Friends" value={(profile?.friends || []).length} />
+            <MiniStat label="Friends" value={(Array.isArray(profile?.friends) ? profile.friends : []).length} />
           </div>
         </div>
       </section>

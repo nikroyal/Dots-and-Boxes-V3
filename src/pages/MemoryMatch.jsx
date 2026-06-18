@@ -1,10 +1,14 @@
 import { useState, useEffect, useRef } from 'react';
+import { useAuth } from '../lib/AuthContext';
+import { recordActivity, ACTIVITY_TYPES } from '../lib/activity';
 import { Star, Zap, Play, Target, Trophy, Send, Users, Shield } from 'lucide-react';
 import { sfx } from '../lib/sound';
+import Confetti from '../components/Confetti';
 
 const ICONS = [Star, Zap, Play, Target, Trophy, Send, Users, Shield];
 
 export default function MemoryMatch() {
+  const { profile } = useAuth();
   const [cards, setCards] = useState([]);
   const [flipped, setFlipped] = useState([]);
   const [matched, setMatched] = useState([]);
@@ -24,13 +28,17 @@ export default function MemoryMatch() {
     if (isGameWon) {
       setBestMoves((currentBest) => {
         if (currentBest === null || moves < currentBest) {
-          localStorage.setItem('memory-match-best', moves.toString());
           return moves;
         }
         return currentBest;
       });
+      // Side effects belong in the effect body, not the state updater function.
+      if (bestMoves === null || moves < bestMoves) {
+        recordActivity(profile, ACTIVITY_TYPES.ARCADE_BEST, { game: 'Memory Match', score: moves + ' moves' });
+        localStorage.setItem('memory-match-best', moves.toString());
+      }
     }
-  }, [isGameWon, moves]);
+  }, [isGameWon, moves, bestMoves, profile]);
 
   const initializeGame = () => {
     // Generate a secure random sort
@@ -86,6 +94,7 @@ export default function MemoryMatch() {
 
   return (
     <div className="fade-in space-y-10 max-w-2xl mx-auto">
+      {isGameWon && <Confetti />}
       <section className="text-center">
         <h1 className="font-display text-5xl font-medium tracking-tight mb-2">Memory Match</h1>
         <p className="font-mono text-sm tracking-widest uppercase opacity-60 mb-2">

@@ -65,7 +65,7 @@ export default function Profile() {
   const nextRank = rankInfo.nextRank;
   const rankProgress = rankInfo.progress;
   const winRate = target.gamesPlayed > 0 ? Math.round((target.wins / target.gamesPlayed) * 100) : 0;
-  const isFriend = (me.friends || []).includes(target.id);
+  const isFriend = (Array.isArray(me.friends) ? me.friends : []).includes(target.id);
   const isBlocked = (me.blocked || []).includes(target.id);
 
   const saveProfile = async () => {

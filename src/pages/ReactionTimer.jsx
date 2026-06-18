@@ -1,11 +1,15 @@
 import { useState, useEffect, useRef } from 'react';
+import { useAuth } from '../lib/AuthContext';
+import { recordActivity, ACTIVITY_TYPES } from '../lib/activity';
 import { sfx } from '../lib/sound';
 
 export default function ReactionTimer() {
+  const { profile } = useAuth();
   // states: 'waiting' | 'ready' | 'finished'
   const [gameState, setGameState] = useState('waiting');
   const [reactionTime, setReactionTime] = useState(null);
   const [message, setMessage] = useState('Click to start');
+  const [isNewBest, setIsNewBest] = useState(false);
   const [bestTime, setBestTime] = useState(() => {
     try {
       const saved = localStorage.getItem('axiom-reaction-best');
@@ -31,6 +35,7 @@ export default function ReactionTimer() {
     gameStateRef.current = 'ready';
     setMessage('Wait for green...');
     setReactionTime(null);
+    setIsNewBest(false);
 
     // Random delay between 1.5 and 5 seconds
     const delay = Math.random() * 3500 + 1500;
@@ -63,14 +68,18 @@ export default function ReactionTimer() {
     setMessage(`Your time: ${time.toFixed(0)} ms`);
 
     if (!bestTime || time < bestTime) {
+      recordActivity(profile, ACTIVITY_TYPES.ARCADE_BEST, { game: 'Reaction Timer', score: time.toFixed(0) + ' ms' });
+      setIsNewBest(true);
       setBestTime(time);
       try {
         localStorage.setItem('axiom-reaction-best', time.toString());
       } catch {}
+    } else {
+      setIsNewBest(false);
     }
   };
 
-  const handleClick = () => {
+  const handleTrigger = () => {
     if (gameStateRef.current === 'waiting' || gameStateRef.current === 'finished') {
       startGame();
     } else if (gameStateRef.current === 'ready') {
@@ -84,8 +93,13 @@ export default function ReactionTimer() {
     if (e.key === ' ' || e.key === 'Enter') {
       if (e.repeat) return;
       e.preventDefault();
-      handleTrigger();
+      handleClick();
     }
+  };
+
+  const handlePointerDown = (e) => {
+    e.preventDefault();
+    handleClick();
   };
 
   // Determine background color based on state
@@ -115,8 +129,7 @@ export default function ReactionTimer() {
       </section>
 
       <button
-        onPointerDown={handlePointerDown}
-        onClick={handleClick}
+        onPointerDown={handleTrigger}
         onKeyDown={handleKeyDown}
         className="w-full max-w-md aspect-video border hairline card transition-colors duration-150 flex flex-col items-center justify-center focus-ring select-none"
         style={{ background: bgColor, color: textColor }}
@@ -126,8 +139,15 @@ export default function ReactionTimer() {
           {message}
         </div>
         {gameState === 'finished' && reactionTime && (
-          <div className="font-mono text-sm mt-4 opacity-80 pointer-events-none tracking-widest uppercase">
-            Click to try again
+          <div className="flex flex-col items-center pointer-events-none mt-4">
+            {isNewBest && (
+              <div className="font-display text-2xl text-[var(--ochre)] pulse-soft mb-2">
+                🎉 New Best!
+              </div>
+            )}
+            <div className="font-mono text-sm opacity-80 tracking-widest uppercase">
+              Click to try again
+            </div>
           </div>
         )}
       </button>
