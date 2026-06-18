@@ -243,7 +243,7 @@ export default function Battleships() {
               </p>
               <div className="flex gap-4">
                 <button
-                  className="btn-secondary flex items-center gap-2"
+                  className="btn-ghost flex items-center gap-2"
                   onClick={() => setIsVertical(!isVertical)}
                 >
                   <RotateCw size={16} /> Rotate ({isVertical ? 'Vertical' : 'Horizontal'})
