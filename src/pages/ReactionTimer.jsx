@@ -1,7 +1,10 @@
 import { useState, useEffect, useRef } from 'react';
+import { useAuth } from '../lib/AuthContext';
+import { recordActivity, ACTIVITY_TYPES } from '../lib/activity';
 import { sfx } from '../lib/sound';
 
 export default function ReactionTimer() {
+  const { profile } = useAuth();
   // states: 'waiting' | 'ready' | 'finished'
   const [gameState, setGameState] = useState('waiting');
   const [reactionTime, setReactionTime] = useState(null);
@@ -63,6 +66,7 @@ export default function ReactionTimer() {
     setMessage(`Your time: ${time.toFixed(0)} ms`);
 
     if (!bestTime || time < bestTime) {
+      recordActivity(profile, ACTIVITY_TYPES.ARCADE_BEST, { game: 'Reaction Timer', score: time.toFixed(0) + ' ms' });
       setBestTime(time);
       try {
         localStorage.setItem('axiom-reaction-best', time.toString());
@@ -84,8 +88,13 @@ export default function ReactionTimer() {
     if (e.key === ' ' || e.key === 'Enter') {
       if (e.repeat) return;
       e.preventDefault();
-      handleTrigger();
+      handleClick();
     }
+  };
+
+  const handlePointerDown = (e) => {
+    e.preventDefault();
+    handleClick();
   };
 
   // Determine background color based on state

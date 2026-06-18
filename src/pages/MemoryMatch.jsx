@@ -1,10 +1,13 @@
 import { useState, useEffect, useRef } from 'react';
+import { useAuth } from '../lib/AuthContext';
+import { recordActivity, ACTIVITY_TYPES } from '../lib/activity';
 import { Star, Zap, Play, Target, Trophy, Send, Users, Shield } from 'lucide-react';
 import { sfx } from '../lib/sound';
 
 const ICONS = [Star, Zap, Play, Target, Trophy, Send, Users, Shield];
 
 export default function MemoryMatch() {
+  const { profile } = useAuth();
   const [cards, setCards] = useState([]);
   const [flipped, setFlipped] = useState([]);
   const [matched, setMatched] = useState([]);
@@ -24,13 +27,17 @@ export default function MemoryMatch() {
     if (isGameWon) {
       setBestMoves((currentBest) => {
         if (currentBest === null || moves < currentBest) {
-          localStorage.setItem('memory-match-best', moves.toString());
           return moves;
         }
         return currentBest;
       });
+      // Side effects belong in the effect body, not the state updater function.
+      if (bestMoves === null || moves < bestMoves) {
+        recordActivity(profile, ACTIVITY_TYPES.ARCADE_BEST, { game: 'Memory Match', score: moves + ' moves' });
+        localStorage.setItem('memory-match-best', moves.toString());
+      }
     }
-  }, [isGameWon, moves]);
+  }, [isGameWon, moves, bestMoves, profile]);
 
   const initializeGame = () => {
     // Generate a secure random sort
