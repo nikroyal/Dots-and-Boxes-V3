@@ -97,6 +97,11 @@ export default function CircuitMaker() {
   const { prompt, dialog: promptDialogEl } = usePrompt();
 
   const values = useMemo(() => evaluateCircuit(state), [state]);
+  // Optimization (Bolt): Pre-compute Map for fast component lookups across render and interaction logic.
+  // Impact: Replaces O(N) array scans inside nested render loops with O(1) Map lookups, vastly reducing main thread blocking during updates.
+  const componentMap = useMemo(() => {
+    return new Map(state.components.map(c => [c.id, c]));
+  }, [state.components]);
   const projects = projectOpen ? readProjects() : {};
 
   const commit = useCallback((next) => {
@@ -164,8 +169,8 @@ export default function CircuitMaker() {
 
   const connectSelected = () => {
     if (selected.length !== 2) return;
-    const first = state.components.find(component => component.id === selected[0]);
-    const second = state.components.find(component => component.id === selected[1]);
+    const first = componentMap.get(selected[0]);
+    const second = componentMap.get(selected[1]);
     if (!first || !second) return;
     const source = first.type === 'output' ? second : first;
     const target = source.id === first.id ? second : first;
@@ -281,8 +286,8 @@ export default function CircuitMaker() {
 
     if (drag) {
       const lastState = history[historyIndex];
-      const currentComp = state.components.find(component => component.id === drag.id);
-      const lastComp = lastState?.components.find(component => component.id === drag.id);
+      const currentComp = componentMap.get(drag.id);
+      const lastComp = lastState ? lastState.components.find(component => component.id === drag.id) : undefined;
       if (currentComp && lastComp && (currentComp.x !== lastComp.x || currentComp.y !== lastComp.y)) {
         commit(state);
       }
@@ -345,7 +350,6 @@ export default function CircuitMaker() {
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     ctx.strokeStyle = 'rgba(255,255,255,0.55)';
     ctx.lineWidth = 4;
-    const componentMap = new Map(state.components.map(c => [c.id, c]));
     for (const wire of state.wires) {
       const from = componentMap.get(wire.from);
       const to = componentMap.get(wire.to);
