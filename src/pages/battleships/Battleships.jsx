@@ -1,12 +1,11 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { sfx } from '../../lib/sound';
 import {
   BOARD_SIZE, SHIPS, createEmptyGrid, canPlaceShip, placeShip,
   generateRandomBoardState, processShot, createInitialShipsState
 } from '../../lib/battleships/engine';
 import { getBotMove } from '../../lib/battleships/bot';
-import Confetti from '../../components/Confetti';
-import { RotateCw, Target } from 'lucide-react';
+import { RotateCw } from 'lucide-react';
 
 const GAME_STATES = {
   PLACEMENT: 'PLACEMENT',
