@@ -204,7 +204,14 @@ export default function Dashboard() {
             )}
           </div>
           {nextRank && (
-            <div className="h-1.5 w-full bg-black/5 rounded-full overflow-hidden">
+            <div
+              className="h-1.5 w-full bg-black/5 rounded-full overflow-hidden"
+              role="progressbar"
+              aria-label="Rank progress"
+              aria-valuenow={rankProgress}
+              aria-valuemin="0"
+              aria-valuemax="100"
+            >
               <div
                 className="h-full transition-all duration-1000 ease-out"
                 style={{ width: `${rankProgress}%`, background: rank.color }}
@@ -304,9 +311,11 @@ export default function Dashboard() {
                 </div>
                 <div className="flex gap-1">
                   <button onClick={() => acceptFriendRequest(profile, req.fromId).then(() => toast('Friend added', 'success'))}
-                          className="px-3 py-1 font-mono text-[0.65rem] tracking-widest uppercase hover:bg-black/5">Accept</button>
+                          className="px-3 py-1 font-mono text-[0.65rem] tracking-widest uppercase hover:bg-black/5"
+                          aria-label={`Accept friend request from ${req.fromUsername}`}>Accept</button>
                   <button onClick={() => declineFriendRequest(profile, req.fromId)}
-                          className="px-3 py-1 font-mono text-[0.65rem] tracking-widest uppercase opacity-50 hover:opacity-100">Decline</button>
+                          className="px-3 py-1 font-mono text-[0.65rem] tracking-widest uppercase opacity-50 hover:opacity-100"
+                          aria-label={`Decline friend request from ${req.fromUsername}`}>Decline</button>
                 </div>
               </div>
             ))}
@@ -325,11 +334,18 @@ export default function Dashboard() {
                 <div className="font-display text-base">{upNextAchievement.a.name}</div>
                 <div className="font-mono text-[0.65rem] tracking-wide opacity-60 mt-1 leading-relaxed">{upNextAchievement.a.desc}</div>
                 <div className="mt-3">
-                  <div className="flex justify-between font-mono text-[0.55rem] tracking-widest uppercase opacity-50 mb-1">
+                  <div className="flex justify-between font-mono text-[0.55rem] tracking-widest uppercase opacity-50 mb-1" id={`progress-label-${upNextAchievement.a.id}`}>
                     <span>Progress</span>
                     <span>{Math.floor(upNextAchievement.curr)} / {upNextAchievement.max}</span>
                   </div>
-                  <div className="h-1 w-full bg-black/10 rounded-full overflow-hidden">
+                  <div
+                    className="h-1 w-full bg-black/10 rounded-full overflow-hidden"
+                    role="progressbar"
+                    aria-labelledby={`progress-label-${upNextAchievement.a.id}`}
+                    aria-valuenow={Math.floor(upNextAchievement.curr)}
+                    aria-valuemin="0"
+                    aria-valuemax={upNextAchievement.max}
+                  >
                     <div className="h-full transition-all duration-500" style={{ width: `${upNextAchievement.pct}%`, background: 'var(--ochre)' }} />
                   </div>
                 </div>

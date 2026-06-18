@@ -14,7 +14,15 @@ export default function Achievements() {
           {unlocked.length} of {ACHIEVEMENTS.length} unlocked
         </div>
         <h1 className="font-display text-4xl font-medium tracking-tight">Achievements</h1>
-        <div className="mt-4 h-1 w-full max-w-md" style={{ background: 'var(--hairline)' }}>
+        <div
+          className="mt-4 h-1 w-full max-w-md"
+          style={{ background: 'var(--hairline)' }}
+          role="progressbar"
+          aria-label="Overall achievements progress"
+          aria-valuenow={unlocked.length}
+          aria-valuemin="0"
+          aria-valuemax={ACHIEVEMENTS.length}
+        >
           <div className="h-full transition-all duration-500" style={{ width: `${progress}%`, background: 'var(--ink)' }} />
         </div>
       </section>
@@ -34,11 +42,18 @@ export default function Achievements() {
                     if (pct === 0 && max === 1) return null; // Hide 0/1 binary progress
                     return (
                       <div className="mt-3 max-w-xs">
-                        <div className="flex justify-between font-mono text-[0.55rem] tracking-widest uppercase opacity-50 mb-1">
+                        <div className="flex justify-between font-mono text-[0.55rem] tracking-widest uppercase opacity-50 mb-1" id={`progress-label-${a.id}`}>
                           <span>Progress</span>
                           <span>{Math.floor(curr)} / {max}</span>
                         </div>
-                        <div className="h-1 w-full bg-black/10 rounded-full overflow-hidden">
+                        <div
+                          className="h-1 w-full bg-black/10 rounded-full overflow-hidden"
+                          role="progressbar"
+                          aria-labelledby={`progress-label-${a.id}`}
+                          aria-valuenow={Math.floor(curr)}
+                          aria-valuemin="0"
+                          aria-valuemax={max}
+                        >
                           <div className="h-full bg-current opacity-40 transition-all duration-500" style={{ width: `${pct}%` }} />
                         </div>
                       </div>
