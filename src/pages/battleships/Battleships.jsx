@@ -267,7 +267,7 @@ export default function Battleships() {
 
                   // Reveal sunk ships or hit cells
                   if (gameState === GAME_STATES.PLAYING || gameState === GAME_STATES.GAME_OVER) {
-                     const botShipId = botBoardState?.grid[r][c];
+                     const botShipId = botBoardState?.grid?.[r]?.[c];
                      if (botShipId && botBoardState.ships[botShipId].sunk) {
                        bgColor = 'bg-[var(--crimson)] opacity-70';
                      } else if (gameState === GAME_STATES.GAME_OVER && botShipId && !botBoardState.ships[botShipId].sunk) {
