@@ -9,6 +9,7 @@ export default function ReactionTimer() {
   const [gameState, setGameState] = useState('waiting');
   const [reactionTime, setReactionTime] = useState(null);
   const [message, setMessage] = useState('Click to start');
+  const [isNewBest, setIsNewBest] = useState(false);
   const [bestTime, setBestTime] = useState(() => {
     try {
       const saved = localStorage.getItem('axiom-reaction-best');
@@ -34,6 +35,7 @@ export default function ReactionTimer() {
     gameStateRef.current = 'ready';
     setMessage('Wait for green...');
     setReactionTime(null);
+    setIsNewBest(false);
 
     // Random delay between 1.5 and 5 seconds
     const delay = Math.random() * 3500 + 1500;
@@ -67,14 +69,17 @@ export default function ReactionTimer() {
 
     if (!bestTime || time < bestTime) {
       recordActivity(profile, ACTIVITY_TYPES.ARCADE_BEST, { game: 'Reaction Timer', score: time.toFixed(0) + ' ms' });
+      setIsNewBest(true);
       setBestTime(time);
       try {
         localStorage.setItem('axiom-reaction-best', time.toString());
       } catch {}
+    } else {
+      setIsNewBest(false);
     }
   };
 
-  const handleClick = () => {
+  const handleTrigger = () => {
     if (gameStateRef.current === 'waiting' || gameStateRef.current === 'finished') {
       startGame();
     } else if (gameStateRef.current === 'ready') {
@@ -135,8 +140,15 @@ export default function ReactionTimer() {
           {message}
         </div>
         {gameState === 'finished' && reactionTime && (
-          <div className="font-mono text-sm mt-4 opacity-80 pointer-events-none tracking-widest uppercase">
-            Click to try again
+          <div className="flex flex-col items-center pointer-events-none mt-4">
+            {isNewBest && (
+              <div className="font-display text-2xl text-[var(--ochre)] pulse-soft mb-2">
+                🎉 New Best!
+              </div>
+            )}
+            <div className="font-mono text-sm opacity-80 tracking-widest uppercase">
+              Click to try again
+            </div>
           </div>
         )}
       </button>

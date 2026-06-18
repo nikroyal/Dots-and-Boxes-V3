@@ -3,6 +3,7 @@ import { useAuth } from '../lib/AuthContext';
 import { recordActivity, ACTIVITY_TYPES } from '../lib/activity';
 import { Star, Zap, Play, Target, Trophy, Send, Users, Shield } from 'lucide-react';
 import { sfx } from '../lib/sound';
+import Confetti from '../components/Confetti';
 
 const ICONS = [Star, Zap, Play, Target, Trophy, Send, Users, Shield];
 
@@ -93,6 +94,7 @@ export default function MemoryMatch() {
 
   return (
     <div className="fade-in space-y-10 max-w-2xl mx-auto">
+      {isGameWon && <Confetti />}
       <section className="text-center">
         <h1 className="font-display text-5xl font-medium tracking-tight mb-2">Memory Match</h1>
         <p className="font-mono text-sm tracking-widest uppercase opacity-60 mb-2">
