@@ -507,9 +507,9 @@ export default function PaperIo() {
           </div>
           <div className="relative aspect-square max-h-[680px] mx-auto">
             <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" aria-label="Paper.io arena" />
-            {screen === 'menu' && <Overlay title="Paper.io" body="Choose a version, pick a difficulty, then claim as much territory as you can." />}
-            {screen === 'paused' && <Overlay title="Paused" body="Resume when you are ready. Your run is kept in this tab." />}
-            {screen === 'over' && <Overlay title="Game over" body={reason} />}
+            {screen === 'menu' && <Overlay title="Paper.io" body="Choose a version, pick a difficulty, then claim as much territory as you can." action={<button onClick={start} className="btn-primary w-full max-w-[200px] mt-6"><Play size={14} /> Start Game</button>} />}
+            {screen === 'paused' && <Overlay title="Paused" body="Resume when you are ready. Your run is kept in this tab." action={<button onClick={() => setScreen('playing')} className="btn-primary w-full max-w-[200px] mt-6"><Play size={14} /> Resume</button>} />}
+            {screen === 'over' && <Overlay title="Game over" body={reason} action={<button onClick={start} className="btn-primary w-full max-w-[200px] mt-6"><RotateCcw size={14} /> Play Again</button>} />}
           </div>
         </div>
 
@@ -576,12 +576,13 @@ export default function PaperIo() {
   );
 }
 
-function Overlay({ title, body }) {
+function Overlay({ title, body, action }) {
   return (
     <div className="absolute inset-0 flex items-center justify-center bg-black/55 text-white p-6 text-center">
-      <div>
+      <div className="flex flex-col items-center">
         <div className="font-display text-5xl leading-none mb-3">{title}</div>
         <p className="font-display text-xl opacity-75 max-w-md">{body}</p>
+        {action}
       </div>
     </div>
   );

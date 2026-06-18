@@ -2,7 +2,7 @@ import { useEffect, useState, memo } from 'react';
 import { Link } from 'react-router-dom';
 import { getActivityForUsers, ACTIVITY_TYPES } from '../lib/activity';
 import { ACHIEVEMENTS } from '../lib/achievements';
-import { Trophy, X as Loss, Minus as Equal, UserPlus, Users } from 'lucide-react';
+import { Trophy, X as Loss, Minus as Equal, UserPlus, Users, Zap } from 'lucide-react';
 
 // Recent activity from the user and their friends. Lives on the Dashboard.
 export default function ActivityFeed({ profile }) {
@@ -92,6 +92,12 @@ const ActivityRow = memo(function ActivityRow({ item, isMe }) {
       icon = <Users size={14} />;
       color = 'var(--ink)';
       text = <>{subject} founded club <strong>{item.data?.clubName || '?'}</strong></>;
+      break;
+    }
+    case ACTIVITY_TYPES.ARCADE_BEST: {
+      icon = <Zap size={14} />;
+      color = 'var(--crimson)';
+      text = <>{subject} set a new personal best in <strong>{item.data?.game || 'an arcade game'}</strong> ({item.data?.score})</>;
       break;
     }
     default:
