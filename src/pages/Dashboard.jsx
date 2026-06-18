@@ -132,7 +132,7 @@ export default function Dashboard() {
   const nextRank = rankInfo.nextRank;
   const rankProgress = rankInfo.progress;
   const winRate = profile.gamesPlayed > 0
-    ? Math.round((profile.wins / profile.gamesPlayed) * 100)
+    ? Math.round(((profile.wins || 0) / profile.gamesPlayed) * 100)
     : 0;
   const recentAchievements = (profile.unlockedAchievements || []).slice(-3).reverse();
   const friendRequests = profile.friendRequests || [];
@@ -224,7 +224,7 @@ export default function Dashboard() {
         <StatCard icon={<Trophy size={14} />} label="Wins" value={profile.wins || 0} />
         <StatCard icon={<Target size={14} />} label="Games" value={profile.gamesPlayed || 0} />
         <StatCard icon={<TrendingUp size={14} />} label="Win Rate" value={`${winRate}%`} />
-        <StatCard icon={<Users size={14} />} label="Friends" value={(profile.friends || []).length} />
+        <StatCard icon={<Users size={14} />} label="Friends" value={(Array.isArray(profile.friends) ? profile.friends : []).length} />
       </section>
 
       {/* ELO trend */}

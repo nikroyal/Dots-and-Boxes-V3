@@ -10,7 +10,7 @@ export default function ActivityFeed({ profile }) {
   // Dep on the joined sorted ID list, not just .length — otherwise swapping
   // one friend for another (same count) wouldn't trigger a refresh.
   const idKey = profile
-    ? [profile.id, ...(profile.friends || [])].sort().join(',')
+    ? [profile.id, ...(Array.isArray(profile.friends) ? profile.friends : [])].sort().join(',')
     : '';
   useEffect(() => {
     let alive = true;
