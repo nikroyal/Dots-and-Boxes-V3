@@ -33,6 +33,7 @@ import MatchChess from './pages/MatchChess';
 import MemoryMatch from './pages/MemoryMatch';
 import ReactionTimer from './pages/ReactionTimer';
 import Snake from './pages/Snake';
+import Battleships from './pages/battleships/Battleships';
 
 import LocalDistrictExchange from './pages/LocalDistrictExchange';
 import DistrictExchangeHub from './pages/DistrictExchangeHub';
@@ -106,6 +107,7 @@ function Shell() {
         <Route path="/reaction-timer" element={<ReactionTimer />} />
         <Route path="/district-exchange/local" element={<LocalDistrictExchange />} />
         <Route path="/snake" element={<Snake />} />
+        <Route path="/battleships" element={<Battleships />} />
         <Route path="/paper-io" element={<PaperIo />} />
         <Route path="*" element={<Navigate to="/login" />} />
       </Routes>
@@ -149,6 +151,7 @@ function Shell() {
               <Route path="/memory-match" element={<MemoryMatch />} />
               <Route path="/reaction-timer" element={<ReactionTimer />} />
               <Route path="/snake" element={<Snake />} />
+              <Route path="/battleships" element={<Battleships />} />
               <Route path="/lobby" element={<Lobby />} />
               <Route path="/match/:id" element={<Match />} />
               <Route path="/connect4/match/:id" element={<MatchConnect4 />} />

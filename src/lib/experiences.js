@@ -102,6 +102,21 @@ export const EXPERIENCE_CATALOG = [
     routePrefixes: ['/paper-io'],
   },
   {
+    id: 'battleships',
+    name: 'Battleships',
+    shortName: 'Battleships',
+    path: '/battleships',
+    kind: 'Strategy',
+    status: 'Live',
+    accent: 'var(--forest)',
+    description: 'Classic naval combat game. Strategically place your fleet and sink the enemy before they sink you.',
+    features: ['Local play', 'Smart AI opponent'],
+    navItems: [
+      { to: '/battleships', label: 'Play' },
+    ],
+    routePrefixes: ['/battleships'],
+  },
+  {
     id: 'memory-match',
     name: 'Memory Match',
     shortName: 'Memory',
