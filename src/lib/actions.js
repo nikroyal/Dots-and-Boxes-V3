@@ -242,7 +242,7 @@ export async function quickMatch(currentUser, rows = 5, cols = 5, gameType = 'do
     const da = Math.abs((a.elo || 1000) - myElo);
     const db_ = Math.abs((b.elo || 1000) - myElo);
     if (da !== db_) return da - db_;
-    return crypto.getRandomValues(new Uint32Array(1))[0] / 4294967296 - 0.5;
+    return (crypto.getRandomValues(new Uint32Array(1))[0] % 1000) / 1000 - 0.5;
   });
   const target = candidates[0];
 

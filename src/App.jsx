@@ -103,6 +103,7 @@ function Shell() {
         <Route path="/chess/local" element={<LocalChess />} />
         <Route path="/memory-match" element={<MemoryMatch />} />
         <Route path="/reaction-timer" element={<ReactionTimer />} />
+        <Route path="/district-exchange/local" element={<LocalDistrictExchange />} />
         <Route path="*" element={<Navigate to="/login" />} />
       </Routes>
     );

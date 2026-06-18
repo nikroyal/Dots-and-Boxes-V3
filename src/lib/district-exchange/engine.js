@@ -4,7 +4,7 @@ import { OPPORTUNITY_CARDS, FORTUNE_CARDS, shuffleDeck } from './cards';
 // Upgrades: 0=None, 1=Shed, 2=Shop, 3=Block, 4=Tower
 // Max level is 4 (Tower). Note: classic uses 5, but requirements say 4-step progression (Shed, Shop, Block, Tower).
 // So base rent -> 1 shed -> 2 shop -> 3 block -> 4 tower
-export const MAX_UPGRADE = 4;
+export const MAX_UPGRADE = 5;
 export const STARTING_CASH = 1500;
 
 export function createInitialState(players) {
@@ -334,8 +334,8 @@ export function passAuction(state, playerId) {
   let newState = { ...state };
   if (newState.auctionState) {
     newState.auctionState.activeBidders = newState.auctionState.activeBidders.filter(id => id !== playerId);
-    const isSoleBidderHighest = newState.auctionState.activeBidders[0] === newState.auctionState.highestBidder;
-    if (newState.auctionState.activeBidders.length === 0 || (newState.auctionState.activeBidders.length === 1 && isSoleBidderHighest)) {
+    const hasBids = newState.auctionState.highestBidder !== null;
+    if (newState.auctionState.activeBidders.length === 0 || (newState.auctionState.activeBidders.length === 1 && hasBids)) {
        newState = resolveAuction(newState);
     }
   }

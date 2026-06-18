@@ -27,11 +27,11 @@ export default function Confetti({ pieceCount = 80, durationMs = 3500 }) {
     const colors = ['#B91C3C', '#B7791F', '#2F6B3F', '#1A1A1A', '#E25C7A', '#D9A85A'];
     const count = adaptivePieceCount(pieceCount);
     const list = Array.from({ length: count }).map((_, i) => {
-      const left = crypto.getRandomValues(new Uint32Array(1))[0] / 4294967296 * 100; // vw
-      const dx = (crypto.getRandomValues(new Uint32Array(1))[0] / 4294967296 - 0.5) * 240; // px lateral drift
-      const rot = (crypto.getRandomValues(new Uint32Array(1))[0] / 4294967296 * 1440) - 720; // deg
-      const duration = 2200 + crypto.getRandomValues(new Uint32Array(1))[0] / 4294967296 * 1600; // ms
-      const delay = crypto.getRandomValues(new Uint32Array(1))[0] / 4294967296 * 400; // ms
+      const left = (crypto.getRandomValues(new Uint32Array(1))[0] % 1000) / 1000 * 100; // vw
+      const dx = ((crypto.getRandomValues(new Uint32Array(1))[0] % 1000) / 1000 - 0.5) * 240; // px lateral drift
+      const rot = ((crypto.getRandomValues(new Uint32Array(1))[0] % 1000) / 1000 * 1440) - 720; // deg
+      const duration = 2200 + (crypto.getRandomValues(new Uint32Array(1))[0] % 1000) / 1000 * 1600; // ms
+      const delay = (crypto.getRandomValues(new Uint32Array(1))[0] % 1000) / 1000 * 400; // ms
       const color = colors[i % colors.length];
       return { id: i, left, dx, rot, duration, delay, color };
     });

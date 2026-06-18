@@ -93,7 +93,7 @@ function createGame(settings) {
 }
 
 function turnBot(bot, drift, game) {
-  if (crypto.getRandomValues(new Uint32Array(1))[0] / 4294967296 > drift) return;
+  if ((crypto.getRandomValues(new Uint32Array(1))[0] % 100) / 100 > drift) return;
   const turns = [
     { dx: 1, dy: 0 },
     { dx: -1, dy: 0 },
