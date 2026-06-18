@@ -66,4 +66,5 @@ export const sfx = {
     [659, 784, 988, 1175].forEach((f, i) => setTimeout(() => tone(f, 0.14, 'triangle', 0.09), i * 80));
   },
   click:   () => tone(220, 0.04, 'square', 0.04),
+  piece:   () => tone(330, 0.05, 'square', 0.05),
 };
