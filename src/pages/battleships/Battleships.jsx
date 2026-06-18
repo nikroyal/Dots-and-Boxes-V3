@@ -1,11 +1,12 @@
-import { useState, useEffect } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { sfx } from '../../lib/sound';
 import {
   BOARD_SIZE, SHIPS, createEmptyGrid, canPlaceShip, placeShip,
   generateRandomBoardState, processShot, createInitialShipsState
 } from '../../lib/battleships/engine';
 import { getBotMove } from '../../lib/battleships/bot';
-import { RotateCw } from 'lucide-react';
+import Confetti from '../../components/Confetti';
+import { RotateCw, Target } from 'lucide-react';
 
 const GAME_STATES = {
   PLACEMENT: 'PLACEMENT',
@@ -242,7 +243,7 @@ export default function Battleships() {
               </p>
               <div className="flex gap-4">
                 <button
-                  className="btn-ghost flex items-center gap-2"
+                  className="btn-secondary flex items-center gap-2"
                   onClick={() => setIsVertical(!isVertical)}
                 >
                   <RotateCw size={16} /> Rotate ({isVertical ? 'Vertical' : 'Horizontal'})
@@ -266,7 +267,7 @@ export default function Battleships() {
 
                   // Reveal sunk ships or hit cells
                   if (gameState === GAME_STATES.PLAYING || gameState === GAME_STATES.GAME_OVER) {
-                     const botShipId = botBoardState?.grid?.[r]?.[c];
+                     const botShipId = botBoardState?.grid[r][c];
                      if (botShipId && botBoardState.ships[botShipId].sunk) {
                        bgColor = 'bg-[var(--crimson)] opacity-70';
                      } else if (gameState === GAME_STATES.GAME_OVER && botShipId && !botBoardState.ships[botShipId].sunk) {
