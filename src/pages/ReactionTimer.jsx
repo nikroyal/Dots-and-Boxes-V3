@@ -129,8 +129,7 @@ export default function ReactionTimer() {
       </section>
 
       <button
-        onPointerDown={handlePointerDown}
-        onClick={handleClick}
+        onPointerDown={handleTrigger}
         onKeyDown={handleKeyDown}
         className="w-full max-w-md aspect-video border hairline card transition-colors duration-150 flex flex-col items-center justify-center focus-ring select-none"
         style={{ background: bgColor, color: textColor }}
