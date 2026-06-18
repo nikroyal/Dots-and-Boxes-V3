@@ -155,14 +155,7 @@ export default function Snake() {
 
   useEffect(() => {
     const handleKeyDown = (e) => {
-      // Allow scrolling if not playing
-      if (gameStateRef.current !== 'playing') {
-        if (e.key === ' ' || e.key === 'Enter') {
-            e.preventDefault();
-            startGame();
-        }
-        return;
-      }
+      if (gameStateRef.current !== 'playing') return;
 
       const { x, y } = lastMoveDirectionRef.current;
 
