@@ -5,3 +5,6 @@
 ## 2024-11-20 - Unsafe Array Length Checks
 **Learning:** Destructuring or defaulting arrays using `(obj.array || []).length` is dangerous when the field might contain legacy data types like numbers instead of arrays.
 **Action:** Use `Array.isArray(obj.array) ? obj.array : []` to guarantee safe array iteration and length checks.
+## 2024-11-20 - Operator Precedence with Ternary Array Checks
+**Learning:** When using ternary inline checks like `Array.isArray(arr) ? arr.length : 0` to index into an array (e.g., to find the last item `arr[... - 1]`), failing to wrap the ternary in parentheses causes operator precedence bugs (`0 - 1` evaluates first).
+**Action:** Always wrap ternary expressions in parentheses when performing arithmetic on their result: `(Array.isArray(arr) ? arr.length : 0) - 1`.

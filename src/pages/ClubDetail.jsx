@@ -401,12 +401,12 @@ function SettingsModal({ club, members, channels, requests, onClose, currentUser
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm fade-in">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm fade-in" role="dialog" aria-modal="true" aria-labelledby="club-settings-title">
       {confirmDialogEl2}
       <div className="bg-[var(--paper-tint)] border hairline w-full max-w-4xl h-[80vh] shadow-2xl rounded-2xl flex overflow-hidden">
         {/* Sidebar */}
         <div className="w-56 border-r hairline bg-black/[0.02] p-4 space-y-1">
-          <div className="font-mono text-[0.6rem] opacity-40 uppercase tracking-widest px-3 mb-2">Club Settings</div>
+          <div id="club-settings-title" className="font-mono text-[0.6rem] opacity-40 uppercase tracking-widest px-3 mb-2">Club Settings</div>
           {[
             { id: 'general', label: 'General', icon: Settings },
             { id: 'channels', label: 'Channels', icon: Hash },

@@ -81,7 +81,7 @@ const MatchCard = memo(function MatchCard({ match, youAreIn }) {
   const totalBoxes = match.rows * match.cols;
   const claimed = scores.reduce((a, b) => a + b, 0);
   const progress = totalBoxes > 0 ? Math.round((claimed / totalBoxes) * 100) : 0;
-  const specCount = (match.spectators || []).length;
+  const specCount = Array.isArray(match.spectators) ? match.spectators.length : 0;
   const isPaused = match.status === 'paused';
 
   return (
