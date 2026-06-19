@@ -5,12 +5,12 @@ import { ACHIEVEMENTS } from '../lib/achievements';
 import { Trophy, X as Loss, Minus as Equal, UserPlus, Users, Zap } from 'lucide-react';
 
 // Recent activity from the user and their friends. Lives on the Dashboard.
-export default function ActivityFeed({ profile }) {
+export default function ActivityFeed({ profile, singleUser = false, viewerId = null }) {
   const [items, setItems] = useState(null); // null=loading, []=empty
   // Dep on the joined sorted ID list, not just .length — otherwise swapping
   // one friend for another (same count) wouldn't trigger a refresh.
   const idKey = profile
-    ? [profile.id, ...(Array.isArray(profile.friends) ? profile.friends : [])].sort().join(',')
+    ? (singleUser ? [profile.id] : [profile.id, ...(Array.isArray(profile.friends) ? profile.friends : [])]).sort().join(',')
     : '';
   useEffect(() => {
     let alive = true;
@@ -36,7 +36,7 @@ export default function ActivityFeed({ profile }) {
 
   return (
     <div className="space-y-1.5">
-      {items.map(it => <ActivityRow key={it.id} item={it} isMe={it.userId === profile.id} />)}
+      {items.map(it => <ActivityRow key={it.id} item={it} isMe={viewerId ? it.userId === viewerId : it.userId === profile.id && !singleUser} />)}
     </div>
   );
 }
