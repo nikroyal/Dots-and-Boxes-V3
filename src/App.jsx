@@ -1,4 +1,4 @@
-import { Component, lazy, Suspense } from 'react';
+import React, { Component, lazy, Suspense } from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AuthProvider, useAuth } from './lib/AuthContext';
 import { isImmersivePath } from './lib/experiences';

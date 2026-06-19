@@ -34,7 +34,7 @@ const getOrientation = (index) => {
   return 'corner';
 };
 
-export default function Board({ gameState }) {
+export default function Board({ gameState, isRolling }) {
   if (!gameState) return null;
 
   const renderTokens = (spaceId) => {
@@ -140,10 +140,7 @@ export default function Board({ gameState }) {
                   orientation === 'right' ? 'mr-auto w-3/4' :
                   orientation === 'top' ? 'mb-auto h-3/4' :
                   orientation === 'bottom' ? 'mt-auto h-3/4' : ''
-              } ${
-                orientation === 'left' ? 'rotate-90' :
-                orientation === 'right' ? '-rotate-90' :
-                orientation === 'top' ? 'rotate-180' : ''
+              } ${''
               }`}>
                 {isCorner ? (
                   <div className="font-display text-sm sm:text-base uppercase text-center w-full break-words leading-none">
@@ -151,7 +148,7 @@ export default function Board({ gameState }) {
                   </div>
                 ) : (
                   <>
-                    <div className="font-sans font-bold leading-none break-words w-full text-center mb-0.5">
+                    <div className="font-sans font-bold leading-tight break-words w-full text-center mb-0.5 text-[0.55rem] sm:text-xs">
                       {space.name}
                     </div>
                     {space.price && (
@@ -190,15 +187,26 @@ export default function Board({ gameState }) {
             <span className="font-display text-blue-600/50 dark:text-blue-300/50 text-xs sm:text-lg">FORTUNE</span>
           </div>
 
-          {/* Dice Area (if rolling) */}
-          {gameState.turnPhase !== 'roll' && gameState.lastDice && gameState.lastDice[0] > 0 && (
+          {/* Dice Area */}
+          {(gameState.turnPhase !== 'roll' || isRolling) && (
              <div className="absolute flex gap-2">
-                <div className="w-8 h-8 sm:w-10 sm:h-10 bg-white dark:bg-gray-800 text-black dark:text-white rounded flex items-center justify-center font-bold text-lg shadow-lg border">
-                  {gameState.lastDice[0]}
-                </div>
-                <div className="w-8 h-8 sm:w-10 sm:h-10 bg-white dark:bg-gray-800 text-black dark:text-white rounded flex items-center justify-center font-bold text-lg shadow-lg border">
-                  {gameState.lastDice[1]}
-                </div>
+                {isRolling ? (
+                  <>
+                    <div className="w-8 h-8 sm:w-10 sm:h-10 bg-white dark:bg-gray-800 text-black dark:text-white rounded flex items-center justify-center font-bold text-lg shadow-lg border animate-bounce">?</div>
+                    <div className="w-8 h-8 sm:w-10 sm:h-10 bg-white dark:bg-gray-800 text-black dark:text-white rounded flex items-center justify-center font-bold text-lg shadow-lg border animate-bounce" style={{animationDelay: '150ms'}}>?</div>
+                  </>
+                ) : (
+                  gameState.lastDice && gameState.lastDice[0] > 0 && (
+                    <>
+                      <div className="w-8 h-8 sm:w-10 sm:h-10 bg-white dark:bg-gray-800 text-black dark:text-white rounded flex items-center justify-center font-bold text-lg shadow-lg border">
+                        {gameState.lastDice[0]}
+                      </div>
+                      <div className="w-8 h-8 sm:w-10 sm:h-10 bg-white dark:bg-gray-800 text-black dark:text-white rounded flex items-center justify-center font-bold text-lg shadow-lg border">
+                        {gameState.lastDice[1]}
+                      </div>
+                    </>
+                  )
+                )}
              </div>
           )}
         </div>

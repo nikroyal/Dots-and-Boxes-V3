@@ -13,12 +13,12 @@ export default function PlayerPanel({ gameState, currentPlayerId }) {
         return (
           <div
             key={player.id}
-            className={`card p-4 flex flex-col gap-2 transition-all duration-300 ${isCurrentTurn ? 'ring-2 ring-primary scale-[1.02] shadow-xl' : 'opacity-80'} ${player.bankrupt ? 'grayscale opacity-50' : ''}`}
+            className={`card p-2 sm:p-3 flex flex-col gap-1.5 transition-all duration-300 ${isCurrentTurn ? 'ring-2 ring-primary scale-[1.02] shadow-xl' : 'opacity-80'} ${player.bankrupt ? 'grayscale opacity-50' : ''}`}
             style={{ borderTop: `4px solid ${player.color}` }}
           >
             <div className="flex justify-between items-start gap-2">
               <div className="flex-1 min-w-0">
-                <h3 className="font-display font-bold text-lg flex items-center gap-2 truncate">
+                <h3 className="font-display font-bold text-base flex items-center gap-2 truncate">
                   <span className="truncate">{player.name}</span>
                   {isMe && <span className="text-[0.6rem] font-mono bg-primary/20 text-primary px-1.5 py-0.5 rounded uppercase tracking-wider flex-shrink-0">You</span>}
                   {player.isAI && <span className="text-[0.6rem] font-mono bg-gray-500/20 text-gray-400 px-1.5 py-0.5 rounded uppercase tracking-wider flex-shrink-0">Bot</span>}
@@ -31,7 +31,7 @@ export default function PlayerPanel({ gameState, currentPlayerId }) {
                 )}
               </div>
               <div className="text-right flex-shrink-0">
-                <div className="font-mono text-xl font-bold text-green-600 dark:text-green-400">
+                <div className="font-mono text-base font-bold text-green-600 dark:text-green-400">
                   ¤{player.cash}
                 </div>
               </div>
@@ -47,7 +47,7 @@ export default function PlayerPanel({ gameState, currentPlayerId }) {
                 return (
                   <div
                     key={spaceId}
-                    className={`w-4 h-4 rounded-sm border border-black/20 ${isMortgaged ? 'opacity-30 grayscale relative' : ''}`}
+                    className={`w-3 h-3 rounded-sm border border-black/20 ${isMortgaged ? 'opacity-30 grayscale relative' : ''}`}
                     style={{ backgroundColor: color }}
                     title={`${space.name}${isMortgaged ? ' (Mortgaged)' : ''}`}
                   >
