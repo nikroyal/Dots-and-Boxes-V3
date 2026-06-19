@@ -36,7 +36,7 @@ export default function ActivityFeed({ profile, singleUser = false, viewerId = n
 
   return (
     <div className="space-y-1.5">
-      {items.map(it => <ActivityRow key={it.id} item={it} isMe={viewerId ? it.userId === viewerId : it.userId === profile.id && !singleUser} />)}
+      {items.map(it => <ActivityRow key={it.id} item={it} isMe={it.userId === (singleUser ? viewerId : profile.id)} />)}
     </div>
   );
 }
