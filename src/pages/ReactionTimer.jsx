@@ -89,6 +89,15 @@ export default function ReactionTimer() {
     }
   };
 
+
+  const getRating = (time) => {
+    if (time < 200) return "⚡ Superhuman!";
+    if (time < 250) return "🐆 Excellent!";
+    if (time < 300) return "🏃 Good!";
+    if (time < 400) return "🚶 Average!";
+    return "🐢 Keep practicing!";
+  };
+
   const handleKeyDown = (e) => {
     if (e.key === ' ' || e.key === 'Enter') {
       if (e.repeat) return;
@@ -140,12 +149,16 @@ export default function ReactionTimer() {
         </div>
         {gameState === 'finished' && reactionTime && (
           <div className="flex flex-col items-center pointer-events-none mt-4">
-            {isNewBest && (
+            {isNewBest ? (
               <div className="font-display text-2xl text-[var(--ochre)] pulse-soft mb-2">
                 🎉 New Best!
               </div>
+            ) : (
+              <div className="font-display text-xl text-[var(--ink)] mb-2 opacity-90">
+                {getRating(reactionTime)}
+              </div>
             )}
-            <div className="font-mono text-sm opacity-80 tracking-widest uppercase">
+            <div className="font-mono text-sm opacity-80 tracking-widest uppercase mt-2">
               Click to try again
             </div>
           </div>
