@@ -137,20 +137,8 @@ export default function LocalDistrictExchange() {
       switch (type) {
         case 'roll':
           sfx.piece();
-          setIsRolling(true);
-          // Pre-compute the roll results
-          const computedNext = rollDice(next);
-          // Set an intermediate state just to show dice rolling
-          setGameState(prev => ({ ...prev, isRollingAnimation: true }));
-          setTimeout(() => {
-            setIsRolling(false);
-            setGameState(prev => {
-              // We replace the state with the actual computed roll state
-              // To avoid state desync, we actually just apply rollDice to the latest state
-              return rollDice(prev);
-            });
-          }, 3000);
-          return prev; // don't mutate state right now in this switch
+          setTimeout(() => setIsRolling(true), 0);
+          break;
         case 'end':
           next = endTurn(next);
           break;
