@@ -177,6 +177,21 @@ export const EXPERIENCE_CATALOG = [
     routePrefixes: ['/whack-a-mole'],
   },
   {
+    id: 'rock-paper-scissors',
+    name: 'Rock Paper Scissors',
+    shortName: 'RPS',
+    path: '/rock-paper-scissors',
+    kind: 'Arcade',
+    status: 'Live',
+    accent: 'var(--forest)',
+    description: 'Classic Rock Paper Scissors. Play against the computer and build your winning streak.',
+    features: ['Local play', 'Winning streak'],
+    navItems: [
+      { to: '/rock-paper-scissors', label: 'Play' },
+    ],
+    routePrefixes: ['/rock-paper-scissors'],
+  },
+  {
     id: 'district-exchange',
     name: 'District Exchange',
     shortName: 'District',
