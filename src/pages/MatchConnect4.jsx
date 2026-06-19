@@ -332,7 +332,7 @@ export default function MatchConnect4() {
 
   // Pause concealment - hide board if paused
   const concealBoard = match.status === 'paused' && match.pauseConcealed;
-  const lastMove = (match.game.moves || [])[(Array.isArray(match.game.moves) ? match.game.moves.length : 0) - 1];
+  const lastMove = (Array.isArray(match.game.moves) ? match.game.moves : []).slice(-1)[0];
 
   return (
     <>
