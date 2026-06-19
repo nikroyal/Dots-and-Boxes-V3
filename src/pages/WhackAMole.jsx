@@ -158,11 +158,12 @@ export default function WhackAMole() {
             <button
               key={i}
               onPointerDown={(e) => { e.preventDefault(); handleHoleClick(i); }}
-              className={`aspect-square rounded-full flex items-center justify-center transition-all duration-100 ${
+              onClick={() => handleHoleClick(i)}
+              className={'aspect-square rounded-full flex items-center justify-center transition-all duration-100 ' + (
                 activeMole === i
                   ? 'bg-[var(--forest)] scale-105 shadow-md cursor-crosshair'
                   : 'bg-[var(--bg-soft)] border hairline cursor-default'
-              }`}
+              )}
               aria-label={activeMole === i ? 'Whack mole' : 'Empty hole'}
             >
               {activeMole === i && (
