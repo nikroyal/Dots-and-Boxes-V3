@@ -6,3 +6,8 @@
 **Vulnerability:** A custom float division (`/ 4294967296 * length`) combined with `Math.floor` was used with `crypto.getRandomValues` to generate random array indices for avatars.
 **Learning:** This approach recreates a pseudo `Math.random()` leading to floating point precision issues. While low impact for avatars, it demonstrates poor cryptographic hygiene and is prone to errors.
 **Prevention:** Always use standard modulo arithmetic (`crypto.getRandomValues(array)[0] % length`) or unbiased random selection algorithms when choosing a random element from an array based on cryptographic values.
+
+## 2024-05-18 - [Fix Hardcoded Firebase Credentials]
+**Vulnerability:** Hardcoded Firebase API Key, Project ID, and other configuration parameters were found directly in `src/lib/firebase.js`.
+**Learning:** These configurations were likely hardcoded for convenience during development, avoiding the need for a `.env` file but exposing sensitive access credentials to version control.
+**Prevention:** Use environment variables (e.g., `import.meta.env`) with fallback logic to keep secrets out of source code while still maintaining a robust fail-fast mechanism.
