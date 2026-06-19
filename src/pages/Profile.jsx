@@ -259,7 +259,7 @@ export default function Profile() {
       {/* ELO trend */}
       {(target.matchHistory || []).length > 0 && (
         <section className="card">
-          <EloChart matchHistory={target.matchHistory || []} currentElo={target.elo || 1000} />
+          <EloChart matchHistory={target.matchHistory || []} currentElo={target.elo ?? 1000} />
         </section>
       )}
 
