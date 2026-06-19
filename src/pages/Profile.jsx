@@ -257,7 +257,7 @@ export default function Profile() {
       {/* Achievements */}
       <section>
         <div className="font-mono text-[0.65rem] tracking-widest uppercase opacity-50 mb-3">
-          Achievements ({(target.unlockedAchievements || []).length}/{ACHIEVEMENTS.length})
+          Achievements ({(Array.isArray(target.unlockedAchievements) ? target.unlockedAchievements.length : 0)}/{ACHIEVEMENTS.length})
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
           {ACHIEVEMENTS.map(a => {

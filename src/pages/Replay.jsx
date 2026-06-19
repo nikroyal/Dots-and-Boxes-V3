@@ -66,7 +66,7 @@ export default function Replay() {
 
   useEffect(() => {
     if (!playing || !match) return;
-    const totalSteps = (match.game.moves || []).length;
+    const totalSteps = (Array.isArray(match.game.moves) ? match.game.moves.length : 0);
     if (step >= totalSteps) { setPlaying(false); return; }
     const t = setTimeout(() => {
       setStep(s => Math.min(totalSteps, s + 1));

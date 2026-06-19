@@ -14,7 +14,7 @@ export default function Achievements() {
           {unlocked.length} of {ACHIEVEMENTS.length} unlocked
         </div>
         <h1 className="font-display text-4xl font-medium tracking-tight">Achievements</h1>
-        <div className="mt-4 h-1 w-full max-w-md" style={{ background: 'var(--hairline)' }}>
+        <div className="mt-4 h-1 w-full max-w-md" style={{ background: 'var(--hairline)' }} role="progressbar" aria-valuenow={unlocked.length} aria-valuemin={0} aria-valuemax={ACHIEVEMENTS.length}>
           <div className="h-full transition-all duration-500" style={{ width: `${progress}%`, background: 'var(--ink)' }} />
         </div>
       </section>
@@ -38,7 +38,7 @@ export default function Achievements() {
                           <span>Progress</span>
                           <span>{Math.floor(curr)} / {max}</span>
                         </div>
-                        <div className="h-1 w-full bg-black/10 rounded-full overflow-hidden">
+                        <div className="h-1 w-full bg-black/10 rounded-full overflow-hidden" role="progressbar" aria-valuenow={Math.floor(curr)} aria-valuemin={0} aria-valuemax={max}>
                           <div className="h-full bg-current opacity-40 transition-all duration-500" style={{ width: `${pct}%` }} />
                         </div>
                       </div>

@@ -129,12 +129,12 @@ export default function Clubs() {
 
       {/* Create Modal */}
       {showCreate && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm fade-in">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm fade-in" role="dialog" aria-modal="true" aria-labelledby="create-club-title">
           <div className="bg-[var(--paper-tint)] border hairline w-full max-w-lg shadow-2xl p-8 rounded-2xl relative">
-            <button onClick={() => setShowCreate(false)} className="absolute top-4 right-4 p-2 opacity-40 hover:opacity-100 transition-opacity">
+            <button onClick={() => setShowCreate(false)} className="absolute top-4 right-4 p-2 opacity-40 hover:opacity-100 transition-opacity" aria-label="Close create club dialog">
               <X size={20} />
             </button>
-            <h2 className="font-display text-3xl mb-2">Start a new Club</h2>
+            <h2 id="create-club-title" className="font-display text-3xl mb-2">Start a new Club</h2>
             <p className="font-display text-sm opacity-60 mb-8">Choose a name and description for your community.</p>
             
             <form onSubmit={handleCreate} className="space-y-6">

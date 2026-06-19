@@ -18,6 +18,14 @@ export default function MemoryMatch() {
     return saved ? parseInt(saved, 10) : null;
   });
   const [isGameWon, setIsGameWon] = useState(false);
+  const timeoutRef = useRef(null);
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    };
+  }, []);
 
   // Initialize game
   useEffect(() => {
@@ -78,14 +86,16 @@ export default function MemoryMatch() {
 
         // Check win condition
         if (matched.length + 2 === cards.length) {
-          setTimeout(() => {
+          if (timeoutRef.current) clearTimeout(timeoutRef.current);
+          timeoutRef.current = setTimeout(() => {
             setIsGameWon(true);
             sfx.win();
           }, 300);
         }
       } else {
         // No match
-        setTimeout(() => {
+        if (timeoutRef.current) clearTimeout(timeoutRef.current);
+        timeoutRef.current = setTimeout(() => {
           setFlipped([]);
         }, 1000);
       }

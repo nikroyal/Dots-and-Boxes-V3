@@ -508,7 +508,7 @@ export default function MatchChess() {
 
   // Pause concealment - hide board if paused
   const concealBoard = match.status === 'paused' && match.pauseConcealed;
-  const lastMove = (displayGame.moves || [])[(displayGame.moves || []).length - 1];
+  const lastMove = (displayGame.moves || [])[(Array.isArray(displayGame.moves) ? displayGame.moves.length : 0) - 1];
 
   const customSquareStyles = {
     ...(lastMove ? {
@@ -649,7 +649,7 @@ export default function MatchChess() {
         <div className="flex items-center justify-between flex-wrap gap-3">
           <div className="font-mono text-xs tracking-wide opacity-60">
             {isSpectator ? (
-              <><Eye size={12} className="inline mr-1" /> Spectating · {match.spectators?.length || 0} watching</>
+              <><Eye size={12} className="inline mr-1" /> Spectating · {(Array.isArray(match.spectators) ? match.spectators.length : 0)} watching</>
             ) : inCountdown ? (
               'Starting…'
             ) : isMyTurn ? (
@@ -700,11 +700,11 @@ export default function MatchChess() {
         <div className="px-4 py-3 border-b hairline flex items-center justify-between">
           <div className="font-mono text-[0.65rem] tracking-widest uppercase opacity-60">Chat</div>
           <div className="font-mono text-[0.6rem] tracking-widest uppercase opacity-50">
-            <Eye size={10} className="inline mr-1" /> {match.spectators?.length || 0}
+            <Eye size={10} className="inline mr-1" /> {(Array.isArray(match.spectators) ? match.spectators.length : 0)}
           </div>
         </div>
         <div className="flex-1 overflow-y-auto p-3 space-y-2 scrollbar-thin">
-          {(match.chat || []).length === 0 && (
+          {(Array.isArray(match.chat) ? match.chat.length : 0) === 0 && (
             <div className="font-mono text-[0.65rem] opacity-40 text-center py-8 italic">
               No messages yet
             </div>

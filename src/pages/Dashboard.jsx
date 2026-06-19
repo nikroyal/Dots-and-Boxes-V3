@@ -228,7 +228,7 @@ export default function Dashboard() {
       </section>
 
       {/* ELO trend */}
-      {(profile.matchHistory || []).length > 0 && (
+      {(Array.isArray(profile.matchHistory) ? profile.matchHistory.length : 0) > 0 && (
         <section className="card">
           <EloChart matchHistory={profile.matchHistory || []} currentElo={profile.elo || 1000} />
         </section>
