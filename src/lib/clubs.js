@@ -346,7 +346,7 @@ export async function migrateClubIfNeeded(club) {
 
   // 3. Update club doc to remove old arrays and add new fields
   const updateData = {
-    memberCount: club.members?.length || 1,
+    memberCount: Array.isArray(club.members) ? club.members.length : 1,
     memberIds: club.members || [club.ownerId],
     chat: null, // delete field
     members: null, // delete field

@@ -37,6 +37,20 @@ const getOrientation = (index) => {
 export default function Board({ gameState, isRolling }) {
   if (!gameState) return null;
 
+  // Optimization (Bolt): Pre-compute property owners to avoid O(N*M) lookups during render.
+  // The old code scanned `gameState.players` and `.includes(spaceId)` for every space on the board,
+  // twice per render (once for upgrades, once for owner bar). This Map turns those into O(1) lookups.
+  const propertyOwners = React.useMemo(() => {
+    const map = new Map();
+    for (const player of gameState.players || []) {
+      if (player.bankrupt) continue;
+      for (const spaceId of player.properties || []) {
+        map.set(spaceId, player);
+      }
+    }
+    return map;
+  }, [gameState.players]);
+
   const renderTokens = (spaceId) => {
     const playersOnSpace = gameState.players.filter(p => p.position === spaceId && !p.bankrupt);
     return (
@@ -54,7 +68,7 @@ export default function Board({ gameState, isRolling }) {
   };
 
   const renderUpgrades = (spaceId) => {
-    const owner = gameState.players.find(p => p.properties.includes(spaceId));
+    const owner = propertyOwners.get(spaceId);
     if (!owner) return null;
     const level = owner.upgrades[spaceId] || 0;
     if (level === 0) return null;
@@ -79,7 +93,7 @@ export default function Board({ gameState, isRolling }) {
   };
 
   const renderOwnerBar = (spaceId) => {
-    const owner = gameState.players.find(p => p.properties.includes(spaceId));
+    const owner = propertyOwners.get(spaceId);
     if (!owner) return null;
     return (
       <div

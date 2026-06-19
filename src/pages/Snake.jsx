@@ -195,6 +195,14 @@ export default function Snake() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
+
+  const getGameOverMessage = (finalScore) => {
+    if (finalScore === 0) return "Ouch. Fast game!";
+    if (finalScore < 50) return "Good start!";
+    if (finalScore < 100) return "Getting the hang of it!";
+    return "Snake charmer!";
+  };
+
   const handleMobileControl = (dirX, dirY) => {
     if (gameState !== 'playing') return;
     const { x, y } = lastMoveDirectionRef.current;
@@ -229,7 +237,8 @@ export default function Snake() {
 
         {gameState === 'gameover' && (
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/10 z-10 backdrop-blur-[2px]">
-            <p className="font-display text-3xl mb-4 text-[var(--crimson)]">Game Over</p>
+            <p className="font-display text-3xl mb-2 text-[var(--crimson)]">Game Over</p>
+            <p className="font-mono text-sm opacity-80 mb-4">{getGameOverMessage(score)}</p>
             <button onClick={startGame} className="btn-primary">
               Play Again
             </button>

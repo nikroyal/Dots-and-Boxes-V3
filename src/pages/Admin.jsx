@@ -241,7 +241,7 @@ function MatchInspector({ admin, match }) {
         <Metric label="Status" value={match.status || '?'} />
         <Metric label="Board" value={`${match.rows || '?'}x${match.cols || '?'}`} />
         <Metric label="Moves" value={match.game?.moveCount || 0} />
-        <Metric label="Spectators" value={match.spectators?.length || 0} />
+        <Metric label="Spectators" value={(Array.isArray(match.spectators) ? match.spectators.length : 0)} />
       </div>
       <Panel title="Scores">
         {players.map(id => (
@@ -327,7 +327,7 @@ function ClubsPanel({ admin, clubs }) {
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">
               <div className="font-display text-xl truncate">{club.name || '?'}</div>
-              <div className="font-mono text-[0.6rem] tracking-widest uppercase opacity-50">{club.members?.length || 0} members</div>
+              <div className="font-mono text-[0.6rem] tracking-widest uppercase opacity-50">{Array.isArray(club.members) ? club.members.length : 0} members</div>
             </div>
             <button className="btn-danger" onClick={async () => {
               try { await deleteClubAsAdmin(admin, club); toast('Club deleted', 'success'); }

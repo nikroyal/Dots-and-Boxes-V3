@@ -44,9 +44,15 @@ function PendingTradeDialog({ gameState, currentPlayerId, onAction }) {
   );
 
   return (
+<<<<<<< HEAD
+    <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="trade-dialog-title">
+      <div className="card max-w-md w-full p-6 text-center space-y-6">
+        <h2 id="trade-dialog-title" className="font-display text-2xl">Proposed Trade</h2>
+=======
     <div className="absolute inset-0 bg-black/60 pointer-events-auto rounded-lg backdrop-blur-sm z-50 flex items-center justify-center p-4">
       <div className="card max-w-sm scale-95 sm:scale-100 w-full p-6 text-center space-y-6">
         <h2 className="font-display text-xl">Proposed Trade</h2>
+>>>>>>> e854616 (chore: add learning about reducer state copy)
         <div className="text-sm opacity-80">
           {proposer.name} proposed a trade to {target.name}
         </div>
@@ -79,12 +85,21 @@ function PendingActionDialog({ gameState, isMyTurn, onAction }) {
   if (action.type === 'buy') {
     const space = gameState.boardSpaces[action.spaceId];
     return (
+<<<<<<< HEAD
+      <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="buy-dialog-title">
+        <div className="card max-w-sm w-full p-6 text-center space-y-6">
+          <h2 id="buy-dialog-title" className="font-display text-2xl">Unowned Property</h2>
+          <div className="py-4 px-6 border-2 rounded-lg" style={{ borderColor: 'var(--border)' }}>
+            <div className="text-xl font-bold mb-2">{space.name}</div>
+            <div className="font-mono text-lg text-green-600 dark:text-green-400">Price: ¤{space.price}</div>
+=======
       <div className="absolute inset-0 bg-black/60 pointer-events-auto rounded-lg backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div className="card max-w-[16rem] scale-95 sm:scale-100 w-full p-4 text-center space-y-4 shadow-2xl border-2 border-primary/20">
           <h2 className="font-display text-xl">Unowned Property</h2>
           <div className="py-2 px-4 border-2 rounded-lg" style={{ borderColor: 'var(--border)' }}>
             <div className="text-lg font-bold mb-1">{space.name}</div>
             <div className="font-mono text-base text-green-600 dark:text-green-400">Price: ¤{space.price}</div>
+>>>>>>> e854616 (chore: add learning about reducer state copy)
           </div>
           <div className="flex gap-4">
              <button onClick={() => onAction('buy')} className="btn-primary flex-1">Buy Property</button>
@@ -97,10 +112,17 @@ function PendingActionDialog({ gameState, isMyTurn, onAction }) {
 
   if (action.type === 'card') {
     return (
+<<<<<<< HEAD
+      <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="card-dialog-title">
+        <div className={`card max-w-sm w-full p-8 text-center space-y-6 border-t-8 shadow-2xl ${action.deckType === 'opportunity' ? 'border-orange-500' : 'border-blue-500'}`}>
+          <h2 id="card-dialog-title" className="font-display text-3xl uppercase tracking-widest">{action.deckType}</h2>
+          <div className="py-8 px-4 text-xl font-medium font-sans">
+=======
       <div className="absolute inset-0 bg-black/60 pointer-events-auto rounded-lg backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div className={`card max-w-[16rem] w-full p-5 text-center space-y-6 border-t-8 shadow-2xl ${action.deckType === 'opportunity' ? 'border-orange-500' : 'border-blue-500'}`}>
           <h2 className="font-display text-2xl uppercase tracking-widest">{action.deckType}</h2>
           <div className="py-4 px-2 text-base font-medium font-sans">
+>>>>>>> e854616 (chore: add learning about reducer state copy)
             {action.card.text}
           </div>
           <button onClick={() => onAction('resolveCard')} className="btn-primary w-full">Continue</button>
@@ -138,9 +160,15 @@ function AuctionDialog({ gameState, currentPlayerId, onAction }) {
   const humanWaitState = activeHumans.length === 0;
 
   return (
+<<<<<<< HEAD
+    <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="auction-dialog-title">
+      <div className="card max-w-2xl w-full p-6 flex flex-col items-center space-y-6 shadow-2xl">
+        <h2 id="auction-dialog-title" className="font-display text-3xl text-red-500 uppercase tracking-widest animate-pulse">Live Auction</h2>
+=======
     <div className="absolute inset-0 bg-black/60 pointer-events-auto rounded-lg backdrop-blur-sm z-50 flex items-center justify-center p-4">
       <div className="card max-w-lg scale-95 sm:scale-100 w-full p-6 flex flex-col items-center space-y-6 shadow-2xl">
         <h2 className="font-display text-2xl text-red-500 uppercase tracking-widest animate-pulse">Live Auction</h2>
+>>>>>>> e854616 (chore: add learning about reducer state copy)
 
         <div className="text-center">
           <div className="text-2xl font-bold mb-1">{space.name}</div>
@@ -162,7 +190,7 @@ function AuctionDialog({ gameState, currentPlayerId, onAction }) {
         </div>
 
         {humanWaitState ? (
-          <div className="text-center font-mono opacity-50 py-4 w-full">
+          <div className="text-center font-mono opacity-50 py-4 w-full" aria-live="polite">
             Waiting for AI bidders...
           </div>
         ) : (
@@ -265,7 +293,7 @@ export function ControlsPanel({ gameState, currentPlayerId, onAction, isRolling 
       )}
 
       {inDebt && me && (
-        <div className="flex gap-2 items-center bg-red-500/10 border border-red-500/50 p-2 rounded">
+        <div className="flex gap-2 items-center bg-red-500/10 border border-red-500/50 p-2 rounded" role="alert">
           <div className="text-red-500 font-bold uppercase text-sm mr-2">In Debt!</div>
           {me.cash >= 0 ? (
             <button onClick={handleResolveDebt} className="btn-primary bg-green-500 hover:bg-green-600 border-none shadow-none text-white text-xs">
@@ -331,10 +359,17 @@ function MortgageDialog({ gameState, currentPlayerId, onClose, onAction }) {
   if (!me) return null;
 
   return (
+<<<<<<< HEAD
+    <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="mortgage-dialog-title">
+      <div className="card max-w-lg w-full p-6 space-y-6 max-h-[80vh] flex flex-col">
+        <div className="flex justify-between items-center border-b pb-4 border-black/10 dark:border-white/10">
+          <h2 id="mortgage-dialog-title" className="font-display text-2xl">Manage Mortgages</h2>
+=======
     <div className="absolute inset-0 bg-black/60 pointer-events-auto rounded-lg backdrop-blur-sm z-50 flex items-center justify-center p-4">
       <div className="card max-w-md scale-95 sm:scale-100 w-full p-6 space-y-6 max-h-[80vh] flex flex-col">
         <div className="flex justify-between items-center border-b pb-4 border-black/10 dark:border-white/10">
           <h2 className="font-display text-xl">Manage Mortgages</h2>
+>>>>>>> e854616 (chore: add learning about reducer state copy)
           <button onClick={onClose} className="btn-ghost px-3 py-1">Close</button>
         </div>
 
@@ -421,16 +456,24 @@ function ProposeTradeDialog({ gameState, currentPlayerId, onClose, onAction }) {
   };
 
   return (
+<<<<<<< HEAD
+    <div className="fixed inset-0 bg-black/80 z-[60] flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="propose-trade-dialog-title">
+      <div className="card max-w-2xl w-full p-6 space-y-6 max-h-[90vh] flex flex-col">
+        <div className="flex justify-between items-center border-b pb-4 hairline">
+          <h2 id="propose-trade-dialog-title" className="font-display text-2xl">Propose Trade</h2>
+=======
     <div className="absolute inset-0 bg-black/80 pointer-events-auto rounded-lg backdrop-blur-sm z-[60] flex items-center justify-center p-4">
       <div className="card max-w-lg scale-95 sm:scale-100 w-full p-6 space-y-6 max-h-[90vh] flex flex-col">
         <div className="flex justify-between items-center border-b pb-4 hairline">
           <h2 className="font-display text-xl">Propose Trade</h2>
+>>>>>>> e854616 (chore: add learning about reducer state copy)
           <button onClick={onClose} className="btn-ghost px-3 py-1">Close</button>
         </div>
 
         <div className="flex items-center gap-4">
-          <label className="font-mono text-sm">Trading Partner:</label>
+          <label htmlFor="trading-partner-select" className="font-mono text-sm">Trading Partner:</label>
           <select
+            id="trading-partner-select"
             value={targetId}
             onChange={(e) => {
               setTargetId(e.target.value);
@@ -454,8 +497,9 @@ function ProposeTradeDialog({ gameState, currentPlayerId, onClose, onAction }) {
               <h3 className="font-bold border-b hairline pb-2">Your Offer</h3>
 
               <div>
-                <label className="text-xs opacity-60 block mb-1">Cash (Max: ¤{me.cash})</label>
+                <label htmlFor="offer-cash-input" className="text-xs opacity-60 block mb-1">Cash (Max: ¤{me.cash})</label>
                 <input
+                  id="offer-cash-input"
                   type="number"
                   min="0"
                   max={me.cash}
@@ -467,8 +511,9 @@ function ProposeTradeDialog({ gameState, currentPlayerId, onClose, onAction }) {
 
               {me.getOutOfJailCards > 0 && (
                 <div>
-                  <label className="text-xs opacity-60 block mb-1">Release Cards (Max: {me.getOutOfJailCards})</label>
+                  <label htmlFor="offer-cards-input" className="text-xs opacity-60 block mb-1">Release Cards (Max: {me.getOutOfJailCards})</label>
                   <input
+                    id="offer-cards-input"
                     type="number"
                     min="0"
                     max={me.getOutOfJailCards}
@@ -499,8 +544,9 @@ function ProposeTradeDialog({ gameState, currentPlayerId, onClose, onAction }) {
               <h3 className="font-bold border-b hairline pb-2">{target.name}'s Assets</h3>
 
               <div>
-                <label className="text-xs opacity-60 block mb-1">Cash Request (Max: ¤{target.cash})</label>
+                <label htmlFor="req-cash-input" className="text-xs opacity-60 block mb-1">Cash Request (Max: ¤{target.cash})</label>
                 <input
+                  id="req-cash-input"
                   type="number"
                   min="0"
                   max={target.cash}
@@ -512,8 +558,9 @@ function ProposeTradeDialog({ gameState, currentPlayerId, onClose, onAction }) {
 
               {target.getOutOfJailCards > 0 && (
                 <div>
-                  <label className="text-xs opacity-60 block mb-1">Release Cards (Max: {target.getOutOfJailCards})</label>
+                  <label htmlFor="req-cards-input" className="text-xs opacity-60 block mb-1">Release Cards (Max: {target.getOutOfJailCards})</label>
                   <input
+                    id="req-cards-input"
                     type="number"
                     min="0"
                     max={target.getOutOfJailCards}
@@ -601,10 +648,17 @@ function UpgradeDialog({ gameState, currentPlayerId, onClose, onAction }) {
   }
 
   return (
+<<<<<<< HEAD
+    <div className="fixed inset-0 bg-black/60 z-[60] flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="upgrade-dialog-title">
+      <div className="card max-w-lg w-full p-6 space-y-6 max-h-[90vh] flex flex-col">
+        <div className="flex justify-between items-center border-b pb-4 hairline">
+          <h2 id="upgrade-dialog-title" className="font-display text-2xl">Property Upgrades</h2>
+=======
     <div className="absolute inset-0 bg-black/60 pointer-events-auto rounded-lg backdrop-blur-sm z-[60] flex items-center justify-center p-4">
       <div className="card max-w-md scale-95 sm:scale-100 w-full p-6 space-y-6 max-h-[90vh] flex flex-col">
         <div className="flex justify-between items-center border-b pb-4 hairline">
           <h2 className="font-display text-xl">Property Upgrades</h2>
+>>>>>>> e854616 (chore: add learning about reducer state copy)
           <button onClick={onClose} className="btn-ghost px-3 py-1">Close</button>
         </div>
 

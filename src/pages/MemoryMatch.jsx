@@ -18,6 +18,14 @@ export default function MemoryMatch() {
     return saved ? parseInt(saved, 10) : null;
   });
   const [isGameWon, setIsGameWon] = useState(false);
+  const timeoutRef = useRef(null);
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    };
+  }, []);
 
   // Initialize game
   useEffect(() => {
@@ -39,6 +47,13 @@ export default function MemoryMatch() {
       }
     }
   }, [isGameWon, moves, bestMoves, profile]);
+
+
+  const getStars = (moveCount) => {
+    if (moveCount <= 10) return "⭐⭐⭐";
+    if (moveCount <= 14) return "⭐⭐";
+    return "⭐";
+  };
 
   const initializeGame = () => {
     // Generate a secure random sort
@@ -78,14 +93,16 @@ export default function MemoryMatch() {
 
         // Check win condition
         if (matched.length + 2 === cards.length) {
-          setTimeout(() => {
+          if (timeoutRef.current) clearTimeout(timeoutRef.current);
+          timeoutRef.current = setTimeout(() => {
             setIsGameWon(true);
             sfx.win();
           }, 300);
         }
       } else {
         // No match
-        setTimeout(() => {
+        if (timeoutRef.current) clearTimeout(timeoutRef.current);
+        timeoutRef.current = setTimeout(() => {
           setFlipped([]);
         }, 1000);
       }
@@ -101,7 +118,10 @@ export default function MemoryMatch() {
           Moves: {moves} {bestMoves !== null && <span className="ml-4">Best: {bestMoves}</span>}
         </p>
         {isGameWon && (
-          <p className="font-display text-2xl text-[var(--forest)] pulse-soft">You Win!</p>
+          <div className="flex flex-col items-center gap-2">
+            <p className="font-display text-2xl text-[var(--forest)] pulse-soft">You Win!</p>
+            <p className="text-3xl">{getStars(moves)}</p>
+          </div>
         )}
       </section>
 

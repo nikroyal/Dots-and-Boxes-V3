@@ -769,7 +769,7 @@ function computeUpdatedUserStats(u, m, matchId, derivedStats) {
   newStats.finalizedMatches = trimmedFinalized;
 
   // Check achievements with the projected stats
-  const projectedStats = { ...u, ...newStats, friends: (u.friends || []).length };
+  const projectedStats = { ...u, ...newStats, friends: Array.isArray(u.friends) ? u.friends.length : 0 };
   const newlyUnlocked = checkUnlocks(projectedStats, u.unlockedAchievements || []);
   if (newlyUnlocked.length > 0) {
     // Achievements never roll off; there are only ~23 of them, so the array
