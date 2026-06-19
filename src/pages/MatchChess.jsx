@@ -508,7 +508,7 @@ export default function MatchChess() {
 
   // Pause concealment - hide board if paused
   const concealBoard = match.status === 'paused' && match.pauseConcealed;
-  const lastMove = (displayGame.moves || [])[(Array.isArray(displayGame.moves) ? displayGame.moves.length : 0) - 1];
+  const lastMove = (Array.isArray(displayGame.moves) ? displayGame.moves : []).slice(-1)[0];
 
   const customSquareStyles = {
     ...(lastMove ? {
