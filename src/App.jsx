@@ -34,6 +34,7 @@ import MemoryMatch from './pages/MemoryMatch';
 import ReactionTimer from './pages/ReactionTimer';
 import Snake from './pages/Snake';
 import Battleships from './pages/battleships/Battleships';
+import WhackAMole from './pages/WhackAMole';
 
 import LocalDistrictExchange from './pages/LocalDistrictExchange';
 import DistrictExchangeHub from './pages/DistrictExchangeHub';
@@ -105,6 +106,7 @@ function Shell() {
         <Route path="/chess/local" element={<LocalChess />} />
         <Route path="/memory-match" element={<MemoryMatch />} />
         <Route path="/reaction-timer" element={<ReactionTimer />} />
+        <Route path="/whack-a-mole" element={<WhackAMole />} />
         <Route path="/district-exchange/local" element={<LocalDistrictExchange />} />
         <Route path="/snake" element={<Snake />} />
         <Route path="/battleships" element={<Battleships />} />
@@ -150,6 +152,7 @@ function Shell() {
               <Route path="/circuit-maker" element={<CircuitMaker />} />
               <Route path="/memory-match" element={<MemoryMatch />} />
               <Route path="/reaction-timer" element={<ReactionTimer />} />
+              <Route path="/whack-a-mole" element={<WhackAMole />} />
               <Route path="/snake" element={<Snake />} />
               <Route path="/battleships" element={<Battleships />} />
               <Route path="/lobby" element={<Lobby />} />

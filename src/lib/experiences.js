@@ -162,6 +162,21 @@ export const EXPERIENCE_CATALOG = [
     routePrefixes: ['/reaction-timer'],
   },
   {
+    id: 'whack-a-mole',
+    name: 'Whack-A-Mole',
+    shortName: 'Whack-A-Mole',
+    path: '/whack-a-mole',
+    kind: 'Arcade',
+    status: 'Live',
+    accent: 'var(--ochre)',
+    description: 'Whack the moles as quickly as you can before time runs out.',
+    features: ['Local play', 'Best score'],
+    navItems: [
+      { to: '/whack-a-mole', label: 'Play' },
+    ],
+    routePrefixes: ['/whack-a-mole'],
+  },
+  {
     id: 'district-exchange',
     name: 'District Exchange',
     shortName: 'District',
