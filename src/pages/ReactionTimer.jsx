@@ -149,15 +149,14 @@ export default function ReactionTimer() {
         </div>
         {gameState === 'finished' && reactionTime && (
           <div className="flex flex-col items-center pointer-events-none mt-4">
-            {isNewBest ? (
+            {isNewBest && (
               <div className="font-display text-2xl text-[var(--ochre)] pulse-soft mb-2">
                 🎉 New Best!
               </div>
-            ) : (
-              <div className="font-display text-xl text-[var(--ink)] mb-2 opacity-90">
-                {getRating(reactionTime)}
-              </div>
             )}
+            <div className="font-display text-xl text-[var(--ink)] mb-2 opacity-90">
+              {getRating(reactionTime)}
+            </div>
             <div className="font-mono text-sm opacity-80 tracking-widest uppercase mt-2">
               Click to try again
             </div>
