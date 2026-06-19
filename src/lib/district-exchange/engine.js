@@ -48,7 +48,8 @@ export function rollDice(state) {
   const d2 = Math.floor(Math.random() * 6) + 1;
   const isDoubles = d1 === d2;
 
-  let newState = { ...state, lastDice: [d1, d2] };
+  let newState = structuredClone(state);
+  newState.lastDice = [d1, d2];
   const cp = newState.players[newState.currentPlayerIdx];
 
   if (cp.inJail) {
@@ -85,7 +86,7 @@ export function rollDice(state) {
 }
 
 export function movePlayer(state, playerId, amount) {
-  let newState = { ...state };
+  let newState = structuredClone(state);
   const pIdx = newState.players.findIndex(p => p.id === playerId);
   let cp = newState.players[pIdx];
 
@@ -105,7 +106,7 @@ export function movePlayer(state, playerId, amount) {
 }
 
 export function resolveSpace(state, playerId, spaceId) {
-  let newState = { ...state };
+  let newState = structuredClone(state);
   const space = newState.boardSpaces[spaceId];
   const pIdx = newState.players.findIndex(p => p.id === playerId);
   const cp = newState.players[pIdx];
@@ -147,7 +148,7 @@ export function resolveSpace(state, playerId, spaceId) {
 }
 
 export function drawCard(state, playerId, deckType) {
-  let newState = { ...state };
+  let newState = structuredClone(state);
   let deck = deckType === 'opportunity' ? newState.opportunityDeck : newState.fortuneDeck;
   if (deck.length === 0) return newState; // Should reshuffle in reality, simplified here
 
@@ -167,7 +168,7 @@ export function drawCard(state, playerId, deckType) {
 }
 
 export function resolveCard(state) {
-  let newState = { ...state };
+  let newState = structuredClone(state);
   if (!newState.pendingAction || newState.pendingAction.type !== 'card') return newState;
 
   const card = newState.pendingAction.card;
@@ -288,7 +289,7 @@ export function getOwner(state, spaceId) {
 }
 
 export function buyProperty(state, playerId, spaceId) {
-  let newState = { ...state };
+  let newState = structuredClone(state);
   const space = newState.boardSpaces[spaceId];
   const pIdx = newState.players.findIndex(p => p.id === playerId);
 
@@ -302,7 +303,7 @@ export function buyProperty(state, playerId, spaceId) {
 }
 
 export function declineBuy(state) {
-  let newState = { ...state };
+  let newState = structuredClone(state);
   if (newState.pendingAction && newState.pendingAction.type === 'buy') {
     // Start Auction
     newState.auctionState = {
@@ -317,7 +318,7 @@ export function declineBuy(state) {
 }
 
 export function bidAuction(state, playerId, amount) {
-  let newState = { ...state };
+  let newState = structuredClone(state);
   if (newState.auctionState) {
     if (amount > newState.auctionState.highestBid) {
       const p = newState.players.find(pl => pl.id === playerId);
@@ -331,7 +332,7 @@ export function bidAuction(state, playerId, amount) {
 }
 
 export function passAuction(state, playerId) {
-  let newState = { ...state };
+  let newState = structuredClone(state);
   if (newState.auctionState) {
     newState.auctionState.activeBidders = newState.auctionState.activeBidders.filter(id => id !== playerId);
     const isSoleBidderHighest = newState.auctionState.activeBidders[0] === newState.auctionState.highestBidder;
@@ -343,7 +344,7 @@ export function passAuction(state, playerId) {
 }
 
 export function resolveAuction(state) {
-  let newState = { ...state };
+  let newState = structuredClone(state);
   if (newState.auctionState) {
     const { spaceId, highestBid, highestBidder } = newState.auctionState;
     if (highestBidder) {
@@ -372,7 +373,7 @@ export function mortgageProperty(state, playerId, spaceId) {
     if (setHasUpgrades) return state;
   }
 
-  let newState = { ...state };
+  let newState = structuredClone(state);
   newState.players[pIdx].mortgaged.push(spaceId);
   newState.players[pIdx].cash += Math.floor(space.price / 2);
 
@@ -389,7 +390,7 @@ export function unmortgageProperty(state, playerId, spaceId) {
   const cost = Math.floor((space.price / 2) * 1.1); // 10% interest
   if (cp.cash < cost) return state;
 
-  let newState = { ...state };
+  let newState = structuredClone(state);
   newState.players[pIdx].cash -= cost;
   newState.players[pIdx].mortgaged = newState.players[pIdx].mortgaged.filter(id => id !== spaceId);
 
@@ -421,7 +422,7 @@ export function upgradeProperty(state, playerId, spaceId) {
   const minLevel = Math.min(...levels);
   if (currentLevel > minLevel) return state; // Need to build evenly
 
-  let newState = { ...state };
+  let newState = structuredClone(state);
   newState.players[pIdx].cash -= space.upgradeCost;
   newState.players[pIdx].upgrades[spaceId] = currentLevel + 1;
 
@@ -445,7 +446,7 @@ export function sellUpgrade(state, playerId, spaceId) {
 
   if (currentLevel < maxLevel) return state; // Must sell evenly
 
-  let newState = { ...state };
+  let newState = structuredClone(state);
   newState.players[pIdx].upgrades[spaceId] = currentLevel - 1;
   newState.players[pIdx].cash += Math.floor(space.upgradeCost / 2);
 
@@ -453,7 +454,7 @@ export function sellUpgrade(state, playerId, spaceId) {
 }
 
 export function pay(state, playerId, amount, toPlayerId = null, reason = '') {
-  let newState = { ...state };
+  let newState = structuredClone(state);
   const pIdx = newState.players.findIndex(p => p.id === playerId);
 
   newState.players[pIdx].cash -= amount;
@@ -476,7 +477,7 @@ export function pay(state, playerId, amount, toPlayerId = null, reason = '') {
 }
 
 export function declareBankruptcy(state, playerId) {
-  let newState = { ...state };
+  let newState = structuredClone(state);
   const pIdx = newState.players.findIndex(p => p.id === playerId);
   const cp = newState.players[pIdx];
 
@@ -511,7 +512,7 @@ export function declareBankruptcy(state, playerId) {
 }
 
 export function resolveDebt(state, playerId) {
-  let newState = { ...state };
+  let newState = structuredClone(state);
   if (newState.debtState && newState.debtState.playerId === playerId) {
     const cp = newState.players.find(p => p.id === playerId);
     if (cp.cash >= 0) {
@@ -522,14 +523,14 @@ export function resolveDebt(state, playerId) {
 }
 
 export function addCash(state, playerId, amount, reason = '') {
-  let newState = { ...state };
+  let newState = structuredClone(state);
   const pIdx = newState.players.findIndex(p => p.id === playerId);
   newState.players[pIdx].cash += amount;
   return newState;
 }
 
 export function sendToJail(state, playerId) {
-  let newState = { ...state };
+  let newState = structuredClone(state);
   const pIdx = newState.players.findIndex(p => p.id === playerId);
   newState.players[pIdx].inJail = true;
   newState.players[pIdx].jailTurns = 0;
@@ -538,7 +539,7 @@ export function sendToJail(state, playerId) {
 }
 
 export function releaseFromJail(state, playerId, free = true) {
-  let newState = { ...state };
+  let newState = structuredClone(state);
   const pIdx = newState.players.findIndex(p => p.id === playerId);
   newState.players[pIdx].inJail = false;
   newState.players[pIdx].jailTurns = 0;
@@ -546,7 +547,7 @@ export function releaseFromJail(state, playerId, free = true) {
 }
 
 export function useGetOutOfJailCard(state, playerId) {
-  let newState = { ...state };
+  let newState = structuredClone(state);
   const pIdx = newState.players.findIndex(p => p.id === playerId);
   if (newState.players[pIdx].getOutOfJailCards > 0 && newState.players[pIdx].inJail) {
     newState.players[pIdx].getOutOfJailCards -= 1;
@@ -557,7 +558,7 @@ export function useGetOutOfJailCard(state, playerId) {
 
 export function proposeTrade(state, proposerId, targetId, offer, request) {
   // offer/request structure: { cash: 0, properties: [pid1, pid2], getOutOfJailCards: 0 }
-  let newState = { ...state };
+  let newState = structuredClone(state);
   newState.tradeState = {
     proposerId,
     targetId,
@@ -568,19 +569,19 @@ export function proposeTrade(state, proposerId, targetId, offer, request) {
 }
 
 export function cancelTrade(state) {
-  let newState = { ...state };
+  let newState = structuredClone(state);
   newState.tradeState = null;
   return newState;
 }
 
 export function rejectTrade(state) {
-  let newState = { ...state };
+  let newState = structuredClone(state);
   newState.tradeState = null;
   return newState;
 }
 
 export function acceptTrade(state, playerId) {
-  let newState = { ...state };
+  let newState = structuredClone(state);
   if (!newState.tradeState || newState.tradeState.targetId !== playerId) return newState;
 
   const { proposerId, targetId, offer, request } = newState.tradeState;
@@ -620,7 +621,7 @@ export function acceptTrade(state, playerId) {
 }
 
 export function endTurn(state) {
-  let newState = { ...state };
+  let newState = structuredClone(state);
   if (newState.turnPhase !== 'end') return newState;
 
   if (newState.doublesCount > 0 && !newState.players[newState.currentPlayerIdx].inJail) {

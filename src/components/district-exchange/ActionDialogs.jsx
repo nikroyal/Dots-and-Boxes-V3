@@ -216,7 +216,7 @@ function AuctionDialog({ gameState, currentPlayerId, onAction }) {
   );
 }
 
-export function ControlsPanel({ gameState, currentPlayerId, onAction }) {
+export function ControlsPanel({ gameState, currentPlayerId, onAction, isRolling }) {
   const [showUpgrades, setShowUpgrades] = useState(false);
   const [showTrade, setShowTrade] = useState(false);
   const [showMortgages, setShowMortgages] = useState(false);
@@ -253,7 +253,7 @@ export function ControlsPanel({ gameState, currentPlayerId, onAction }) {
 
   return (
     <div className="flex gap-4 justify-center items-center py-4 flex-wrap">
-      {gameState.turnPhase === 'roll' && isMyTurn && !gameState.pendingAction && !gameState.auctionState && !inDebt && (
+      {gameState.turnPhase === 'roll' && isMyTurn && !gameState.pendingAction && !gameState.auctionState && !inDebt && !isRolling && (
         <button onClick={handleRoll} className="btn-primary px-8 py-3 text-lg shadow-lg hover:scale-105 transition-transform">
           Roll Dice
         </button>

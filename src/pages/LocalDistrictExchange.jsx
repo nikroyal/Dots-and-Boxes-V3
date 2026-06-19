@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+
 import { useNavigate } from 'react-router-dom';
 import { X, Trophy } from 'lucide-react';
 import { useConfirm } from '../components/ConfirmDialog';
@@ -43,6 +44,7 @@ export default function LocalDistrictExchange() {
   const [setup, setSetup] = useState(true);
   const [players, setPlayers] = useState(DEFAULT_PLAYERS.slice(0, 4));
   const [gameState, setGameState] = useState(null);
+  const [isRolling, setIsRolling] = useState(false);
   const { confirm, dialog: confirmDialogEl } = useConfirm();
 
   // Handle AI Turns and Auctions
@@ -135,8 +137,20 @@ export default function LocalDistrictExchange() {
       switch (type) {
         case 'roll':
           sfx.piece();
-          next = rollDice(next);
-          break;
+          setIsRolling(true);
+          // Pre-compute the roll results
+          const computedNext = rollDice(next);
+          // Set an intermediate state just to show dice rolling
+          setGameState(prev => ({ ...prev, isRollingAnimation: true }));
+          setTimeout(() => {
+            setIsRolling(false);
+            setGameState(prev => {
+              // We replace the state with the actual computed roll state
+              // To avoid state desync, we actually just apply rollDice to the latest state
+              return rollDice(prev);
+            });
+          }, 3000);
+          return prev; // don't mutate state right now in this switch
         case 'end':
           next = endTurn(next);
           break;
@@ -148,7 +162,7 @@ export default function LocalDistrictExchange() {
           next = declineBuy(next);
           break;
         case 'resolveCard':
-          sfx.bell();
+          sfx.notify();
           next = resolveCard(next);
           break;
         case 'bidAuction':
@@ -169,7 +183,7 @@ export default function LocalDistrictExchange() {
           next = sellUpgrade(next, cpId, payload);
           break;
         case 'proposeTrade':
-          sfx.bell();
+          sfx.notify();
           next = proposeTrade(next, cpId, payload.targetId, payload.offer, payload.request);
           break;
         case 'acceptTrade':
@@ -296,12 +310,13 @@ export default function LocalDistrictExchange() {
       </div>
 
       <div className="flex flex-col lg:flex-row gap-6 items-start">
-        <div className="w-full lg:w-[60%] flex-shrink-0 sticky top-4">
-           <Board gameState={gameState} />
-           <ControlsPanel gameState={gameState} currentPlayerId={interactingHumanId} onAction={handleAction} />
+        <div className="w-full lg:w-[70%] flex-shrink-0 sticky top-4 relative">
+           <Board gameState={gameState} isRolling={isRolling} />
+           {!isRolling && <ActionDialogs gameState={gameState} currentPlayerId={interactingHumanId} onAction={handleAction} />}
+           <ControlsPanel gameState={gameState} currentPlayerId={interactingHumanId} onAction={handleAction} isRolling={isRolling} />
         </div>
 
-        <div className="w-full lg:w-[40%] space-y-4 max-h-[80vh] overflow-y-auto pr-2">
+        <div className="w-full lg:w-[30%] space-y-4 max-h-[80vh] overflow-y-auto pr-2">
            <PlayerPanel gameState={gameState} currentPlayerId={interactingHumanId} />
 
            {/* Turn Log (Simplified) */}
@@ -312,8 +327,6 @@ export default function LocalDistrictExchange() {
            </div>
         </div>
       </div>
-
-      <ActionDialogs gameState={gameState} currentPlayerId={interactingHumanId} onAction={handleAction} />
 
       {gameState.winner && (
         <div className="fixed inset-0 bg-black/80 z-[100] flex items-center justify-center p-4 fade-in" role="dialog" aria-modal="true" aria-labelledby="winner-dialog-title">

@@ -7,3 +7,11 @@
 ## 2026-06-19 - Adding Dynamic Contextual Feedback
 **Learning:** Adding lightweight conditional UI messaging mapped directly to the final user state (e.g., scores, moves) creates an immediate qualitative assessment that is highly satisfying.
 **Action:** In small arcade games, always consider replacing generic "Game Over" or "You Win" states with performance-based qualitative tiers (like stars or descriptive ratings) to instantly improve the replay loop.
+## 2026-06-18 - Avoid Shallow Copying Reducer State
+**Learning:** Relying on shallow copies (e.g. `{ ...state }`) within game state reducers, especially nested objects and arrays, leads to mutation issues that crash React Strict Mode apps.
+**Action:** Always use deep copying methods like `structuredClone(state)` at the start of a reducer function that performs multiple mutations.
+=======
+## 2026-06-19 - Adding Dynamic Contextual Feedback
+**Learning:** Adding lightweight conditional UI messaging mapped directly to the final user state (e.g., scores, moves) creates an immediate qualitative assessment that is highly satisfying.
+**Action:** In small arcade games, always consider replacing generic "Game Over" or "You Win" states with performance-based qualitative tiers (like stars or descriptive ratings) to instantly improve the replay loop.
+
