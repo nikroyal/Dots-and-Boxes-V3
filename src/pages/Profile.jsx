@@ -8,6 +8,8 @@ import { ACHIEVEMENTS, AVATAR_OPTIONS, TITLE_OPTIONS, getRankFromElo } from '../
 import { toast } from '../components/Notifications';
 import { useConfirm } from '../components/ConfirmDialog';
 import { Edit2, UserPlus, Ban, Check } from 'lucide-react';
+import EloChart from '../components/EloChart';
+import ActivityFeed from '../components/ActivityFeed';
 
 export default function Profile() {
   const { username } = useParams();
@@ -252,6 +254,19 @@ export default function Profile() {
           <Stat label="Biggest Chain" value={target.biggestChain || 0} />
           <Stat label="Perfect Wins" value={target.perfectWins || 0} />
         </div>
+      </section>
+
+      {/* ELO trend */}
+      {(target.matchHistory || []).length > 0 && (
+        <section className="card">
+          <EloChart matchHistory={target.matchHistory || []} currentElo={target.elo ?? 1000} />
+        </section>
+      )}
+
+      {/* Activity feed */}
+      <section>
+        <div className="font-mono text-[0.65rem] tracking-widest uppercase opacity-50 mb-3">Recent Activity</div>
+        <ActivityFeed profile={target} singleUser={true} viewerId={me.id} />
       </section>
 
       {/* Achievements */}
