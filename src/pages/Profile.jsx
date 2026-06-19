@@ -266,7 +266,7 @@ export default function Profile() {
       {/* Activity feed */}
       <section>
         <div className="font-mono text-[0.65rem] tracking-widest uppercase opacity-50 mb-3">Recent Activity</div>
-        <ActivityFeed profile={target} singleUser={true} viewerId={me?.id} />
+        <ActivityFeed profile={target} singleUser={true} viewerId={me.id} />
       </section>
 
       {/* Achievements */}
