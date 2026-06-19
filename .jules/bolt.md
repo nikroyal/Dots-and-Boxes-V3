@@ -24,3 +24,6 @@
 ## 2026-06-18 - Nested `Array.find` within Multiple Loops
 **Learning:** React components containing multiple functions which loop over all players using `.find` per cell rendered results in a complexity of O(C * P) per property lookup. Using it twice across rendering the board means iterating O(2 * C * P) each render. This gets progressively worse as the board scale or number of players grow.
 **Action:** Lift static maps up and leverage `useMemo` to convert properties into a O(1) indexed `Map` (`Map<PropertyId, Player>`). Then utilize `.get` on that memoized map for efficient resolution throughout child components.
+## 2024-11-20 - O(1) Map lookups in render loops
+**Learning:** Using `Array.find()` inside a `.map()` render loop creates an O(N²) time complexity bottleneck which blocks the main thread during renders, especially for large arrays like chat history. While replacing it with a Map lookup (`Map.get()`) makes it O(1), recreating the Map from the array on every render cycle introduces unnecessary O(N) computational overhead and memory allocation churn, which can degrade performance rather than improve it.
+**Action:** Always memoize the Map creation (e.g., using `useMemo`) so the O(N) map generation cost is only paid when the underlying array changes, ensuring true O(1) lookup performance in the render loop.

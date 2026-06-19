@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useMemo } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../lib/AuthContext';
 import { 
@@ -101,6 +101,8 @@ export default function ClubDetail() {
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages.length]);
+
+  const messageMap = useMemo(() => new Map(messages.map(m => [m.id, m])), [messages]);
 
   if (!profile) return null;
   if (club === undefined) return <div className="font-mono text-xs opacity-50 text-center py-20">LOADING...</div>;
@@ -268,7 +270,7 @@ export default function ClubDetail() {
             messages.map((msg, idx) => {
               const prevMsg = messages[idx-1];
               const isContinuation = prevMsg && prevMsg.userId === msg.userId && (msg.ts - prevMsg.ts < 300000);
-              const replyMsg = msg.replyTo ? messages.find(m => m.id === msg.replyTo) : null;
+              const replyMsg = msg.replyTo ? messageMap.get(msg.replyTo) : null;
 
               return (
                 <MessageItem 
