@@ -90,7 +90,8 @@ export function generateRandomBotGrid() {
       }
     }
 
-    const bestPlacements = validPlacements.filter(p => p.score === maxScore);
+    const scoreThreshold = 1;
+    const bestPlacements = validPlacements.filter(p => p.score >= maxScore - scoreThreshold);
     const chosen = bestPlacements[Math.floor(Math.random() * bestPlacements.length)];
     grid = placeShip(grid, ship.length, chosen.row, chosen.col, chosen.isVertical, ship.id);
   }
