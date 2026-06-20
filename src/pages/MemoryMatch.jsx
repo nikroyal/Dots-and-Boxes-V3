@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../lib/AuthContext';
 import { recordActivity, ACTIVITY_TYPES } from '../lib/activity';
+import { updateArcadeBest } from '../lib/actions';
 import { Star, Zap, Play, Target, Trophy, Send, Users, Shield } from 'lucide-react';
 import { sfx } from '../lib/sound';
 import Confetti from '../components/Confetti';
@@ -43,6 +44,7 @@ export default function MemoryMatch() {
       // Side effects belong in the effect body, not the state updater function.
       if (bestMoves === null || moves < bestMoves) {
         recordActivity(profile, ACTIVITY_TYPES.ARCADE_BEST, { game: 'Memory Match', score: moves + ' moves' });
+        updateArcadeBest(profile, 'memory-match', 'Memory Match', moves, moves + ' moves');
         localStorage.setItem('memory-match-best', moves.toString());
       }
     }

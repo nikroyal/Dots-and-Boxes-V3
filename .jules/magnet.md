@@ -9,3 +9,9 @@
 **Learning:** Static statistics (like total wins or high scores) on a user's profile show capability, but they don't tell a story. By exposing dynamic narratives—like ELO progression over time and recent activity feeds—on public profiles, we trigger competitive curiosity. Users can see *how* someone achieved their rank and what they are actively doing, which motivates them to engage more to build their own narrative.
 
 **Action:** When designing public-facing user profiles, prioritize chronological activity and progression timelines alongside static lifetime metrics to create social proof and encourage reciprocal engagement.
+
+## 2024-05-19 - Permanent Arcade Records
+
+**Learning:** When players set personal bests in solo arcade games, storing them only locally or temporarily in feeds reduces their perceived value. Making personal bests persistent across sessions and visible on a player's public profile makes the achievement feel permanent and shareable, increasing motivation to retry for higher scores.
+
+**Action:** Whenever implementing a solo game or high-score system, ensure the best results are persisted to the user's backend profile and publicly displayed on their dashboard/profile page so they can be shown off as "records" rather than ephemeral stats.

@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../lib/AuthContext';
 import { recordActivity, ACTIVITY_TYPES } from '../lib/activity';
+import { updateArcadeBest } from '../lib/actions';
 import { sfx } from '../lib/sound';
 
 export default function ReactionTimer() {
@@ -69,6 +70,7 @@ export default function ReactionTimer() {
 
     if (!bestTime || time < bestTime) {
       recordActivity(profile, ACTIVITY_TYPES.ARCADE_BEST, { game: 'Reaction Timer', score: time.toFixed(0) + ' ms' });
+      updateArcadeBest(profile, 'reaction-timer', 'Reaction Timer', time, time.toFixed(0) + ' ms');
       setIsNewBest(true);
       setBestTime(time);
       try {
@@ -102,13 +104,13 @@ export default function ReactionTimer() {
     if (e.key === ' ' || e.key === 'Enter') {
       if (e.repeat) return;
       e.preventDefault();
-      handleClick();
+      handleTrigger();
     }
   };
 
   const handlePointerDown = (e) => {
     e.preventDefault();
-    handleClick();
+    handleTrigger();
   };
 
   // Determine background color based on state

@@ -1,4 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { useAuth } from '../lib/AuthContext';
+import { recordActivity, ACTIVITY_TYPES } from '../lib/activity';
+import { updateArcadeBest } from '../lib/actions';
 import { sfx } from '../lib/sound';
 
 const GRID_SIZE = 20;
@@ -14,6 +17,7 @@ const INITIAL_SNAKE = [
 const INITIAL_DIRECTION = { x: 0, y: -1 }; // UP
 
 export default function Snake() {
+  const { profile } = useAuth();
   const [snake, setSnake] = useState(INITIAL_SNAKE);
   const [direction, setDirection] = useState(INITIAL_DIRECTION);
   const [food, setFood] = useState({ x: 5, y: 5 });
@@ -88,6 +92,8 @@ export default function Snake() {
       try {
         localStorage.setItem('axiom-snake-best', scoreRef.current.toString());
       } catch {}
+      recordActivity(profile, ACTIVITY_TYPES.ARCADE_BEST, { game: 'Snake', score: scoreRef.current.toString() });
+      updateArcadeBest(profile, 'snake', 'Snake', scoreRef.current, scoreRef.current.toString());
     }
   };
 

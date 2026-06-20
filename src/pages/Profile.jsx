@@ -4,7 +4,7 @@ import { doc, onSnapshot, getDoc } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { useAuth } from '../lib/AuthContext';
 import { updateProfile, sendFriendRequest, removeFriend, blockUser } from '../lib/actions';
-import { ACHIEVEMENTS, AVATAR_OPTIONS, TITLE_OPTIONS, getRankFromElo } from '../lib/achievements';
+import { ACHIEVEMENTS, AVATAR_OPTIONS, TITLE_OPTIONS, getRankInfo } from '../lib/achievements';
 import { toast } from '../components/Notifications';
 import { useConfirm } from '../components/ConfirmDialog';
 import { Edit2, UserPlus, Ban, Check } from 'lucide-react';
@@ -268,6 +268,18 @@ export default function Profile() {
         <div className="font-mono text-[0.65rem] tracking-widest uppercase opacity-50 mb-3">Recent Activity</div>
         <ActivityFeed profile={target} singleUser={true} viewerId={me.id} />
       </section>
+
+      {/* Arcade Records */}
+      {target.arcadeBests && Object.keys(target.arcadeBests).length > 0 && (
+        <section>
+          <div className="font-mono text-[0.65rem] tracking-widest uppercase opacity-50 mb-3">Arcade Records</div>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            {Object.entries(target.arcadeBests).map(([gameId, record]) => (
+              <Stat key={gameId} label={record.gameName || gameId} value={record.scoreDisplay} />
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* Achievements */}
       <section>
