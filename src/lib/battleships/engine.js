@@ -43,18 +43,57 @@ export function placeShip(grid, length, row, col, isVertical, shipId) {
 
 export function generateRandomBotGrid() {
   let grid = createEmptyGrid();
-  for (const ship of SHIPS) {
-    let placed = false;
-    while (!placed) {
-      const isVertical = Math.random() < 0.5;
-      const row = Math.floor(Math.random() * BOARD_SIZE);
-      const col = Math.floor(Math.random() * BOARD_SIZE);
 
-      if (canPlaceShip(grid, ship.length, row, col, isVertical)) {
-        grid = placeShip(grid, ship.length, row, col, isVertical, ship.id);
-        placed = true;
+  for (const ship of SHIPS) {
+    const validPlacements = [];
+    let maxScore = -Infinity;
+
+    for (let isVertical of [true, false]) {
+      for (let row = 0; row < BOARD_SIZE; row++) {
+        for (let col = 0; col < BOARD_SIZE; col++) {
+          if (canPlaceShip(grid, ship.length, row, col, isVertical)) {
+            let score = 0;
+            const cells = [];
+            if (isVertical) {
+              for (let i = 0; i < ship.length; i++) cells.push({ r: row + i, c: col });
+            } else {
+              for (let i = 0; i < ship.length; i++) cells.push({ r: row, c: col + i });
+            }
+
+            for (const { r, c } of cells) {
+              // Edge penalty
+              if (r === 0 || r === BOARD_SIZE - 1 || c === 0 || c === BOARD_SIZE - 1) {
+                score -= 1;
+              }
+
+              // Adjacency penalty (clumping)
+              const adjacents = [
+                { r: r - 1, c }, { r: r + 1, c },
+                { r, c: c - 1 }, { r, c: c + 1 }
+              ];
+              for (const adj of adjacents) {
+                if (adj.r >= 0 && adj.r < BOARD_SIZE && adj.c >= 0 && adj.c < BOARD_SIZE) {
+                  if (grid[adj.r][adj.c] !== null) {
+                    score -= 1;
+                  }
+                }
+              }
+            }
+
+            if (score > maxScore) {
+              maxScore = score;
+            }
+
+            validPlacements.push({ row, col, isVertical, score });
+          }
+        }
       }
     }
+
+    const scoreThreshold = 1;
+    const bestPlacements = validPlacements.filter(p => p.score >= maxScore - scoreThreshold);
+    const chosen = bestPlacements[Math.floor(Math.random() * bestPlacements.length)];
+    grid = placeShip(grid, ship.length, chosen.row, chosen.col, chosen.isVertical, ship.id);
   }
   return grid;
 }
