@@ -118,8 +118,9 @@ export function getBotMove(shotGrid, difficulty = 3, targetGrid, targetShips) {
     // Find smallest unsunk ship length
     let minLength = 5;
     for (const shipId in targetShips) {
-      if (!targetShips[shipId].sunk) {
-        minLength = Math.min(minLength, targetShips[shipId].length);
+      const ship = targetShips[shipId];
+      if (ship && !ship.sunk && typeof ship.length === 'number') {
+        minLength = Math.min(minLength, ship.length);
       }
     }
     parity = minLength;
