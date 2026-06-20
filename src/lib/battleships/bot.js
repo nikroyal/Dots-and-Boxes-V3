@@ -50,7 +50,7 @@ export function getBotMove(shotGrid, difficulty = 3, targetGrid, targetShips) {
     const shipId = shipIds[0];
     const hits = liveHitsByShip[shipId];
 
-    if (difficulty >= 4 && hits.length > 1) {
+    if (difficulty >= 4 && hits.length > 1 && shipId !== 'unknown') {
       // Axis detection
       const isHorizontal = hits[0].r === hits[1].r;
       const validTargets = [];
