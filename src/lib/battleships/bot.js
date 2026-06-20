@@ -77,8 +77,16 @@ export function getBotMove(shotGrid, difficulty = 3, targetGrid, targetShips) {
         const maxC = hits[hits.length - 1].c;
         const r = hits[0].r;
 
-        if (minC > 0 && shotGrid[r][minC - 1] === null) validTargets.push({ r, c: minC - 1 });
-        if (maxC < BOARD_SIZE - 1 && shotGrid[r][maxC + 1] === null) validTargets.push({ r, c: maxC + 1 });
+        for (let c = minC + 1; c < maxC; c++) {
+          if (shotGrid[r][c] === null) {
+            validTargets.push({ r, c });
+          }
+        }
+
+        if (validTargets.length === 0) {
+          if (minC > 0 && shotGrid[r][minC - 1] === null) validTargets.push({ r, c: minC - 1 });
+          if (maxC < BOARD_SIZE - 1 && shotGrid[r][maxC + 1] === null) validTargets.push({ r, c: maxC + 1 });
+        }
       } else {
         // Sort by row
         hits.sort((a, b) => a.r - b.r);
@@ -86,8 +94,16 @@ export function getBotMove(shotGrid, difficulty = 3, targetGrid, targetShips) {
         const maxR = hits[hits.length - 1].r;
         const c = hits[0].c;
 
-        if (minR > 0 && shotGrid[minR - 1][c] === null) validTargets.push({ r: minR - 1, c });
-        if (maxR < BOARD_SIZE - 1 && shotGrid[maxR + 1][c] === null) validTargets.push({ r: maxR + 1, c });
+        for (let r = minR + 1; r < maxR; r++) {
+          if (shotGrid[r][c] === null) {
+            validTargets.push({ r, c });
+          }
+        }
+
+        if (validTargets.length === 0) {
+          if (minR > 0 && shotGrid[minR - 1][c] === null) validTargets.push({ r: minR - 1, c });
+          if (maxR < BOARD_SIZE - 1 && shotGrid[maxR + 1][c] === null) validTargets.push({ r: maxR + 1, c });
+        }
       }
 
       if (validTargets.length > 0) {
