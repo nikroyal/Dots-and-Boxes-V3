@@ -116,11 +116,15 @@ export default function ReactionTimer() {
     e.preventDefault();
     const rating = getRating(reactionTime);
     const text = `I scored ${reactionTime.toFixed(0)}ms on Axiom Reaction Timer! ${rating}`;
-    navigator.clipboard.writeText(text).then(() => {
-      sfx.notify();
-    }).catch(err => {
-      console.warn("Clipboard copy failed", err);
-    });
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(() => {
+        sfx.notify();
+      }).catch(err => {
+        console.warn("Clipboard copy failed", err);
+      });
+    } else {
+      console.warn("Clipboard API not supported");
+    }
   };
 
   // Determine background color based on state
