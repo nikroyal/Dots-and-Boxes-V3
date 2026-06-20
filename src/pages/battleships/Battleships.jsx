@@ -139,7 +139,7 @@ export default function Battleships() {
 
       return () => clearTimeout(timer);
     }
-  }, [gameState, isPlayerTurn, botShots, playerGrid, playerShips]);
+  }, [gameState, isPlayerTurn, botShots, playerGrid, playerShips, difficulty]);
 
   const resetGame = () => {
     setGameState(GAME_STATES.PLACEMENT);
