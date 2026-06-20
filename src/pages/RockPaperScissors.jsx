@@ -138,7 +138,6 @@ export default function RockPaperScissors() {
             {CHOICES.map((choice) => (
               <button
                 key={choice}
-                onPointerDown={(e) => { e.preventDefault(); handleChoice(choice); }}
                 onClick={() => handleChoice(choice)}
                 disabled={gameState === 'playing'}
                 className="w-20 h-20 sm:w-24 sm:h-24 text-4xl sm:text-5xl border hairline rounded flex items-center justify-center bg-[var(--bg-soft)] hover:bg-[var(--bg-hover)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus-ring"
