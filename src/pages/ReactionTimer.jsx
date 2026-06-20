@@ -113,6 +113,22 @@ export default function ReactionTimer() {
     handleTrigger();
   };
 
+  const handleShare = (e) => {
+    e.stopPropagation();
+    e.preventDefault();
+    const rating = getRating(reactionTime);
+    const text = `I scored ${reactionTime.toFixed(0)}ms on Axiom Reaction Timer! ${rating}`;
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(() => {
+        sfx.notify();
+      }).catch(err => {
+        console.warn("Clipboard copy failed", err);
+      });
+    } else {
+      console.warn("Clipboard API not supported");
+    }
+  };
+
   // Determine background color based on state
   let bgColor = 'var(--paper-tint)';
   let textColor = 'var(--ink)';
@@ -139,32 +155,44 @@ export default function ReactionTimer() {
         )}
       </section>
 
-      <button
-        onPointerDown={handleTrigger}
-        onKeyDown={handleKeyDown}
-        className="w-full max-w-md aspect-video border hairline card transition-colors duration-150 flex flex-col items-center justify-center focus-ring select-none"
-        style={{ background: bgColor, color: textColor }}
-        aria-label="Reaction timer area"
-      >
-        <div className="font-display text-3xl md:text-4xl pointer-events-none">
-          {message}
-        </div>
-        {gameState === 'finished' && reactionTime && (
-          <div className="flex flex-col items-center pointer-events-none mt-4">
-            {isNewBest && (
-              <div className="font-display text-2xl text-[var(--ochre)] pulse-soft mb-2">
-                🎉 New Best!
-              </div>
-            )}
-            <div className="font-display text-xl text-[var(--ink)] mb-2 opacity-90">
-              {getRating(reactionTime)}
-            </div>
-            <div className="font-mono text-sm opacity-80 tracking-widest uppercase mt-2">
-              Click to try again
-            </div>
+      <div className="w-full max-w-md flex flex-col items-center gap-4">
+        <button
+          onPointerDown={handleTrigger}
+          onKeyDown={handleKeyDown}
+          className="w-full aspect-video border hairline card transition-colors duration-150 flex flex-col items-center justify-center focus-ring select-none"
+          style={{ background: bgColor, color: textColor }}
+          aria-label="Reaction timer area"
+        >
+          <div className="font-display text-3xl md:text-4xl pointer-events-none">
+            {message}
           </div>
+          {gameState === 'finished' && reactionTime && (
+            <div className="flex flex-col items-center pointer-events-none mt-4">
+              {isNewBest && (
+                <div className="font-display text-2xl text-[var(--ochre)] pulse-soft mb-2">
+                  🎉 New Best!
+                </div>
+              )}
+              <div className="font-display text-xl text-[var(--ink)] mb-2 opacity-90">
+                {getRating(reactionTime)}
+              </div>
+              <div className="font-mono text-sm opacity-80 tracking-widest uppercase mt-2">
+                Click to try again
+              </div>
+            </div>
+          )}
+        </button>
+
+        {gameState === 'finished' && reactionTime && (
+          <button
+            onClick={handleShare}
+            onPointerDown={(e) => e.stopPropagation()}
+            className="btn-secondary fade-up"
+          >
+            Share Result
+          </button>
         )}
-      </button>
+      </div>
     </div>
   );
 }
