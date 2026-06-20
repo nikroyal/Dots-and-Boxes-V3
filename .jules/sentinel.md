@@ -6,3 +6,7 @@
 **Vulnerability:** A custom float division (`/ 4294967296 * length`) combined with `Math.floor` was used with `crypto.getRandomValues` to generate random array indices for avatars.
 **Learning:** This approach recreates a pseudo `Math.random()` leading to floating point precision issues. While low impact for avatars, it demonstrates poor cryptographic hygiene and is prone to errors.
 **Prevention:** Always use standard modulo arithmetic (`crypto.getRandomValues(array)[0] % length`) or unbiased random selection algorithms when choosing a random element from an array based on cryptographic values.
+## 2024-10-18 - Hardcoded Firebase Configuration Secrets
+**Vulnerability:** The Firebase configuration in `src/lib/firebase.js` contained a hardcoded, public `apiKey` and other project details.
+**Learning:** Hardcoding credentials exposes them in the source code repository. Anyone with access to the source code can read these values, potentially leading to unauthorized access, quota exhaustion, or data manipulation if not properly secured by Firestore Rules or App Check. It existed likely due to a direct copy-paste from the Firebase console without subsequent refactoring to environment variables.
+**Prevention:** Always source configuration secrets dynamically from the environment using variables like `import.meta.env.VITE_FIREBASE_API_KEY` (in Vite) or `process.env`. Ensure local development templates (like `.env.example`) are provided to indicate required variables without exposing actual secrets.
