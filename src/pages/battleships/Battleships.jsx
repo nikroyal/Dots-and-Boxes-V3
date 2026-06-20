@@ -17,6 +17,7 @@ export default function Battleships() {
   const [gameState, setGameState] = useState(GAME_STATES.PLACEMENT);
 
   // Placement State
+  const [difficulty, setDifficulty] = useState(3);
   const [playerGrid, setPlayerGrid] = useState(createEmptyGrid());
   const [shipsToPlace, setShipsToPlace] = useState([...SHIPS]);
   const [isVertical, setIsVertical] = useState(false);
@@ -112,7 +113,7 @@ export default function Battleships() {
   useEffect(() => {
     if (gameState === GAME_STATES.PLAYING && !isPlayerTurn) {
       const timer = setTimeout(() => {
-        const move = getBotMove(botShots);
+        const move = getBotMove(botShots, difficulty, playerGrid, playerShips);
         if (!move) return; // Should not happen
 
         const res = processShot(playerGrid, botShots, playerShips, move.r, move.c);
@@ -192,6 +193,23 @@ export default function Battleships() {
         {/* Player Grid Section */}
         <div className="flex flex-col items-center">
           <h2 className="font-mono text-sm tracking-widest uppercase opacity-60 mb-4">Your Waters</h2>
+          {gameState === GAME_STATES.PLACEMENT && (
+            <div className="mb-4">
+              <label htmlFor="difficulty-select" className="mr-2 text-sm font-medium">Bot Difficulty:</label>
+              <select
+                id="difficulty-select"
+                value={difficulty}
+                onChange={(e) => setDifficulty(parseInt(e.target.value, 10))}
+                className="bg-white dark:bg-neutral-800 border hairline rounded p-1 text-sm"
+              >
+                <option value={1}>1 - Easy (Random)</option>
+                <option value={2}>2 - Normal</option>
+                <option value={3}>3 - Hard (Focused)</option>
+                <option value={4}>4 - Expert (Axis Detection)</option>
+                <option value={5}>5 - Unbeatable (Parity Hunt)</option>
+              </select>
+            </div>
+          )}
           <div
             className="border hairline p-2 bg-[var(--paper-tint)] shadow-sm inline-block"
             onMouseLeave={handlePlayerGridMouseLeave}
