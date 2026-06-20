@@ -15,3 +15,10 @@
 **Learning:** Adding lightweight conditional UI messaging mapped directly to the final user state (e.g., scores, moves) creates an immediate qualitative assessment that is highly satisfying.
 **Action:** In small arcade games, always consider replacing generic "Game Over" or "You Win" states with performance-based qualitative tiers (like stars or descriptive ratings) to instantly improve the replay loop.
 
+## 2024-06-20 - Adding Initial Peeks
+**Learning:** For memory-based games, forcing players into a completely blind first turn feels random and relies entirely on luck, which can hurt first-minute engagement.
+**Action:** Always consider adding a brief "peek" phase where the board or state is temporarily revealed before play starts to establish context and give players an immediate strategic hook.
+
+## 2024-06-20 - Shareable Milestones
+**Learning:** Players enjoy sharing good results, but manually typing out scores is high friction.
+**Action:** When a player reaches a game-over or win state with a score or qualitative rating, add a simple "Share Result" button that writes a pre-formatted string to the clipboard to encourage social shareability and replayability.

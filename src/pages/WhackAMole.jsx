@@ -14,6 +14,7 @@ export default function WhackAMole() {
   const [score, setScore] = useState(0);
   const [timeLeft, setTimeLeft] = useState(GAME_DURATION);
   const [activeMole, setActiveMole] = useState(null);
+  const [hits, setHits] = useState([]);
   const [bestScore, setBestScore] = useState(() => {
     try {
       const saved = localStorage.getItem('axiom-whackamole-best');
@@ -65,6 +66,7 @@ export default function WhackAMole() {
       spawnMole();
     } else {
       setActiveMole(null);
+      setHits([]);
       if (moleTimerRef.current) clearTimeout(moleTimerRef.current);
     }
   }, [gameState, spawnMole]);
@@ -74,6 +76,7 @@ export default function WhackAMole() {
     setGameState('playing');
     setScore(0);
     setTimeLeft(GAME_DURATION);
+    setHits([]);
     scoreRef.current = 0;
 
     if (timerRef.current) clearInterval(timerRef.current);
@@ -112,6 +115,13 @@ export default function WhackAMole() {
       sfx.piece();
       setScore((s) => s + 10);
       setActiveMole(null); // hide immediately
+
+      const hitId = Date.now();
+      setHits(currentHits => [...currentHits, { id: hitId, index }]);
+      setTimeout(() => {
+        setHits(currentHits => currentHits.filter(h => h.id !== hitId));
+      }, 500);
+
       if (moleTimerRef.current) clearTimeout(moleTimerRef.current);
       moleTimerRef.current = setTimeout(spawnMole, 200); // small delay before next spawn
     } else {
@@ -154,23 +164,32 @@ export default function WhackAMole() {
         )}
 
         <div className="grid grid-cols-3 gap-4 sm:gap-6">
-          {Array.from({ length: GRID_SIZE }).map((_, i) => (
-            <button
-              key={i}
-              onPointerDown={(e) => { e.preventDefault(); handleHoleClick(i); }}
-              onClick={() => handleHoleClick(i)}
-              className={'aspect-square rounded-full flex items-center justify-center transition-all duration-100 ' + (
-                activeMole === i
-                  ? 'bg-[var(--forest)] scale-105 shadow-md cursor-crosshair'
-                  : 'bg-[var(--bg-soft)] border hairline cursor-default'
-              )}
-              aria-label={activeMole === i ? 'Whack mole' : 'Empty hole'}
-            >
-              {activeMole === i && (
-                <div className="w-1/2 h-1/2 rounded-full bg-white opacity-80 pointer-events-none" />
-              )}
-            </button>
-          ))}
+          {Array.from({ length: GRID_SIZE }).map((_, i) => {
+            const isHit = hits.some(h => h.index === i);
+            return (
+              <div key={i} className="relative aspect-square">
+                <button
+                  onPointerDown={(e) => { e.preventDefault(); handleHoleClick(i); }}
+                  onClick={() => handleHoleClick(i)}
+                  className={'w-full h-full rounded-full flex items-center justify-center transition-all duration-100 ' + (
+                    activeMole === i
+                      ? 'bg-[var(--forest)] scale-105 shadow-md cursor-crosshair'
+                      : 'bg-[var(--bg-soft)] border hairline cursor-default'
+                  )}
+                  aria-label={activeMole === i ? 'Whack mole' : 'Empty hole'}
+                >
+                  {activeMole === i && (
+                    <div className="w-1/2 h-1/2 rounded-full bg-white opacity-80 pointer-events-none" />
+                  )}
+                </button>
+                {isHit && (
+                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none fade-up text-[var(--forest)] font-display text-2xl" style={{ animationDuration: '0.3s' }}>
+                    +10
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
       </div>
 

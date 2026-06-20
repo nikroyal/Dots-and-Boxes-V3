@@ -18,12 +18,15 @@ export default function MemoryMatch() {
     return saved ? parseInt(saved, 10) : null;
   });
   const [isGameWon, setIsGameWon] = useState(false);
+  const [isPeeking, setIsPeeking] = useState(false);
   const timeoutRef = useRef(null);
+  const peekTimeoutRef = useRef(null);
 
   // Cleanup timeout on unmount
   useEffect(() => {
     return () => {
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
+      if (peekTimeoutRef.current) clearTimeout(peekTimeoutRef.current);
     };
   }, []);
 
@@ -67,9 +70,16 @@ export default function MemoryMatch() {
     setMatched([]);
     setMoves(0);
     setIsGameWon(false);
+
+    setIsPeeking(true);
+    if (peekTimeoutRef.current) clearTimeout(peekTimeoutRef.current);
+    peekTimeoutRef.current = setTimeout(() => {
+      setIsPeeking(false);
+    }, 1500);
   };
 
   const handleCardClick = (id) => {
+    if (isPeeking) return; // Prevent clicking during initial peek
     if (flipped.length === 2) return; // Prevent clicking more than 2 cards
     if (flipped.includes(id)) return; // Prevent double clicking same card
     if (matched.includes(id)) return; // Prevent clicking matched cards
@@ -130,7 +140,7 @@ export default function MemoryMatch() {
           const isFlipped = flipped.includes(card.id);
           const isMatched = matched.includes(card.id);
           const Icon = card.Icon;
-          const showFace = isFlipped || isMatched;
+          const showFace = isPeeking || isFlipped || isMatched;
 
           return (
             <button
@@ -139,7 +149,7 @@ export default function MemoryMatch() {
               className={`border hairline aspect-square flex items-center justify-center cursor-pointer transition-all duration-300 ${
                 showFace ? 'bg-white shadow-sm' : 'bg-[var(--bg-soft)] hover:bg-[var(--bg-hover)]'
               } ${isMatched ? 'opacity-50' : ''}`}
-              disabled={isMatched || isFlipped || flipped.length === 2}
+              disabled={isPeeking || isMatched || isFlipped || flipped.length === 2}
               aria-label={showFace ? 'Card face visible' : 'Face down card'}
             >
               {showFace ? (
