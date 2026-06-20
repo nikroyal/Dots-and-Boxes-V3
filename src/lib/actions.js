@@ -1076,6 +1076,20 @@ export async function updateArcadeBest(currentUser, gameId, gameName, scoreValue
   if (!currentUser?.id) return;
 
   const userRef = doc(db, 'users', currentUser.id);
+  const userSnap = await getDoc(userRef);
+
+  if (userSnap.exists()) {
+    const userData = userSnap.data();
+    const existingRecord = userData.arcadeBests?.[gameId];
+    if (existingRecord) {
+      const isLowerBetter = gameId === 'reaction-timer' || gameId === 'memory-match';
+      const isNewBest = isLowerBetter
+        ? scoreValue < existingRecord.scoreValue
+        : scoreValue > existingRecord.scoreValue;
+      if (!isNewBest) return;
+    }
+  }
+
   const fieldPath = `arcadeBests.${gameId}`;
 
   await updateDoc(userRef, {
