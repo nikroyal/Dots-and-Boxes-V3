@@ -1072,10 +1072,58 @@ export async function acceptTimer(matchId, currentUser, useTimer, timerMins) {
 
 // ─── Arcade Records ────────────────────────────────────────────────────────
 export async function updateArcadeBest(currentUser, gameId, gameName, scoreValue, scoreDisplay) {
+  if (typeof scoreValue !== 'number' || Number.isNaN(scoreValue)) return;
+
   guard(currentUser);
   if (!currentUser?.id) return;
 
+  const existingRecord = currentUser.arcadeBests?.[gameId];
+  let existingScore = existingRecord?.scoreValue;
+
+  if (existingScore === undefined || existingScore === null) {
+    if (typeof existingRecord === 'number') {
+      existingScore = existingRecord;
+    } else if (existingRecord && typeof existingRecord === 'object' && typeof existingRecord.score === 'number') {
+      existingScore = existingRecord.score;
+    }
+  }
+
+  if (existingScore !== undefined && existingScore !== null) {
+    const isLowerBetter = gameId === 'reaction-timer' || gameId === 'memory-match';
+    const isNewBest = isLowerBetter
+      ? scoreValue < existingScore
+      : scoreValue > existingScore;
+    if (!isNewBest) return;
+  }
+
   const userRef = doc(db, 'users', currentUser.id);
+  const userSnap = await getDoc(userRef);
+
+  if (userSnap.exists()) {
+    const userData = userSnap.data();
+    const existingDbRecord = userData.arcadeBests?.[gameId];
+
+    if (existingDbRecord !== undefined && existingDbRecord !== null) {
+      let existingDbScore = existingDbRecord?.scoreValue;
+
+      if (existingDbScore === undefined || existingDbScore === null) {
+        if (typeof existingDbRecord === 'number') {
+          existingDbScore = existingDbRecord;
+        } else if (typeof existingDbRecord === 'object' && typeof existingDbRecord.score === 'number') {
+          existingDbScore = existingDbRecord.score;
+        }
+      }
+
+      if (existingDbScore !== undefined && existingDbScore !== null) {
+        const isLowerBetter = gameId === 'reaction-timer' || gameId === 'memory-match';
+        const isNewBest = isLowerBetter
+          ? scoreValue < existingDbScore
+          : scoreValue > existingDbScore;
+        if (!isNewBest) return;
+      }
+    }
+  }
+
   const fieldPath = `arcadeBests.${gameId}`;
 
   await updateDoc(userRef, {
