@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useAuth } from '../lib/AuthContext';
 import { recordActivity, ACTIVITY_TYPES } from '../lib/activity';
+import { updateArcadeBest } from '../lib/actions';
 import { sfx } from '../lib/sound';
 
 const GAME_DURATION = 30; // 30 seconds
@@ -96,6 +97,7 @@ export default function WhackAMole() {
         localStorage.setItem('axiom-whackamole-best', finalScore.toString());
       } catch {}
       recordActivity(profile, ACTIVITY_TYPES.ARCADE_BEST, { game: 'Whack-A-Mole', score: finalScore });
+      updateArcadeBest(profile, 'whack-a-mole', 'Whack-A-Mole', finalScore, finalScore.toString());
     }
   }, [bestScore, profile]);
 

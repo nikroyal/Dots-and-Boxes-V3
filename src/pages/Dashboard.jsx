@@ -314,6 +314,18 @@ export default function Dashboard() {
         </section>
       )}
 
+      {/* Arcade Records */}
+      {profile.arcadeBests && Object.keys(profile.arcadeBests).length > 0 && (
+        <section>
+          <div className="font-mono text-[0.65rem] tracking-widest uppercase opacity-50 mb-3">Arcade Records</div>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            {Object.entries(profile.arcadeBests).map(([gameId, record]) => (
+              <StatCard key={gameId} icon={<Zap size={14} />} label={record.gameName || gameId} value={record.scoreDisplay} />
+            ))}
+          </div>
+        </section>
+      )}
+
       {/* Achievements overview */}
       {(recentAchievements.length > 0 || upNextAchievement) && (
         <section>

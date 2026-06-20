@@ -1069,3 +1069,21 @@ export async function acceptTimer(matchId, currentUser, useTimer, timerMins) {
     turnTimeoutMs: useTimer ? timerMins * 60 * 1000 : -1,
   });
 }
+
+// ─── Arcade Records ────────────────────────────────────────────────────────
+export async function updateArcadeBest(currentUser, gameId, gameName, scoreValue, scoreDisplay) {
+  guard(currentUser);
+  if (!currentUser?.id) return;
+
+  const userRef = doc(db, 'users', currentUser.id);
+  const fieldPath = `arcadeBests.${gameId}`;
+
+  await updateDoc(userRef, {
+    [fieldPath]: {
+      gameName,
+      scoreValue,
+      scoreDisplay,
+      achievedAt: serverTimestamp()
+    }
+  });
+}
