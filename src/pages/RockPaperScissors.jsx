@@ -57,7 +57,6 @@ export default function RockPaperScissors() {
       if (choice === compChoice) {
         msg = 'It\'s a tie!';
         sfx.notify();
-        setStreak(0); // Reset streak on tie
       } else if (WIN_MAP[choice] === compChoice) {
         msg = 'You win!';
         sfx.win();
