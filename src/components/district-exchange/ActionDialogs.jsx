@@ -1,7 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { getPropertiesInSet } from '../../lib/district-exchange/board';
 
 export function ActionDialogs({ gameState, currentPlayerId, onAction }) {
+  const playerMap = useMemo(() => {
+    const map = new Map();
+    for (const p of gameState?.players || []) map.set(p.id, p);
+    return map;
+  }, [gameState?.players]);
+
   if (!gameState) return null;
 
   const cp = gameState.players[gameState.currentPlayerIdx];
@@ -10,13 +16,13 @@ export function ActionDialogs({ gameState, currentPlayerId, onAction }) {
   return (
     <>
       <PendingActionDialog gameState={gameState} isMyTurn={isMyTurn} onAction={onAction} />
-      <AuctionDialog gameState={gameState} currentPlayerId={currentPlayerId} onAction={onAction} />
-      <PendingTradeDialog gameState={gameState} currentPlayerId={currentPlayerId} onAction={onAction} />
+      <AuctionDialog gameState={gameState} currentPlayerId={currentPlayerId} onAction={onAction} playerMap={playerMap} />
+      <PendingTradeDialog gameState={gameState} currentPlayerId={currentPlayerId} onAction={onAction} playerMap={playerMap} />
     </>
   );
 }
 
-function PendingTradeDialog({ gameState, currentPlayerId, onAction }) {
+function PendingTradeDialog({ gameState, currentPlayerId, onAction, playerMap }) {
   if (!gameState.tradeState) return null;
   const { proposerId, targetId, offer, request } = gameState.tradeState;
 
@@ -25,8 +31,8 @@ function PendingTradeDialog({ gameState, currentPlayerId, onAction }) {
 
   if (!amITarget && !amIProposer) return null;
 
-  const proposer = gameState.players.find(p => p.id === proposerId);
-  const target = gameState.players.find(p => p.id === targetId);
+  const proposer = playerMap.get(proposerId);
+  const target = playerMap.get(targetId);
 
   const renderItems = (items, playerName) => (
     <div className="bg-black/5 dark:bg-white/5 p-3 rounded text-left space-y-1">
@@ -112,14 +118,14 @@ function PendingActionDialog({ gameState, isMyTurn, onAction }) {
   return null;
 }
 
-function AuctionDialog({ gameState, currentPlayerId, onAction }) {
+function AuctionDialog({ gameState, currentPlayerId, onAction, playerMap }) {
   if (!gameState.auctionState) return null;
   const auction = gameState.auctionState;
   const space = gameState.boardSpaces[auction.spaceId];
 
   // Find all active human bidders for hotseat
   const activeHumans = auction.activeBidders
-    .map(id => gameState.players.find(p => p.id === id))
+    .map(id => playerMap.get(id))
     .filter(p => p && !p.isAI && !p.bankrupt);
 
   const handleBid = (playerId, amount) => {
@@ -152,7 +158,7 @@ function AuctionDialog({ gameState, currentPlayerId, onAction }) {
           <div className="font-mono text-4xl text-green-600 dark:text-green-400 font-bold mb-2">¤{auction.highestBid}</div>
           {auction.highestBidder && (
             <div className="text-sm font-bold">
-              {gameState.players.find(p => p.id === auction.highestBidder)?.name}
+              {playerMap.get(auction.highestBidder)?.name}
             </div>
           )}
         </div>
@@ -221,7 +227,14 @@ export function ControlsPanel({ gameState, currentPlayerId, onAction, isRolling 
   const [showTrade, setShowTrade] = useState(false);
   const [showMortgages, setShowMortgages] = useState(false);
 
+  const playerMap = useMemo(() => {
+    const map = new Map();
+    for (const p of gameState?.players || []) map.set(p.id, p);
+    return map;
+  }, [gameState?.players]);
+
   if (!gameState) return null;
+
   const cp = gameState.players[gameState.currentPlayerIdx];
   const isMyTurn = cp.id === currentPlayerId && !cp.isAI;
 
@@ -237,7 +250,7 @@ export function ControlsPanel({ gameState, currentPlayerId, onAction, isRolling 
   const handleResolveDebt = () => onAction('resolveDebt', currentPlayerId);
 
   // Check if I can build or sell
-  const me = gameState.players.find(p => p.id === currentPlayerId);
+  const me = playerMap.get(currentPlayerId);
   let canBuildOrSell = false;
   if (me) {
      const sets = ['harbor', 'neon', 'market', 'gardens', 'riverfront', 'foundry', 'summit', 'skyline'];
@@ -286,7 +299,7 @@ export function ControlsPanel({ gameState, currentPlayerId, onAction, isRolling 
       )}
       {gameState.winner && (
          <div className="font-display text-2xl text-green-500 font-bold uppercase animate-pulse">
-           {gameState.players.find(p => p.id === gameState.winner)?.name} Wins!
+           {playerMap.get(gameState.winner)?.name} Wins!
          </div>
       )}
 
@@ -296,7 +309,7 @@ export function ControlsPanel({ gameState, currentPlayerId, onAction, isRolling 
              Upgrades
            </button>
            {showUpgrades && (
-             <UpgradeDialog gameState={gameState} currentPlayerId={currentPlayerId} onClose={() => setShowUpgrades(false)} onAction={onAction} />
+             <UpgradeDialog gameState={gameState} currentPlayerId={currentPlayerId} onClose={() => setShowUpgrades(false)} onAction={onAction} playerMap={playerMap} />
            )}
          </>
       )}
@@ -307,7 +320,7 @@ export function ControlsPanel({ gameState, currentPlayerId, onAction, isRolling 
              Trade
            </button>
            {showTrade && (
-             <ProposeTradeDialog gameState={gameState} currentPlayerId={currentPlayerId} onClose={() => setShowTrade(false)} onAction={onAction} />
+             <ProposeTradeDialog gameState={gameState} currentPlayerId={currentPlayerId} onClose={() => setShowTrade(false)} onAction={onAction} playerMap={playerMap} />
            )}
          </>
       )}
@@ -318,7 +331,7 @@ export function ControlsPanel({ gameState, currentPlayerId, onAction, isRolling 
              Mortgages
            </button>
            {showMortgages && (
-             <MortgageDialog gameState={gameState} currentPlayerId={currentPlayerId} onClose={() => setShowMortgages(false)} onAction={onAction} />
+             <MortgageDialog gameState={gameState} currentPlayerId={currentPlayerId} onClose={() => setShowMortgages(false)} onAction={onAction} playerMap={playerMap} />
            )}
          </>
       )}
@@ -326,8 +339,8 @@ export function ControlsPanel({ gameState, currentPlayerId, onAction, isRolling 
   );
 }
 
-function MortgageDialog({ gameState, currentPlayerId, onClose, onAction }) {
-  const me = gameState.players.find(p => p.id === currentPlayerId);
+function MortgageDialog({ gameState, currentPlayerId, onClose, onAction, playerMap }) {
+  const me = playerMap.get(currentPlayerId);
   if (!me) return null;
 
   return (
@@ -386,7 +399,7 @@ function MortgageDialog({ gameState, currentPlayerId, onClose, onAction }) {
   );
 }
 
-function ProposeTradeDialog({ gameState, currentPlayerId, onClose, onAction }) {
+function ProposeTradeDialog({ gameState, currentPlayerId, onClose, onAction, playerMap }) {
   const [targetId, setTargetId] = useState('');
 
   const [offerCash, setOfferCash] = useState(0);
@@ -397,10 +410,10 @@ function ProposeTradeDialog({ gameState, currentPlayerId, onClose, onAction }) {
   const [reqProps, setReqProps] = useState([]);
   const [reqCards, setReqCards] = useState(0);
 
-  const me = gameState.players.find(p => p.id === currentPlayerId);
+  const me = playerMap.get(currentPlayerId);
   const otherPlayers = gameState.players.filter(p => p.id !== currentPlayerId && !p.bankrupt);
 
-  const target = gameState.players.find(p => p.id === targetId);
+  const target = playerMap.get(targetId);
 
   const toggleProp = (pid, isOffer) => {
     if (isOffer) {
@@ -560,8 +573,8 @@ function ProposeTradeDialog({ gameState, currentPlayerId, onClose, onAction }) {
   );
 }
 
-function UpgradeDialog({ gameState, currentPlayerId, onClose, onAction }) {
-  const me = gameState.players.find(p => p.id === currentPlayerId);
+function UpgradeDialog({ gameState, currentPlayerId, onClose, onAction, playerMap }) {
+  const me = playerMap.get(currentPlayerId);
 
   // Find properties where player has a monopoly
   const upgradeableProperties = [];
