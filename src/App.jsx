@@ -31,6 +31,7 @@ import ChessHub from './pages/ChessHub';
 import LocalChess from './pages/LocalChess';
 import MatchChess from './pages/MatchChess';
 import MemoryMatch from './pages/MemoryMatch';
+import GuessTheNumber from './pages/GuessTheNumber';
 import ReactionTimer from './pages/ReactionTimer';
 import Snake from './pages/Snake';
 import Battleships from './pages/battleships/Battleships';
@@ -106,6 +107,7 @@ function Shell() {
         <Route path="/tictactoe/local" element={<LocalTicTacToe />} />
         <Route path="/chess/local" element={<LocalChess />} />
         <Route path="/memory-match" element={<MemoryMatch />} />
+        <Route path="/guess-the-number" element={<GuessTheNumber />} />
         <Route path="/reaction-timer" element={<ReactionTimer />} />
         <Route path="/whack-a-mole" element={<WhackAMole />} />
         <Route path="/rock-paper-scissors" element={<RockPaperScissors />} />
@@ -153,6 +155,7 @@ function Shell() {
               <Route path="/paper-io" element={<PaperIo />} />
               <Route path="/circuit-maker" element={<CircuitMaker />} />
               <Route path="/memory-match" element={<MemoryMatch />} />
+              <Route path="/guess-the-number" element={<GuessTheNumber />} />
               <Route path="/reaction-timer" element={<ReactionTimer />} />
               <Route path="/whack-a-mole" element={<WhackAMole />} />
               <Route path="/rock-paper-scissors" element={<RockPaperScissors />} />

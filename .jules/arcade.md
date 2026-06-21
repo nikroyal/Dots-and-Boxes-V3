@@ -6,3 +6,4 @@
 ## 2024-06-19 - Strict dependency boundary
 **Learning:** Do not install dependencies like `@playwright/test` for temporary Playwright verification scripts, as this modifies `package.json` and violates negative constraints. Use Node.js built-in `require("assert")` or raw playwright assertions instead.
 **Action:** Write standalone verification scripts without requiring external assertion libraries, or do not commit dependency changes.
+## 2026-06-21 - Guess the Number   **Learning:** The application's scoring system ('lower is better') needs explicit game ID registration in `updateArcadeBest` to handle edge case games where fewer points/attempts/time is superior. Build artifacts (like `dist/`) must not be committed to the repo. Unused imports should be cleaned up.   **Action:** When adding a new game that counts time or attempts, always check and update `updateArcadeBest` logic. Exclude build artifacts before creating a PR.
