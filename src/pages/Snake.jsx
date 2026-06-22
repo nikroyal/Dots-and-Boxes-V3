@@ -296,6 +296,7 @@ export default function Snake() {
         <button
           className="btn-secondary h-12 flex items-center justify-center text-xl"
           onPointerDown={(e) => { e.preventDefault(); handleMobileControl(0, -1); }}
+          aria-label="Move Up"
         >
           ↑
         </button>
@@ -303,18 +304,21 @@ export default function Snake() {
         <button
           className="btn-secondary h-12 flex items-center justify-center text-xl"
           onPointerDown={(e) => { e.preventDefault(); handleMobileControl(-1, 0); }}
+          aria-label="Move Left"
         >
           ←
         </button>
         <button
           className="btn-secondary h-12 flex items-center justify-center text-xl"
           onPointerDown={(e) => { e.preventDefault(); handleMobileControl(0, 1); }}
+          aria-label="Move Down"
         >
           ↓
         </button>
         <button
           className="btn-secondary h-12 flex items-center justify-center text-xl"
           onPointerDown={(e) => { e.preventDefault(); handleMobileControl(1, 0); }}
+          aria-label="Move Right"
         >
           →
         </button>

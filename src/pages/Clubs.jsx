@@ -139,8 +139,9 @@ export default function Clubs() {
             
             <form onSubmit={handleCreate} className="space-y-6">
               <div>
-                <label className="font-mono block mb-2 text-[0.65rem] tracking-widest uppercase opacity-55">Club Name</label>
+                <label htmlFor="create-club-name" className="font-mono block mb-2 text-[0.65rem] tracking-widest uppercase opacity-55">Club Name</label>
                 <input 
+                  id="create-club-name"
                   className="input-field" 
                   value={name}
                   onChange={e => setName(e.target.value.slice(0, 40))}
@@ -150,8 +151,9 @@ export default function Clubs() {
                 <div className="font-mono text-[0.6rem] opacity-40 mt-1 text-right">{name.length}/40</div>
               </div>
               <div>
-                <label className="font-mono block mb-2 text-[0.65rem] tracking-widest uppercase opacity-55">Description</label>
+                <label htmlFor="create-club-description" className="font-mono block mb-2 text-[0.65rem] tracking-widest uppercase opacity-55">Description</label>
                 <textarea 
+                  id="create-club-description"
                   className="input-field font-display text-base" 
                   value={description}
                   onChange={e => setDescription(e.target.value.slice(0, 200))}
