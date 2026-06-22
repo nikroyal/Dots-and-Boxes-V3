@@ -34,25 +34,15 @@ const getOrientation = (index) => {
   return 'corner';
 };
 
-export default function Board({ gameState, isRolling }) {
-  if (!gameState) return null;
+const EMPTY_ARRAY = [];
 
-  // Optimization (Bolt): Pre-compute property owners to avoid O(N*M) lookups during render.
-  // The old code scanned `gameState.players` and `.includes(spaceId)` for every space on the board,
-  // twice per render (once for upgrades, once for owner bar). This Map turns those into O(1) lookups.
-  const propertyOwners = React.useMemo(() => {
-    const map = new Map();
-    for (const player of gameState.players || []) {
-      if (player.bankrupt) continue;
-      for (const spaceId of player.properties || []) {
-        map.set(spaceId, player);
-      }
-    }
-    return map;
-  }, [gameState.players]);
+const BoardSpace = React.memo(function BoardSpace({ space, index, owner, level, playersOnSpace }) {
+  const style = getSpaceStyle(index);
+  const orientation = getOrientation(index);
+  const hasColorBand = space.type === 'property';
+  const isCorner = orientation === 'corner';
 
-  const renderTokens = (spaceId) => {
-    const playersOnSpace = gameState.players.filter(p => p.position === spaceId && !p.bankrupt);
+  const renderTokens = () => {
     return (
       <div className="absolute inset-0 flex flex-wrap justify-center items-center gap-1 pointer-events-none p-1">
         {playersOnSpace.map(p => (
@@ -67,10 +57,7 @@ export default function Board({ gameState, isRolling }) {
     );
   };
 
-  const renderUpgrades = (spaceId) => {
-    const owner = propertyOwners.get(spaceId);
-    if (!owner) return null;
-    const level = owner.upgrades[spaceId] || 0;
+  const renderUpgrades = () => {
     if (level === 0) return null;
 
     const markers = [];
@@ -92,8 +79,7 @@ export default function Board({ gameState, isRolling }) {
     );
   };
 
-  const renderOwnerBar = (spaceId) => {
-    const owner = propertyOwners.get(spaceId);
+  const renderOwnerBar = () => {
     if (!owner) return null;
     return (
       <div
@@ -102,6 +88,97 @@ export default function Board({ gameState, isRolling }) {
       />
     );
   };
+
+  return (
+    <div
+      className={getSpaceClassNames(index)}
+      style={style}
+    >
+      {/* Color Band for properties */}
+      {!isCorner && hasColorBand && (
+        <div
+          className={`absolute ${
+            orientation === 'bottom' ? 'top-0 left-0 right-0 h-1/4 border-b' :
+            orientation === 'top' ? 'bottom-0 left-0 right-0 h-1/4 border-t' :
+            orientation === 'left' ? 'top-0 right-0 bottom-0 w-1/4 border-l' :
+            'top-0 left-0 bottom-0 w-1/4 border-r'
+          } border-gray-400 dark:border-gray-600`}
+          style={{ backgroundColor: getBandColor(space.setId) }}
+        >
+          {/* Upgrade markers placed inside color band area */}
+          {orientation === 'bottom' || orientation === 'top' ? (
+             <div className="flex justify-center h-full items-center">
+               {renderUpgrades()}
+             </div>
+          ) : (
+             <div className="flex flex-col justify-center h-full items-center">
+               {renderUpgrades()}
+             </div>
+          )}
+        </div>
+      )}
+
+      {/* Content Container */}
+      <div className={`p-1 flex flex-col justify-center items-center h-full w-full z-0 ${
+          orientation === 'left' ? 'ml-auto w-3/4' :
+          orientation === 'right' ? 'mr-auto w-3/4' :
+          orientation === 'top' ? 'mb-auto h-3/4' :
+          orientation === 'bottom' ? 'mt-auto h-3/4' : ''
+      } ${''
+      }`}>
+        {isCorner ? (
+          <div className="font-display text-sm sm:text-base uppercase text-center w-full break-words leading-none">
+            {space.name}
+          </div>
+        ) : (
+          <>
+            <div className="font-sans font-bold leading-tight break-words w-full text-center mb-0.5 text-[0.55rem] sm:text-xs">
+              {space.name}
+            </div>
+            {space.price && (
+              <div className="font-mono text-[0.55rem] mt-auto">
+                ¤{space.price}
+              </div>
+            )}
+          </>
+        )}
+      </div>
+
+      {renderOwnerBar()}
+      {renderTokens()}
+    </div>
+  );
+});
+
+export default function Board({ gameState, isRolling }) {
+  if (!gameState) return null;
+
+  // Optimization (Bolt): Pre-compute property owners to avoid O(N*M) lookups during render.
+  // The old code scanned `gameState.players` and `.includes(spaceId)` for every space on the board,
+  // twice per render (once for upgrades, once for owner bar). This Map turns those into O(1) lookups.
+  const propertyOwners = React.useMemo(() => {
+    const map = new Map();
+    for (const player of gameState.players || []) {
+      if (player.bankrupt) continue;
+      for (const spaceId of player.properties || []) {
+        map.set(spaceId, player);
+      }
+    }
+    return map;
+  }, [gameState.players]);
+
+  // Optimization (Bolt): Group players by space ID to maintain reference stability for React.memo
+  // on BoardSpace component. Without this, `.filter` creates a new array on every render and defeats memoization.
+  const playersBySpace = React.useMemo(() => {
+    const map = new Map();
+    for (const player of gameState.players || []) {
+      if (player.bankrupt) continue;
+      const arr = map.get(player.position) || [];
+      arr.push(player);
+      map.set(player.position, arr);
+    }
+    return map;
+  }, [gameState.players]);
 
   return (
     <div className="aspect-square w-full max-w-[800px] mx-auto bg-[#cce3c6] dark:bg-[#1a2f24] p-1 sm:p-2 select-none relative">
@@ -113,70 +190,18 @@ export default function Board({ gameState, isRolling }) {
         }}
       >
         {BOARD_SPACES.map((space, index) => {
-          const style = getSpaceStyle(index);
-          const orientation = getOrientation(index);
-          const hasColorBand = space.type === 'property';
-          const isCorner = orientation === 'corner';
-
+          const owner = propertyOwners.get(space.id);
+          const level = owner?.upgrades[space.id] || 0;
+          const playersOnSpace = playersBySpace.get(space.id) || EMPTY_ARRAY;
           return (
-            <div
+            <BoardSpace
               key={space.id}
-              className={getSpaceClassNames(index)}
-              style={style}
-            >
-              {/* Color Band for properties */}
-              {!isCorner && hasColorBand && (
-                <div
-                  className={`absolute ${
-                    orientation === 'bottom' ? 'top-0 left-0 right-0 h-1/4 border-b' :
-                    orientation === 'top' ? 'bottom-0 left-0 right-0 h-1/4 border-t' :
-                    orientation === 'left' ? 'top-0 right-0 bottom-0 w-1/4 border-l' :
-                    'top-0 left-0 bottom-0 w-1/4 border-r'
-                  } border-gray-400 dark:border-gray-600`}
-                  style={{ backgroundColor: getBandColor(space.setId) }}
-                >
-                  {/* Upgrade markers placed inside color band area */}
-                  {orientation === 'bottom' || orientation === 'top' ? (
-                     <div className="flex justify-center h-full items-center">
-                       {renderUpgrades(space.id)}
-                     </div>
-                  ) : (
-                     <div className="flex flex-col justify-center h-full items-center">
-                       {renderUpgrades(space.id)}
-                     </div>
-                  )}
-                </div>
-              )}
-
-              {/* Content Container */}
-              <div className={`p-1 flex flex-col justify-center items-center h-full w-full z-0 ${
-                  orientation === 'left' ? 'ml-auto w-3/4' :
-                  orientation === 'right' ? 'mr-auto w-3/4' :
-                  orientation === 'top' ? 'mb-auto h-3/4' :
-                  orientation === 'bottom' ? 'mt-auto h-3/4' : ''
-              } ${''
-              }`}>
-                {isCorner ? (
-                  <div className="font-display text-sm sm:text-base uppercase text-center w-full break-words leading-none">
-                    {space.name}
-                  </div>
-                ) : (
-                  <>
-                    <div className="font-sans font-bold leading-tight break-words w-full text-center mb-0.5 text-[0.55rem] sm:text-xs">
-                      {space.name}
-                    </div>
-                    {space.price && (
-                      <div className="font-mono text-[0.55rem] mt-auto">
-                        ¤{space.price}
-                      </div>
-                    )}
-                  </>
-                )}
-              </div>
-
-              {renderOwnerBar(space.id)}
-              {renderTokens(space.id)}
-            </div>
+              space={space}
+              index={index}
+              owner={owner}
+              level={level}
+              playersOnSpace={playersOnSpace}
+            />
           );
         })}
 

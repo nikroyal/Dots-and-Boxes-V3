@@ -26,3 +26,6 @@
 ## 2026-06-21 - Shareable Results to Improve Retension
 **Learning:** Adding easy "Share Result" clipboard features to game over screens leverages word-of-mouth loops to improve game discoverability and virality. Ensuring clear visual feedback (like "Copied!") is essential for a complete and polished UX.
 **Action:** When adding sharing features, prioritize copying a fun text string with relevant stats and emojis directly to the clipboard. Always add immediate visual UI feedback when the copy succeeds so users aren't left guessing.
+## 2026-06-22 - Adding Shareable Loops & Dynamic Difficulty
+   **Learning:** Enhancing simple games with share buttons and dynamically scaling difficulty significantly improves the 'play again' loop and potential viral growth.
+   **Action:** Always consider shareability on game-over screens and ensure difficulty ramps up smoothly.

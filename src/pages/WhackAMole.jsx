@@ -51,8 +51,9 @@ export default function WhackAMole() {
     });
 
     // Random duration for mole to stay
-    const minStay = 400;
-    const maxStay = 1000;
+    const difficulty = Math.min(scoreRef.current / 50, 5);
+    const minStay = Math.max(200, 400 - difficulty * 30);
+    const maxStay = Math.max(400, 1000 - difficulty * 80);
     const stayDuration = Math.random() * (maxStay - minStay) + minStay;
 
     if (moleTimerRef.current) clearTimeout(moleTimerRef.current);
@@ -153,6 +154,15 @@ export default function WhackAMole() {
     } else {
       // Missed
       sfx.click();
+    }
+  };
+
+  const handleShare = (e) => {
+    e.stopPropagation();
+    e.preventDefault();
+    const text = `I scored ${score} in Axiom Whack-A-Mole!`;
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(() => sfx.notify()).catch(() => {});
     }
   };
 
