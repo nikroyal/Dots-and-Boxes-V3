@@ -1089,7 +1089,7 @@ export async function updateArcadeBest(currentUser, gameId, gameName, scoreValue
   }
 
   if (existingScore !== undefined && existingScore !== null) {
-    const isLowerBetter = gameId === 'reaction-timer' || gameId === 'memory-match' || gameId === 'guess-the-number';
+    const isLowerBetter = gameId === 'reaction-timer' || gameId === 'memory-match';
     const isNewBest = isLowerBetter
       ? scoreValue < existingScore
       : scoreValue > existingScore;
@@ -1115,7 +1115,7 @@ export async function updateArcadeBest(currentUser, gameId, gameName, scoreValue
       }
 
       if (existingDbScore !== undefined && existingDbScore !== null) {
-        const isLowerBetter = gameId === 'reaction-timer' || gameId === 'memory-match' || gameId === 'guess-the-number';
+        const isLowerBetter = gameId === 'reaction-timer' || gameId === 'memory-match';
         const isNewBest = isLowerBetter
           ? scoreValue < existingDbScore
           : scoreValue > existingDbScore;
