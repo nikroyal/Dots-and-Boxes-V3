@@ -242,6 +242,21 @@ export const EXPERIENCE_CATALOG = [
     ],
     routePrefixes: ['/circuit-maker'],
   },
+  {
+    id: 'guess-the-number',
+    name: 'Guess the Number',
+    shortName: 'Guess',
+    path: '/guess-the-number',
+    kind: 'Arcade',
+    status: 'Live',
+    accent: 'var(--ochre)',
+    description: 'A classic guessing game. Guess the secret number in as few attempts as possible.',
+    features: ['Local play', 'Best score'],
+    navItems: [
+      { to: '/guess-the-number', label: 'Play' },
+    ],
+    routePrefixes: ['/guess-the-number'],
+  },
 ];
 
 export const DEFAULT_EXPERIENCE = {
