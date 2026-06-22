@@ -173,7 +173,7 @@ export default function WhackAMole() {
               <button onClick={startGame} className="btn-primary">
                 Play Again
               </button>
-              <button onClick={handleShare} className="btn-secondary">
+              <button onClick={handleShare} className="btn-ghost">
                 Share Result
               </button>
             </div>
