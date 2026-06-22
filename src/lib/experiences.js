@@ -132,6 +132,21 @@ export const EXPERIENCE_CATALOG = [
     routePrefixes: ['/memory-match'],
   },
   {
+    id: 'sequence-memory',
+    name: 'Sequence Memory',
+    shortName: 'Sequence',
+    path: '/sequence-memory',
+    kind: 'Arcade',
+    status: 'Live',
+    accent: 'var(--crimson)',
+    description: 'Test your memory. Remember the sequence of pads and repeat it back.',
+    features: ['Local play', 'Best score'],
+    navItems: [
+      { to: '/sequence-memory', label: 'Play' },
+    ],
+    routePrefixes: ['/sequence-memory'],
+  },
+  {
     id: 'snake',
     name: 'Snake',
     shortName: 'Snake',
