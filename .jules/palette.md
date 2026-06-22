@@ -9,3 +9,7 @@
 ## 2024-05-19 - Added ARIA Progress Bar properties
 **Learning:** React component '<div role="progressbar">' elements require 'aria-valuenow', 'aria-valuemin', and 'aria-valuemax' to be accessible.
 **Action:** When creating custom progress bars or loaders mapped to a specific max value or range, apply ARIA attributes dynamically to match state values.
+
+## 2024-05-19 - ARIA Labels on Directional Symbols
+**Learning:** Buttons containing only directional symbols (like ↑, ←, ↓, →) are announced by screen readers by their literal symbol names (e.g., "Upwards arrow"), which doesn't convey the action context well.
+**Action:** Always include descriptive `aria-label`s (like "Move Up") on mobile control buttons that use symbolic text so screen readers announce them as clear actions.
