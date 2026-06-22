@@ -64,8 +64,10 @@ export default function GuessTheNumber() {
         try {
           localStorage.setItem('axiom-guess-best', newAttempts.toString());
         } catch {}
-        recordActivity(profile, ACTIVITY_TYPES.ARCADE_BEST, { game: 'Guess the Number', score: newAttempts.toString() + ' attempts' });
-        updateArcadeBest(profile, 'guess-the-number', 'Guess the Number', newAttempts, newAttempts.toString() + ' attempts');
+        if (profile) {
+          recordActivity(profile, ACTIVITY_TYPES.ARCADE_BEST, { game: 'Guess the Number', score: newAttempts.toString() + ' attempts' });
+          updateArcadeBest(profile, 'guess-the-number', 'Guess the Number', newAttempts, newAttempts.toString() + ' attempts');
+        }
       }
     } else if (numGuess < targetNumber) {
       sfx.piece();
