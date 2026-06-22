@@ -215,7 +215,7 @@ export default function LocalChess() {
             <X size={16} />
           </button>
           {!flipBoard && (
-            <button onClick={() => setFlipBoard(true)} className="btn-ghost" title="Enable auto-flip">
+            <button onClick={() => setFlipBoard(true)} className="btn-ghost" title="Enable auto-flip" aria-label="Enable auto-flip">
               <RefreshCcw size={16} />
             </button>
           )}

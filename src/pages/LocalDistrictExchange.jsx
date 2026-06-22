@@ -262,7 +262,7 @@ export default function LocalDistrictExchange() {
                   </select>
                 )}
                 {players.length > 2 && (
-                  <button onClick={() => handleRemovePlayer(i)} className="p-2 opacity-50 hover:opacity-100" type="button">
+                  <button onClick={() => handleRemovePlayer(i)} className="p-2 opacity-50 hover:opacity-100" type="button" aria-label="Remove player">
                     <X size={16} />
                   </button>
                 )}
