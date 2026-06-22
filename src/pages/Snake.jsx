@@ -294,8 +294,9 @@ export default function Snake() {
       <div className="mt-8 grid grid-cols-3 gap-2 sm:hidden w-full max-w-[200px]">
         <div />
         <button
+          type="button"
           className="btn-secondary h-12 flex items-center justify-center text-xl"
-          onPointerDown={(e) => { e.preventDefault(); handleMobileControl(0, -1); }}
+          onClick={() => handleMobileControl(0, -1)}
           aria-label="Move Up"
         >
           ↑
