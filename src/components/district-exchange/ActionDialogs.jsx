@@ -576,6 +576,7 @@ function ProposeTradeDialog({ gameState, currentPlayerId, onClose, onAction, pla
 
 function UpgradeDialog({ gameState, currentPlayerId, onClose, onAction, playerMap }) {
   const me = playerMap.get(currentPlayerId);
+  if (!me) return null;
 
   // Find properties where player has a monopoly
   const upgradeableProperties = [];
