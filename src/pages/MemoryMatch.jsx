@@ -14,6 +14,7 @@ export default function MemoryMatch() {
   const [flipped, setFlipped] = useState([]);
   const [matched, setMatched] = useState([]);
   const [moves, setMoves] = useState(0);
+  const [copied, setCopied] = useState(false);
   const [bestMoves, setBestMoves] = useState(() => {
     const saved = localStorage.getItem('memory-match-best');
     return saved ? parseInt(saved, 10) : null;
@@ -58,6 +59,22 @@ export default function MemoryMatch() {
     if (moveCount <= 10) return "⭐⭐⭐";
     if (moveCount <= 14) return "⭐⭐";
     return "⭐";
+  };
+
+  const handleShare = (e) => {
+    e.stopPropagation();
+    e.preventDefault();
+    const stars = getStars(moves);
+    const text = `I won Axiom Memory Match in ${moves} moves! 🧠 ${stars}`;
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(() => {
+        sfx.notify();
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      }).catch(err => console.warn("Clipboard copy failed", err));
+    } else {
+      console.warn("Clipboard API not supported");
+    }
   };
 
   const initializeGame = () => {
@@ -164,10 +181,15 @@ export default function MemoryMatch() {
         })}
       </section>
 
-      <div className="text-center">
+      <div className="flex justify-center gap-4">
         <button onClick={() => { sfx.click(); initializeGame(); }} className="btn-primary">
           Restart Game
         </button>
+        {isGameWon && (
+          <button onClick={handleShare} className="btn-secondary">
+            {copied ? 'Copied!' : 'Share Result'}
+          </button>
+        )}
       </div>
     </div>
   );

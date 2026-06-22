@@ -13,6 +13,7 @@ export default function WhackAMole() {
   // states: 'waiting' | 'playing' | 'gameover'
   const [gameState, setGameState] = useState('waiting');
   const [score, setScore] = useState(0);
+  const [copied, setCopied] = useState(false);
   const [timeLeft, setTimeLeft] = useState(GAME_DURATION);
   const [activeMole, setActiveMole] = useState(null);
   const [hits, setHits] = useState([]);
@@ -110,6 +111,29 @@ export default function WhackAMole() {
     }
   }, [timeLeft, gameState, endGame]);
 
+  const getRatingMessage = (s) => {
+    if (s >= 300) return "🔨 Master";
+    if (s >= 200) return "🔨 Pro";
+    if (s >= 100) return "🔨 Good";
+    return "🔨 Novice";
+  };
+
+  const handleShare = (e) => {
+    e.stopPropagation();
+    e.preventDefault();
+    const rating = getRatingMessage(score);
+    const text = `I scored ${score} in Axiom Whack-A-Mole! ${rating}`;
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(() => {
+        sfx.notify();
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      }).catch(err => console.warn("Clipboard copy failed", err));
+    } else {
+      console.warn("Clipboard API not supported");
+    }
+  };
+
   const handleHoleClick = (index) => {
     if (gameState !== 'playing') return;
 
@@ -158,10 +182,16 @@ export default function WhackAMole() {
         {gameState === 'gameover' && (
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/10 z-10 backdrop-blur-[2px]">
             <p className="font-display text-3xl mb-2 text-[var(--crimson)]">Time's Up!</p>
-            <p className="font-mono text-lg mb-6">Final Score: {score}</p>
-            <button onClick={startGame} className="btn-primary">
-              Play Again
-            </button>
+            <p className="font-mono text-lg mb-1">Final Score: {score}</p>
+            <p className="font-display text-xl mb-6 text-[var(--ink)] opacity-90">{getRatingMessage(score)}</p>
+            <div className="flex gap-4">
+              <button onClick={startGame} className="btn-primary">
+                Play Again
+              </button>
+              <button onClick={handleShare} className="btn-secondary">
+                {copied ? 'Copied!' : 'Share Result'}
+              </button>
+            </div>
           </div>
         )}
 
