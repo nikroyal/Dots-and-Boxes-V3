@@ -30,6 +30,13 @@ export default function WhackAMole() {
   const scoreRef = useRef(score);
 
   useEffect(() => {
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+      if (moleTimerRef.current) clearTimeout(moleTimerRef.current);
+    };
+  }, []);
+
+  useEffect(() => {
     scoreRef.current = score;
   }, [score]);
 
