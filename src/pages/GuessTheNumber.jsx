@@ -44,9 +44,9 @@ export default function GuessTheNumber() {
 
     const numGuess = parseInt(guess, 10);
 
-    if (isNaN(numGuess)) {
+    if (isNaN(numGuess) || numGuess < 1 || numGuess > 100) {
       sfx.click();
-      setMessage('Please enter a valid number');
+      setMessage('Please enter a valid number between 1 and 100');
       return;
     }
 
