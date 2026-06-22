@@ -34,6 +34,8 @@ const getOrientation = (index) => {
   return 'corner';
 };
 
+const EMPTY_ARRAY = [];
+
 const BoardSpace = React.memo(function BoardSpace({ space, index, owner, level, playersOnSpace }) {
   const style = getSpaceStyle(index);
   const orientation = getOrientation(index);
