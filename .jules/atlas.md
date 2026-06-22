@@ -22,3 +22,6 @@
 ## 2024-06-20 - Shareable Milestones
 **Learning:** Players enjoy sharing good results, but manually typing out scores is high friction.
 **Action:** When a player reaches a game-over or win state with a score or qualitative rating, add a simple "Share Result" button that writes a pre-formatted string to the clipboard to encourage social shareability and replayability.
+## 2026-06-22 - Adding Shareable Loops & Dynamic Difficulty
+   **Learning:** Enhancing simple games with share buttons and dynamically scaling difficulty significantly improves the 'play again' loop and potential viral growth.
+   **Action:** Always consider shareability on game-over screens and ensure difficulty ramps up smoothly.
