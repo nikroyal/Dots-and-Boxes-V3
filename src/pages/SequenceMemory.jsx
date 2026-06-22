@@ -191,7 +191,6 @@ export default function SequenceMemory() {
             return (
               <button
                 key={pad.id}
-                onPointerDown={(e) => { e.preventDefault(); handlePadClick(pad.id); }}
                 onClick={() => handlePadClick(pad.id)}
                 className={`w-full h-full rounded-2xl transition-all duration-150 ${
                   isActive ? pad.activeClass : pad.colorClass + ' opacity-80 cursor-pointer hover:opacity-100'
