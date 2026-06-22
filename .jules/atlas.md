@@ -23,7 +23,7 @@
 **Learning:** Players enjoy sharing good results, but manually typing out scores is high friction.
 **Action:** When a player reaches a game-over or win state with a score or qualitative rating, add a simple "Share Result" button that writes a pre-formatted string to the clipboard to encourage social shareability and replayability.
 
-## 2026-06-21 - Shareable Results to Improve Retension
+## 2026-06-21 - Shareable Results to Improve Retention
 **Learning:** Adding easy "Share Result" clipboard features to game over screens leverages word-of-mouth loops to improve game discoverability and virality. Ensuring clear visual feedback (like "Copied!") is essential for a complete and polished UX.
 **Action:** When adding sharing features, prioritize copying a fun text string with relevant stats and emojis directly to the clipboard. Always add immediate visual UI feedback when the copy succeeds so users aren't left guessing.
 ## 2026-06-22 - Adding Shareable Loops & Dynamic Difficulty
