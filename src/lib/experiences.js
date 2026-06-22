@@ -132,21 +132,6 @@ export const EXPERIENCE_CATALOG = [
     routePrefixes: ['/memory-match'],
   },
   {
-    id: 'sequence-memory',
-    name: 'Sequence Memory',
-    shortName: 'Sequence',
-    path: '/sequence-memory',
-    kind: 'Arcade',
-    status: 'Live',
-    accent: 'var(--crimson)',
-    description: 'Test your memory. Remember the sequence of pads and repeat it back.',
-    features: ['Local play', 'Best score'],
-    navItems: [
-      { to: '/sequence-memory', label: 'Play' },
-    ],
-    routePrefixes: ['/sequence-memory'],
-  },
-  {
     id: 'snake',
     name: 'Snake',
     shortName: 'Snake',
@@ -241,21 +226,6 @@ export const EXPERIENCE_CATALOG = [
       { to: '/circuit-maker#exportPng', label: 'Export' },
     ],
     routePrefixes: ['/circuit-maker'],
-  },
-  {
-    id: 'guess-the-number',
-    name: 'Guess the Number',
-    shortName: 'Guess',
-    path: '/guess-the-number',
-    kind: 'Arcade',
-    status: 'Live',
-    accent: 'var(--ochre)',
-    description: 'A classic guessing game. Guess the secret number in as few attempts as possible.',
-    features: ['Local play', 'Best score'],
-    navItems: [
-      { to: '/guess-the-number', label: 'Play' },
-    ],
-    routePrefixes: ['/guess-the-number'],
   },
 ];
 

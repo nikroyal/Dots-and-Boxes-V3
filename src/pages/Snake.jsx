@@ -23,6 +23,7 @@ export default function Snake() {
   const [food, setFood] = useState({ x: 5, y: 5 });
   const [gameState, setGameState] = useState('waiting');
   const [score, setScore] = useState(0);
+  const [copied, setCopied] = useState(false);
   const [bestScore, setBestScore] = useState(() => {
     try {
       const saved = localStorage.getItem('axiom-snake-best');
@@ -209,20 +210,27 @@ export default function Snake() {
     return "Snake charmer!";
   };
 
+  const handleShare = (e) => {
+    e.stopPropagation();
+    e.preventDefault();
+    const msg = getGameOverMessage(score);
+    const text = `I scored ${score} in Axiom Snake! 🐍 ${msg}`;
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(() => {
+        sfx.notify();
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      }).catch(err => console.warn("Clipboard copy failed", err));
+    } else {
+      console.warn("Clipboard API not supported");
+    }
+  };
+
   const handleMobileControl = (dirX, dirY) => {
     if (gameState !== 'playing') return;
     const { x, y } = lastMoveDirectionRef.current;
     if (dirX !== 0 && x !== -dirX) setDirection({ x: dirX, y: 0 });
     if (dirY !== 0 && y !== -dirY) setDirection({ x: 0, y: dirY });
-  };
-
-  const handleShare = (e) => {
-    e.stopPropagation();
-    e.preventDefault();
-    const text = `I scored ${score} in Axiom Snake!`;
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(text).then(() => sfx.notify()).catch(() => {});
-    }
   };
 
   return (
@@ -258,8 +266,8 @@ export default function Snake() {
               <button onClick={startGame} className="btn-primary">
                 Play Again
               </button>
-              <button onClick={handleShare} className="btn-ghost">
-                Share Result
+              <button onClick={handleShare} className="btn-secondary">
+                {copied ? 'Copied!' : 'Share Result'}
               </button>
             </div>
           </div>
