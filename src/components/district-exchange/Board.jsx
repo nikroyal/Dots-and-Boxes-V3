@@ -190,7 +190,7 @@ export default function Board({ gameState, isRolling }) {
         {BOARD_SPACES.map((space, index) => {
           const owner = propertyOwners.get(space.id);
           const level = owner?.upgrades[space.id] || 0;
-          const playersOnSpace = playersBySpace.get(space.id) || [];
+          const playersOnSpace = playersBySpace.get(space.id) || EMPTY_ARRAY;
           return (
             <BoardSpace
               key={space.id}
