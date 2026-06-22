@@ -147,6 +147,21 @@ export const EXPERIENCE_CATALOG = [
     routePrefixes: ['/snake'],
   },
   {
+    id: 'guess-the-number',
+    name: 'Guess the Number',
+    shortName: 'Guess',
+    path: '/guess-the-number',
+    kind: 'Arcade',
+    status: 'Live',
+    accent: 'var(--ochre)',
+    description: 'Find the hidden number. Use logic and higher/lower feedback to guess it in the fewest tries.',
+    features: ['Local play', 'Best score'],
+    navItems: [
+      { to: '/guess-the-number', label: 'Play' },
+    ],
+    routePrefixes: ['/guess-the-number'],
+  },
+  {
     id: 'reaction-timer',
     name: 'Reaction Timer',
     shortName: 'Reaction',

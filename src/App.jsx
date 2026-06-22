@@ -36,6 +36,7 @@ import Snake from './pages/Snake';
 import Battleships from './pages/battleships/Battleships';
 import WhackAMole from './pages/WhackAMole';
 import RockPaperScissors from './pages/RockPaperScissors';
+import GuessTheNumber from './pages/GuessTheNumber';
 
 import LocalDistrictExchange from './pages/LocalDistrictExchange';
 import DistrictExchangeHub from './pages/DistrictExchangeHub';
@@ -111,6 +112,7 @@ function Shell() {
         <Route path="/rock-paper-scissors" element={<RockPaperScissors />} />
         <Route path="/district-exchange/local" element={<LocalDistrictExchange />} />
         <Route path="/snake" element={<Snake />} />
+        <Route path="/guess-the-number" element={<GuessTheNumber />} />
         <Route path="/battleships" element={<Battleships />} />
         <Route path="/paper-io" element={<PaperIo />} />
         <Route path="*" element={<Navigate to="/login" />} />
@@ -157,6 +159,7 @@ function Shell() {
               <Route path="/whack-a-mole" element={<WhackAMole />} />
               <Route path="/rock-paper-scissors" element={<RockPaperScissors />} />
               <Route path="/snake" element={<Snake />} />
+              <Route path="/guess-the-number" element={<GuessTheNumber />} />
               <Route path="/battleships" element={<Battleships />} />
               <Route path="/lobby" element={<Lobby />} />
               <Route path="/match/:id" element={<Match />} />
