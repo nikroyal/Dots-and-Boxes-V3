@@ -13,6 +13,7 @@ export const ACTIVITY_TYPES = {
   CLUB_JOINED: 'club_joined',
   CLUB_CREATED: 'club_created',
   ARCADE_BEST: 'arcade_best',
+  DAILY_GOAL: 'daily_goal',
 };
 
 // Append an activity entry. Best-effort — failures are swallowed so they

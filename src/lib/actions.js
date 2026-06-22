@@ -6,6 +6,7 @@ import {
 import { db } from './firebase';
 import { createEmptyGame, applyMove, computeElo } from './gameLogic';
 import { createEmptyGame as createEmptyGameC4, applyMove as applyMoveC4 } from './connect4Logic';
+import { getDailyGoal, getLocalYYYYMMDD } from './daily';
 import { createEmptyGame as createEmptyGameTTT, applyMove as applyMoveTTT } from './tictactoeLogic';
 import { createEmptyGame as createEmptyGameChess, applyMove as applyMoveChess } from './chessLogic.js';
 import { checkUnlocks } from './achievements';
@@ -718,6 +719,50 @@ function computeUpdatedUserStats(u, m, matchId, derivedStats) {
   const bestWinStreak = Math.max(u.bestWinStreak || 0, newWinStreak);
   const playedAtMidnight = !!u.playedAtMidnight || isNightOwl;
 
+  const today = getLocalYYYYMMDD();
+  let currentDailyStats = u.dailyStats;
+  if (!currentDailyStats || currentDailyStats.date !== today) {
+    currentDailyStats = { date: today, wins: 0, gamesPlayed: 0, totalBoxes: 0, biggestChain: 0 };
+  }
+
+  // Update daily stats with this match
+  const newDailyStats = {
+    ...currentDailyStats,
+    gamesPlayed: currentDailyStats.gamesPlayed + 1,
+    wins: currentDailyStats.wins + (result === 'win' ? 1 : 0),
+    totalBoxes: currentDailyStats.totalBoxes + myScore,
+    biggestChain: Math.max(currentDailyStats.biggestChain, myBiggestChain),
+  };
+
+  const dailyGoal = getDailyGoal(today);
+  const wasCompleted = dailyGoal.check(currentDailyStats);
+  const isCompletedNow = dailyGoal.check(newDailyStats);
+  const completedDailyGoal = !wasCompleted && isCompletedNow;
+
+  let newDailyGoalStreak = u.dailyGoalStreak || 0;
+  if (completedDailyGoal) {
+    // Check if the previous day was also completed to maintain streak
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    const yesterdayStr = `${yesterday.getFullYear()}-${String(yesterday.getMonth() + 1).padStart(2, '0')}-${String(yesterday.getDate()).padStart(2, '0')}`;
+
+    if (u.dailyGoalDate === yesterdayStr) {
+      newDailyGoalStreak += 1;
+    } else if (u.dailyGoalDate !== today) {
+      newDailyGoalStreak = 1;
+    }
+  } else if (u.dailyGoalDate !== today) {
+     // Streak might be broken if they didn't complete yesterday's and it's a new day,
+     // but we only definitively break the streak if they didn't complete yesterday's goal.
+     const yesterday = new Date();
+     yesterday.setDate(yesterday.getDate() - 1);
+     const yesterdayStr = `${yesterday.getFullYear()}-${String(yesterday.getMonth() + 1).padStart(2, '0')}-${String(yesterday.getDate()).padStart(2, '0')}`;
+
+     if (u.dailyGoalDate !== yesterdayStr && u.dailyGoalDate !== today) {
+        newDailyGoalStreak = 0;
+     }
+  }
+
   const newStats = {
     elo: clampedElo,
     gamesPlayed: (u.gamesPlayed || 0) + 1,
@@ -733,6 +778,10 @@ function computeUpdatedUserStats(u, m, matchId, derivedStats) {
     bestWinStreak,
     fastestWin: fastestWin === Infinity ? null : fastestWin,
     playedAtMidnight,
+    dailyStats: newDailyStats,
+    dailyGoalDate: completedDailyGoal ? today : (u.dailyGoalDate || null),
+    dailyGoalsCompleted: (u.dailyGoalsCompleted || 0) + (completedDailyGoal ? 1 : 0),
+    dailyGoalStreak: newDailyGoalStreak,
   };
 
   // Bounded rolloff for matchHistory and finalizedMatches. Firestore docs
@@ -777,7 +826,7 @@ function computeUpdatedUserStats(u, m, matchId, derivedStats) {
     newStats.unlockedAchievements = arrayUnion(...newlyUnlocked);
   }
 
-  return { newStats, txResult: { newlyUnlocked, deltaA: effectiveDelta, result } };
+  return { newStats, txResult: { newlyUnlocked, deltaA: effectiveDelta, result, completedDailyGoal } };
 }
 
 function recordPostMatchActivities(currentUser, m, matchId, derivedStats, txResult) {
@@ -794,6 +843,9 @@ function recordPostMatchActivities(currentUser, m, matchId, derivedStats, txResu
   });
   for (const ach of txResult.newlyUnlocked) {
     recordActivity(currentUser, ACTIVITY_TYPES.ACHIEVEMENT, { achievementId: ach });
+  }
+  if (txResult.completedDailyGoal) {
+    recordActivity(currentUser, ACTIVITY_TYPES.DAILY_GOAL, {});
   }
 }
 
