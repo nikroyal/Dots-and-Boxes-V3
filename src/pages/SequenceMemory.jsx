@@ -127,9 +127,10 @@ export default function SequenceMemory() {
     playToneForPad(padId);
 
     // clear active pad shortly after
-    setTimeout(() => {
+    const t = setTimeout(() => {
       setActivePad(curr => curr === padId ? null : curr);
     }, 200);
+    padTimeouts.current.push(t);
 
     const currentSeq = sequenceRef.current;
 
