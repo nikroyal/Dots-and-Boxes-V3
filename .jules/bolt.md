@@ -30,3 +30,6 @@
 ## 2026-06-20 - React.memo Defeated by Inline .filter()
 **Learning:** Using `React.memo` on a child component inside a loop (like board spaces) provides exactly 0% performance improvement if one of its props is instantiated inline via methods like `.filter()`. `.filter()` returns a new array reference on every render, causing the shallow comparison in `React.memo` to always fail.
 **Action:** When extracting components to apply `React.memo`, pre-compute grouping logic in the parent component using a `useMemo` hook (e.g., creating a `Map` of stable arrays) so that the props passed down maintain reference stability across renders.
+\n## 2026-06-21 - Hooks before conditional returns
+**Learning:** Placing a React hook like `useMemo` after an early return (e.g., `if (!gameState) return null;`) violates the Rules of Hooks. This causes a crash if the condition changes during re-renders, resulting in a 'Rendered more hooks than during the previous render' error.
+**Action:** Always ensure all React hooks are called unconditionally at the top level of the component, before any conditional returns. When dealing with potentially null properties in a hook, use optional chaining and logical OR operators (e.g., `[gameState?.players || []]`) to safely process data inside the hook instead of relying on early returns.

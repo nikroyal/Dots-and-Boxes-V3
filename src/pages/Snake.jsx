@@ -216,6 +216,15 @@ export default function Snake() {
     if (dirY !== 0 && y !== -dirY) setDirection({ x: 0, y: dirY });
   };
 
+  const handleShare = (e) => {
+    e.stopPropagation();
+    e.preventDefault();
+    const text = `I scored ${score} in Axiom Snake!`;
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(() => sfx.notify()).catch(() => {});
+    }
+  };
+
   return (
     <div className="fade-in max-w-2xl mx-auto flex flex-col items-center justify-center min-h-[60vh]">
       <section className="text-center mb-6">
@@ -245,9 +254,14 @@ export default function Snake() {
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/10 z-10 backdrop-blur-[2px]">
             <p className="font-display text-3xl mb-2 text-[var(--crimson)]">Game Over</p>
             <p className="font-mono text-sm opacity-80 mb-4">{getGameOverMessage(score)}</p>
-            <button onClick={startGame} className="btn-primary">
-              Play Again
-            </button>
+            <div className="flex gap-4">
+              <button onClick={startGame} className="btn-primary">
+                Play Again
+              </button>
+              <button onClick={handleShare} className="btn-ghost">
+                Share Result
+              </button>
+            </div>
           </div>
         )}
 
