@@ -144,7 +144,7 @@ export default function MemoryMatch() {
       <section className="text-center">
         <h1 className="font-display text-5xl font-medium tracking-tight mb-2">Memory Match</h1>
         <p className="font-mono text-sm tracking-widest uppercase opacity-60 mb-2">
-          Moves: {moves} {bestMoves !== null && <span className="ml-4">Best: {bestMoves}</span>}
+          Moves: {moves} <span className="ml-2">{getStars(moves)}</span> {bestMoves !== null && <span className="ml-4">Best: {bestMoves}</span>}
         </p>
         {isGameWon && (
           <div className="flex flex-col items-center gap-2">
