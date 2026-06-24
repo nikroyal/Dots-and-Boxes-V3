@@ -157,7 +157,7 @@ export default function ReactionTimer() {
 
       <div className="w-full max-w-md flex flex-col items-center gap-4">
         <button
-          onPointerDown={(e) => { e.preventDefault(); handleTrigger(); }}
+          onPointerDown={handlePointerDown}
           onKeyDown={handleKeyDown}
           className="w-full aspect-video border hairline card transition-colors duration-150 flex flex-col items-center justify-center focus-ring select-none"
           style={{ background: bgColor, color: textColor }}
