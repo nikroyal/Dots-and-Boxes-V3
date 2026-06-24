@@ -125,7 +125,7 @@ export default function MatchConnect4() {
   // Auto-scroll chat
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [match?.chat?.length]);
+  }, [Array.isArray(match?.chat) ? match.chat.length : 0]);
 
   // Join as spectator if not a player
   useEffect(() => {
@@ -144,7 +144,7 @@ export default function MatchConnect4() {
     if (!match.players.includes(profile.id)) return;
     setFinalized(true);
     finalizeStats(id, profile).then((res) => {
-      if (res?.newlyUnlocked?.length) {
+      if (Array.isArray(res?.newlyUnlocked) ? res.newlyUnlocked.length : 0) {
         sfx.achievement();
         setAchievementToasts(res.newlyUnlocked);
       }

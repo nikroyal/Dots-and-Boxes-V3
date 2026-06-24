@@ -43,6 +43,12 @@ export default function MatchChess() {
   const [optionSquares, setOptionSquares] = useState({});
   const [pendingGame, setPendingGame] = useState(null);
   const pendingTimeoutRef = useRef(null);
+
+  useEffect(() => {
+    return () => {
+      if (pendingTimeoutRef.current) clearTimeout(pendingTimeoutRef.current);
+    };
+  }, []);
   const prevMoveCount = useRef(-1); // -1 sentinel: no snapshot yet
   const prevStatus = useRef(null);
   const hasSubscribed = useRef(false);
@@ -139,7 +145,7 @@ export default function MatchChess() {
   // Auto-scroll chat
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [match?.chat?.length]);
+  }, [Array.isArray(match?.chat) ? match.chat.length : 0]);
 
   // Join as spectator if not a player
   useEffect(() => {
@@ -158,7 +164,7 @@ export default function MatchChess() {
     if (!match.players.includes(profile.id)) return;
     setFinalized(true);
     finalizeStats(id, profile).then((res) => {
-      if (res?.newlyUnlocked?.length) {
+      if (Array.isArray(res?.newlyUnlocked) ? res.newlyUnlocked.length : 0) {
         sfx.achievement();
         setAchievementToasts(res.newlyUnlocked);
       }

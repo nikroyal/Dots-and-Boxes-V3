@@ -113,6 +113,7 @@ function Shell() {
         <Route path="/guess-the-number" element={<GuessTheNumber />} />
         <Route path="/district-exchange/local" element={<LocalDistrictExchange />} />
         <Route path="/snake" element={<Snake />} />
+        <Route path="/guess-the-number" element={<GuessTheNumber />} />
         <Route path="/battleships" element={<Battleships />} />
         <Route path="/paper-io" element={<PaperIo />} />
         <Route path="*" element={<Navigate to="/login" />} />
@@ -160,6 +161,7 @@ function Shell() {
               <Route path="/rock-paper-scissors" element={<RockPaperScissors />} />
               <Route path="/guess-the-number" element={<GuessTheNumber />} />
               <Route path="/snake" element={<Snake />} />
+              <Route path="/guess-the-number" element={<GuessTheNumber />} />
               <Route path="/battleships" element={<Battleships />} />
               <Route path="/lobby" element={<Lobby />} />
               <Route path="/match/:id" element={<Match />} />

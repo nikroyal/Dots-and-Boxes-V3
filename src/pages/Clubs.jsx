@@ -98,8 +98,8 @@ export default function Clubs() {
       {/* Tabs */}
       <div className="flex gap-8 border-b hairline px-2">
         {[
-          { id: 'mine', label: 'My Clubs', icon: Layout, count: myClubs?.length },
-          { id: 'public', label: 'Discover', icon: Compass, count: publicClubs?.length }
+          { id: 'mine', label: 'My Clubs', icon: Layout, count: Array.isArray(myClubs) ? myClubs.length : undefined },
+          { id: 'public', label: 'Discover', icon: Compass, count: Array.isArray(publicClubs) ? publicClubs.length : undefined }
         ].map(t => (
           <button 
             key={t.id} 

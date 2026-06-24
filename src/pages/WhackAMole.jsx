@@ -31,6 +31,13 @@ export default function WhackAMole() {
   const scoreRef = useRef(score);
 
   useEffect(() => {
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+      if (moleTimerRef.current) clearTimeout(moleTimerRef.current);
+    };
+  }, []);
+
+  useEffect(() => {
     scoreRef.current = score;
   }, [score]);
 
@@ -211,7 +218,7 @@ export default function WhackAMole() {
                   aria-label={activeMole === i ? 'Whack mole' : 'Empty hole'}
                 >
                   {activeMole === i && (
-                    <div className="w-1/2 h-1/2 rounded-full bg-white opacity-80 pointer-events-none" />
+                    <div className="text-4xl sm:text-5xl pointer-events-none select-none drop-shadow-sm">🐹</div>
                   )}
                 </button>
                 {isHit && (
