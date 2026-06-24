@@ -26,3 +26,7 @@
 ## 2026-06-21 - Shareable Results to Improve Retension
 **Learning:** Adding easy "Share Result" clipboard features to game over screens leverages word-of-mouth loops to improve game discoverability and virality. Ensuring clear visual feedback (like "Copied!") is essential for a complete and polished UX.
 **Action:** When adding sharing features, prioritize copying a fun text string with relevant stats and emojis directly to the clipboard. Always add immediate visual UI feedback when the copy succeeds so users aren't left guessing.
+
+## 2026-06-23 - Adding share results to outcomes
+**Learning:** In Rock Paper Scissors, people like sharing their final streak, but resetting it instantly on loss destroys that moment. Deferring the state reset until the *next* game begins preserves the outcome for sharing while maintaining the correct gameplay loop.
+**Action:** When adding sharing to streak-based games, always decouple the game over state from the internal streak reset.
