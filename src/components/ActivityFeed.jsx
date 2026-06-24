@@ -14,8 +14,11 @@ export default function ActivityFeed({ profile, singleUser = false, viewerId = n
     : '';
   useEffect(() => {
     let alive = true;
-    if (!idKey) return;
-    const ids = idKey.split(',').filter(Boolean);
+    const ids = idKey ? idKey.split(',').filter(Boolean) : [];
+    if (ids.length === 0) {
+      if (alive) setItems([]);
+      return;
+    }
     getActivityForUsers(ids, 20).then(list => {
       if (alive) setItems(list);
     }).catch(err => {

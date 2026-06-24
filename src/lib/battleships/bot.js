@@ -240,6 +240,8 @@ export function getBotMove(shotGrid, difficulty = 3, targetGrid, targetShips) {
         return bestTargets[Math.floor(Math.random() * bestTargets.length)];
       }
       return uniqueTargets[Math.floor(Math.random() * uniqueTargets.length)];
+    } else {
+      return candidates[Math.floor(Math.random() * candidates.length)];
     }
   }
 
