@@ -152,7 +152,7 @@ export default function GuessTheNumber() {
           </div>
         )}
 
-        {history.length > 0 && gameState === 'playing' && (
+        {history.length > 0 && (
           <div className="mt-8 w-full">
             <h3 className="font-mono text-xs tracking-widest uppercase opacity-50 mb-3 text-center">Recent Guesses</h3>
             <div className="flex flex-col gap-2">
