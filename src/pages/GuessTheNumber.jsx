@@ -203,7 +203,7 @@ export default function GuessTheNumber() {
                 <button onClick={startGame} className="btn-primary w-full">
                   Play Again
                 </button>
-                <button onClick={handleShare} className="btn-secondary w-full">
+                <button onClick={handleShare} className="btn-ghost w-full">
                   {copied ? 'Copied!' : 'Share Result'}
                 </button>
               </div>
