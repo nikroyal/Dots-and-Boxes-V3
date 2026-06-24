@@ -27,3 +27,6 @@
 ## 2024-11-20 - O(1) Map lookups in render loops
 **Learning:** Using `Array.find()` inside a `.map()` render loop creates an O(N²) time complexity bottleneck which blocks the main thread during renders, especially for large arrays like chat history. While replacing it with a Map lookup (`Map.get()`) makes it O(1), recreating the Map from the array on every render cycle introduces unnecessary O(N) computational overhead and memory allocation churn, which can degrade performance rather than improve it.
 **Action:** Always memoize the Map creation (e.g., using `useMemo`) so the O(N) map generation cost is only paid when the underlying array changes, ensuring true O(1) lookup performance in the render loop.
+## 2025-02-23 - Optimize Array Search in Render Paths
+**Learning:** Found multiple files using `ACHIEVEMENTS.find(x => x.id === id)` inside render paths and list loops. While small arrays don't break applications immediately, performing an O(N) linear search per item in a list creates unnecessary overhead and main thread blocking.
+**Action:** Replace `Array.find` lookups with a precomputed Map (`new Map()`) for O(1) performance in cases where the collection size is fixed or changes rarely.

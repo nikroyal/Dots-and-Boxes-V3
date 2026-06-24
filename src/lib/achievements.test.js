@@ -1,9 +1,9 @@
 import { describe, it, expect } from 'vitest';
-import { getRankFromElo, ACHIEVEMENTS } from './achievements';
+import { getRankFromElo, getAchievementById } from './achievements';
 
 describe('achievements', () => {
   describe('social_butterfly', () => {
-    const ach = ACHIEVEMENTS.find((a) => a.id === 'social_butterfly');
+    const ach = getAchievementById('social_butterfly');
 
     it('handles numeric values', () => {
       expect(ach.check({ friends: 5 })).toBe(true);

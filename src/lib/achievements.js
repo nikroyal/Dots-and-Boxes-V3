@@ -54,6 +54,13 @@ export const ACHIEVEMENTS = [
     check: s => !!s.playedAtMidnight, progress: s => [s.playedAtMidnight ? 1 : 0, 1] },
 ];
 
+// Optimization (Bolt): Pre-compute achievement map to avoid O(N) array scans during renders
+const ACHIEVEMENT_MAP = new Map(ACHIEVEMENTS.map(a => [a.id, a]));
+
+export function getAchievementById(id) {
+  return ACHIEVEMENT_MAP.get(id);
+}
+
 // Returns a list of newly-unlocked achievement IDs
 export function checkUnlocks(stats, alreadyUnlocked = []) {
   const newlyUnlocked = [];

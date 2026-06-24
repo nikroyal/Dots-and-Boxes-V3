@@ -1,7 +1,7 @@
 import { useEffect, useState, memo } from 'react';
 import { Link } from 'react-router-dom';
 import { getActivityForUsers, ACTIVITY_TYPES } from '../lib/activity';
-import { ACHIEVEMENTS } from '../lib/achievements';
+import { getAchievementById } from '../lib/achievements';
 import { Trophy, X as Loss, Minus as Equal, UserPlus, Users, Zap, Target } from 'lucide-react';
 
 // Recent activity from the user and their friends. Lives on the Dashboard.
@@ -70,7 +70,7 @@ const ActivityRow = memo(function ActivityRow({ item, isMe }) {
       break;
     }
     case ACTIVITY_TYPES.ACHIEVEMENT: {
-      const a = ACHIEVEMENTS.find(x => x.id === item.data?.achievementId);
+      const a = getAchievementById(item.data?.achievementId);
       icon = <Trophy size={14} />;
       color = 'var(--ochre)';
       text = <>{subject} unlocked <strong>{a?.name || 'an achievement'}</strong></>;
