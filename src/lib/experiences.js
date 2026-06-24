@@ -177,6 +177,21 @@ export const EXPERIENCE_CATALOG = [
     routePrefixes: ['/reaction-timer'],
   },
   {
+    id: 'word-scramble',
+    name: 'Word Scramble',
+    shortName: 'Scramble',
+    path: '/word-scramble',
+    kind: 'Arcade',
+    status: 'Live',
+    accent: 'var(--forest)',
+    description: 'Unscramble as many words as you can in 60 seconds.',
+    features: ['Local play', 'Best score'],
+    navItems: [
+      { to: '/word-scramble', label: 'Play' },
+    ],
+    routePrefixes: ['/word-scramble'],
+  },
+  {
     id: 'whack-a-mole',
     name: 'Whack-A-Mole',
     shortName: 'Whack-A-Mole',
