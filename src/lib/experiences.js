@@ -192,6 +192,21 @@ export const EXPERIENCE_CATALOG = [
     routePrefixes: ['/whack-a-mole'],
   },
   {
+    id: 'guess-the-number',
+    name: 'Guess the Number',
+    shortName: 'Guess',
+    path: '/guess-the-number',
+    kind: 'Arcade',
+    status: 'Live',
+    accent: 'var(--ochre)',
+    description: 'Guess the secret number in the fewest attempts possible.',
+    features: ['Local play', 'Best attempts'],
+    navItems: [
+      { to: '/guess-the-number', label: 'Play' },
+    ],
+    routePrefixes: ['/guess-the-number'],
+  },
+  {
     id: 'rock-paper-scissors',
     name: 'Rock Paper Scissors',
     shortName: 'RPS',

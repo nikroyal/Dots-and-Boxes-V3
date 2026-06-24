@@ -110,6 +110,7 @@ function Shell() {
         <Route path="/reaction-timer" element={<ReactionTimer />} />
         <Route path="/whack-a-mole" element={<WhackAMole />} />
         <Route path="/rock-paper-scissors" element={<RockPaperScissors />} />
+        <Route path="/guess-the-number" element={<GuessTheNumber />} />
         <Route path="/district-exchange/local" element={<LocalDistrictExchange />} />
         <Route path="/snake" element={<Snake />} />
         <Route path="/guess-the-number" element={<GuessTheNumber />} />
@@ -158,6 +159,7 @@ function Shell() {
               <Route path="/reaction-timer" element={<ReactionTimer />} />
               <Route path="/whack-a-mole" element={<WhackAMole />} />
               <Route path="/rock-paper-scissors" element={<RockPaperScissors />} />
+              <Route path="/guess-the-number" element={<GuessTheNumber />} />
               <Route path="/snake" element={<Snake />} />
               <Route path="/guess-the-number" element={<GuessTheNumber />} />
               <Route path="/battleships" element={<Battleships />} />
