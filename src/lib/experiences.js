@@ -147,6 +147,21 @@ export const EXPERIENCE_CATALOG = [
     routePrefixes: ['/snake'],
   },
   {
+    id: 'click-the-target',
+    name: 'Click the Target',
+    shortName: 'Target',
+    path: '/click-the-target',
+    kind: 'Arcade',
+    status: 'Live',
+    accent: 'var(--crimson)',
+    description: 'Click the target as many times as you can in 30 seconds.',
+    features: ['Local play', 'Best score'],
+    navItems: [
+      { to: '/click-the-target', label: 'Play' },
+    ],
+    routePrefixes: ['/click-the-target'],
+  },
+  {
     id: 'guess-the-number',
     name: 'Guess the Number',
     shortName: 'Guess',
