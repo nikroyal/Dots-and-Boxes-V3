@@ -163,6 +163,23 @@ export default function WhackAMole() {
     }
   };
 
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (gameState !== 'playing') return;
+      const keyMap = {
+        '1': 0, '2': 1, '3': 2,
+        '4': 3, '5': 4, '6': 5,
+        '7': 6, '8': 7, '9': 8,
+      };
+      if (keyMap[e.key] !== undefined) {
+        e.preventDefault();
+        handleHoleClick(keyMap[e.key]);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [gameState, activeMole]);
+
   return (
     <div className="fade-in max-w-2xl mx-auto flex flex-col items-center justify-center min-h-[60vh]">
       <section className="text-center mb-8">
@@ -220,6 +237,9 @@ export default function WhackAMole() {
                   {activeMole === i && (
                     <div className="text-4xl sm:text-5xl pointer-events-none select-none drop-shadow-sm">🐹</div>
                   )}
+                  <div className="hidden sm:block absolute top-1 left-2 font-mono text-xs opacity-30 pointer-events-none">
+                    {i + 1}
+                  </div>
                 </button>
                 {isHit && (
                   <div className="absolute inset-0 flex items-center justify-center pointer-events-none fade-up text-[var(--forest)] font-display text-2xl" style={{ animationDuration: '0.3s' }}>

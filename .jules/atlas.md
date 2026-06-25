@@ -30,3 +30,6 @@
 ## 2026-06-23 - Adding share results to outcomes
 **Learning:** In Rock Paper Scissors, people like sharing their final streak, but resetting it instantly on loss destroys that moment. Deferring the state reset until the *next* game begins preserves the outcome for sharing while maintaining the correct gameplay loop.
 **Action:** When adding sharing to streak-based games, always decouple the game over state from the internal streak reset.
+## 2024-11-20 - Keyboard Shortcuts for Fast Core Loops
+**Learning:** For small arcade games like Rock Paper Scissors or Whack-A-Mole, requiring pointer clicks limits the maximum speed and flow a power user can achieve. Adding keyboard shortcuts fundamentally transforms the replay loop from an interactive webpage to a highly responsive twitch game.
+**Action:** When evaluating arcade or click-heavy games, always map core actions to the number row/numpad and include visual hints in the UI to surface these shortcuts.

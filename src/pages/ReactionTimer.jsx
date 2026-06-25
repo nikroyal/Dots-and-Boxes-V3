@@ -11,6 +11,7 @@ export default function ReactionTimer() {
   const [reactionTime, setReactionTime] = useState(null);
   const [message, setMessage] = useState('Click to start');
   const [isNewBest, setIsNewBest] = useState(false);
+  const [copied, setCopied] = useState(false);
   const [bestTime, setBestTime] = useState(() => {
     try {
       const saved = localStorage.getItem('axiom-reaction-best');
@@ -121,6 +122,8 @@ export default function ReactionTimer() {
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(text).then(() => {
         sfx.notify();
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
       }).catch(err => {
         console.warn("Clipboard copy failed", err);
       });
@@ -189,7 +192,7 @@ export default function ReactionTimer() {
             onPointerDown={(e) => e.stopPropagation()}
             className="btn-secondary fade-up"
           >
-            Share Result
+            {copied ? 'Copied!' : 'Share Result'}
           </button>
         )}
       </div>

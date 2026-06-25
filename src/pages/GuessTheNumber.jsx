@@ -13,6 +13,7 @@ export default function GuessTheNumber() {
   const [gameState, setGameState] = useState('playing'); // 'playing' | 'won'
   const [message, setMessage] = useState('Guess a number between 1 and 100!');
   const [history, setHistory] = useState([]);
+  const [copied, setCopied] = useState(false);
   const [bestAttempts, setBestAttempts] = useState(() => {
     try {
       const saved = localStorage.getItem('axiom-guess-best');
@@ -89,13 +90,24 @@ export default function GuessTheNumber() {
     }
   };
 
+  const getRatingMessage = (att) => {
+    if (att <= 3) return "🔮 Mind Reader!";
+    if (att <= 5) return "🎯 Sharpshooter!";
+    if (att <= 7) return "🧠 Smart Cookie!";
+    if (att <= 10) return "👍 Good Job!";
+    return "🐢 Made it eventually!";
+  };
+
   const handleShare = (e) => {
     e.stopPropagation();
     e.preventDefault();
-    const text = `I guessed the number in ${attempts} attempts on Axiom Guess The Number! 🎯`;
+    const rating = getRatingMessage(attempts);
+    const text = `I guessed the number in ${attempts} attempts on Axiom Guess The Number! 🎯 ${rating}`;
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(text).then(() => {
         sfx.notify();
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
       }).catch(err => {
         console.warn("Clipboard copy failed", err);
       });
@@ -123,6 +135,12 @@ export default function GuessTheNumber() {
           {message}
         </div>
 
+        {gameState === 'won' && (
+          <div className="font-display text-xl text-[var(--forest)] mb-4 pulse-soft text-center w-full">
+            {getRatingMessage(attempts)}
+          </div>
+        )}
+
         {gameState === 'playing' ? (
           <form onSubmit={handleGuess} className="w-full flex flex-col items-center gap-4">
             <input
@@ -147,7 +165,7 @@ export default function GuessTheNumber() {
               Play Again
             </button>
             <button onClick={handleShare} className="btn-secondary w-full">
-              Share Result
+              {copied ? 'Copied!' : 'Share Result'}
             </button>
           </div>
         )}
