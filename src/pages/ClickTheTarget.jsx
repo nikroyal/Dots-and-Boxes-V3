@@ -137,7 +137,7 @@ export default function ClickTheTarget() {
         )}
 
         {gameState === 'result' && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/50 backdrop-blur-[2px] fade-in">
+          <div className="absolute inset-0 flex flex-col items-center justify-center bg-[var(--paper-tint)] fade-in">
              <div className="font-display text-4xl mb-2">Time's Up!</div>
              <div className="font-display text-2xl mb-6 opacity-80 text-[var(--forest)]">Score: {score}</div>
              <div className="flex gap-4">
