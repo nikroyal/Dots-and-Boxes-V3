@@ -126,7 +126,7 @@ export default function ClickTheTarget() {
         )}
 
         {gameState === 'waiting' && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/50 backdrop-blur-[2px]">
+          <div className="absolute inset-0 flex flex-col items-center justify-center bg-[var(--paper-tint)]">
             <p className="mb-6 font-display text-xl opacity-80 text-center px-4">
               Click the target as many times as you can in 30 seconds!
             </p>
