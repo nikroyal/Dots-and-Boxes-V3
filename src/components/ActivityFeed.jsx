@@ -1,7 +1,7 @@
 import { useEffect, useState, memo } from 'react';
 import { Link } from 'react-router-dom';
 import { getActivityForUsers, ACTIVITY_TYPES } from '../lib/activity';
-import { ACHIEVEMENTS, getAchievementById } from '../lib/achievements';
+import { getAchievementById } from '../lib/achievements';
 import { Trophy, X as Loss, Minus as Equal, UserPlus, Users, Zap, Target } from 'lucide-react';
 
 // Recent activity from the user and their friends. Lives on the Dashboard.
