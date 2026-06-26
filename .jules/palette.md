@@ -16,3 +16,6 @@
 ## 2024-05-18 - Missing id and htmlFor on Form Elements
 **Learning:** Form labels and inputs (e.g., in `Clubs.jsx`) often lack proper programmatic association (`id` and `htmlFor`), even when visual layout implies a connection.
 **Action:** Ensure all `<label>` tags explicitly target their respective `<input>` or `<textarea>` elements using the `htmlFor` attribute matched to the input's `id`.
+## 2026-06-26 - ARIA labels on text inputs lacking explicit labels
+**Learning:** Text inputs that visually lack explicit `<label>` tags (such as compact inline search bars) are not accessible to screen readers and need an explicit `aria-label` to be correctly interpreted.
+**Action:** Always ensure that inline inputs, like search bars or generic prompt fields, include descriptive `aria-label` attributes.

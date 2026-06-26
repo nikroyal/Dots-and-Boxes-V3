@@ -77,6 +77,7 @@ export function PromptDialog({ open, title, defaultValue = '', confirmLabel = 'O
           value={value}
           onChange={(e) => setValue(e.target.value)}
           className="w-full bg-black/5 dark:bg-white/5 border hairline px-3 py-2 font-display outline-none focus-ring mb-6"
+          aria-label={title}
         />
         <div className="flex gap-2 justify-end">
           <button onClick={onCancel} className="btn-ghost">{cancelLabel}</button>
