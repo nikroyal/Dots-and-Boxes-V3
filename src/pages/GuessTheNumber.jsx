@@ -13,6 +13,8 @@ export default function GuessTheNumber() {
   const [gameState, setGameState] = useState('playing'); // 'playing' | 'won'
   const [message, setMessage] = useState('Guess a number between 1 and 100!');
   const [history, setHistory] = useState([]);
+  const [minBound, setMinBound] = useState(1);
+  const [maxBound, setMaxBound] = useState(100);
   const [bestAttempts, setBestAttempts] = useState(() => {
     try {
       const saved = localStorage.getItem('axiom-guess-best');
@@ -31,6 +33,8 @@ export default function GuessTheNumber() {
     setGameState('playing');
     setMessage('Guess a number between 1 and 100!');
     setHistory([]);
+    setMinBound(1);
+    setMaxBound(100);
     setTimeout(() => {
       if (inputRef.current) inputRef.current.focus();
     }, 100);
@@ -75,9 +79,11 @@ export default function GuessTheNumber() {
     } else if (guess < targetNumber) {
       sfx.click();
       resultMessage = 'Too low!';
+      setMinBound(prev => Math.max(prev, guess + 1));
     } else {
       sfx.click();
       resultMessage = 'Too high!';
+      setMaxBound(prev => Math.min(prev, guess - 1));
     }
 
     setMessage(resultMessage);
@@ -111,6 +117,11 @@ export default function GuessTheNumber() {
         <p className="font-mono text-sm tracking-widest uppercase opacity-60 mb-2">
           Attempts: {attempts}
         </p>
+        {gameState === 'playing' && (
+          <p className="font-mono text-xs tracking-widest uppercase opacity-80 mt-1 text-[var(--ink)]">
+            Range: {minBound} - {maxBound}
+          </p>
+        )}
         {bestAttempts !== null && (
           <p className="font-mono text-xs tracking-widest uppercase opacity-80 mt-2 text-[var(--ochre)]">
             Best: {bestAttempts} attempts
