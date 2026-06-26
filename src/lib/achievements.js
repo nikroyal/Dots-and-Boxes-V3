@@ -109,3 +109,11 @@ export function getRankInfo(elo) {
 export function getRankFromElo(elo) {
   return getRankInfo(elo).rank;
 }
+
+// Optimization (Bolt): Pre-compute Map for fast achievement lookups.
+// Impact: Replaces O(N) array scans with O(1) Map lookups when rendering lists of achievements.
+const ACHIEVEMENTS_MAP = new Map(ACHIEVEMENTS.map(a => [a.id, a]));
+
+export function getAchievementById(id) {
+  return ACHIEVEMENTS_MAP.get(id);
+}
