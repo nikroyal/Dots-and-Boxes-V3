@@ -1,18 +1,15 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import { BrowserRouter } from 'react-router-dom';
-import App from './App.jsx';
-import './index.css';
-import { applyTheme } from './lib/theme';
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+import App from './App.jsx'
+import TestDashboard from './pages/TestDashboard.jsx'
+import './index.css'
 
-// Apply saved theme + reduced-motion preference *before* React renders so
-// the user doesn't see a flash of the wrong theme.
-applyTheme();
-
-ReactDOM.createRoot(document.getElementById('root')).render(
-  <React.StrictMode>
-    <BrowserRouter>
+if (window.location.search.includes('test=1')) {
+  ReactDOM.createRoot(document.getElementById('root')).render(<TestDashboard />);
+} else {
+  ReactDOM.createRoot(document.getElementById('root')).render(
+    <React.StrictMode>
       <App />
-    </BrowserRouter>
-  </React.StrictMode>
-);
+    </React.StrictMode>,
+  )
+}

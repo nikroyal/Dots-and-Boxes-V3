@@ -25,3 +25,8 @@
 **Learning:** Implementing time-gated progress systems (like daily goals) requires careful hydration of state on the client. Relying purely on transient transactional outcomes (`txResult`) to set state flags like `dailyGoalCompletedToday` can cause state to stall across real-world day boundaries if a user leaves a tab open or logs in without triggering a transaction.
 
 **Action:** When deriving UI state for time-dependent features, always evaluate the status live in the component based on the current timestamp compared to the stored completion timestamp (`profile.dailyGoalDate === today`), rather than relying on boolean flags flipped by past transactions.
+## 2024-06-24 - Daily Goal Streak Celebration
+
+**Learning:** Celebrating streaks visibly at the point of action (Daily Goal card) and explicitly inviting users back ("Come back tomorrow to keep your streak going") turns a static metric into a returning habit.
+
+**Action:** Surface existing retention metrics actively rather than passively burying them in profiles, and always provide a clear "next step" for the next day.
