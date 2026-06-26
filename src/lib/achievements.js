@@ -54,6 +54,13 @@ export const ACHIEVEMENTS = [
     check: s => !!s.playedAtMidnight, progress: s => [s.playedAtMidnight ? 1 : 0, 1] },
 ];
 
+// Pre-compute Map for O(1) lookups
+const achievementMap = new Map(ACHIEVEMENTS.map(a => [a.id, a]));
+
+export function getAchievementById(id) {
+  return achievementMap.get(id);
+}
+
 // Returns a list of newly-unlocked achievement IDs
 export function checkUnlocks(stats, alreadyUnlocked = []) {
   const newlyUnlocked = [];
