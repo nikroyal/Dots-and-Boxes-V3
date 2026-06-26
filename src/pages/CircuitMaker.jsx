@@ -568,7 +568,7 @@ function CircuitNode({ component, selected, value, onSelect, onDragStart, onTogg
         cursor: 'grab',
       }}
       onClick={onSelect}
-      onPointerDown={onDragStart}
+      onPointerDown={(e) => { e.preventDefault(); onDragStart(e); }}
     >
       <div className="flex items-start justify-between gap-2">
         <div>
@@ -607,7 +607,7 @@ function CircuitNode({ component, selected, value, onSelect, onDragStart, onTogg
         <span
           className="absolute right-[-7px] top-[38px] w-3 h-3 rounded-full"
           style={{ background: live ? '#35d399' : 'rgba(255,255,255,0.7)', cursor: 'crosshair', pointerEvents: 'auto' }}
-          onPointerDown={onWireStart}
+          onPointerDown={(e) => { e.preventDefault(); onWireStart(e); }}
         />
       )}
     </div>

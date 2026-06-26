@@ -1,8 +1,8 @@
 import { useEffect, useState, memo } from 'react';
 import { Link } from 'react-router-dom';
 import { getActivityForUsers, ACTIVITY_TYPES } from '../lib/activity';
-import { ACHIEVEMENTS } from '../lib/achievements';
-import { Trophy, X as Loss, Minus as Equal, UserPlus, Users, Zap } from 'lucide-react';
+import { ACHIEVEMENTS, getAchievementById } from '../lib/achievements';
+import { Trophy, X as Loss, Minus as Equal, UserPlus, Users, Zap, Target } from 'lucide-react';
 
 // Recent activity from the user and their friends. Lives on the Dashboard.
 export default function ActivityFeed({ profile, singleUser = false, viewerId = null }) {
@@ -14,8 +14,11 @@ export default function ActivityFeed({ profile, singleUser = false, viewerId = n
     : '';
   useEffect(() => {
     let alive = true;
-    if (!idKey) return;
-    const ids = idKey.split(',').filter(Boolean);
+    const ids = idKey ? idKey.split(',').filter(Boolean) : [];
+    if (ids.length === 0) {
+      if (alive) setItems([]);
+      return;
+    }
     getActivityForUsers(ids, 20).then(list => {
       if (alive) setItems(list);
     }).catch(err => {
@@ -70,7 +73,7 @@ const ActivityRow = memo(function ActivityRow({ item, isMe }) {
       break;
     }
     case ACTIVITY_TYPES.ACHIEVEMENT: {
-      const a = ACHIEVEMENTS.find(x => x.id === item.data?.achievementId);
+      const a = getAchievementById(item.data?.achievementId);
       icon = <Trophy size={14} />;
       color = 'var(--ochre)';
       text = <>{subject} unlocked <strong>{a?.name || 'an achievement'}</strong></>;
@@ -98,6 +101,12 @@ const ActivityRow = memo(function ActivityRow({ item, isMe }) {
       icon = <Zap size={14} />;
       color = 'var(--crimson)';
       text = <>{subject} set a new personal best in <strong>{item.data?.game || 'an arcade game'}</strong> ({item.data?.score})</>;
+      break;
+    }
+    case ACTIVITY_TYPES.DAILY_GOAL: {
+      icon = <Target size={14} />;
+      color = 'var(--forest)';
+      text = <>{subject} completed their <strong>Daily Goal</strong></>;
       break;
     }
     default:

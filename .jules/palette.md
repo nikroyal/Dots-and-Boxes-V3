@@ -9,3 +9,13 @@
 ## 2024-05-19 - Added ARIA Progress Bar properties
 **Learning:** React component '<div role="progressbar">' elements require 'aria-valuenow', 'aria-valuemin', and 'aria-valuemax' to be accessible.
 **Action:** When creating custom progress bars or loaders mapped to a specific max value or range, apply ARIA attributes dynamically to match state values.
+## 2024-05-18 - Missing ARIA Labels on Icon-Only Buttons
+**Learning:** Icon-only buttons (like `X`, `RefreshCcw`, arrows) frequently lack `aria-label` attributes across different components (e.g., `LocalChess.jsx`, `Snake.jsx`, `LocalDistrictExchange.jsx`).
+**Action:** Always verify that interactive elements containing only visual icons have descriptive `aria-label`s.
+
+## 2024-05-18 - Missing id and htmlFor on Form Elements
+**Learning:** Form labels and inputs (e.g., in `Clubs.jsx`) often lack proper programmatic association (`id` and `htmlFor`), even when visual layout implies a connection.
+**Action:** Ensure all `<label>` tags explicitly target their respective `<input>` or `<textarea>` elements using the `htmlFor` attribute matched to the input's `id`.
+## 2024-05-18 - Missing id and htmlFor on Form Elements
+**Learning:** Form labels and inputs (e.g., in `Clubs.jsx` for the "Public Club" checkbox) often lack proper programmatic association (`id` and `htmlFor`), even when visual layout implies a connection.
+**Action:** Ensure all `<label>` tags explicitly target their respective `<input>` or `<textarea>` elements using the `htmlFor` attribute matched to the input's `id`.

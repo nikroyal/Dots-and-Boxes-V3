@@ -23,6 +23,7 @@ export default function Snake() {
   const [food, setFood] = useState({ x: 5, y: 5 });
   const [gameState, setGameState] = useState('waiting');
   const [score, setScore] = useState(0);
+  const [copied, setCopied] = useState(false);
   const [bestScore, setBestScore] = useState(() => {
     try {
       const saved = localStorage.getItem('axiom-snake-best');
@@ -209,6 +210,22 @@ export default function Snake() {
     return "Snake charmer!";
   };
 
+  const handleShare = (e) => {
+    e.stopPropagation();
+    e.preventDefault();
+    const msg = getGameOverMessage(score);
+    const text = `I scored ${score} in Axiom Snake! 🐍 ${msg}`;
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(() => {
+        sfx.notify();
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      }).catch(err => console.warn("Clipboard copy failed", err));
+    } else {
+      console.warn("Clipboard API not supported");
+    }
+  };
+
   const handleMobileControl = (dirX, dirY) => {
     if (gameState !== 'playing') return;
     const { x, y } = lastMoveDirectionRef.current;
@@ -245,9 +262,14 @@ export default function Snake() {
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/10 z-10 backdrop-blur-[2px]">
             <p className="font-display text-3xl mb-2 text-[var(--crimson)]">Game Over</p>
             <p className="font-mono text-sm opacity-80 mb-4">{getGameOverMessage(score)}</p>
-            <button onClick={startGame} className="btn-primary">
-              Play Again
-            </button>
+            <div className="flex gap-4">
+              <button onClick={startGame} className="btn-primary">
+                Play Again
+              </button>
+              <button onClick={handleShare} className="btn-secondary">
+                {copied ? 'Copied!' : 'Share Result'}
+              </button>
+            </div>
           </div>
         )}
 
@@ -296,6 +318,7 @@ export default function Snake() {
         <button
           className="btn-secondary h-12 flex items-center justify-center text-xl"
           onPointerDown={(e) => { e.preventDefault(); handleMobileControl(0, -1); }}
+          aria-label="Move Up"
         >
           ↑
         </button>
@@ -303,18 +326,21 @@ export default function Snake() {
         <button
           className="btn-secondary h-12 flex items-center justify-center text-xl"
           onPointerDown={(e) => { e.preventDefault(); handleMobileControl(-1, 0); }}
+          aria-label="Move Left"
         >
           ←
         </button>
         <button
           className="btn-secondary h-12 flex items-center justify-center text-xl"
           onPointerDown={(e) => { e.preventDefault(); handleMobileControl(0, 1); }}
+          aria-label="Move Down"
         >
           ↓
         </button>
         <button
           className="btn-secondary h-12 flex items-center justify-center text-xl"
           onPointerDown={(e) => { e.preventDefault(); handleMobileControl(1, 0); }}
+          aria-label="Move Right"
         >
           →
         </button>

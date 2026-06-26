@@ -9,10 +9,11 @@ import {
 } from '../lib/actions';
 import { toast } from '../components/Notifications';
 import { sfx } from '../lib/sound';
-import { getRankInfo, ACHIEVEMENTS } from '../lib/achievements';
+import { getRankInfo, ACHIEVEMENTS, getAchievementById } from '../lib/achievements';
+import { getDailyGoal, getLocalYYYYMMDD } from '../lib/daily';
 import EloChart from '../components/EloChart';
 import ActivityFeed from '../components/ActivityFeed';
-import { Send, X, Trophy, Target, TrendingUp, Users, Zap } from 'lucide-react';
+import { Send, X, Trophy, Target, TrendingUp, Users, Zap, Check } from 'lucide-react';
 
 export default function Dashboard() {
   const { profile } = useAuth();
@@ -137,6 +138,11 @@ export default function Dashboard() {
   const recentAchievements = (profile.unlockedAchievements || []).slice(-3).reverse();
   const friendRequests = profile.friendRequests || [];
 
+  const today = getLocalYYYYMMDD();
+  const dailyGoal = getDailyGoal(today);
+  const dailyStats = profile.dailyStats?.date === today ? profile.dailyStats : { wins: 0, gamesPlayed: 0, totalBoxes: 0, biggestChain: 0 };
+  const dailyGoalCompleted = profile.dailyGoalDate === today || dailyGoal.check(dailyStats);
+
   // Find the locked achievement with the highest progress percentage
   const upNextAchievement = (() => {
     let best = null;
@@ -217,6 +223,27 @@ export default function Dashboard() {
             🔥 {profile.winStreak} Win Streak
           </div>
         )}
+      </section>
+
+      {/* Daily Goal */}
+      <section className="card" style={{ borderColor: dailyGoalCompleted ? 'var(--forest)' : 'var(--hairline)' }}>
+        <div className="flex items-center justify-between gap-4 flex-wrap">
+          <div>
+            <div className="font-mono text-[0.65rem] tracking-widest uppercase opacity-50 mb-1 flex items-center gap-1.5">
+              <Target size={12} /> Daily Goal
+            </div>
+            <div className="font-display text-xl">{dailyGoal.text}</div>
+          </div>
+          {dailyGoalCompleted ? (
+            <div className="flex items-center gap-2 font-mono text-[0.7rem] tracking-widest uppercase px-3 py-1.5 rounded-full" style={{ background: 'var(--forest)', color: 'var(--paper)' }}>
+              <Check size={14} /> Completed
+            </div>
+          ) : (
+            <div className="font-mono text-xs opacity-60">
+              {dailyGoal.getProgress(dailyStats)} / {dailyGoal.max}
+            </div>
+          )}
+        </div>
       </section>
 
       {/* Stat cards */}
@@ -348,7 +375,7 @@ export default function Dashboard() {
               </div>
             )}
             {recentAchievements.map(id => {
-              const a = ACHIEVEMENTS.find(x => x.id === id);
+              const a = getAchievementById(id);
               if (!a) return null;
               return (
                 <div key={id} className="border hairline p-3 opacity-80">

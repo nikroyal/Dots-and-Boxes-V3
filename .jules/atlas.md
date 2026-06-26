@@ -22,3 +22,25 @@
 ## 2024-06-20 - Shareable Milestones
 **Learning:** Players enjoy sharing good results, but manually typing out scores is high friction.
 **Action:** When a player reaches a game-over or win state with a score or qualitative rating, add a simple "Share Result" button that writes a pre-formatted string to the clipboard to encourage social shareability and replayability.
+
+## 2026-06-21 - Shareable Results to Improve Retension
+**Learning:** Adding easy "Share Result" clipboard features to game over screens leverages word-of-mouth loops to improve game discoverability and virality. Ensuring clear visual feedback (like "Copied!") is essential for a complete and polished UX.
+**Action:** When adding sharing features, prioritize copying a fun text string with relevant stats and emojis directly to the clipboard. Always add immediate visual UI feedback when the copy succeeds so users aren't left guessing.
+
+## 2026-06-23 - Adding share results to outcomes
+**Learning:** In Rock Paper Scissors, people like sharing their final streak, but resetting it instantly on loss destroys that moment. Deferring the state reset until the *next* game begins preserves the outcome for sharing while maintaining the correct gameplay loop.
+**Action:** When adding sharing to streak-based games, always decouple the game over state from the internal streak reset.
+## 2024-11-20 - Keyboard Shortcuts for Fast Core Loops
+**Learning:** For small arcade games like Rock Paper Scissors or Whack-A-Mole, requiring pointer clicks limits the maximum speed and flow a power user can achieve. Adding keyboard shortcuts fundamentally transforms the replay loop from an interactive webpage to a highly responsive twitch game.
+**Action:** When evaluating arcade or click-heavy games, always map core actions to the number row/numpad and include visual hints in the UI to surface these shortcuts.
+## 2024-05-18 - Differential Feedback
+   **Learning:** Players find it much more satisfying to see a direct comparison (+/- ms) against their best score rather than just their absolute time. Fast, comparative feedback loops create a stronger "play again" incentive.
+   **Action:** Always consider showing the delta (difference) between the current performance and the best performance in fast-paced arcade games.
+
+## 2024-05-18 - Dynamic Constraint Visualization
+   **Learning:** In guessing games or games with logical boundaries, visually narrowing the constraints dynamically (like updating the valid `minBound` and `maxBound`) drastically reduces cognitive load for new players, improving the first-minute experience.
+   **Action:** Look for opportunities to visualize logical constraints and update them dynamically during gameplay, rather than relying solely on text-based feedback like "Too high".
+
+## 2024-05-18 - Explicit Target Context
+   **Learning:** Games with star ratings based on move counts or time often lack context for new players. By explicitly stating the target required for the top rating upfront (e.g., "Target: ≤ 10 moves"), players instantly understand the goal and have a reason to replay.
+   **Action:** Expose rating thresholds or "par" scores directly in the UI before or during the game, rather than only revealing them upon completion.
