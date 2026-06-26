@@ -75,7 +75,7 @@ export const UNLOCKABLE_AVATARS = [
   { val: '♠', req: 'Win 50 games', check: s => (s.wins || 0) >= 50 },
   { val: '♣', req: 'Win 100 games', check: s => (s.wins || 0) >= 100 },
   { val: '♥', req: 'Have 5+ friends', check: s => (Array.isArray(s.friends) ? s.friends.length : 0) >= 5 },
-  { val: '♦', req: 'Win 10 in a row', check: s => (s.winStreak || 0) >= 10 },
+  { val: '♦', req: 'Win 10 in a row', check: s => (s.bestWinStreak || 0) >= 10 },
   { val: '✦', req: 'Reach 1800 ELO', check: s => (s.elo || 1000) >= 1800 },
   { val: '✧', req: 'Reach 2000 ELO', check: s => (s.elo || 1000) >= 2000 },
   { val: '◉', req: 'Claim 1000 boxes', check: s => (s.totalBoxes || 0) >= 1000 },
