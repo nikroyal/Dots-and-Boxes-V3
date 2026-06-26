@@ -89,7 +89,7 @@ export default function MatchChess() {
       // match?" — set after the first callback fires.
       const newMoveCount = m.game?.moveCount || 0;
       if (hasSubscribed.current && newMoveCount > prevMoveCount.current) {
-        const lastMove = m.game.moves?.[m.game.moves.length - 1];
+        const lastMove = m.game.moves?.[(Array.isArray(m.game.moves) ? m.game.moves.length : 0) - 1];
         if (lastMove?.claimed > 0) sfx.claim();
         else sfx.line();
       }
