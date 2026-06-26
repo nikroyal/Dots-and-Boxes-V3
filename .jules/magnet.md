@@ -25,3 +25,9 @@
 **Learning:** Implementing time-gated progress systems (like daily goals) requires careful hydration of state on the client. Relying purely on transient transactional outcomes (`txResult`) to set state flags like `dailyGoalCompletedToday` can cause state to stall across real-world day boundaries if a user leaves a tab open or logs in without triggering a transaction.
 
 **Action:** When deriving UI state for time-dependent features, always evaluate the status live in the component based on the current timestamp compared to the stored completion timestamp (`profile.dailyGoalDate === today`), rather than relying on boolean flags flipped by past transactions.
+
+## 2024-05-24 - Unlockable Cosmetics
+
+**Learning:** Tying cosmetic profile customizations (like avatars and titles) directly to engagement stats and achievements creates social proof, making players want to earn those cosmetics to show off on their public profile, driving retention.
+
+**Action:** When offering user customization, structure the options so that some are immediately available but premium options are visibly locked behind specific gameplay milestones, using them as intrinsic motivation drivers.
