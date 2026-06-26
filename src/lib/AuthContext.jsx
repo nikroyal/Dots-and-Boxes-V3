@@ -132,7 +132,7 @@ export function AuthProvider({ children }) {
         email: cleanEmail, // for the user's own reference; never displayed publicly
         role: 'player',
         status: 'active',
-        avatar: AVATAR_OPTIONS[crypto.getRandomValues(new Uint32Array(1))[0] % 10], // first 10 are free
+        avatar: AVATAR_OPTIONS[crypto.getRandomValues(new Uint32Array(1))[0] % (AVATAR_OPTIONS.freeCount || 10)], // first 10 are free
         title: '',
         bio: '',
         createdAt: serverTimestamp(),
