@@ -123,7 +123,6 @@ export default function ReactionTimer() {
       navigator.clipboard.writeText(text).then(() => {
         sfx.notify();
         setCopied(true);
-        setTimeout(() => setCopied(false), 2000);
       }).catch(err => {
         console.warn("Clipboard copy failed", err);
       });
