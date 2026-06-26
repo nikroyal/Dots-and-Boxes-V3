@@ -210,7 +210,7 @@ export default function WordScramble() {
             <button
               onClick={() => loadNewWord()}
               disabled={gameState !== 'playing'}
-              className="btn-secondary text-xs"
+              className="btn-ghost text-xs"
             >
               Skip
             </button>
