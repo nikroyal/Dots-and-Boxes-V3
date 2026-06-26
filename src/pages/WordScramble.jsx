@@ -193,6 +193,7 @@ export default function WordScramble() {
 
           <form onSubmit={handleSubmit} className="w-full flex flex-col items-center">
             <input
+              ref={inputRef}
               type="text"
               value={userInput}
               onChange={(e) => setUserInput(e.target.value)}
