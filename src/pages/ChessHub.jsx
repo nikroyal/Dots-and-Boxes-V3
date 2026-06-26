@@ -9,7 +9,7 @@ import {
 } from '../lib/actions';
 import { toast } from '../components/Notifications';
 import { sfx } from '../lib/sound';
-import { getRankFromElo, ACHIEVEMENTS, getAchievementById } from '../lib/achievements';
+import { getRankFromElo, getAchievementById } from '../lib/achievements';
 import EloChart from '../components/EloChart';
 import ActivityFeed from '../components/ActivityFeed';
 import { Send, X, Trophy, Target, TrendingUp, Users, Zap } from 'lucide-react';
