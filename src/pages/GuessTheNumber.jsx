@@ -13,6 +13,9 @@ export default function GuessTheNumber() {
   const [gameState, setGameState] = useState('playing'); // 'playing' | 'won'
   const [message, setMessage] = useState('Guess a number between 1 and 100!');
   const [history, setHistory] = useState([]);
+  const [copied, setCopied] = useState(false);
+  const [minBound, setMinBound] = useState(1);
+  const [maxBound, setMaxBound] = useState(100);
   const [bestAttempts, setBestAttempts] = useState(() => {
     try {
       const saved = localStorage.getItem('axiom-guess-best');
@@ -31,6 +34,8 @@ export default function GuessTheNumber() {
     setGameState('playing');
     setMessage('Guess a number between 1 and 100!');
     setHistory([]);
+    setMinBound(1);
+    setMaxBound(100);
     setTimeout(() => {
       if (inputRef.current) inputRef.current.focus();
     }, 100);
@@ -75,9 +80,11 @@ export default function GuessTheNumber() {
     } else if (guess < targetNumber) {
       sfx.click();
       resultMessage = 'Too low!';
+      setMinBound(prev => Math.max(prev, guess + 1));
     } else {
       sfx.click();
       resultMessage = 'Too high!';
+      setMaxBound(prev => Math.min(prev, guess - 1));
     }
 
     setMessage(resultMessage);
@@ -89,13 +96,23 @@ export default function GuessTheNumber() {
     }
   };
 
+  const getRatingMessage = (att) => {
+    if (att <= 3) return "🔮 Mind Reader!";
+    if (att <= 5) return "🎯 Sharpshooter!";
+    if (att <= 7) return "🧠 Smart Cookie!";
+    if (att <= 10) return "👍 Good Job!";
+    return "🐢 Made it eventually!";
+  };
+
   const handleShare = (e) => {
     e.stopPropagation();
     e.preventDefault();
-    const text = `I guessed the number in ${attempts} attempts on Axiom Guess The Number! 🎯`;
+    const rating = getRatingMessage(attempts);
+    const text = `I guessed the number in ${attempts} attempts on Axiom Guess The Number! 🎯 ${rating}`;
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(text).then(() => {
         sfx.notify();
+        setCopied(true);
       }).catch(err => {
         console.warn("Clipboard copy failed", err);
       });
@@ -111,6 +128,11 @@ export default function GuessTheNumber() {
         <p className="font-mono text-sm tracking-widest uppercase opacity-60 mb-2">
           Attempts: {attempts}
         </p>
+        {gameState === 'playing' && (
+          <p className="font-mono text-xs tracking-widest uppercase opacity-80 mt-1 text-[var(--ink)]">
+            Range: {minBound} - {maxBound}
+          </p>
+        )}
         {bestAttempts !== null && (
           <p className="font-mono text-xs tracking-widest uppercase opacity-80 mt-2 text-[var(--ochre)]">
             Best: {bestAttempts} attempts
@@ -122,6 +144,12 @@ export default function GuessTheNumber() {
         <div className="font-display text-2xl text-center mb-6 min-h-[3rem] flex items-center justify-center">
           {message}
         </div>
+
+        {gameState === 'won' && (
+          <div className="font-display text-xl text-[var(--forest)] mb-4 pulse-soft text-center w-full">
+            {getRatingMessage(attempts)}
+          </div>
+        )}
 
         {gameState === 'playing' ? (
           <form onSubmit={handleGuess} className="w-full flex flex-col items-center gap-4">
@@ -147,7 +175,7 @@ export default function GuessTheNumber() {
               Play Again
             </button>
             <button onClick={handleShare} className="btn-secondary w-full">
-              Share Result
+              {copied ? 'Copied!' : 'Share Result'}
             </button>
           </div>
         )}

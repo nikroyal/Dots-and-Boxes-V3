@@ -38,6 +38,7 @@ import WhackAMole from './pages/WhackAMole';
 import WordScramble from './pages/WordScramble';
 import RockPaperScissors from './pages/RockPaperScissors';
 import GuessTheNumber from './pages/GuessTheNumber';
+import ClickTheTarget from './pages/ClickTheTarget';
 
 import LocalDistrictExchange from './pages/LocalDistrictExchange';
 import DistrictExchangeHub from './pages/DistrictExchangeHub';
@@ -113,6 +114,7 @@ function Shell() {
         <Route path="/whack-a-mole" element={<WhackAMole />} />
         <Route path="/rock-paper-scissors" element={<RockPaperScissors />} />
         <Route path="/guess-the-number" element={<GuessTheNumber />} />
+        <Route path="/click-the-target" element={<ClickTheTarget />} />
         <Route path="/district-exchange/local" element={<LocalDistrictExchange />} />
         <Route path="/snake" element={<Snake />} />
         <Route path="/guess-the-number" element={<GuessTheNumber />} />
@@ -163,6 +165,7 @@ function Shell() {
               <Route path="/whack-a-mole" element={<WhackAMole />} />
               <Route path="/rock-paper-scissors" element={<RockPaperScissors />} />
               <Route path="/guess-the-number" element={<GuessTheNumber />} />
+              <Route path="/click-the-target" element={<ClickTheTarget />} />
               <Route path="/snake" element={<Snake />} />
               <Route path="/guess-the-number" element={<GuessTheNumber />} />
               <Route path="/battleships" element={<Battleships />} />
