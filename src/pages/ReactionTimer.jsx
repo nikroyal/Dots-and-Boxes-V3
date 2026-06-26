@@ -12,6 +12,7 @@ export default function ReactionTimer() {
   const [message, setMessage] = useState('Click to start');
   const [isNewBest, setIsNewBest] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [prevBestTime, setPrevBestTime] = useState(null);
   const [bestTime, setBestTime] = useState(() => {
     try {
       const saved = localStorage.getItem('axiom-reaction-best');
@@ -70,6 +71,7 @@ export default function ReactionTimer() {
     setMessage(`Your time: ${time.toFixed(0)} ms`);
 
     if (!bestTime || time < bestTime) {
+      setPrevBestTime(bestTime);
       recordActivity(profile, ACTIVITY_TYPES.ARCADE_BEST, { game: 'Reaction Timer', score: time.toFixed(0) + ' ms' });
       updateArcadeBest(profile, 'reaction-timer', 'Reaction Timer', time, time.toFixed(0) + ' ms');
       setIsNewBest(true);
@@ -175,9 +177,19 @@ export default function ReactionTimer() {
                   🎉 New Best!
                 </div>
               )}
-              <div className="font-display text-xl text-[var(--ink)] mb-2 opacity-90">
+              <div className="font-display text-xl text-[var(--ink)] mb-1 opacity-90">
                 {getRating(reactionTime)}
               </div>
+              {!isNewBest && bestTime && (
+                <div className="font-mono text-xs opacity-60 tracking-widest uppercase mb-2">
+                  +{ (reactionTime - bestTime).toFixed(0) } ms slower than best
+                </div>
+              )}
+              {isNewBest && prevBestTime && (
+                <div className="font-mono text-xs text-[var(--forest)] tracking-widest uppercase mb-2">
+                  -{ (prevBestTime - reactionTime).toFixed(0) } ms faster!
+                </div>
+              )}
               <div className="font-mono text-sm opacity-80 tracking-widest uppercase mt-2">
                 Click to try again
               </div>

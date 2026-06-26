@@ -11,7 +11,7 @@ import {
 import { PLAYER_COLORS, hKey, vKey, bKey } from '../lib/gameLogic';
 import { sfx } from '../lib/sound';
 import { toast } from '../components/Notifications';
-import { ACHIEVEMENTS } from '../lib/achievements';
+import { ACHIEVEMENTS, getAchievementById } from '../lib/achievements';
 import Confetti from '../components/Confetti';
 import { useConfirm } from '../components/ConfirmDialog';
 import { isDisconnected } from '../lib/presence';
@@ -979,7 +979,7 @@ function WinScreen({ match, profile, achievementToasts, onHome, onReplay }) {
           </div>
           <div className="space-y-2 max-w-sm mx-auto">
             {achievementToasts.map(id => {
-              const a = ACHIEVEMENTS.find(x => x.id === id);
+              const a = getAchievementById(id);
               if (!a) return null;
               return (
                 <div key={id} className="card fade-in text-left" style={{ background: 'rgba(183,121,31,0.05)', borderColor: 'rgba(183,121,31,0.3)' }}>
