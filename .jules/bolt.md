@@ -27,3 +27,6 @@
 ## 2024-11-20 - O(1) Map lookups in render loops
 **Learning:** Using `Array.find()` inside a `.map()` render loop creates an O(N²) time complexity bottleneck which blocks the main thread during renders, especially for large arrays like chat history. While replacing it with a Map lookup (`Map.get()`) makes it O(1), recreating the Map from the array on every render cycle introduces unnecessary O(N) computational overhead and memory allocation churn, which can degrade performance rather than improve it.
 **Action:** Always memoize the Map creation (e.g., using `useMemo`) so the O(N) map generation cost is only paid when the underlying array changes, ensuring true O(1) lookup performance in the render loop.
+## 2026-06-26 - O(1) Map Lookups In Render Loops
+**Learning:** Re-computing a map structure like `new Map(array)` directly inside a React component render block will incur an O(N) cost and create new references every render. This completely defeats the performance benefits of transitioning from `Array.find()` to `Map.get()`.
+**Action:** When migrating O(N) repeated array iterations inside a component down to O(1) indexing, always wrap the map instantiation in a `useMemo(() => new Map(...), [dependencies])` so the structure is built strictly only when its dependencies update.
