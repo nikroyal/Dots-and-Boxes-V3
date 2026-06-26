@@ -899,7 +899,7 @@ function WinScreen({ match, profile, achievementToasts, onHome, onReplay }) {
                 : rematchState === 'sending' ? 'Sending…'
                 : 'Rematch'}
             </button>
-            {opponentInfo && !isSelf && !isFriend && !hasPendingRequest && !hasIncomingRequest && (
+            {opponentInfo && !isFriend && !hasPendingRequest && !hasIncomingRequest && (
               <button onClick={handleAddFriend} disabled={friendRequestState === 'sending' || friendRequestState === 'sent'}
                       className={friendRequestState === 'sent' ? 'btn-ghost opacity-50' : 'btn-ghost'}>
                 <UserPlus size={14} />{' '}
