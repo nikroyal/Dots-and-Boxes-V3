@@ -35,6 +35,7 @@ import ReactionTimer from './pages/ReactionTimer';
 import Snake from './pages/Snake';
 import Battleships from './pages/battleships/Battleships';
 import WhackAMole from './pages/WhackAMole';
+import WordScramble from './pages/WordScramble';
 import RockPaperScissors from './pages/RockPaperScissors';
 import GuessTheNumber from './pages/GuessTheNumber';
 import ClickTheTarget from './pages/ClickTheTarget';
@@ -109,6 +110,7 @@ function Shell() {
         <Route path="/chess/local" element={<LocalChess />} />
         <Route path="/memory-match" element={<MemoryMatch />} />
         <Route path="/reaction-timer" element={<ReactionTimer />} />
+        <Route path="/word-scramble" element={<WordScramble />} />
         <Route path="/whack-a-mole" element={<WhackAMole />} />
         <Route path="/rock-paper-scissors" element={<RockPaperScissors />} />
         <Route path="/guess-the-number" element={<GuessTheNumber />} />
@@ -159,6 +161,7 @@ function Shell() {
               <Route path="/circuit-maker" element={<CircuitMaker />} />
               <Route path="/memory-match" element={<MemoryMatch />} />
               <Route path="/reaction-timer" element={<ReactionTimer />} />
+              <Route path="/word-scramble" element={<WordScramble />} />
               <Route path="/whack-a-mole" element={<WhackAMole />} />
               <Route path="/rock-paper-scissors" element={<RockPaperScissors />} />
               <Route path="/guess-the-number" element={<GuessTheNumber />} />
