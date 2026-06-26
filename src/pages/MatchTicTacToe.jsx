@@ -11,7 +11,7 @@ import {
 import { PLAYER_COLORS } from '../lib/gameLogic';
 import { sfx } from '../lib/sound';
 import { toast } from '../components/Notifications';
-import { ACHIEVEMENTS, getAchievementById } from '../lib/achievements';
+import { getAchievementById } from '../lib/achievements';
 import Confetti from '../components/Confetti';
 import { useConfirm } from '../components/ConfirmDialog';
 import { isDisconnected } from '../lib/presence';
