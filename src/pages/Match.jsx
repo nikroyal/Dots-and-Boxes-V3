@@ -11,7 +11,7 @@ import {
 import { PLAYER_COLORS, hKey, vKey, bKey } from '../lib/gameLogic';
 import { sfx } from '../lib/sound';
 import { toast } from '../components/Notifications';
-import { ACHIEVEMENTS, getAchievementById } from '../lib/achievements';
+import { getAchievementById } from '../lib/achievements';
 import Confetti from '../components/Confetti';
 import BoxParticles from '../components/BoxParticles';
 import { useConfirm } from '../components/ConfirmDialog';
