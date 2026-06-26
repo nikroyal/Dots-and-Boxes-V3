@@ -939,7 +939,6 @@ function WinScreen({ match, profile, achievementToasts, onHome, onReplay }) {
   const isFriend = (Array.isArray(profile.friends) ? profile.friends : []).includes(opponentId);
   const hasPendingRequest = (Array.isArray(profile.outgoingFriendRequests) ? profile.outgoingFriendRequests : []).includes(opponentId);
   const hasIncomingRequest = (Array.isArray(profile.friendRequests) ? profile.friendRequests : []).some(r => r.fromId === opponentId);
-  const isSelf = opponentId === profile.id;
 
   const handleAddFriend = async () => {
     if (friendRequestState === 'sending' || friendRequestState === 'sent') return;
