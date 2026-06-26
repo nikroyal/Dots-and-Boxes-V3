@@ -83,6 +83,7 @@ export const UNLOCKABLE_AVATARS = [
 ];
 
 export const AVATAR_OPTIONS = UNLOCKABLE_AVATARS.map(a => a.val);
+AVATAR_OPTIONS.freeCount = UNLOCKABLE_AVATARS.filter(a => a.free).length;
 
 export const UNLOCKABLE_TITLES = [
   { val: 'Novice', free: true },
