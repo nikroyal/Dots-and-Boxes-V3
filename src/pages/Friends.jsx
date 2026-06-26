@@ -20,7 +20,7 @@ function useUserDocs(ids) {
   const stableKey = useMemo(() => [...ids].sort().join(','), [ids]);
   useEffect(() => {
     if (!stableKey) { setDocs({}); return; }
-    const idsArr = stableKey.split(',').filter(Boolean);
+    const idsArr = stableKey ? stableKey.split(',').filter(Boolean) : [];
     // Drop any cached entries that aren't in the current id set, so the
     // returned list doesn't include stale users after the membership
     // shrinks (removed friend, unblocked user).

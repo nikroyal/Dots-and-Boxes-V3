@@ -18,6 +18,8 @@ const GATE_TYPES = [
 
 const initialState = { components: [], wires: [], nextId: 1 };
 
+const GATE_TYPES_MAP = new Map(GATE_TYPES);
+
 function makeComponent(type, id, x, y) {
   return {
     id,
@@ -26,7 +28,7 @@ function makeComponent(type, id, x, y) {
     y,
     value: type === 'input' ? false : undefined,
     color: type === 'output' ? '#35d399' : undefined,
-    label: GATE_TYPES.find(([key]) => key === type)?.[1] || type,
+    label: GATE_TYPES_MAP.get(type) || type,
   };
 }
 
@@ -287,7 +289,11 @@ export default function CircuitMaker() {
     if (drag) {
       const lastState = history[historyIndex];
       const currentComp = componentMap.get(drag.id);
-      const lastComp = lastState ? lastState.components.find(component => component.id === drag.id) : undefined;
+      let lastComp = undefined;
+      if (lastState) {
+        const lastComponentMap = new Map(lastState.components.map(c => [c.id, c]));
+        lastComp = lastComponentMap.get(drag.id);
+      }
       if (currentComp && lastComp && (currentComp.x !== lastComp.x || currentComp.y !== lastComp.y)) {
         commit(state);
       }
