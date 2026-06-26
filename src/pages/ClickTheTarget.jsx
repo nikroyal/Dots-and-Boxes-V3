@@ -144,7 +144,7 @@ export default function ClickTheTarget() {
                <button onClick={startGame} className="btn-primary">
                   Play Again
                </button>
-               <button onClick={handleShare} className="btn-secondary">
+               <button onClick={handleShare} className="btn-ghost">
                  {copied ? 'Copied!' : 'Share Result'}
                </button>
              </div>
