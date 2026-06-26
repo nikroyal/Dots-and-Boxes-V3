@@ -94,7 +94,7 @@ export const UNLOCKABLE_TITLES = [
   { val: 'Grandmaster', req: 'Reach 2500 ELO', check: s => (s.elo || 1000) >= 2500 },
   { val: 'Legend', req: 'Reach 3000 ELO', check: s => (s.elo || 1000) >= 3000 },
   { val: 'The Patient', req: 'Lose 25 games', check: s => (s.losses || 0) >= 25 },
-  { val: 'The Bold', req: 'Win in under 2 minutes', check: s => (s.fastestWin || Infinity) < 120000 },
+  { val: 'The Bold', req: 'Win in under 2 minutes', check: s => (s.fastestWin ?? Infinity) < 120000 },
 ];
 
 export const TITLE_OPTIONS = UNLOCKABLE_TITLES.map(t => t.val);
