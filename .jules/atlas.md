@@ -26,3 +26,7 @@
 ## 2026-06-21 - Shareable Results to Improve Retension
 **Learning:** Adding easy "Share Result" clipboard features to game over screens leverages word-of-mouth loops to improve game discoverability and virality. Ensuring clear visual feedback (like "Copied!") is essential for a complete and polished UX.
 **Action:** When adding sharing features, prioritize copying a fun text string with relevant stats and emojis directly to the clipboard. Always add immediate visual UI feedback when the copy succeeds so users aren't left guessing.
+
+## 2024-06-22 - Preserving State in Fail Screens
+**Learning:** Resetting a score or streak immediately upon failure robs the player of the chance to see their final result, making the fail state frustrating rather than satisfying.
+**Action:** Always wait to reset scores or streaks until the player explicitly restarts the game (e.g., clicking "Play Again"), allowing the fail screen to display the final achieved state and enabling shareability.

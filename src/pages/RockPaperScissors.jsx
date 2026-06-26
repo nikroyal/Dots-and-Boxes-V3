@@ -24,6 +24,7 @@ export default function RockPaperScissors() {
   const [computerChoice, setComputerChoice] = useState(null);
   const [resultMessage, setResultMessage] = useState('');
   const [streak, setStreak] = useState(0);
+  const [copied, setCopied] = useState(false);
   const [bestStreak, setBestStreak] = useState(() => {
     try {
       const saved = localStorage.getItem('axiom-rps-best');
@@ -64,7 +65,6 @@ export default function RockPaperScissors() {
       } else {
         msg = 'You lose!';
         sfx.loss();
-        setStreak(0); // Reset streak on loss
       }
       setResultMessage(msg);
       setGameState('result');
@@ -83,10 +83,36 @@ export default function RockPaperScissors() {
 
   const resetGame = () => {
     sfx.click();
+    if (resultMessage === 'You lose!') {
+      setStreak(0);
+    }
     setGameState('waiting');
     setPlayerChoice(null);
     setComputerChoice(null);
     setResultMessage('');
+  };
+
+  const getRatingMessage = (s) => {
+    if (s >= 10) return "🔥 Unstoppable!";
+    if (s >= 5) return "🎯 Sharp!";
+    if (s >= 3) return "👍 Good run!";
+    return "😅 Better luck next time!";
+  };
+
+  const handleShare = (e) => {
+    e.stopPropagation();
+    e.preventDefault();
+    const rating = getRatingMessage(streak);
+    const text = `I hit a streak of ${streak} in Axiom Rock Paper Scissors! ✊✋✌️ ${rating}`;
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(() => {
+        sfx.notify();
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      }).catch(err => console.warn("Clipboard copy failed", err));
+    } else {
+      console.warn("Clipboard API not supported");
+    }
   };
 
   return (
@@ -125,12 +151,27 @@ export default function RockPaperScissors() {
 
         {gameState === 'result' ? (
           <div className="flex flex-col items-center fade-in">
-             <div className={`font-display text-3xl mb-6 ${resultMessage === 'You win!' ? 'text-[var(--forest)]' : resultMessage === 'You lose!' ? 'text-[var(--crimson)]' : ''}`}>
+             <div className={`font-display text-3xl mb-2 ${resultMessage === 'You win!' ? 'text-[var(--forest)]' : resultMessage === 'You lose!' ? 'text-[var(--crimson)]' : ''}`}>
                 {resultMessage}
              </div>
-             <button onClick={resetGame} className="btn-primary">
-                Play Again
-             </button>
+             {resultMessage === 'You lose!' && streak > 0 && (
+                <div className="font-display text-xl mb-6 text-[var(--ink)] opacity-90">
+                  {getRatingMessage(streak)}
+                </div>
+             )}
+             {resultMessage !== 'You lose!' && (
+                <div className="mb-6" />
+             )}
+             <div className="flex gap-4">
+                <button onClick={resetGame} className="btn-primary">
+                   Play Again
+                </button>
+                {resultMessage === 'You lose!' && streak > 0 && (
+                   <button onClick={handleShare} className="btn-secondary">
+                      {copied ? 'Copied!' : 'Share Result'}
+                   </button>
+                )}
+             </div>
           </div>
         ) : (
           <div className="flex gap-4">
