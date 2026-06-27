@@ -114,8 +114,8 @@ export default function ClickTheTarget() {
             style={{
               top: targetPos.top,
               left: targetPos.left,
-              transform: 'translate(-50%, -50%)',
-              transition: 'top 0.1s ease-out, left 0.1s ease-out'
+              transform: `translate(-50%, -50%) scale(${Math.max(0.4, 1 - score * 0.015)})`,
+              transition: 'top 0.1s ease-out, left 0.1s ease-out, transform 0.1s ease-out'
             }}
             aria-label="Target"
           >
