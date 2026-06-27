@@ -40,6 +40,7 @@ import RockPaperScissors from './pages/RockPaperScissors';
 import GuessTheNumber from './pages/GuessTheNumber';
 import ClickTheTarget from './pages/ClickTheTarget';
 import SequenceMemory from './pages/SequenceMemory';
+import TypingSpeed from './pages/TypingSpeed';
 
 import LocalDistrictExchange from './pages/LocalDistrictExchange';
 import DistrictExchangeHub from './pages/DistrictExchangeHub';
@@ -117,6 +118,7 @@ function Shell() {
         <Route path="/guess-the-number" element={<GuessTheNumber />} />
         <Route path="/click-the-target" element={<ClickTheTarget />} />
         <Route path="/sequence-memory" element={<SequenceMemory />} />
+        <Route path="/typing-speed" element={<TypingSpeed />} />
         <Route path="/district-exchange/local" element={<LocalDistrictExchange />} />
         <Route path="/snake" element={<Snake />} />
         <Route path="/guess-the-number" element={<GuessTheNumber />} />
@@ -169,6 +171,7 @@ function Shell() {
               <Route path="/guess-the-number" element={<GuessTheNumber />} />
               <Route path="/sequence-memory" element={<SequenceMemory />} />
               <Route path="/click-the-target" element={<ClickTheTarget />} />
+              <Route path="/typing-speed" element={<TypingSpeed />} />
               <Route path="/snake" element={<Snake />} />
               <Route path="/guess-the-number" element={<GuessTheNumber />} />
               <Route path="/battleships" element={<Battleships />} />
