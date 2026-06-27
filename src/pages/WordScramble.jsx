@@ -207,6 +207,11 @@ export default function WordScramble() {
                   setUserInput(val);
                 }
               }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && !userInput.trim()) {
+                  e.preventDefault();
+                }
+              }}
               className="w-full text-center text-2xl font-display uppercase tracking-widest p-4 border hairline bg-[var(--bg-soft)] focus:outline-none focus:ring-2 focus:ring-[var(--forest)]"
               placeholder="Type word..."
               disabled={gameState !== 'playing'}
