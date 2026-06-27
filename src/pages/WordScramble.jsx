@@ -50,6 +50,7 @@ export default function WordScramble() {
 
   const timerRef = useRef(null);
   const scoreRef = useRef(score);
+  const inputRef = useRef(null);
 
   useEffect(() => {
     return () => {
@@ -196,7 +197,21 @@ export default function WordScramble() {
               ref={inputRef}
               type="text"
               value={userInput}
-              onChange={(e) => setUserInput(e.target.value)}
+              onChange={(e) => {
+                const val = e.target.value;
+                if (val.trim().toUpperCase() === currentWord) {
+                  sfx.piece();
+                  setScore((s) => s + 10);
+                  loadNewWord();
+                } else {
+                  setUserInput(val);
+                }
+              }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && !userInput.trim()) {
+                  e.preventDefault();
+                }
+              }}
               className="w-full text-center text-2xl font-display uppercase tracking-widest p-4 border hairline bg-[var(--bg-soft)] focus:outline-none focus:ring-2 focus:ring-[var(--forest)]"
               placeholder="Type word..."
               disabled={gameState !== 'playing'}
