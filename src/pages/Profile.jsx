@@ -4,7 +4,7 @@ import { doc, onSnapshot, getDoc } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { useAuth } from '../lib/AuthContext';
 import { updateProfile, sendFriendRequest, removeFriend, blockUser } from '../lib/actions';
-import { ACHIEVEMENTS, AVATAR_OPTIONS, TITLE_OPTIONS, getRankInfo } from '../lib/achievements';
+import { ACHIEVEMENTS, AVATAR_OPTIONS, TITLE_OPTIONS, UNLOCKABLE_AVATARS, UNLOCKABLE_TITLES, getRankInfo } from '../lib/achievements';
 import { toast } from '../components/Notifications';
 import { useConfirm } from '../components/ConfirmDialog';
 import { Edit2, UserPlus, Ban, Check } from 'lucide-react';
@@ -182,20 +182,27 @@ export default function Profile() {
           <div>
             <div className="font-mono block mb-3 text-[0.65rem] tracking-widest uppercase opacity-55">Avatar</div>
             <div className="flex flex-wrap gap-2" role="radiogroup" aria-label="Pick avatar">
-              {AVATAR_OPTIONS.map(av => (
-                <button key={av} onClick={() => setEditAvatar(av)}
+              {UNLOCKABLE_AVATARS.map(av => {
+                const isUnlocked = av.free || av.check(target);
+                return (
+                <button key={av.val} onClick={() => isUnlocked && setEditAvatar(av.val)}
                         type="button"
                         role="radio"
-                        aria-checked={editAvatar === av}
-                        aria-label={`Avatar ${av}`}
-                        className="w-12 h-12 border hairline font-display text-2xl transition-all focus-ring"
+                        aria-checked={editAvatar === av.val}
+                        aria-label={`Avatar ${av.val}${!isUnlocked ? ` (Locked: ${av.req})` : ''}`}
+                        title={!isUnlocked ? `Locked: ${av.req}` : ''}
+                        disabled={!isUnlocked}
+                        className="w-12 h-12 border hairline font-display text-2xl transition-all focus-ring flex items-center justify-center relative"
                         style={{
-                          background: editAvatar === av ? 'var(--bg-soft)' : 'transparent',
-                          borderColor: editAvatar === av ? 'var(--ink)' : 'var(--hairline)',
+                          background: editAvatar === av.val ? 'var(--bg-soft)' : 'transparent',
+                          borderColor: editAvatar === av.val ? 'var(--ink)' : 'var(--hairline)',
+                          opacity: isUnlocked ? 1 : 0.3,
+                          cursor: isUnlocked ? 'pointer' : 'not-allowed'
                         }}>
-                  {av}
+                  {av.val}
+                  {!isUnlocked && <span className="absolute top-0 right-0 text-[0.4rem] opacity-70">🔒</span>}
                 </button>
-              ))}
+              )})}
             </div>
           </div>
           <div>
@@ -203,7 +210,10 @@ export default function Profile() {
             <select id="profile-title" value={editTitle} onChange={e => setEditTitle(e.target.value)}
                     className="input-field" style={{ background: 'transparent' }}>
               <option value="">— None —</option>
-              {TITLE_OPTIONS.map(t => <option key={t} value={t}>{t}</option>)}
+              {UNLOCKABLE_TITLES.map(t => {
+                const isUnlocked = t.free || t.check(target);
+                return <option key={t.val} value={t.val} disabled={!isUnlocked}>{t.val} {!isUnlocked ? `(🔒 ${t.req})` : ''}</option>;
+              })}
             </select>
           </div>
           <div>
@@ -259,7 +269,7 @@ export default function Profile() {
       </section>
 
       {/* ELO trend */}
-      {(target.matchHistory || []).length > 0 && (
+      {(Array.isArray(target.matchHistory) ? target.matchHistory.length : 0) > 0 && (
         <section className="card">
           <EloChart matchHistory={target.matchHistory || []} currentElo={target.elo ?? 1000} />
         </section>

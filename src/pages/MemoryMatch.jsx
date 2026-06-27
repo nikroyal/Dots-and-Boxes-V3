@@ -144,8 +144,13 @@ export default function MemoryMatch() {
       <section className="text-center">
         <h1 className="font-display text-5xl font-medium tracking-tight mb-2">Memory Match</h1>
         <p className="font-mono text-sm tracking-widest uppercase opacity-60 mb-2">
-          Moves: {moves} {bestMoves !== null && <span className="ml-4">Best: {bestMoves}</span>}
+          Moves: {moves} {moves > 0 && <span className="ml-2">{getStars(moves)}</span>} {bestMoves !== null && <span className="ml-4">Best: {bestMoves}</span>}
         </p>
+        {!isGameWon && (
+          <p className="font-mono text-xs tracking-widest uppercase opacity-50 mt-1">
+            Target: ≤ 10 moves for ⭐⭐⭐
+          </p>
+        )}
         {isGameWon && (
           <div className="flex flex-col items-center gap-2">
             <p className="font-display text-2xl text-[var(--forest)] pulse-soft">You Win!</p>

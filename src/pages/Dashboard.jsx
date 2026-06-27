@@ -9,7 +9,7 @@ import {
 } from '../lib/actions';
 import { toast } from '../components/Notifications';
 import { sfx } from '../lib/sound';
-import { getRankInfo, ACHIEVEMENTS } from '../lib/achievements';
+import { getRankInfo, ACHIEVEMENTS, getAchievementById } from '../lib/achievements';
 import { getDailyGoal, getLocalYYYYMMDD } from '../lib/daily';
 import EloChart from '../components/EloChart';
 import ActivityFeed from '../components/ActivityFeed';
@@ -385,7 +385,7 @@ export default function Dashboard() {
               </div>
             )}
             {recentAchievements.map(id => {
-              const a = ACHIEVEMENTS.find(x => x.id === id);
+              const a = getAchievementById(id);
               if (!a) return null;
               return (
                 <div key={id} className="border hairline p-3 opacity-80">

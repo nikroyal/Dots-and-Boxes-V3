@@ -5,17 +5,17 @@ import { db } from '../lib/firebase';
 import { useAuth } from '../lib/AuthContext';
 import {
   watchMatch, makeMove, requestPause, respondToPause, resumeMatch, resignMatch,
-  sendChatAs, joinAsSpectator, leaveSpectator, finalizeStats, requestRematch,
+  sendChatAs, joinAsSpectator, leaveSpectator, finalizeStats, requestRematch, sendFriendRequest,
   forfeitOnTimeout,
 } from '../lib/actions';
 import { PLAYER_COLORS } from '../lib/gameLogic';
 import { sfx } from '../lib/sound';
 import { toast } from '../components/Notifications';
-import { ACHIEVEMENTS } from '../lib/achievements';
+import { ACHIEVEMENTS, getAchievementById } from '../lib/achievements';
 import Confetti from '../components/Confetti';
 import { useConfirm } from '../components/ConfirmDialog';
 import { isDisconnected } from '../lib/presence';
-import { Pause, Play, Flag, Send, Eye, Trophy, RotateCcw, Home, Repeat, Clock, WifiOff, Handshake } from 'lucide-react';
+import { Pause, Play, Flag, Send, Eye, Trophy, RotateCcw, Home, Repeat, Clock, WifiOff, Handshake, UserPlus } from 'lucide-react';
 
 export default function MatchTicTacToe() {
   const { id } = useParams();
@@ -125,7 +125,7 @@ export default function MatchTicTacToe() {
   // Auto-scroll chat
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [match?.chat?.length]);
+  }, [Array.isArray(match?.chat) ? match.chat.length : 0]);
 
   // Join as spectator if not a player
   useEffect(() => {
@@ -144,7 +144,7 @@ export default function MatchTicTacToe() {
     if (!match.players.includes(profile.id)) return;
     setFinalized(true);
     finalizeStats(id, profile).then((res) => {
-      if (res?.newlyUnlocked?.length) {
+      if (Array.isArray(res?.newlyUnlocked) ? res.newlyUnlocked.length : 0) {
         sfx.achievement();
         setAchievementToasts(res.newlyUnlocked);
       }
@@ -787,6 +787,28 @@ function WinScreen({ match, profile, achievementToasts, onHome, onReplay }) {
   const wasResigned = !!match.resignedBy;
 
   const [rematchState, setRematchState] = useState('idle'); // idle | sending | sent | error
+  const [friendRequestState, setFriendRequestState] = useState('idle');
+
+  const opponentId = match.players.find(id => id !== profile.id);
+  const opponentInfo = match.playerInfo?.[opponentId];
+  const isFriend = (Array.isArray(profile.friends) ? profile.friends : []).includes(opponentId);
+  const hasPendingRequest = (Array.isArray(profile.outgoingFriendRequests) ? profile.outgoingFriendRequests : []).includes(opponentId);
+  const hasIncomingRequest = (Array.isArray(profile.friendRequests) ? profile.friendRequests : []).some(r => r.fromId === opponentId);
+
+  const handleAddFriend = async () => {
+    if (friendRequestState === 'sending' || friendRequestState === 'sent') return;
+    if (!opponentInfo?.username) return;
+    setFriendRequestState('sending');
+    try {
+      await sendFriendRequest(profile, opponentInfo.username);
+      setFriendRequestState('sent');
+      toast('Friend request sent', 'success');
+      sfx.click();
+    } catch (e) {
+      setFriendRequestState('idle');
+      toast(e.message, 'error');
+    }
+  };
   const handleRematch = async () => {
     if (rematchState === 'sending' || rematchState === 'sent') return;
     setRematchState('sending');
@@ -854,7 +876,7 @@ function WinScreen({ match, profile, achievementToasts, onHome, onReplay }) {
           </div>
           <div className="space-y-2 max-w-sm mx-auto">
             {achievementToasts.map(id => {
-              const a = ACHIEVEMENTS.find(x => x.id === id);
+              const a = getAchievementById(id);
               if (!a) return null;
               return (
                 <div key={id} className="card fade-in text-left" style={{ background: 'rgba(183,121,31,0.05)', borderColor: 'rgba(183,121,31,0.3)' }}>
@@ -869,13 +891,24 @@ function WinScreen({ match, profile, achievementToasts, onHome, onReplay }) {
 
       <div className="flex gap-3 justify-center flex-wrap">
         {isPlayer && (
-          <button onClick={handleRematch} disabled={rematchState === 'sending' || rematchState === 'sent'}
-                  className="btn-ghost">
-            <Repeat size={14} />{' '}
-            {rematchState === 'sent' ? 'Rematch sent'
-              : rematchState === 'sending' ? 'Sending…'
-              : 'Rematch'}
-          </button>
+          <>
+            <button onClick={handleRematch} disabled={rematchState === 'sending' || rematchState === 'sent'}
+                    className="btn-ghost">
+              <Repeat size={14} />{' '}
+              {rematchState === 'sent' ? 'Rematch sent'
+                : rematchState === 'sending' ? 'Sending…'
+                : 'Rematch'}
+            </button>
+            {opponentInfo && !isFriend && !hasPendingRequest && !hasIncomingRequest && (
+              <button onClick={handleAddFriend} disabled={friendRequestState === 'sending' || friendRequestState === 'sent'}
+                      className={friendRequestState === 'sent' ? 'btn-ghost opacity-50' : 'btn-ghost'}>
+                <UserPlus size={14} />{' '}
+                {friendRequestState === 'sent' ? 'Request sent'
+                  : friendRequestState === 'sending' ? 'Sending…'
+                  : 'Add Friend'}
+              </button>
+            )}
+          </>
         )}
         <button onClick={onReplay} className="btn-ghost"><RotateCcw size={14} /> Watch Replay</button>
         <button onClick={onHome} className="btn-primary"><Home size={14} /> Home</button>

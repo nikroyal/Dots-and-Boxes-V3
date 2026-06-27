@@ -16,3 +16,6 @@
 ## 2024-05-18 - Missing id and htmlFor on Form Elements
 **Learning:** Form labels and inputs (e.g., in `Clubs.jsx`) often lack proper programmatic association (`id` and `htmlFor`), even when visual layout implies a connection.
 **Action:** Ensure all `<label>` tags explicitly target their respective `<input>` or `<textarea>` elements using the `htmlFor` attribute matched to the input's `id`.
+## 2024-05-18 - Missing id and htmlFor on Form Elements
+**Learning:** Form labels and inputs (e.g., in `Clubs.jsx` for the "Public Club" checkbox) often lack proper programmatic association (`id` and `htmlFor`), even when visual layout implies a connection.
+**Action:** Ensure all `<label>` tags explicitly target their respective `<input>` or `<textarea>` elements using the `htmlFor` attribute matched to the input's `id`.
