@@ -33,10 +33,14 @@ export default function SequenceMemory() {
   });
 
   const timeoutsRef = useRef([]);
+  const clickTimeoutRef = useRef(null);
 
   const clearAllTimeouts = () => {
     timeoutsRef.current.forEach(clearTimeout);
     timeoutsRef.current = [];
+    if (clickTimeoutRef.current) {
+      clearTimeout(clickTimeoutRef.current);
+    }
   };
 
   useEffect(() => {
