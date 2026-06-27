@@ -172,7 +172,8 @@ export default function SequenceMemory() {
       navigator.clipboard.writeText(text).then(() => {
         sfx.notify();
         setCopied(true);
-        setTimeout(() => setCopied(false), 2000);
+        const shareTimeout = setTimeout(() => setCopied(false), 2000);
+        timeoutsRef.current.push(shareTimeout);
       }).catch(err => console.warn("Clipboard copy failed", err));
     } else {
       console.warn("Clipboard API not supported");
