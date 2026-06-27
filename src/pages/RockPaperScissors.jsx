@@ -86,6 +86,10 @@ export default function RockPaperScissors() {
     if (resultMessage === 'You lose!') {
       setStreak(0);
     }
+    setCopied(false);
+    if (copyTimeoutRef.current) {
+      clearTimeout(copyTimeoutRef.current);
+    }
     setGameState('waiting');
     setPlayerChoice(null);
     setComputerChoice(null);
