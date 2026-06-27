@@ -108,10 +108,12 @@ export default function SequenceMemory() {
     setActivePad(padId);
 
     // Quick visual feedback
-    const hideTimeout = setTimeout(() => {
+    if (clickTimeoutRef.current) {
+      clearTimeout(clickTimeoutRef.current);
+    }
+    clickTimeoutRef.current = setTimeout(() => {
       setActivePad(null);
     }, 200);
-    timeoutsRef.current.push(hideTimeout);
 
     const newPlayerSeq = [...playerSequence, padId];
     const currentIndex = newPlayerSeq.length - 1;
