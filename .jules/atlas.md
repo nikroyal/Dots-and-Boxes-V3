@@ -44,3 +44,14 @@
 ## 2024-05-18 - Explicit Target Context
    **Learning:** Games with star ratings based on move counts or time often lack context for new players. By explicitly stating the target required for the top rating upfront (e.g., "Target: ≤ 10 moves"), players instantly understand the goal and have a reason to replay.
    **Action:** Expose rating thresholds or "par" scores directly in the UI before or during the game, rather than only revealing them upon completion.
+## 2026-06-27 - Auto-Advancing Flow State
+**Learning:** In fast-paced input games (like Word Scramble), requiring a player to hit Enter or click a submit button after typing the correct answer creates unnecessary friction and breaks flow.
+**Action:** Always consider checking the input state dynamically (`onChange`) and auto-advancing the game loop the instant the winning condition is met.
+
+## 2026-06-27 - Progressive Scaling Difficulty
+**Learning:** Small arcade games can feel monotonous if the difficulty is static. Dynamically scaling elements based on the score (e.g. shrinking a target using `transform: scale()`) is an extremely low-effort way to create a smooth, organic difficulty curve without complex mechanics.
+**Action:** When evaluating simple click or timing games, identify the core interaction point and tie its size or speed directly to the player's current score.
+
+## 2026-06-27 - Anti-Spam Penalties
+**Learning:** In games where players must click specific targets (like Whack-a-Mole), the lack of a penalty for missing encourages a degenerate strategy where the player just spams clicks everywhere.
+**Action:** Always implement a miss penalty (e.g., negative points) with clear visual feedback to enforce precision and increase the skill ceiling.
