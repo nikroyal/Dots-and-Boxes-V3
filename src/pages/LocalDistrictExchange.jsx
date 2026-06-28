@@ -237,6 +237,7 @@ export default function LocalDistrictExchange() {
                   value={p.color}
                   onChange={e => handleUpdatePlayer(i, 'color', e.target.value)}
                   className="w-10 h-10 p-0 border-0 cursor-pointer"
+                  aria-label={`Player ${i + 1} Color`}
                 />
                 <input
                   value={p.name}
@@ -244,9 +245,11 @@ export default function LocalDistrictExchange() {
                   className="flex-1 bg-black/5 dark:bg-white/5 border hairline px-3 py-2 font-display outline-none focus-ring"
                   required
                   maxLength={15}
+                  aria-label={`Player ${i + 1} Name`}
                 />
-                <label className="flex items-center gap-2 font-mono text-xs cursor-pointer">
+                <label htmlFor={`p${i}-isAI`} className="flex items-center gap-2 font-mono text-xs cursor-pointer">
                   <input
+                    id={`p${i}-isAI`}
                     type="checkbox"
                     checked={p.isAI}
                     onChange={e => handleUpdatePlayer(i, 'isAI', e.target.checked)}
@@ -258,6 +261,7 @@ export default function LocalDistrictExchange() {
                     value={p.difficulty || 'balanced'}
                     onChange={e => handleUpdatePlayer(i, 'difficulty', e.target.value)}
                     className="bg-black/5 dark:bg-white/5 border hairline text-xs font-mono p-1 rounded outline-none"
+                    aria-label={`${p.name} Difficulty`}
                   >
                     <option value="cautious">Cautious</option>
                     <option value="balanced">Balanced</option>
