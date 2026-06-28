@@ -42,8 +42,8 @@ function useUserDocs(ids) {
 
 export default function Friends() {
   const { profile } = useAuth();
-  const friendIds = Array.isArray(profile?.friends) ? profile?.friends : [];
-  const blockedIds = Array.isArray(profile?.blocked) ? profile?.blocked : [];
+  const friendIds = Array.isArray(profile?.friends) ? profile.friends : [];
+  const blockedIds = Array.isArray(profile?.blocked) ? profile.blocked : [];
   const friendsData = useUserDocs(friendIds);
   const blockedData = useUserDocs(blockedIds);
   const [addInput, setAddInput] = useState('');

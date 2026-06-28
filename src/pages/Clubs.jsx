@@ -88,7 +88,6 @@ export default function Clubs() {
                 onChange={e => setSearch(e.target.value)}
                 placeholder="Search clubs..."
                 className="w-full bg-[var(--paper-tint)] border hairline rounded-lg py-2.5 pl-10 pr-4 font-display text-base outline-none focus:border-[var(--ink)] transition-colors"
-                aria-label="Search clubs"
               />
             </div>
           </div>

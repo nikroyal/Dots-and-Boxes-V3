@@ -26,6 +26,7 @@
 ## 2024-11-20 - Unsafe array default evaluations (`|| []`)
 **Learning:** Defaulting arrays inline using `obj.array || []` is dangerous because if the data contains a truthy non-array type (like a number or string from a legacy schema), operations like `.map()`, `.filter()`, or `.length` will fail and potentially crash the application.
 **Action:** Use `Array.isArray(obj.array) ? obj.array : []` to guarantee type safety before array iteration or length checks.
+
 ## 2024-11-20 - Rules of Hooks violation
 **Learning:** Returning early before all hooks are initialized will cause React Strict Mode evaluation mismatch, crashing components depending on hook order rules.
 **Action:** Always verify all `useEffect`, `useMemo`, and `useState` initializers exist before any conditional early returns like `if (!gameState) return null;`.
