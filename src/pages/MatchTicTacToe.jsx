@@ -535,7 +535,7 @@ export default function MatchTicTacToe() {
               onClick={() => handleSendChat(null, emote)}
               className="px-2 py-1 text-sm bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 rounded transition-colors whitespace-nowrap focus-ring"
               title={`Send ${emote}`}
-              aria-label={`Send ${emote} emote`}
+              aria-label={"Send " + ({ '👍': 'thumbs up', '🎯': 'bullseye', '🔥': 'fire', '😂': 'laughing face' }[emote] || emote) + " emote"}
             >
               {emote}
             </button>
