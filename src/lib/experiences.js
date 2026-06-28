@@ -308,7 +308,12 @@ export const SHARED_NAV_ITEMS = [
   { to: '/clubs', label: 'Clubs' },
 ];
 
-const experienceMap = new Map(EXPERIENCE_CATALOG.map(experience => [experience.id, experience]));
+const experienceMap = new Map();
+for (const experience of EXPERIENCE_CATALOG) {
+  if (!experienceMap.has(experience.id)) {
+    experienceMap.set(experience.id, experience);
+  }
+}
 
 export function getExperienceById(id) {
   return experienceMap.get(id);
