@@ -11,7 +11,7 @@ import {
 import { PLAYER_COLORS, hKey, vKey, bKey } from '../lib/gameLogic';
 import { sfx } from '../lib/sound';
 import { toast } from '../components/Notifications';
-import { ACHIEVEMENTS, getAchievementById } from '../lib/achievements';
+import { ACHIEVEMENTS, getAchievementById, getRankInfo } from '../lib/achievements';
 import Confetti from '../components/Confetti';
 import BoxParticles from '../components/BoxParticles';
 import { useConfirm } from '../components/ConfirmDialog';
@@ -934,6 +934,15 @@ function WinScreen({ match, profile, achievementToasts, onHome, onReplay }) {
   const youWon = match.winner === profile.id;
   const wasResigned = !!match.resignedBy;
 
+  const historyEntry = (profile?.matchHistory || []).find(h => h.matchId === match.id);
+  const eloDelta = historyEntry?.eloDelta;
+  const newElo = historyEntry?.eloAfter ?? profile?.elo ?? 1000;
+  const rankInfo = getRankInfo(newElo);
+  const rank = rankInfo.rank;
+  const nextRank = rankInfo.nextRank;
+  const rankProgress = rankInfo.progress;
+
+
   const [rematchState, setRematchState] = useState('idle'); // idle | sending | sent | error
   const [friendRequestState, setFriendRequestState] = useState('idle');
 
@@ -1015,6 +1024,39 @@ function WinScreen({ match, profile, achievementToasts, onHome, onReplay }) {
           </div>
         ))}
       </div>
+
+
+      {/* Post-Match Progression (ELO & Streak) */}
+      {isPlayer && historyEntry && (
+        <div className="mb-8 text-left border hairline p-4 bg-black/5" style={{ borderColor: 'var(--hairline)' }}>
+          <div className="flex justify-between items-end mb-2">
+            <div className="font-mono text-xs tracking-widest uppercase" style={{ color: rank.color }}>
+              {rank.name} · {newElo} ELO
+              <span className="ml-2" style={{ color: eloDelta >= 0 ? 'var(--forest)' : 'var(--crimson)' }}>
+                {eloDelta > 0 ? '+' : ''}{eloDelta}
+              </span>
+            </div>
+            {nextRank && (
+              <div className="font-mono text-[0.6rem] tracking-widest uppercase opacity-50">
+                Next: {nextRank.name} ({nextRank.min})
+              </div>
+            )}
+          </div>
+          {nextRank && (
+            <div className="h-1.5 w-full bg-black/10 rounded-full overflow-hidden">
+              <div
+                className="h-full transition-all duration-1000 ease-out"
+                style={{ width: `${rankProgress}%`, background: rank.color }}
+              />
+            </div>
+          )}
+          {youWon && (profile.winStreak || 0) > 1 && (
+            <div className="mt-3 font-mono text-[0.7rem] tracking-widest uppercase" style={{ color: 'var(--ochre)' }}>
+              🔥 {profile.winStreak} Win Streak
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Achievement unlocks */}
       {achievementToasts.length > 0 && (
