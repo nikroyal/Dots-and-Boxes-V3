@@ -334,7 +334,7 @@ export function ControlsPanel({ gameState, currentPlayerId, onAction, isRolling,
 }
 
 function MortgageDialog({ gameState, currentPlayerId, onClose, onAction, playerMap }) {
-  const me = playerMap ? playerMap.get(currentPlayerId) : gameState.players.find(p => p.id === currentPlayerId);
+  const me = playerMap.get(currentPlayerId);
   if (!me) return null;
 
   return (
