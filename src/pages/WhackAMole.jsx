@@ -28,6 +28,8 @@ export default function WhackAMole() {
 
   const timerRef = useRef(null);
   const moleTimerRef = useRef(null);
+  const hitClearTimerRef = useRef(null);
+  const copiedTimerRef = useRef(null);
   const scoreRef = useRef(score);
 
   useEffect(() => {
@@ -38,6 +40,8 @@ export default function WhackAMole() {
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
       if (moleTimerRef.current) clearTimeout(moleTimerRef.current);
+      if (hitClearTimerRef.current) clearTimeout(hitClearTimerRef.current);
+      if (copiedTimerRef.current) clearTimeout(copiedTimerRef.current);
     };
   }, []);
 
@@ -127,7 +131,8 @@ export default function WhackAMole() {
       navigator.clipboard.writeText(text).then(() => {
         sfx.notify();
         setCopied(true);
-        setTimeout(() => setCopied(false), 2000);
+        if (copiedTimerRef.current) clearTimeout(copiedTimerRef.current);
+        copiedTimerRef.current = setTimeout(() => setCopied(false), 2000);
       }).catch(err => console.warn("Clipboard copy failed", err));
     } else {
       console.warn("Clipboard API not supported");
@@ -144,7 +149,9 @@ export default function WhackAMole() {
 
       const hitId = Date.now();
       setHits(currentHits => [...currentHits, { id: hitId, index }]);
-      setTimeout(() => {
+
+      if (hitClearTimerRef.current) clearTimeout(hitClearTimerRef.current);
+      hitClearTimerRef.current = setTimeout(() => {
         setHits(currentHits => currentHits.filter(h => h.id !== hitId));
       }, 500);
 

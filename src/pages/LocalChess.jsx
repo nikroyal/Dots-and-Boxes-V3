@@ -36,7 +36,7 @@ export default function LocalChess() {
   }, [setup, useTimer, game, pendingGame]);
 
   useEffect(() => {
-    if (useTimer && game && !game.finished && !pendingGame) {
+    if (useTimer && game && !game.finished && !pendingGame && turnStartedAtMs > 0) {
       const turnTimeoutMs = timerMins * 60 * 1000;
       const elapsed = Date.now() - turnStartedAtMs;
       if (elapsed > turnTimeoutMs) {

@@ -90,11 +90,15 @@ export function getRankInfo(elo) {
   let nextRank = null;
   let progress = 100;
 
-  for (let i = 0; i < RANKS.length; i++) {
-    if (elo >= RANKS[i].min) {
-      currentRank = RANKS[i];
-      nextRank = RANKS[i + 1] || null;
+  if (elo != null) {
+    for (let i = 0; i < RANKS.length; i++) {
+      if (elo >= RANKS[i].min) {
+        currentRank = RANKS[i];
+        nextRank = RANKS[i + 1] || null;
+      }
     }
+  } else {
+    nextRank = RANKS[1] || null;
   }
 
   if (nextRank) {

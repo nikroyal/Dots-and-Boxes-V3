@@ -23,12 +23,14 @@ export default function MemoryMatch() {
   const [isPeeking, setIsPeeking] = useState(false);
   const timeoutRef = useRef(null);
   const peekTimeoutRef = useRef(null);
+  const copiedTimerRef = useRef(null);
 
   // Cleanup timeout on unmount
   useEffect(() => {
     return () => {
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
       if (peekTimeoutRef.current) clearTimeout(peekTimeoutRef.current);
+      if (copiedTimerRef.current) clearTimeout(copiedTimerRef.current);
     };
   }, []);
 
@@ -70,7 +72,8 @@ export default function MemoryMatch() {
       navigator.clipboard.writeText(text).then(() => {
         sfx.notify();
         setCopied(true);
-        setTimeout(() => setCopied(false), 2000);
+        if (copiedTimerRef.current) clearTimeout(copiedTimerRef.current);
+        copiedTimerRef.current = setTimeout(() => setCopied(false), 2000);
       }).catch(err => console.warn("Clipboard copy failed", err));
     } else {
       console.warn("Clipboard API not supported");

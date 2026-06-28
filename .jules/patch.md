@@ -8,3 +8,15 @@
 ## 2024-11-20 - Operator Precedence with Ternary Array Checks
 **Learning:** When using ternary inline checks like `Array.isArray(arr) ? arr.length : 0` to index into an array (e.g., to find the last item `arr[... - 1]`), failing to wrap the ternary in parentheses causes operator precedence bugs (`0 - 1` evaluates first).
 **Action:** Always wrap ternary expressions in parentheses when performing arithmetic on their result: `(Array.isArray(arr) ? arr.length : 0) - 1`.
+
+## 2026-06-28 - Uninitialized Elapsed Timers
+**Learning:** Checking `elapsed = Date.now() - timestamp` can result in an instant timeout if the `timestamp` state is initialized to `0` but not updated before the first interval tick.
+**Action:** Always guard elapsed timer calculations with a check like `timestamp > 0` to prevent premature triggers.
+
+## 2026-06-28 - React Timeout Overlap Risks
+**Learning:** Inline timeouts triggered by user actions (like 'copied' notifications) must be tracked via `useRef` and cleared during unmount or consecutive actions, otherwise they can overlap and unintentionally overwrite component state (like rapidly flickering 'Copied!' back to 'Share').
+**Action:** Store timeout IDs in a mutable ref and implement explicit `clearTimeout` tracking in cleanup sequences.
+
+## 2026-06-28 - Missing Null Checks in Ranking Mathematics
+**Learning:** Relying on math conditions like `elo >= 0` inherently fails if `elo` is accidentally `null`, since JS coerces `null >= 0` to `true`.
+**Action:** Validate `variable != null` before iterating thresholds based on potentially undefined variables.

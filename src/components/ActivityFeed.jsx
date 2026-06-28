@@ -28,7 +28,9 @@ export default function ActivityFeed({ profile, singleUser = false, viewerId = n
   if (items === null) return (
     <div className="font-mono text-xs opacity-50 text-center py-6">LOADING…</div>
   );
-  if (items.length === 0) return (
+
+  const safeItems = Array.isArray(items) ? items : [];
+  if (safeItems.length === 0) return (
     <div className="font-display italic opacity-50 text-center py-6">
       Nothing yet — play a match or add a friend.
     </div>
@@ -36,7 +38,7 @@ export default function ActivityFeed({ profile, singleUser = false, viewerId = n
 
   return (
     <div className="space-y-1.5">
-      {items.map(it => <ActivityRow key={it.id} item={it} isMe={it.userId === (singleUser ? viewerId : profile.id)} />)}
+      {safeItems.map(it => <ActivityRow key={it.id} item={it} isMe={it.userId === (singleUser ? viewerId : profile.id)} />)}
     </div>
   );
 }

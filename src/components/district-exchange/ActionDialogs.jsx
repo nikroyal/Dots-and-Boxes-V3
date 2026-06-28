@@ -28,20 +28,23 @@ function PendingTradeDialog({ gameState, currentPlayerId, onAction }) {
   const proposer = gameState.players.find(p => p.id === proposerId);
   const target = gameState.players.find(p => p.id === targetId);
 
-  const renderItems = (items, playerName) => (
-    <div className="bg-black/5 dark:bg-white/5 p-3 rounded text-left space-y-1">
-      <div className="font-mono text-xs uppercase opacity-60 mb-2">{playerName} receives:</div>
-      {items.cash > 0 && <div>¤{items.cash}</div>}
-      {items.getOutOfJailCards > 0 && <div>{items.getOutOfJailCards}x Release Card</div>}
-      {items.properties.map(pid => {
-         const space = gameState.boardSpaces[pid];
-         return <div key={pid} className="font-bold">{space.name}</div>;
-      })}
-      {items.cash === 0 && items.getOutOfJailCards === 0 && items.properties.length === 0 && (
-        <div className="opacity-50 italic">Nothing</div>
-      )}
-    </div>
-  );
+  const renderItems = (items, playerName) => {
+    const propsArr = Array.isArray(items?.properties) ? items.properties : [];
+    return (
+      <div className="bg-black/5 dark:bg-white/5 p-3 rounded text-left space-y-1">
+        <div className="font-mono text-xs uppercase opacity-60 mb-2">{playerName} receives:</div>
+        {items.cash > 0 && <div>¤{items.cash}</div>}
+        {items.getOutOfJailCards > 0 && <div>{items.getOutOfJailCards}x Release Card</div>}
+        {propsArr.map(pid => {
+           const space = gameState.boardSpaces[pid];
+           return <div key={pid} className="font-bold">{space.name}</div>;
+        })}
+        {items.cash === 0 && items.getOutOfJailCards === 0 && propsArr.length === 0 && (
+          <div className="opacity-50 italic">Nothing</div>
+        )}
+      </div>
+    );
+  };
 
   return (
     <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="trade-dialog-title">

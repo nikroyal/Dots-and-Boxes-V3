@@ -585,8 +585,9 @@ export async function sendChatAs(matchId, currentUser, text, isSpectator) {
       if (!snap.exists()) return;
       const m = snap.data();
       if (!m.players.includes(currentUser.id)) return;
-      if ((m.chat || []).length > MAX_MATCH_CHAT * 1.5) {
-        const trimmedChat = m.chat.slice(m.chat.length - MAX_MATCH_CHAT);
+      const chatArr = Array.isArray(m.chat) ? m.chat : [];
+      if (chatArr.length > MAX_MATCH_CHAT * 1.5) {
+        const trimmedChat = chatArr.slice(chatArr.length - MAX_MATCH_CHAT);
         await updateDoc(matchRef, { chat: trimmedChat }).catch(() => {});
       }
     } catch {} // never let cleanup failure surface
