@@ -18,7 +18,7 @@
 **Learning:** Iterating through a large array multiple times for independent aggregations (like finding the maximum value and calculating a running total) is computationally expensive and scales poorly with array size.
 **Action:** When computing multiple derived statistics or validations from a single collection of data (such as game moves), merge the operations into a single pass or loop to minimize loop overhead and redundant property access.
 
-## $(date +%Y-%m-%d) - O(1) Component Lookups in CircuitMaker
+## 2026-06-18 - O(1) Component Lookups in CircuitMaker
 **Learning:** Reconstructing a Map inside a React render loop to optimize lookups is an anti-pattern. Building a Map takes O(N) time and creates memory churn on every render cycle, degrading performance.
 **Action:** Always wrap performance-oriented Map generation from arrays in `useMemo()` to ensure the O(N) cost is only incurred when the underlying array dependency changes.
 ## 2026-06-18 - Nested `Array.find` within Multiple Loops

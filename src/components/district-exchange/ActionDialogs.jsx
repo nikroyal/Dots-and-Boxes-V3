@@ -28,8 +28,8 @@ function PendingTradeDialog({ gameState, currentPlayerId, onAction, playerMap })
 
   if (!amITarget && !amIProposer) return null;
 
-  const proposer = playerMap.get(proposerId);
-  const target = playerMap.get(targetId);
+  const proposer = playerMap ? playerMap.get(proposerId) : gameState.players.find(p => p.id === proposerId);
+  const target = playerMap ? playerMap.get(targetId) : gameState.players.find(p => p.id === targetId);
 
   const renderItems = (items, playerName) => (
     <div className="bg-black/5 dark:bg-white/5 p-3 rounded text-left space-y-1">
@@ -407,7 +407,7 @@ function ProposeTradeDialog({ gameState, currentPlayerId, onClose, onAction, pla
   const me = playerMap ? playerMap.get(currentPlayerId) : gameState.players.find(p => p.id === currentPlayerId);
   const otherPlayers = gameState.players.filter(p => p.id !== currentPlayerId && !p.bankrupt);
 
-  const target = playerMap.get(targetId);
+  const target = playerMap ? playerMap.get(targetId) : gameState.players.find(p => p.id === targetId);
 
   const toggleProp = (pid, isOffer) => {
     if (isOffer) {
@@ -568,7 +568,7 @@ function ProposeTradeDialog({ gameState, currentPlayerId, onClose, onAction, pla
 }
 
 function UpgradeDialog({ gameState, currentPlayerId, onClose, onAction, playerMap }) {
-  const me = playerMap.get(currentPlayerId);
+  const me = playerMap ? playerMap.get(currentPlayerId) : gameState.players.find(p => p.id === currentPlayerId);
 
   // Find properties where player has a monopoly
   const upgradeableProperties = [];
