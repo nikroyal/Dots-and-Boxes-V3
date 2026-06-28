@@ -155,7 +155,7 @@ function AuctionDialog({ gameState, currentPlayerId, onAction, playerMap }) {
           <div className="font-mono text-4xl text-green-600 dark:text-green-400 font-bold mb-2">¤{auction.highestBid}</div>
           {auction.highestBidder && (
             <div className="text-sm font-bold">
-              {playerMap ? playerMap.get(auction.highestBidder)?.name : gameState.players.find(p => p.id === auction.highestBidder)?.name}
+              {playerMap.get(auction.highestBidder)?.name}
             </div>
           )}
         </div>
