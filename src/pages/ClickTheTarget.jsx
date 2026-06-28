@@ -49,7 +49,7 @@ export default function ClickTheTarget() {
 
   const handleMiss = (e) => {
     if (gameState !== 'playing') return;
-    const rect = containerRef.current.getBoundingClientRect();
+    const rect = e.currentTarget.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
 
