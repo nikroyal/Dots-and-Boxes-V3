@@ -404,7 +404,7 @@ function ProposeTradeDialog({ gameState, currentPlayerId, onClose, onAction, pla
   const [reqProps, setReqProps] = useState([]);
   const [reqCards, setReqCards] = useState(0);
 
-  const me = playerMap ? playerMap.get(currentPlayerId) : gameState.players.find(p => p.id === currentPlayerId);
+  const me = playerMap.get(currentPlayerId);
   const otherPlayers = gameState.players.filter(p => p.id !== currentPlayerId && !p.bankrupt);
 
   const target = playerMap ? playerMap.get(targetId) : gameState.players.find(p => p.id === targetId);
