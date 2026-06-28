@@ -258,7 +258,7 @@ export default function LocalDistrictExchange() {
                     value={p.difficulty || 'balanced'}
                     onChange={e => handleUpdatePlayer(i, 'difficulty', e.target.value)}
                     className="bg-black/5 dark:bg-white/5 border hairline text-xs font-mono p-1 rounded outline-none"
-                    aria-label={`Bot ${i + 1} Difficulty`}
+                    aria-label={`${p.name} Difficulty`}
                   >
                     <option value="cautious">Cautious</option>
                     <option value="balanced">Balanced</option>
