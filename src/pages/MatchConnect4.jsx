@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, memo, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { doc, onSnapshot } from 'firebase/firestore';
 import { db } from '../lib/firebase';
@@ -11,7 +11,7 @@ import {
 import { PLAYER_COLORS, hKey, vKey, bKey } from '../lib/gameLogic';
 import { sfx } from '../lib/sound';
 import { toast } from '../components/Notifications';
-import { ACHIEVEMENTS, getAchievementById } from '../lib/achievements';
+import { ACHIEVEMENTS, getAchievementById, getRankInfo } from '../lib/achievements';
 import Confetti from '../components/Confetti';
 import { useConfirm } from '../components/ConfirmDialog';
 import { isDisconnected } from '../lib/presence';
@@ -69,7 +69,7 @@ export default function MatchConnect4() {
       // match?" — set after the first callback fires.
       const newMoveCount = m.game?.moveCount || 0;
       if (hasSubscribed.current && newMoveCount > prevMoveCount.current) {
-        const lastMove = m.game.moves?.[m.game.moves.length - 1];
+        const lastMove = Array.isArray(m.game.moves) ? m.game.moves[m.game.moves.length - 1] : undefined;
         if (lastMove?.claimed > 0) sfx.claim();
         else sfx.line();
       }
@@ -265,14 +265,14 @@ export default function MatchConnect4() {
     finally { setBusy(null); }
   };
 
-  const handleMove = async (c) => {
+  const handleMove = useCallback(async (c) => {
     if (!isMyTurn) return;
     if (busy === 'move') return;
     setBusy('move');
     try { await makeMove(id, "connect4", null, null, c, profile); }
     catch (err) { toast(err.message, 'error'); }
     finally { setBusy(null); }
-  };
+  }, [isMyTurn, busy, id, profile]);
 
   const handleSendChat = async (e, textOverride) => {
     e?.preventDefault();
@@ -610,7 +610,7 @@ function TurnTimerBanner({ remainingMs, timeoutMs, isMyTurn, isPlayer, opponentD
       </div>
       <div className="flex items-center gap-3">
         <div className="hidden sm:block" style={{ width: 80, height: 4, background: 'var(--hairline)' }}>
-          <div style={{ width: `${fraction * 100}%`, height: '100%', background: color, transition: 'width 1000ms linear' }} />
+          <div role="progressbar" aria-valuenow={Math.min(timeoutMs / 1000, seconds)} aria-valuemin={0} aria-valuemax={timeoutMs / 1000} style={{ width: (fraction * 100) + '%', height: '100%', background: color, transition: 'width 1000ms linear' }} />
         </div>
         <span className="font-mono text-sm tabular-nums" style={{ color }}>
           {seconds}s
@@ -632,7 +632,9 @@ const PLAYER_STROKE_PATTERNS = [
   '8 3 2 3',           // P4: dash-dot
 ];
 
-function Board({ game, players, playerInfo, isMyTurn, onPlay, lastMove }) {
+// Optimization (Bolt): React.memo prevents the heavy SVG board from re-rendering
+// every single second when the parent's `now` ticker updates the timer banner.
+const Board = memo(function Board({ game, players, playerInfo, isMyTurn, onPlay, lastMove }) {
   const { rows, cols, hLines, vLines, boxes } = game;
   // Larger minimum tap target on small cells (D41). The hit area below the
   // visible line is at least max(44, cell*0.4) — iOS HIG's 44pt minimum.
@@ -840,9 +842,10 @@ function Board({ game, players, playerInfo, isMyTurn, onPlay, lastMove }) {
       )}
     </svg>
   );
-}
+});
 
-function ConcealedBoard({ rows, cols }) {
+// Optimization (Bolt): React.memo prevents the concealed board from re-rendering every second.
+const ConcealedBoard = memo(function ConcealedBoard({ rows, cols }) {
   const cell = Math.min(70, Math.max(28, 520 / Math.max(rows, cols)));
   const padding = 30;
   const w = cols * cell + padding * 2;
@@ -862,7 +865,7 @@ function ConcealedBoard({ rows, cols }) {
       </div>
     </div>
   );
-}
+});
 
 function PauseRequestCard({ request, currentUserId, playerInfo, isPlayer, onRespond }) {
   const requester = playerInfo?.[request.byId];
@@ -910,6 +913,15 @@ function WinScreen({ match, profile, achievementToasts, onHome, onReplay }) {
   const isDraw = match.winner === 'draw';
   const youWon = match.winner === profile.id;
   const wasResigned = !!match.resignedBy;
+
+  const historyEntry = (profile?.matchHistory || []).find(h => h.matchId === match.id);
+  const eloDelta = historyEntry?.eloDelta;
+  const newElo = historyEntry?.eloAfter ?? profile?.elo ?? 1000;
+  const rankInfo = getRankInfo(newElo);
+  const rank = rankInfo.rank;
+  const nextRank = rankInfo.nextRank;
+  const rankProgress = rankInfo.progress;
+
 
   const [rematchState, setRematchState] = useState('idle'); // idle | sending | sent | error
   const [friendRequestState, setFriendRequestState] = useState('idle');
@@ -992,6 +1004,39 @@ function WinScreen({ match, profile, achievementToasts, onHome, onReplay }) {
           </div>
         ))}
       </div>
+
+
+      {/* Post-Match Progression (ELO & Streak) */}
+      {isPlayer && historyEntry && (
+        <div className="mb-8 text-left border hairline p-4 bg-black/5" style={{ borderColor: 'var(--hairline)' }}>
+          <div className="flex justify-between items-end mb-2">
+            <div className="font-mono text-xs tracking-widest uppercase" style={{ color: rank.color }}>
+              {rank.name} · {newElo} ELO
+              <span className="ml-2" style={{ color: eloDelta >= 0 ? 'var(--forest)' : 'var(--crimson)' }}>
+                {eloDelta > 0 ? '+' : ''}{eloDelta}
+              </span>
+            </div>
+            {nextRank && (
+              <div className="font-mono text-[0.6rem] tracking-widest uppercase opacity-50">
+                Next: {nextRank.name} ({nextRank.min})
+              </div>
+            )}
+          </div>
+          {nextRank && (
+            <div className="h-1.5 w-full bg-black/10 rounded-full overflow-hidden">
+              <div
+                className="h-full transition-all duration-1000 ease-out"
+                style={{ width: `${rankProgress}%`, background: rank.color }}
+              />
+            </div>
+          )}
+          {youWon && (profile.winStreak || 0) > 1 && (
+            <div className="mt-3 font-mono text-[0.7rem] tracking-widest uppercase" style={{ color: 'var(--ochre)' }}>
+              🔥 {profile.winStreak} Win Streak
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Achievement unlocks */}
       {achievementToasts.length > 0 && (
