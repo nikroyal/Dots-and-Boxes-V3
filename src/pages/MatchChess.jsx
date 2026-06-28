@@ -325,7 +325,7 @@ export default function MatchChess() {
     }, 3000);
 
     return true;
-  }, [isMyTurn, busy, pendingGame, match?.game, id, profile]);
+  }, [isMyTurn, busy, pendingGame, match?.game, match?.players, id, profile]);
 
   const undoMove = () => {
     if (pendingTimeoutRef.current) {
