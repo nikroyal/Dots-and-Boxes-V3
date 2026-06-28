@@ -11,6 +11,7 @@ export default function ClickTheTarget() {
   const [score, setScore] = useState(0);
   const [timeLeft, setTimeLeft] = useState(30);
   const [targetPos, setTargetPos] = useState({ top: '50%', left: '50%' });
+  const [missFeedback, setMissFeedback] = useState(null);
   const [bestScore, setBestScore] = useState(() => {
     try {
       const saved = localStorage.getItem('axiom-click-best');
@@ -39,10 +40,27 @@ export default function ClickTheTarget() {
   };
 
   const handleTargetClick = (e) => {
+    e.stopPropagation();
     if (gameState !== 'playing') return;
     sfx.piece();
     setScore((s) => s + 1);
     moveTarget();
+  };
+
+  const handleMiss = (e) => {
+    if (gameState !== 'playing') return;
+    const rect = containerRef.current.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    sfx.click();
+    setScore((s) => Math.max(0, s - 1));
+
+    const id = Date.now();
+    setMissFeedback({ id, x, y });
+    setTimeout(() => {
+      setMissFeedback((prev) => (prev?.id === id ? null : prev));
+    }, 300);
   };
 
   useEffect(() => {
@@ -105,11 +123,30 @@ export default function ClickTheTarget() {
         )}
       </section>
 
-      <div className="w-full max-w-lg border hairline card bg-[var(--paper-tint)] flex flex-col items-center relative overflow-hidden" style={{ minHeight: '400px' }} ref={containerRef}>
+      <div
+        className="w-full max-w-lg border hairline card bg-[var(--paper-tint)] flex flex-col items-center relative overflow-hidden"
+        style={{ minHeight: '400px' }}
+        ref={containerRef}
+        onPointerDown={handleMiss}
+      >
+        {missFeedback && (
+          <div
+            key={missFeedback.id}
+            className="absolute text-[var(--crimson)] font-display text-2xl fade-up pointer-events-none select-none"
+            style={{
+              left: missFeedback.x,
+              top: missFeedback.y,
+              transform: 'translate(-50%, -50%)',
+              animationDuration: '0.3s'
+            }}
+          >
+            -1
+          </div>
+        )}
 
         {gameState === 'playing' && (
           <button
-            onClick={handleTargetClick}
+            onPointerDown={handleTargetClick}
             className="absolute rounded-full bg-[var(--crimson)] w-12 h-12 flex items-center justify-center text-white focus:outline-none hover:bg-red-600 transition-colors shadow-lg active:scale-90"
             style={{
               top: targetPos.top,
