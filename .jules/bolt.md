@@ -65,3 +65,6 @@
 ## 2024-06-25 - Replace Array.find for Static Configuration Lookups
 **Learning:** Calling `Array.find()` repeatedly within render functions to look up metadata from static configuration arrays (like `ACHIEVEMENTS`) introduces O(N) overhead in hot paths without memoization benefits.
 **Action:** Pre-compute a module-level `Map` for static configuration arrays (like `ACHIEVEMENTS`) and expose an O(1) getter function (like `getAchievementById`) to eliminate repetitive loop overhead in component renders.
+## 2025-02-23 - Pre-computing Maps for static lookups
+**Learning:** O(N) array scans (`Array.find()`) over static config data (like `EXPERIENCE_CATALOG`) during component renders can accumulate to unnecessary overhead.
+**Action:** When data structures like catalogs are statically defined, pre-compute a `Map` keyed by their ID at the module level. This exposes an O(1) getter to the rest of the application and completely bypasses the need to iterate or use `useMemo` at the component layer.
