@@ -1,3 +1,6 @@
+## 2024-02-23 - SVG Board Re-render Bottleneck on Ticker Updates
+**Learning:** The `Match` components (`Match.jsx`, `MatchConnect4.jsx`, `MatchTicTacToe.jsx`, `MatchChess.jsx`) use a 1-second `setInterval` to update a `now` state variable that drives the visual turn timer. Because this state is at the root of the match component, it causes full re-renders every second, including the heavy, SVG-dense `Board` component.
+**Action:** Always wrap complex, pure visualization components like `Board` and `ConcealedBoard` in `React.memo` and ensure callback props like `handleMove` are stabilized using `useCallback` when they are placed under a component with a frequently ticking state (like a clock or timer).
 ## 2024-05-24 - Array over Map for Dense IDs
 **Learning:** For dense integer IDs, allocating an array dynamically sized by the maximum ID is extremely fast in Javascript and effectively works as O(1) indexing, whereas maps have more overhead.
 **Action:** When repeatedly looking up counts by integer ID where max ID is relatively small, use an array constructed up to maxId + 1. Ensure sizing to the maximum ID instead of array length to prevent out of bounds when entities are added dynamically (monotonically increasing IDs).

@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, memo, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { doc, onSnapshot } from 'firebase/firestore';
 import { db } from '../lib/firebase';
@@ -290,7 +290,7 @@ export default function MatchChess() {
     finally { setBusy(null); }
   };
 
-  const onDrop = async (sourceSquare, targetSquare, piece) => {
+  const onDrop = useCallback(async (sourceSquare, targetSquare, piece) => {
     if (!isMyTurn) return false;
     if (busy === 'move') return false;
     if (pendingGame) return false;
@@ -325,7 +325,7 @@ export default function MatchChess() {
     }, 3000);
 
     return true;
-  };
+  }, [isMyTurn, busy, pendingGame, match?.game, match?.players, id, profile]);
 
   const undoMove = () => {
     if (pendingTimeoutRef.current) {
@@ -335,7 +335,7 @@ export default function MatchChess() {
     setPendingGame(null);
   };
 
-  const onSquareClick = (square, piece) => {
+  const onSquareClick = useCallback((square, piece) => {
     if (!isMyTurn || match.status !== 'active') return;
 
     if (optionSquares[square]) {
@@ -361,7 +361,7 @@ export default function MatchChess() {
       };
     });
     setOptionSquares(newOptions);
-  };
+  }, [isMyTurn, match?.status, optionSquares, selectedSquare, onDrop, match?.game?.fen]);
 
   const handleSendChat = async (e, textOverride) => {
     e?.preventDefault();
@@ -840,7 +840,8 @@ const PLAYER_STROKE_PATTERNS = [
   '8 3 2 3',           // P4: dash-dot
 ];
 
-function ConcealedBoard({ rows, cols }) {
+// Optimization (Bolt): React.memo prevents the concealed board from re-rendering every second.
+const ConcealedBoard = memo(function ConcealedBoard({ rows, cols }) {
   const cell = Math.min(70, Math.max(28, 520 / Math.max(rows, cols)));
   const padding = 30;
   const w = cols * cell + padding * 2;
@@ -860,7 +861,7 @@ function ConcealedBoard({ rows, cols }) {
       </div>
     </div>
   );
-}
+});
 
 function PauseRequestCard({ request, currentUserId, playerInfo, isPlayer, onRespond }) {
   const requester = playerInfo?.[request.byId];
