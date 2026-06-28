@@ -162,6 +162,21 @@ export const EXPERIENCE_CATALOG = [
     routePrefixes: ['/click-the-target'],
   },
   {
+    id: 'sequence-memory',
+    name: 'Sequence Memory',
+    shortName: 'Sequence',
+    path: '/sequence-memory',
+    kind: 'Arcade',
+    status: 'Live',
+    accent: 'var(--ochre)',
+    description: 'Repeat the pattern of lights and sounds. It gets longer every round!',
+    features: ['Local play', 'Best level'],
+    navItems: [
+      { to: '/sequence-memory', label: 'Play' },
+    ],
+    routePrefixes: ['/sequence-memory'],
+  },
+  {
     id: 'guess-the-number',
     name: 'Guess the Number',
     shortName: 'Guess',
@@ -175,6 +190,21 @@ export const EXPERIENCE_CATALOG = [
       { to: '/guess-the-number', label: 'Play' },
     ],
     routePrefixes: ['/guess-the-number'],
+  },
+  {
+    id: 'typing-speed',
+    name: 'Typing Speed',
+    shortName: 'Typing',
+    path: '/typing-speed',
+    kind: 'Arcade',
+    status: 'Live',
+    accent: 'var(--forest)',
+    description: 'Test your typing speed and accuracy. Type the phrases as fast as you can.',
+    features: ['Local play', 'Best WPM'],
+    navItems: [
+      { to: '/typing-speed', label: 'Play' },
+    ],
+    routePrefixes: ['/typing-speed'],
   },
   {
     id: 'reaction-timer',

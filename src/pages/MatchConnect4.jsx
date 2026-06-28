@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, memo, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { doc, onSnapshot } from 'firebase/firestore';
 import { db } from '../lib/firebase';
@@ -265,14 +265,14 @@ export default function MatchConnect4() {
     finally { setBusy(null); }
   };
 
-  const handleMove = async (c) => {
+  const handleMove = useCallback(async (c) => {
     if (!isMyTurn) return;
     if (busy === 'move') return;
     setBusy('move');
     try { await makeMove(id, "connect4", null, null, c, profile); }
     catch (err) { toast(err.message, 'error'); }
     finally { setBusy(null); }
-  };
+  }, [isMyTurn, busy, id, profile]);
 
   const handleSendChat = async (e, textOverride) => {
     e?.preventDefault();
@@ -610,7 +610,7 @@ function TurnTimerBanner({ remainingMs, timeoutMs, isMyTurn, isPlayer, opponentD
       </div>
       <div className="flex items-center gap-3">
         <div className="hidden sm:block" style={{ width: 80, height: 4, background: 'var(--hairline)' }}>
-          <div style={{ width: `${fraction * 100}%`, height: '100%', background: color, transition: 'width 1000ms linear' }} />
+          <div role="progressbar" aria-valuenow={Math.min(timeoutMs / 1000, seconds)} aria-valuemin={0} aria-valuemax={timeoutMs / 1000} style={{ width: (fraction * 100) + '%', height: '100%', background: color, transition: 'width 1000ms linear' }} />
         </div>
         <span className="font-mono text-sm tabular-nums" style={{ color }}>
           {seconds}s
@@ -632,7 +632,9 @@ const PLAYER_STROKE_PATTERNS = [
   '8 3 2 3',           // P4: dash-dot
 ];
 
-function Board({ game, players, playerInfo, isMyTurn, onPlay, lastMove }) {
+// Optimization (Bolt): React.memo prevents the heavy SVG board from re-rendering
+// every single second when the parent's `now` ticker updates the timer banner.
+const Board = memo(function Board({ game, players, playerInfo, isMyTurn, onPlay, lastMove }) {
   const { rows, cols, hLines, vLines, boxes } = game;
   // Larger minimum tap target on small cells (D41). The hit area below the
   // visible line is at least max(44, cell*0.4) — iOS HIG's 44pt minimum.
@@ -840,9 +842,10 @@ function Board({ game, players, playerInfo, isMyTurn, onPlay, lastMove }) {
       )}
     </svg>
   );
-}
+});
 
-function ConcealedBoard({ rows, cols }) {
+// Optimization (Bolt): React.memo prevents the concealed board from re-rendering every second.
+const ConcealedBoard = memo(function ConcealedBoard({ rows, cols }) {
   const cell = Math.min(70, Math.max(28, 520 / Math.max(rows, cols)));
   const padding = 30;
   const w = cols * cell + padding * 2;
@@ -862,7 +865,7 @@ function ConcealedBoard({ rows, cols }) {
       </div>
     </div>
   );
-}
+});
 
 function PauseRequestCard({ request, currentUserId, playerInfo, isPlayer, onRespond }) {
   const requester = playerInfo?.[request.byId];

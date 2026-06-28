@@ -17,6 +17,7 @@ export default function WhackAMole() {
   const [timeLeft, setTimeLeft] = useState(GAME_DURATION);
   const [activeMole, setActiveMole] = useState(null);
   const [hits, setHits] = useState([]);
+  const [misses, setMisses] = useState([]);
   const [bestScore, setBestScore] = useState(() => {
     try {
       const saved = localStorage.getItem('axiom-whackamole-best');
@@ -28,6 +29,7 @@ export default function WhackAMole() {
 
   const timerRef = useRef(null);
   const moleTimerRef = useRef(null);
+  const hitTimeoutsRef = useRef([]);
   const scoreRef = useRef(score);
 
   useEffect(() => {
@@ -44,6 +46,8 @@ export default function WhackAMole() {
   useEffect(() => {
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
+      hitTimeoutsRef.current.forEach(clearTimeout);
+      hitTimeoutsRef.current = [];
       if (moleTimerRef.current) clearTimeout(moleTimerRef.current);
     };
   }, []);
@@ -76,6 +80,7 @@ export default function WhackAMole() {
     } else {
       setActiveMole(null);
       setHits([]);
+      setMisses([]);
       if (moleTimerRef.current) clearTimeout(moleTimerRef.current);
     }
   }, [gameState, spawnMole]);
@@ -86,8 +91,11 @@ export default function WhackAMole() {
     setScore(0);
     setTimeLeft(GAME_DURATION);
     setHits([]);
+    setMisses([]);
     scoreRef.current = 0;
 
+    hitTimeoutsRef.current.forEach(clearTimeout);
+    hitTimeoutsRef.current = [];
     if (timerRef.current) clearInterval(timerRef.current);
     timerRef.current = setInterval(() => {
       setTimeLeft((prev) => Math.max(0, prev - 1));
@@ -151,15 +159,24 @@ export default function WhackAMole() {
 
       const hitId = Date.now();
       setHits(currentHits => [...currentHits, { id: hitId, index }]);
-      setTimeout(() => {
+      const timeoutId = setTimeout(() => {
         setHits(currentHits => currentHits.filter(h => h.id !== hitId));
+        hitTimeoutsRef.current = hitTimeoutsRef.current.filter(id => id !== timeoutId);
       }, 500);
+      hitTimeoutsRef.current.push(timeoutId);
 
       if (moleTimerRef.current) clearTimeout(moleTimerRef.current);
       moleTimerRef.current = setTimeout(spawnMole, 200); // small delay before next spawn
     } else {
       // Missed
       sfx.click();
+      setScore((s) => Math.max(0, s - 5));
+
+      const missId = Date.now();
+      setMisses(currentMisses => [...currentMisses, { id: missId, index }]);
+      setTimeout(() => {
+        setMisses(currentMisses => currentMisses.filter(m => m.id !== missId));
+      }, 500);
     }
   };
 
@@ -222,6 +239,7 @@ export default function WhackAMole() {
         <div className="grid grid-cols-3 gap-4 sm:gap-6">
           {Array.from({ length: GRID_SIZE }).map((_, i) => {
             const isHit = hits.some(h => h.index === i);
+            const isMiss = misses.some(m => m.index === i);
             return (
               <div key={i} className="relative aspect-square">
                 <button
@@ -244,6 +262,11 @@ export default function WhackAMole() {
                 {isHit && (
                   <div className="absolute inset-0 flex items-center justify-center pointer-events-none fade-up text-[var(--forest)] font-display text-2xl" style={{ animationDuration: '0.3s' }}>
                     +10
+                  </div>
+                )}
+                {isMiss && (
+                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none fade-up text-[var(--crimson)] font-display text-2xl" style={{ animationDuration: '0.3s' }}>
+                    -5
                   </div>
                 )}
               </div>

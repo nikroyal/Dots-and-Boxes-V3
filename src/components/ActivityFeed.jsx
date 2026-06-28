@@ -118,7 +118,7 @@ const ActivityRow = memo(function ActivityRow({ item, isMe }) {
       <div className="flex items-center gap-3 min-w-0">
         <span style={{ color }}>{icon}</span>
         {!isMe && item.username ? (
-          <Link to={`/profile/${item.username}`} className="font-display text-xl shrink-0 hover:opacity-70">
+          <Link to={`/profile/${item.username}`} className="font-display text-xl shrink-0 hover:opacity-70" aria-label={`View ${item.username}'s profile`}>
             {item.avatar || '◆'}
           </Link>
         ) : (
