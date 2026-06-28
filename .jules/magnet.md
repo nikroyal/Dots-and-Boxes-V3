@@ -42,11 +42,7 @@
 **Learning:** Tying cosmetic profile customizations (like avatars and titles) directly to engagement stats and achievements creates social proof, making players want to earn those cosmetics to show off on their public profile, driving retention.
 
 **Action:** When offering user customization, structure the options so that some are immediately available but premium options are visibly locked behind specific gameplay milestones, using them as intrinsic motivation drivers.
-## 2024-05-18 - ELO Progression Visualizations
 
-**Learning:** Players want to see their forward progress towards the next ELO rank, not just what their current ELO is. By visualising the percentage to their next rank up with a progress bar and showing active win streaks, we give them explicit short-term milestones rather than nebulous point numbers to grind.
-
-**Action:** Whenever implementing a tier or ranking system, explicitly expose the threshold and progress required for the *next* milestone rather than just displaying the current state statically.
 
 ## 2026-06-25 - Post-Match Momentum Visualization
 
