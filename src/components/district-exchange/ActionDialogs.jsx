@@ -28,8 +28,8 @@ function PendingTradeDialog({ gameState, currentPlayerId, onAction, playerMap })
 
   if (!amITarget && !amIProposer) return null;
 
-  const proposer = playerMap ? playerMap.get(proposerId) : gameState.players.find(p => p.id === proposerId);
-  const target = playerMap ? playerMap.get(targetId) : gameState.players.find(p => p.id === targetId);
+  const proposer = playerMap.get(proposerId);
+  const target = playerMap.get(targetId);
 
   const renderItems = (items, playerName) => (
     <div className="bg-black/5 dark:bg-white/5 p-3 rounded text-left space-y-1">
