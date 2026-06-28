@@ -9,7 +9,7 @@ import {
 } from '../lib/actions';
 import { toast } from '../components/Notifications';
 import { sfx } from '../lib/sound';
-import { getRankInfo, ACHIEVEMENTS } from '../lib/achievements';
+import { getRankInfo, ACHIEVEMENTS, getAchievementById } from '../lib/achievements';
 import { getDailyGoal, getLocalYYYYMMDD } from '../lib/daily';
 import EloChart from '../components/EloChart';
 import ActivityFeed from '../components/ActivityFeed';
@@ -229,14 +229,24 @@ export default function Dashboard() {
       <section className="card" style={{ borderColor: dailyGoalCompleted ? 'var(--forest)' : 'var(--hairline)' }}>
         <div className="flex items-center justify-between gap-4 flex-wrap">
           <div>
-            <div className="font-mono text-[0.65rem] tracking-widest uppercase opacity-50 mb-1 flex items-center gap-1.5">
-              <Target size={12} /> Daily Goal
+            <div className="font-mono text-[0.65rem] tracking-widest uppercase mb-1 flex items-center gap-2">
+              <span className="opacity-50 flex items-center gap-1.5"><Target size={12} /> Daily Goal</span>
+              {(profile.dailyGoalStreak || 0) > 0 && (
+                <span className="px-1.5 py-0.5 rounded-sm flex items-center gap-1" style={{ background: 'var(--bg-soft)', color: 'var(--ochre)' }}>
+                  🔥 {profile.dailyGoalStreak} Day Streak
+                </span>
+              )}
             </div>
             <div className="font-display text-xl">{dailyGoal.text}</div>
           </div>
           {dailyGoalCompleted ? (
-            <div className="flex items-center gap-2 font-mono text-[0.7rem] tracking-widest uppercase px-3 py-1.5 rounded-full" style={{ background: 'var(--forest)', color: 'var(--paper)' }}>
-              <Check size={14} /> Completed
+            <div className="flex flex-col items-end gap-1.5 mt-1 sm:mt-0">
+              <div className="flex items-center gap-2 font-mono text-[0.7rem] tracking-widest uppercase px-3 py-1.5 rounded-full" style={{ background: 'var(--forest)', color: 'var(--paper)' }}>
+                <Check size={14} /> Completed
+              </div>
+              <div className="font-mono text-[0.55rem] tracking-widest uppercase opacity-60">
+                Come back tomorrow to keep your streak going
+              </div>
             </div>
           ) : (
             <div className="font-mono text-xs opacity-60">
@@ -251,7 +261,7 @@ export default function Dashboard() {
         <StatCard icon={<Trophy size={14} />} label="Wins" value={profile.wins || 0} />
         <StatCard icon={<Target size={14} />} label="Games" value={profile.gamesPlayed || 0} />
         <StatCard icon={<TrendingUp size={14} />} label="Win Rate" value={`${winRate}%`} />
-        <StatCard icon={<Users size={14} />} label="Friends" value={(Array.isArray(profile.friends) ? profile.friends : []).length} />
+        <StatCard icon={<Users size={14} />} label="Friends" value={Array.isArray(profile.friends) ? profile.friends.length : 0} />
       </section>
 
       {/* ELO trend */}
@@ -375,7 +385,7 @@ export default function Dashboard() {
               </div>
             )}
             {recentAchievements.map(id => {
-              const a = ACHIEVEMENTS.find(x => x.id === id);
+              const a = getAchievementById(id);
               if (!a) return null;
               return (
                 <div key={id} className="border hairline p-3 opacity-80">

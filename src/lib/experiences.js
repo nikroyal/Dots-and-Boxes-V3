@@ -147,6 +147,66 @@ export const EXPERIENCE_CATALOG = [
     routePrefixes: ['/snake'],
   },
   {
+    id: 'click-the-target',
+    name: 'Click the Target',
+    shortName: 'Target',
+    path: '/click-the-target',
+    kind: 'Arcade',
+    status: 'Live',
+    accent: 'var(--crimson)',
+    description: 'Click the target as many times as you can in 30 seconds.',
+    features: ['Local play', 'Best score'],
+    navItems: [
+      { to: '/click-the-target', label: 'Play' },
+    ],
+    routePrefixes: ['/click-the-target'],
+  },
+  {
+    id: 'sequence-memory',
+    name: 'Sequence Memory',
+    shortName: 'Sequence',
+    path: '/sequence-memory',
+    kind: 'Arcade',
+    status: 'Live',
+    accent: 'var(--ochre)',
+    description: 'Repeat the pattern of lights and sounds. It gets longer every round!',
+    features: ['Local play', 'Best level'],
+    navItems: [
+      { to: '/sequence-memory', label: 'Play' },
+    ],
+    routePrefixes: ['/sequence-memory'],
+  },
+  {
+    id: 'guess-the-number',
+    name: 'Guess the Number',
+    shortName: 'Guess',
+    path: '/guess-the-number',
+    kind: 'Arcade',
+    status: 'Live',
+    accent: 'var(--ochre)',
+    description: 'Find the hidden number. Use logic and higher/lower feedback to guess it in the fewest tries.',
+    features: ['Local play', 'Best score'],
+    navItems: [
+      { to: '/guess-the-number', label: 'Play' },
+    ],
+    routePrefixes: ['/guess-the-number'],
+  },
+  {
+    id: 'typing-speed',
+    name: 'Typing Speed',
+    shortName: 'Typing',
+    path: '/typing-speed',
+    kind: 'Arcade',
+    status: 'Live',
+    accent: 'var(--forest)',
+    description: 'Test your typing speed and accuracy. Type the phrases as fast as you can.',
+    features: ['Local play', 'Best WPM'],
+    navItems: [
+      { to: '/typing-speed', label: 'Play' },
+    ],
+    routePrefixes: ['/typing-speed'],
+  },
+  {
     id: 'reaction-timer',
     name: 'Reaction Timer',
     shortName: 'Reaction',
@@ -162,6 +222,21 @@ export const EXPERIENCE_CATALOG = [
     routePrefixes: ['/reaction-timer'],
   },
   {
+    id: 'word-scramble',
+    name: 'Word Scramble',
+    shortName: 'Scramble',
+    path: '/word-scramble',
+    kind: 'Arcade',
+    status: 'Live',
+    accent: 'var(--forest)',
+    description: 'Unscramble as many words as you can in 60 seconds.',
+    features: ['Local play', 'Best score'],
+    navItems: [
+      { to: '/word-scramble', label: 'Play' },
+    ],
+    routePrefixes: ['/word-scramble'],
+  },
+  {
     id: 'whack-a-mole',
     name: 'Whack-A-Mole',
     shortName: 'Whack-A-Mole',
@@ -175,6 +250,21 @@ export const EXPERIENCE_CATALOG = [
       { to: '/whack-a-mole', label: 'Play' },
     ],
     routePrefixes: ['/whack-a-mole'],
+  },
+  {
+    id: 'guess-the-number',
+    name: 'Guess the Number',
+    shortName: 'Guess',
+    path: '/guess-the-number',
+    kind: 'Arcade',
+    status: 'Live',
+    accent: 'var(--ochre)',
+    description: 'Guess the secret number in the fewest attempts possible.',
+    features: ['Local play', 'Best attempts'],
+    navItems: [
+      { to: '/guess-the-number', label: 'Play' },
+    ],
+    routePrefixes: ['/guess-the-number'],
   },
   {
     id: 'rock-paper-scissors',
@@ -248,8 +338,10 @@ export const SHARED_NAV_ITEMS = [
   { to: '/clubs', label: 'Clubs' },
 ];
 
+const experienceMap = new Map(EXPERIENCE_CATALOG.map(experience => [experience.id, experience]));
+
 export function getExperienceById(id) {
-  return EXPERIENCE_CATALOG.find(experience => experience.id === id);
+  return experienceMap.get(id);
 }
 
 export function findExperienceByPath(pathname) {

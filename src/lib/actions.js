@@ -585,7 +585,7 @@ export async function sendChatAs(matchId, currentUser, text, isSpectator) {
       if (!snap.exists()) return;
       const m = snap.data();
       if (!m.players.includes(currentUser.id)) return;
-      if ((m.chat || []).length > MAX_MATCH_CHAT * 1.5) {
+      if ((Array.isArray(m.chat) ? m.chat.length : 0) > MAX_MATCH_CHAT * 1.5) {
         const trimmedChat = m.chat.slice(m.chat.length - MAX_MATCH_CHAT);
         await updateDoc(matchRef, { chat: trimmedChat }).catch(() => {});
       }
@@ -1141,7 +1141,7 @@ export async function updateArcadeBest(currentUser, gameId, gameName, scoreValue
   }
 
   if (existingScore !== undefined && existingScore !== null) {
-    const isLowerBetter = gameId === 'reaction-timer' || gameId === 'memory-match';
+    const isLowerBetter = gameId === 'reaction-timer' || gameId === 'memory-match' || gameId === 'guess-the-number';
     const isNewBest = isLowerBetter
       ? scoreValue < existingScore
       : scoreValue > existingScore;
@@ -1167,7 +1167,7 @@ export async function updateArcadeBest(currentUser, gameId, gameName, scoreValue
       }
 
       if (existingDbScore !== undefined && existingDbScore !== null) {
-        const isLowerBetter = gameId === 'reaction-timer' || gameId === 'memory-match';
+        const isLowerBetter = gameId === 'reaction-timer' || gameId === 'memory-match' || gameId === 'guess-the-number';
         const isNewBest = isLowerBetter
           ? scoreValue < existingDbScore
           : scoreValue > existingDbScore;

@@ -99,8 +99,8 @@ export default function Clubs() {
       {/* Tabs */}
       <div className="flex gap-8 border-b hairline px-2">
         {[
-          { id: 'mine', label: 'My Clubs', icon: Layout, count: myClubs?.length },
-          { id: 'public', label: 'Discover', icon: Compass, count: publicClubs?.length }
+          { id: 'mine', label: 'My Clubs', icon: Layout, count: Array.isArray(myClubs) ? myClubs.length : undefined },
+          { id: 'public', label: 'Discover', icon: Compass, count: Array.isArray(publicClubs) ? publicClubs.length : undefined }
         ].map(t => (
           <button 
             key={t.id} 
@@ -164,8 +164,8 @@ export default function Clubs() {
                 <div className="font-mono text-[0.6rem] opacity-40 mt-1 text-right">{description.length}/200</div>
               </div>
               <div className="flex items-center gap-4 py-2">
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input type="checkbox" checked={isPublic} onChange={e => setIsPublic(e.target.checked)} className="accent-[var(--ink)]" />
+                <label htmlFor="create-club-public" className="flex items-center gap-2 cursor-pointer">
+                  <input id="create-club-public" type="checkbox" checked={isPublic} onChange={e => setIsPublic(e.target.checked)} className="accent-[var(--ink)]" />
                   <span className="font-display text-sm">Public Club</span>
                 </label>
                 <span className="font-mono text-[0.6rem] opacity-40">— Anyone can find and join</span>

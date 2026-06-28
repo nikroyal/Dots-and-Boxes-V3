@@ -15,6 +15,12 @@
 **Learning:** When players set personal bests in solo arcade games, storing them only locally or temporarily in feeds reduces their perceived value. Making personal bests persistent across sessions and visible on a player's public profile makes the achievement feel permanent and shareable, increasing motivation to retry for higher scores.
 
 **Action:** Whenever implementing a solo game or high-score system, ensure the best results are persisted to the user's backend profile and publicly displayed on their dashboard/profile page so they can be shown off as "records" rather than ephemeral stats.
+
+## 2024-05-20 - Post-Match Friction Reduction
+
+**Learning:** When players finish an intense or enjoyable online multiplayer match, their emotional engagement is high, making it the perfect moment to build a social connection. However, hiding the "Add Friend" action behind a multi-step profile navigation flow introduces too much friction, preventing these connections from forming. By placing the "Add Friend" button directly alongside the "Rematch" button on the win screen, we capitalize on this high-engagement moment and significantly increase the organic growth of social graphs.
+
+**Action:** Whenever a shared social experience concludes (like a multiplayer match, a collaborative build, or a club event), proactively surface relevant social connection actions (like "Add Friend" or "Join Club") directly in the resolution interface rather than relying on users to seek them out later.
 ## 2026-06-22 - Daily Goals System
 
 **Learning:** Implementing time-gated progress systems (like daily goals) requires careful hydration of state on the client. Relying purely on transient transactional outcomes () to set state flags like `dailyGoalCompletedToday` can cause state to stall across real-world day boundaries if a user leaves a tab open or logs in without triggering a transaction.
@@ -25,3 +31,21 @@
 **Learning:** Implementing time-gated progress systems (like daily goals) requires careful hydration of state on the client. Relying purely on transient transactional outcomes (`txResult`) to set state flags like `dailyGoalCompletedToday` can cause state to stall across real-world day boundaries if a user leaves a tab open or logs in without triggering a transaction.
 
 **Action:** When deriving UI state for time-dependent features, always evaluate the status live in the component based on the current timestamp compared to the stored completion timestamp (`profile.dailyGoalDate === today`), rather than relying on boolean flags flipped by past transactions.
+## 2024-06-24 - Daily Goal Streak Celebration
+
+**Learning:** Celebrating streaks visibly at the point of action (Daily Goal card) and explicitly inviting users back ("Come back tomorrow to keep your streak going") turns a static metric into a returning habit.
+
+**Action:** Surface existing retention metrics actively rather than passively burying them in profiles, and always provide a clear "next step" for the next day.
+
+## 2024-05-24 - Unlockable Cosmetics
+
+**Learning:** Tying cosmetic profile customizations (like avatars and titles) directly to engagement stats and achievements creates social proof, making players want to earn those cosmetics to show off on their public profile, driving retention.
+
+**Action:** When offering user customization, structure the options so that some are immediately available but premium options are visibly locked behind specific gameplay milestones, using them as intrinsic motivation drivers.
+
+
+## 2026-06-25 - Post-Match Momentum Visualization
+
+**Learning:** When players finish an intense or enjoyable online multiplayer match, their emotional engagement is high, making it the perfect moment to build motivation to play again. Displaying a clear progress visualization (such as ELO rank progression and win streak celebrations) on the victory screen capitalizes on this high-engagement moment by giving them an immediate, tangible reason to start another match (e.g., reaching the next rank).
+
+**Action:** Whenever a shared competitive or progress-oriented experience concludes, prioritize displaying dynamic progression elements (progress bars, delta numbers) rather than static states to encourage repeat play.
