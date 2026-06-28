@@ -29,6 +29,7 @@ export default function WhackAMole() {
 
   const timerRef = useRef(null);
   const moleTimerRef = useRef(null);
+  const hitTimeoutsRef = useRef([]);
   const scoreRef = useRef(score);
 
   useEffect(() => {
@@ -45,6 +46,8 @@ export default function WhackAMole() {
   useEffect(() => {
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
+      hitTimeoutsRef.current.forEach(clearTimeout);
+      hitTimeoutsRef.current = [];
       if (moleTimerRef.current) clearTimeout(moleTimerRef.current);
     };
   }, []);
@@ -91,6 +94,8 @@ export default function WhackAMole() {
     setMisses([]);
     scoreRef.current = 0;
 
+    hitTimeoutsRef.current.forEach(clearTimeout);
+    hitTimeoutsRef.current = [];
     if (timerRef.current) clearInterval(timerRef.current);
     timerRef.current = setInterval(() => {
       setTimeLeft((prev) => Math.max(0, prev - 1));
@@ -154,9 +159,11 @@ export default function WhackAMole() {
 
       const hitId = Date.now();
       setHits(currentHits => [...currentHits, { id: hitId, index }]);
-      setTimeout(() => {
+      const timeoutId = setTimeout(() => {
         setHits(currentHits => currentHits.filter(h => h.id !== hitId));
+        hitTimeoutsRef.current = hitTimeoutsRef.current.filter(id => id !== timeoutId);
       }, 500);
+      hitTimeoutsRef.current.push(timeoutId);
 
       if (moleTimerRef.current) clearTimeout(moleTimerRef.current);
       moleTimerRef.current = setTimeout(spawnMole, 200); // small delay before next spawn
