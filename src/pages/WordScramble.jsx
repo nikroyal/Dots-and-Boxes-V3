@@ -196,6 +196,7 @@ export default function WordScramble() {
             <input
               ref={inputRef}
               type="text"
+              aria-label="Type word"
               value={userInput}
               onChange={(e) => {
                 const val = e.target.value;
