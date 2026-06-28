@@ -45,14 +45,17 @@ export default function MemoryMatch() {
         }
         return currentBest;
       });
-      // Side effects belong in the effect body, not the state updater function.
-      if (bestMoves === null || moves < bestMoves) {
-        recordActivity(profile, ACTIVITY_TYPES.ARCADE_BEST, { game: 'Memory Match', score: moves + ' moves' });
-        updateArcadeBest(profile, 'memory-match', 'Memory Match', moves, moves + ' moves');
-        localStorage.setItem('memory-match-best', moves.toString());
-      }
+    }
+  }, [isGameWon, moves]);
+
+  useEffect(() => {
+    if (isGameWon && (bestMoves === null || moves < bestMoves)) {
+      recordActivity(profile, ACTIVITY_TYPES.ARCADE_BEST, { game: "Memory Match", score: moves + " moves" });
+      updateArcadeBest(profile, "memory-match", "Memory Match", moves, moves + " moves");
+      localStorage.setItem("memory-match-best", moves.toString());
     }
   }, [isGameWon, moves, bestMoves, profile]);
+
 
 
   const getStars = (moveCount) => {
@@ -146,6 +149,11 @@ export default function MemoryMatch() {
         <p className="font-mono text-sm tracking-widest uppercase opacity-60 mb-2">
           Moves: {moves} {moves > 0 && <span className="ml-2">{getStars(moves)}</span>} {bestMoves !== null && <span className="ml-4">Best: {bestMoves}</span>}
         </p>
+        {!isGameWon && (
+          <p className="font-mono text-xs tracking-widest uppercase opacity-50 mt-1">
+            Target: ≤ 10 moves for ⭐⭐⭐
+          </p>
+        )}
         {isGameWon && (
           <div className="flex flex-col items-center gap-2">
             <p className="font-display text-2xl text-[var(--forest)] pulse-soft">You Win!</p>

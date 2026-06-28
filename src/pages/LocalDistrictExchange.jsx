@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 
 import { useNavigate } from 'react-router-dom';
 import { X, Trophy } from 'lucide-react';
@@ -47,6 +47,9 @@ export default function LocalDistrictExchange() {
   const [isRolling, setIsRolling] = useState(false);
   const { confirm, dialog: confirmDialogEl } = useConfirm();
 
+  // Optimization (Bolt): Pre-compute player map to avoid repeated O(N) array.find lookups in LocalDistrictExchange
+  const playerMap = useMemo(() => new Map((gameState?.players || []).map(p => [p.id, p])), [gameState?.players]);
+
   // Handle AI Turns and Auctions
   useEffect(() => {
     if (!gameState || gameState.winner) return;
@@ -55,7 +58,7 @@ export default function LocalDistrictExchange() {
 
     // Handle AI evaluating incoming trades immediately
     if (gameState.tradeState) {
-      const targetPlayer = gameState.players.find(p => p.id === gameState.tradeState.targetId);
+      const targetPlayer = playerMap.get(gameState.tradeState.targetId);
       if (targetPlayer && targetPlayer.isAI) {
         const timer = setTimeout(() => {
           setGameState(prev => evaluateIncomingAITrades(prev));
@@ -67,7 +70,7 @@ export default function LocalDistrictExchange() {
     // Handle AI Actions in Auction
     if (gameState.auctionState) {
       const activeAIs = gameState.auctionState.activeBidders.filter(pid => {
-         const p = gameState.players.find(x => x.id === pid);
+         const p = playerMap.get(pid);
          return p && p.isAI;
       });
       if (activeAIs.length > 0) {
@@ -290,7 +293,7 @@ export default function LocalDistrictExchange() {
 
   if (gameState.auctionState) {
      const activeHumans = gameState.auctionState.activeBidders.filter(pid => {
-       const p = gameState.players.find(x => x.id === pid);
+       const p = playerMap.get(pid);
        return p && !p.isAI;
      });
      if (activeHumans.length > 0) {
@@ -336,7 +339,7 @@ export default function LocalDistrictExchange() {
         <div className="fixed inset-0 bg-black/80 z-[100] flex items-center justify-center p-4 fade-in" role="dialog" aria-modal="true" aria-labelledby="winner-dialog-title">
            <div className="card max-w-sm w-full text-center space-y-6 py-10 fade-up">
               <Trophy size={48} className="mx-auto text-yellow-500 mb-4" />
-              <h2 id="winner-dialog-title" className="font-display text-4xl">{gameState.players.find(p => p.id === gameState.winner)?.name} Wins!</h2>
+              <h2 id="winner-dialog-title" className="font-display text-4xl">{playerMap.get(gameState.winner)?.name} Wins!</h2>
               <p className="font-mono text-sm opacity-60">Monopoly Achieved.</p>
               <div className="pt-4">
                  <button onClick={quit} className="btn-primary">Return to Setup</button>

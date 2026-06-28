@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../lib/AuthContext';
 import { recordActivity, ACTIVITY_TYPES } from '../lib/activity';
+import { updateArcadeBest } from '../lib/actions';
 import { sfx } from '../lib/sound';
 
 const CHOICES = ['Rock', 'Paper', 'Scissors'];
@@ -77,10 +78,12 @@ export default function RockPaperScissors() {
         localStorage.setItem('axiom-rps-best', streak.toString());
       } catch {}
       recordActivity(profile, ACTIVITY_TYPES.ARCADE_BEST, { game: 'Rock Paper Scissors', score: streak + ' streak' });
+      updateArcadeBest(profile, 'rock-paper-scissors', 'Rock Paper Scissors', streak, streak + ' streak');
     }
   }, [gameState, streak, bestStreak, profile]);
 
   const resetGame = () => {
+    if (gameState !== 'result') return;
     sfx.click();
     setGameState('waiting');
     if (resultMessage === 'You lose!') {
@@ -90,6 +93,24 @@ export default function RockPaperScissors() {
     setComputerChoice(null);
     setResultMessage('');
   };
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (gameState === 'waiting') {
+        if (e.key === '1') handleChoice('Rock');
+        if (e.key === '2') handleChoice('Paper');
+        if (e.key === '3') handleChoice('Scissors');
+      } else if (gameState === 'result') {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          resetGame();
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [gameState, resultMessage]); // Depend on resultMessage so resetGame works properly when re-evaluating the lose condition
 
   const [copied, setCopied] = useState(false);
   const handleShare = (e) => {
@@ -148,7 +169,7 @@ export default function RockPaperScissors() {
              </div>
              <div className="flex gap-4">
                <button onClick={resetGame} className="btn-primary">
-                  Play Again
+                  Play Again <span className="hidden sm:inline opacity-50 font-mono text-xs ml-2">(Enter)</span>
                </button>
                <button onClick={handleShare} className="btn-secondary">
                  {copied ? 'Copied!' : 'Share Result'}
@@ -157,15 +178,18 @@ export default function RockPaperScissors() {
           </div>
         ) : (
           <div className="flex gap-4">
-            {CHOICES.map((choice) => (
+            {CHOICES.map((choice, i) => (
               <button
                 key={choice}
                 onClick={() => handleChoice(choice)}
                 disabled={gameState === 'playing'}
-                className="w-20 h-20 sm:w-24 sm:h-24 text-4xl sm:text-5xl border hairline rounded flex items-center justify-center bg-[var(--bg-soft)] hover:bg-[var(--bg-hover)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus-ring"
+                className="relative w-20 h-20 sm:w-24 sm:h-24 text-4xl sm:text-5xl border hairline rounded flex items-center justify-center bg-[var(--bg-soft)] hover:bg-[var(--bg-hover)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus-ring"
                 aria-label={`Choose ${choice}`}
               >
                 {EMOJIS[choice]}
+                <div className="hidden sm:block absolute top-1 left-2 font-mono text-xs opacity-30 pointer-events-none">
+                  {i + 1}
+                </div>
               </button>
             ))}
           </div>

@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, memo, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { doc, onSnapshot } from 'firebase/firestore';
 import { db } from '../lib/firebase';
@@ -6,18 +6,18 @@ import { useAuth } from '../lib/AuthContext';
 import {
   watchMatch, makeMove, requestPause, respondToPause, resumeMatch, resignMatch,
   proposeTimer, acceptTimer, rejectTimer,
-  sendChatAs, joinAsSpectator, leaveSpectator, finalizeStats, requestRematch,
+  sendChatAs, joinAsSpectator, leaveSpectator, finalizeStats, requestRematch, sendFriendRequest,
   forfeitOnTimeout,
 } from '../lib/actions';
 import { PLAYER_COLORS, hKey, vKey, bKey } from '../lib/gameLogic';
 import { sfx } from '../lib/sound';
 import { toast } from '../components/Notifications';
-import { ACHIEVEMENTS } from '../lib/achievements';
+import { ACHIEVEMENTS, getAchievementById } from '../lib/achievements';
 import Confetti from '../components/Confetti';
 import { useConfirm } from '../components/ConfirmDialog';
 import { usePrompt } from '../components/PromptDialog';
 import { isDisconnected } from '../lib/presence';
-import { Pause, Play, Flag, Send, Eye, Trophy, RotateCcw, Home, Repeat, Clock, WifiOff, Handshake } from 'lucide-react';
+import { Pause, Play, Flag, Send, Eye, Trophy, RotateCcw, Home, Repeat, Clock, WifiOff, Handshake, UserPlus } from 'lucide-react';
 import { Chessboard } from 'react-chessboard';
 import { Chess } from 'chess.js';
 import { applyMove } from '../lib/chessLogic.js';
@@ -89,7 +89,7 @@ export default function MatchChess() {
       // match?" — set after the first callback fires.
       const newMoveCount = m.game?.moveCount || 0;
       if (hasSubscribed.current && newMoveCount > prevMoveCount.current) {
-        const lastMove = m.game.moves?.[m.game.moves.length - 1];
+        const lastMove = Array.isArray(m.game.moves) ? m.game.moves[m.game.moves.length - 1] : undefined;
         if (lastMove?.claimed > 0) sfx.claim();
         else sfx.line();
       }
@@ -290,7 +290,7 @@ export default function MatchChess() {
     finally { setBusy(null); }
   };
 
-  const onDrop = async (sourceSquare, targetSquare, piece) => {
+  const onDrop = useCallback(async (sourceSquare, targetSquare, piece) => {
     if (!isMyTurn) return false;
     if (busy === 'move') return false;
     if (pendingGame) return false;
@@ -325,7 +325,7 @@ export default function MatchChess() {
     }, 3000);
 
     return true;
-  };
+  }, [isMyTurn, busy, pendingGame, match?.game, match?.players, id, profile]);
 
   const undoMove = () => {
     if (pendingTimeoutRef.current) {
@@ -335,7 +335,7 @@ export default function MatchChess() {
     setPendingGame(null);
   };
 
-  const onSquareClick = (square, piece) => {
+  const onSquareClick = useCallback((square, piece) => {
     if (!isMyTurn || match.status !== 'active') return;
 
     if (optionSquares[square]) {
@@ -361,7 +361,7 @@ export default function MatchChess() {
       };
     });
     setOptionSquares(newOptions);
-  };
+  }, [isMyTurn, match?.status, optionSquares, selectedSquare, onDrop, match?.game?.fen]);
 
   const handleSendChat = async (e, textOverride) => {
     e?.preventDefault();
@@ -818,7 +818,7 @@ function TurnTimerBanner({ remainingMs, timeoutMs, isMyTurn, isPlayer, opponentD
       </div>
       <div className="flex items-center gap-3">
         <div className="hidden sm:block" style={{ width: 80, height: 4, background: 'var(--hairline)' }}>
-          <div style={{ width: `${fraction * 100}%`, height: '100%', background: color, transition: 'width 1000ms linear' }} />
+          <div role="progressbar" aria-valuenow={Math.min(timeoutMs / 1000, seconds)} aria-valuemin={0} aria-valuemax={timeoutMs / 1000} style={{ width: (fraction * 100) + '%', height: '100%', background: color, transition: 'width 1000ms linear' }} />
         </div>
         <span className="font-mono text-sm tabular-nums" style={{ color }}>
           {seconds}s
@@ -840,7 +840,8 @@ const PLAYER_STROKE_PATTERNS = [
   '8 3 2 3',           // P4: dash-dot
 ];
 
-function ConcealedBoard({ rows, cols }) {
+// Optimization (Bolt): React.memo prevents the concealed board from re-rendering every second.
+const ConcealedBoard = memo(function ConcealedBoard({ rows, cols }) {
   const cell = Math.min(70, Math.max(28, 520 / Math.max(rows, cols)));
   const padding = 30;
   const w = cols * cell + padding * 2;
@@ -860,7 +861,7 @@ function ConcealedBoard({ rows, cols }) {
       </div>
     </div>
   );
-}
+});
 
 function PauseRequestCard({ request, currentUserId, playerInfo, isPlayer, onRespond }) {
   const requester = playerInfo?.[request.byId];
@@ -910,6 +911,28 @@ function WinScreen({ match, profile, achievementToasts, onHome, onReplay }) {
   const wasResigned = !!match.resignedBy;
 
   const [rematchState, setRematchState] = useState('idle'); // idle | sending | sent | error
+  const [friendRequestState, setFriendRequestState] = useState('idle');
+
+  const opponentId = match.players.find(id => id !== profile.id);
+  const opponentInfo = match.playerInfo?.[opponentId];
+  const isFriend = (Array.isArray(profile.friends) ? profile.friends : []).includes(opponentId);
+  const hasPendingRequest = (Array.isArray(profile.outgoingFriendRequests) ? profile.outgoingFriendRequests : []).includes(opponentId);
+  const hasIncomingRequest = (Array.isArray(profile.friendRequests) ? profile.friendRequests : []).some(r => r.fromId === opponentId);
+
+  const handleAddFriend = async () => {
+    if (friendRequestState === 'sending' || friendRequestState === 'sent') return;
+    if (!opponentInfo?.username) return;
+    setFriendRequestState('sending');
+    try {
+      await sendFriendRequest(profile, opponentInfo.username);
+      setFriendRequestState('sent');
+      toast('Friend request sent', 'success');
+      sfx.click();
+    } catch (e) {
+      setFriendRequestState('idle');
+      toast(e.message, 'error');
+    }
+  };
   const handleRematch = async () => {
     if (rematchState === 'sending' || rematchState === 'sent') return;
     setRematchState('sending');
@@ -977,7 +1000,7 @@ function WinScreen({ match, profile, achievementToasts, onHome, onReplay }) {
           </div>
           <div className="space-y-2 max-w-sm mx-auto">
             {achievementToasts.map(id => {
-              const a = ACHIEVEMENTS.find(x => x.id === id);
+              const a = getAchievementById(id);
               if (!a) return null;
               return (
                 <div key={id} className="card fade-in text-left" style={{ background: 'rgba(183,121,31,0.05)', borderColor: 'rgba(183,121,31,0.3)' }}>
@@ -992,13 +1015,24 @@ function WinScreen({ match, profile, achievementToasts, onHome, onReplay }) {
 
       <div className="flex gap-3 justify-center flex-wrap">
         {isPlayer && (
-          <button onClick={handleRematch} disabled={rematchState === 'sending' || rematchState === 'sent'}
-                  className="btn-ghost">
-            <Repeat size={14} />{' '}
-            {rematchState === 'sent' ? 'Rematch sent'
-              : rematchState === 'sending' ? 'Sending…'
-              : 'Rematch'}
-          </button>
+          <>
+            <button onClick={handleRematch} disabled={rematchState === 'sending' || rematchState === 'sent'}
+                    className="btn-ghost">
+              <Repeat size={14} />{' '}
+              {rematchState === 'sent' ? 'Rematch sent'
+                : rematchState === 'sending' ? 'Sending…'
+                : 'Rematch'}
+            </button>
+            {opponentInfo && !isFriend && !hasPendingRequest && !hasIncomingRequest && (
+              <button onClick={handleAddFriend} disabled={friendRequestState === 'sending' || friendRequestState === 'sent'}
+                      className={friendRequestState === 'sent' ? 'btn-ghost opacity-50' : 'btn-ghost'}>
+                <UserPlus size={14} />{' '}
+                {friendRequestState === 'sent' ? 'Request sent'
+                  : friendRequestState === 'sending' ? 'Sending…'
+                  : 'Add Friend'}
+              </button>
+            )}
+          </>
         )}
         <button onClick={onReplay} className="btn-ghost"><RotateCcw size={14} /> Watch Replay</button>
         <button onClick={onHome} className="btn-primary"><Home size={14} /> Home</button>

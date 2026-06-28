@@ -9,7 +9,7 @@ import {
 } from '../lib/actions';
 import { toast } from '../components/Notifications';
 import { sfx } from '../lib/sound';
-import { getRankFromElo, ACHIEVEMENTS } from '../lib/achievements';
+import { getRankFromElo, ACHIEVEMENTS, getAchievementById } from '../lib/achievements';
 import EloChart from '../components/EloChart';
 import ActivityFeed from '../components/ActivityFeed';
 import { Send, X, Trophy, Target, TrendingUp, Users, Zap } from 'lucide-react';
@@ -180,7 +180,7 @@ export default function Connect4Hub() {
         <StatCard icon={<Trophy size={14} />} label="Wins" value={profile.wins || 0} />
         <StatCard icon={<Target size={14} />} label="Games" value={profile.gamesPlayed || 0} />
         <StatCard icon={<TrendingUp size={14} />} label="Win Rate" value={`${winRate}%`} />
-        <StatCard icon={<Users size={14} />} label="Friends" value={(Array.isArray(profile.friends) ? profile.friends : []).length} />
+        <StatCard icon={<Users size={14} />} label="Friends" value={Array.isArray(profile.friends) ? profile.friends.length : 0} />
       </section>
 
       {/* ELO trend */}
@@ -276,7 +276,7 @@ export default function Connect4Hub() {
           <div className="font-mono text-[0.65rem] tracking-widest uppercase opacity-50 mb-3">Recent Achievements</div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
             {recentAchievements.map(id => {
-              const a = ACHIEVEMENTS.find(x => x.id === id);
+              const a = getAchievementById(id);
               if (!a) return null;
               return (
                 <div key={id} className="border hairline p-3">

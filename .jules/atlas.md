@@ -30,3 +30,31 @@
 ## 2026-06-23 - Adding share results to outcomes
 **Learning:** In Rock Paper Scissors, people like sharing their final streak, but resetting it instantly on loss destroys that moment. Deferring the state reset until the *next* game begins preserves the outcome for sharing while maintaining the correct gameplay loop.
 **Action:** When adding sharing to streak-based games, always decouple the game over state from the internal streak reset.
+## 2024-11-20 - Keyboard Shortcuts for Fast Core Loops
+**Learning:** For small arcade games like Rock Paper Scissors or Whack-A-Mole, requiring pointer clicks limits the maximum speed and flow a power user can achieve. Adding keyboard shortcuts fundamentally transforms the replay loop from an interactive webpage to a highly responsive twitch game.
+**Action:** When evaluating arcade or click-heavy games, always map core actions to the number row/numpad and include visual hints in the UI to surface these shortcuts.
+## 2024-05-18 - Differential Feedback
+   **Learning:** Players find it much more satisfying to see a direct comparison (+/- ms) against their best score rather than just their absolute time. Fast, comparative feedback loops create a stronger "play again" incentive.
+   **Action:** Always consider showing the delta (difference) between the current performance and the best performance in fast-paced arcade games.
+
+## 2024-05-18 - Dynamic Constraint Visualization
+   **Learning:** In guessing games or games with logical boundaries, visually narrowing the constraints dynamically (like updating the valid `minBound` and `maxBound`) drastically reduces cognitive load for new players, improving the first-minute experience.
+   **Action:** Look for opportunities to visualize logical constraints and update them dynamically during gameplay, rather than relying solely on text-based feedback like "Too high".
+
+## 2024-05-18 - Explicit Target Context
+   **Learning:** Games with star ratings based on move counts or time often lack context for new players. By explicitly stating the target required for the top rating upfront (e.g., "Target: ≤ 10 moves"), players instantly understand the goal and have a reason to replay.
+   **Action:** Expose rating thresholds or "par" scores directly in the UI before or during the game, rather than only revealing them upon completion.
+## 2026-06-27 - Auto-Advancing Flow State
+**Learning:** In fast-paced input games (like Word Scramble), requiring a player to hit Enter or click a submit button after typing the correct answer creates unnecessary friction and breaks flow.
+**Action:** Always consider checking the input state dynamically (`onChange`) and auto-advancing the game loop the instant the winning condition is met.
+
+## 2026-06-27 - Progressive Scaling Difficulty
+**Learning:** Small arcade games can feel monotonous if the difficulty is static. Dynamically scaling elements based on the score (e.g. shrinking a target using `transform: scale()`) is an extremely low-effort way to create a smooth, organic difficulty curve without complex mechanics.
+**Action:** When evaluating simple click or timing games, identify the core interaction point and tie its size or speed directly to the player's current score.
+
+## 2026-06-27 - Anti-Spam Penalties
+**Learning:** In games where players must click specific targets (like Whack-a-Mole), the lack of a penalty for missing encourages a degenerate strategy where the player just spams clicks everywhere.
+**Action:** Always implement a miss penalty (e.g., negative points) with clear visual feedback to enforce precision and increase the skill ceiling.
+## 2026-06-28 - Fast Input Responsiveness
+**Learning:** In fast-paced or reaction-based arcade games (like Click The Target), using standard `onClick` handlers introduces an inherent 100-300ms touch delay on mobile devices, which makes the game feel sluggish and unresponsive.
+**Action:** Always use `onPointerDown` instead of `onClick` for interactive game elements to eliminate touch delay. Ensure you use `e.stopPropagation()` to prevent misclicks on background elements.
