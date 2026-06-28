@@ -244,6 +244,11 @@ export default function Dashboard() {
             </div>
           )}
         </div>
+        {(profile.dailyGoalStreak || 0) > 0 && (
+          <div className="mt-4 font-mono text-[0.7rem] tracking-widest uppercase" style={{ color: 'var(--ochre)' }}>
+            🔥 {profile.dailyGoalStreak} Day Streak! {dailyGoalCompleted ? 'Come back tomorrow to keep it going!' : "Complete today's goal to keep it alive!"}
+          </div>
+        )}
       </section>
 
       {/* Stat cards */}
