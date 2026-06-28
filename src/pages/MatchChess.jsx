@@ -818,7 +818,7 @@ function TurnTimerBanner({ remainingMs, timeoutMs, isMyTurn, isPlayer, opponentD
       </div>
       <div className="flex items-center gap-3">
         <div className="hidden sm:block" style={{ width: 80, height: 4, background: 'var(--hairline)' }}>
-          <div style={{ width: `${fraction * 100}%`, height: '100%', background: color, transition: 'width 1000ms linear' }} />
+          <div role="progressbar" aria-valuenow={Math.min(timeoutMs / 1000, seconds)} aria-valuemin={0} aria-valuemax={timeoutMs / 1000} style={{ width: (fraction * 100) + '%', height: '100%', background: color, transition: 'width 1000ms linear' }} />
         </div>
         <span className="font-mono text-sm tabular-nums" style={{ color }}>
           {seconds}s

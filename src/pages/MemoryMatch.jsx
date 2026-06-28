@@ -45,14 +45,17 @@ export default function MemoryMatch() {
         }
         return currentBest;
       });
-      // Side effects belong in the effect body, not the state updater function.
-      if (bestMoves === null || moves < bestMoves) {
-        recordActivity(profile, ACTIVITY_TYPES.ARCADE_BEST, { game: 'Memory Match', score: moves + ' moves' });
-        updateArcadeBest(profile, 'memory-match', 'Memory Match', moves, moves + ' moves');
-        localStorage.setItem('memory-match-best', moves.toString());
-      }
+    }
+  }, [isGameWon, moves]);
+
+  useEffect(() => {
+    if (isGameWon && (bestMoves === null || moves < bestMoves)) {
+      recordActivity(profile, ACTIVITY_TYPES.ARCADE_BEST, { game: "Memory Match", score: moves + " moves" });
+      updateArcadeBest(profile, "memory-match", "Memory Match", moves, moves + " moves");
+      localStorage.setItem("memory-match-best", moves.toString());
     }
   }, [isGameWon, moves, bestMoves, profile]);
+
 
 
   const getStars = (moveCount) => {

@@ -192,6 +192,21 @@ export const EXPERIENCE_CATALOG = [
     routePrefixes: ['/guess-the-number'],
   },
   {
+    id: 'typing-speed',
+    name: 'Typing Speed',
+    shortName: 'Typing',
+    path: '/typing-speed',
+    kind: 'Arcade',
+    status: 'Live',
+    accent: 'var(--forest)',
+    description: 'Test your typing speed and accuracy. Type the phrases as fast as you can.',
+    features: ['Local play', 'Best WPM'],
+    navItems: [
+      { to: '/typing-speed', label: 'Play' },
+    ],
+    routePrefixes: ['/typing-speed'],
+  },
+  {
     id: 'reaction-timer',
     name: 'Reaction Timer',
     shortName: 'Reaction',
