@@ -26,3 +26,14 @@
 ## 2024-05-18 - Missing preventDefault on pointer inputs
 **Learning:** Native scrolling behaviors intercept user input across some touch events.
 **Action:** Use `e.preventDefault()` inside specific custom UI handles like `onPointerDown` to safely stop scroll behavior overriding intended app input.
+## 2026-06-26 - Secure Randomness with Modulo
+**Learning:** Using division (`/ 4294967296`) to normalize `crypto.getRandomValues` leads to float precision issues and violates secure coding practices for bounded randomness. It's safe to use modulo (e.g. `% 1000 / 1000`).
+**Action:** Always use modulo arithmetic instead of float division to bound randomness.
+
+## 2026-06-26 - Unsafe Array Length Checks
+**Learning:** Destructuring or defaulting arrays using `(obj.array || []).length` is dangerous when the field might contain legacy data types like numbers instead of arrays.
+**Action:** Use `Array.isArray(obj.array) ? obj.array.length : 0` to guarantee safe array length checks.
+
+## 2026-06-26 - Operator Precedence with Ternary Array Checks
+**Learning:** When using ternary inline checks like `Array.isArray(arr) ? arr.length : 0` to index into an array (e.g., to find the last item `arr[... - 1]`), failing to wrap the ternary in parentheses causes operator precedence bugs (`0 - 1` evaluates first).
+**Action:** Always wrap ternary expressions in parentheses when performing arithmetic on their result: `(Array.isArray(arr) ? arr.length : 0) - 1`.
