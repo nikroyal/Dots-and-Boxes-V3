@@ -122,7 +122,7 @@ function AuctionDialog({ gameState, currentPlayerId, onAction, playerMap }) {
 
   // Find all active human bidders for hotseat
   const activeHumans = auction.activeBidders
-    .map(id => playerMap ? playerMap.get(id) : gameState.players.find(p => p.id === id))
+    .map(id => playerMap.get(id))
     .filter(p => p && !p.isAI && !p.bankrupt);
 
   const handleBid = (playerId, amount) => {
