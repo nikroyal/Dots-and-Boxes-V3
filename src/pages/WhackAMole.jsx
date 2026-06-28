@@ -17,6 +17,7 @@ export default function WhackAMole() {
   const [timeLeft, setTimeLeft] = useState(GAME_DURATION);
   const [activeMole, setActiveMole] = useState(null);
   const [hits, setHits] = useState([]);
+  const [misses, setMisses] = useState([]);
   const [bestScore, setBestScore] = useState(() => {
     try {
       const saved = localStorage.getItem('axiom-whackamole-best');
@@ -30,6 +31,13 @@ export default function WhackAMole() {
   const moleTimerRef = useRef(null);
   const hitTimeoutsRef = useRef([]);
   const scoreRef = useRef(score);
+
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+      if (moleTimerRef.current) clearTimeout(moleTimerRef.current);
+    };
+  }, []);
 
   useEffect(() => {
     scoreRef.current = score;
@@ -72,6 +80,7 @@ export default function WhackAMole() {
     } else {
       setActiveMole(null);
       setHits([]);
+      setMisses([]);
       if (moleTimerRef.current) clearTimeout(moleTimerRef.current);
     }
   }, [gameState, spawnMole]);
@@ -82,6 +91,7 @@ export default function WhackAMole() {
     setScore(0);
     setTimeLeft(GAME_DURATION);
     setHits([]);
+    setMisses([]);
     scoreRef.current = 0;
 
     hitTimeoutsRef.current.forEach(clearTimeout);
@@ -160,8 +170,32 @@ export default function WhackAMole() {
     } else {
       // Missed
       sfx.click();
+      setScore((s) => Math.max(0, s - 5));
+
+      const missId = Date.now();
+      setMisses(currentMisses => [...currentMisses, { id: missId, index }]);
+      setTimeout(() => {
+        setMisses(currentMisses => currentMisses.filter(m => m.id !== missId));
+      }, 500);
     }
   };
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (gameState !== 'playing') return;
+      const keyMap = {
+        '1': 0, '2': 1, '3': 2,
+        '4': 3, '5': 4, '6': 5,
+        '7': 6, '8': 7, '9': 8,
+      };
+      if (keyMap[e.key] !== undefined) {
+        e.preventDefault();
+        handleHoleClick(keyMap[e.key]);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [gameState, activeMole]);
 
   return (
     <div className="fade-in max-w-2xl mx-auto flex flex-col items-center justify-center min-h-[60vh]">
@@ -205,6 +239,7 @@ export default function WhackAMole() {
         <div className="grid grid-cols-3 gap-4 sm:gap-6">
           {Array.from({ length: GRID_SIZE }).map((_, i) => {
             const isHit = hits.some(h => h.index === i);
+            const isMiss = misses.some(m => m.index === i);
             return (
               <div key={i} className="relative aspect-square">
                 <button
@@ -218,12 +253,20 @@ export default function WhackAMole() {
                   aria-label={activeMole === i ? 'Whack mole' : 'Empty hole'}
                 >
                   {activeMole === i && (
-                    <div className="w-1/2 h-1/2 rounded-full bg-white opacity-80 pointer-events-none" />
+                    <div className="text-4xl sm:text-5xl pointer-events-none select-none drop-shadow-sm">🐹</div>
                   )}
+                  <div className="hidden sm:block absolute top-1 left-2 font-mono text-xs opacity-30 pointer-events-none">
+                    {i + 1}
+                  </div>
                 </button>
                 {isHit && (
                   <div className="absolute inset-0 flex items-center justify-center pointer-events-none fade-up text-[var(--forest)] font-display text-2xl" style={{ animationDuration: '0.3s' }}>
                     +10
+                  </div>
+                )}
+                {isMiss && (
+                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none fade-up text-[var(--crimson)] font-display text-2xl" style={{ animationDuration: '0.3s' }}>
+                    -5
                   </div>
                 )}
               </div>

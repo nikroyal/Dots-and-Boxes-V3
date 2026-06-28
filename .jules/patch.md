@@ -11,3 +11,18 @@
 ## 2026-06-26 - Using .find() Inside Rendering Loop
 **Learning:** Using `Array.find()` inside nested maps or rendering loops without memoizing a `Map` lookup introduces an O(N) performance overhead.
 **Action:** Replaced O(N) `Array.find` operations with O(1) `Map` lookups and memoized the `Map` when necessary.
+## 2024-05-18 - Safe Length Validation
+**Learning:** Checking length directly via `(arr || []).length` is unsafe for old schema entries that might contain legacy primitive values instead of arrays, throwing unhandled type errors on render.
+**Action:** Use inline ternary checks `Array.isArray(arr) ? arr.length : 0` everywhere length properties are evaluated, particularly in mapping loops and numeric operations.
+## 2024-05-18 - Hooks Execution Order & Early Returns
+**Learning:** Returning early before all hooks are initialized will cause React Strict Mode evaluation mismatch, crashing components depending on hook order rules.
+**Action:** Always verify all `useEffect` and `useState` initializers exist before any conditional early returns like `if (!match) return;`.
+## 2024-05-18 - Side effects inside state updaters
+**Learning:** Adding side-effects such as tracking logic or record keeping within React state dispatch loops (`setX(prev => {...})`) is dangerous as React may re-evaluate the updater function multiple times under strict mode.
+**Action:** Extract the side effect trigger to a `useEffect` using derived properties or conditional checking to run once the desired state has successfully synced.
+## 2024-05-18 - Bot AI soft locks due to lack of fallbacks
+**Learning:** If specific AI modes like parity or difficulty modes evaluate to zero valid candidates, implicit returns that don't explicitly fall back to standard random selections cause soft-lock states.
+**Action:** Always provide `return candidates[Math.floor(Math.random() * candidates.length)]` or an equivalent default guarantee at the bottom or else chain of an AI routine.
+## 2024-05-18 - Missing preventDefault on pointer inputs
+**Learning:** Native scrolling behaviors intercept user input across some touch events.
+**Action:** Use `e.preventDefault()` inside specific custom UI handles like `onPointerDown` to safely stop scroll behavior overriding intended app input.
