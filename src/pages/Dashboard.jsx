@@ -135,8 +135,8 @@ export default function Dashboard() {
   const winRate = profile.gamesPlayed > 0
     ? Math.round(((profile.wins || 0) / profile.gamesPlayed) * 100)
     : 0;
-  const recentAchievements = (profile.unlockedAchievements || []).slice(-3).reverse();
-  const friendRequests = profile.friendRequests || [];
+  const recentAchievements = (Array.isArray(profile.unlockedAchievements) ? profile.unlockedAchievements : []).slice(-3).reverse();
+  const friendRequests = Array.isArray(profile.friendRequests) ? profile.friendRequests : [];
 
   const today = getLocalYYYYMMDD();
   const dailyGoal = getDailyGoal(today);
@@ -147,7 +147,7 @@ export default function Dashboard() {
   const upNextAchievement = (() => {
     let best = null;
     let highestPct = -1;
-    const unlocked = profile.unlockedAchievements || [];
+    const unlocked = Array.isArray(profile.unlockedAchievements) ? profile.unlockedAchievements : [];
     for (const a of ACHIEVEMENTS) {
       if (!unlocked.includes(a.id) && a.progress) {
         const [curr, max, min = 0] = a.progress(profile);
@@ -267,7 +267,7 @@ export default function Dashboard() {
       {/* ELO trend */}
       {(Array.isArray(profile.matchHistory) ? profile.matchHistory.length : 0) > 0 && (
         <section className="card">
-          <EloChart matchHistory={profile.matchHistory || []} currentElo={profile.elo || 1000} />
+          <EloChart matchHistory={Array.isArray(profile.matchHistory) ? profile.matchHistory : []} currentElo={profile.elo || 1000} />
         </section>
       )}
 

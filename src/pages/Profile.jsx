@@ -68,7 +68,7 @@ export default function Profile() {
   const rankProgress = rankInfo.progress;
   const winRate = target.gamesPlayed > 0 ? Math.round((target.wins / target.gamesPlayed) * 100) : 0;
   const isFriend = (Array.isArray(me.friends) ? me.friends : []).includes(target.id);
-  const isBlocked = (me.blocked || []).includes(target.id);
+  const isBlocked = (Array.isArray(me.blocked) ? me.blocked : []).includes(target.id);
 
   const saveProfile = async () => {
     try {
@@ -271,7 +271,7 @@ export default function Profile() {
       {/* ELO trend */}
       {(Array.isArray(target.matchHistory) ? target.matchHistory.length : 0) > 0 && (
         <section className="card">
-          <EloChart matchHistory={target.matchHistory || []} currentElo={target.elo ?? 1000} />
+          <EloChart matchHistory={Array.isArray(target.matchHistory) ? target.matchHistory : []} currentElo={target.elo ?? 1000} />
         </section>
       )}
 
@@ -300,7 +300,7 @@ export default function Profile() {
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
           {ACHIEVEMENTS.map(a => {
-            const unlocked = (target.unlockedAchievements || []).includes(a.id);
+            const unlocked = (Array.isArray(target.unlockedAchievements) ? target.unlockedAchievements : []).includes(a.id);
             return (
               <div key={a.id} className="border hairline p-3" style={{ opacity: unlocked ? 1 : 0.5 }}>
                 <div className="font-display text-base">{a.name}</div>

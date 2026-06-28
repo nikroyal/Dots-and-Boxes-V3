@@ -131,8 +131,8 @@ export default function ChessHub() {
   const winRate = profile.gamesPlayed > 0
     ? Math.round(((profile.wins || 0) / profile.gamesPlayed) * 100)
     : 0;
-  const recentAchievements = (profile.unlockedAchievements || []).slice(-3).reverse();
-  const friendRequests = profile.friendRequests || [];
+  const recentAchievements = (Array.isArray(profile.unlockedAchievements) ? profile.unlockedAchievements : []).slice(-3).reverse();
+  const friendRequests = Array.isArray(profile.friendRequests) ? profile.friendRequests : [];
 
   const handleInvite = async (e) => {
     e.preventDefault();
@@ -186,7 +186,7 @@ export default function ChessHub() {
       {/* ELO trend */}
       {(Array.isArray(profile.matchHistory) ? profile.matchHistory.length : 0) > 0 && (
         <section className="card">
-          <EloChart matchHistory={profile.matchHistory || []} currentElo={profile.elo || 1000} />
+          <EloChart matchHistory={Array.isArray(profile.matchHistory) ? profile.matchHistory : []} currentElo={profile.elo || 1000} />
         </section>
       )}
 

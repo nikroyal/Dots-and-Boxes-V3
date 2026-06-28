@@ -56,7 +56,7 @@ export async function sendInvite(fromUser, toUsername, rows, cols, gameType = 'd
   const target = await lookupUserByUsername(toUsername);
   if (!target) throw new Error('User not found');
   if (target.id === fromUser.id) throw new Error("You can't invite yourself");
-  if ((target.blocked || []).includes(fromUser.id)) throw new Error('Cannot invite this user');
+  if ((Array.isArray(target.blocked) ? target.blocked : []).includes(fromUser.id)) throw new Error('Cannot invite this user');
 
   // Prevent duplicate pending invites — if I already have one outstanding
   // to this user, surface a friendlier error rather than piling up cards.
@@ -190,7 +190,7 @@ export async function consumeAcceptedInvite(inviteId, currentUser) {
 export async function quickMatch(currentUser, rows = 5, cols = 5, gameType = 'dots') {
   guard(currentUser);
   const myElo = currentUser.elo || 1000;
-  const blockedByMe = currentUser.blocked || [];
+  const blockedByMe = Array.isArray(currentUser.blocked) ? currentUser.blocked : [];
 
   // Build the set of users I've challenged in the last 10 minutes so I
   // don't keep pinging the same person who isn't responding. We look at
@@ -228,7 +228,7 @@ export async function quickMatch(currentUser, rows = 5, cols = 5, gameType = 'do
     .filter(u =>
       u.id !== currentUser.id
       && !blockedByMe.includes(u.id)
-      && !(u.blocked || []).includes(currentUser.id)
+      && !(Array.isArray(u.blocked) ? u.blocked : []).includes(currentUser.id)
       && !recentlyInvited.has(u.id)
       && Math.abs((u.elo || 1000) - myElo) <= 200
     );
@@ -606,7 +606,7 @@ export async function joinAsSpectator(matchId, currentUser) {
   // my avatar elsewhere, and come back, arrayUnion would see a different
   // object and append it as a duplicate entry. We resolve at the rule
   // boundary by reading first, then writing the merged value.
-  const existing = m.spectators || [];
+  const existing = Array.isArray(m.spectators) ? m.spectators : [];
   const mine = {
     id: currentUser.id,
     username: currentUser.username,
@@ -636,7 +636,7 @@ export async function leaveSpectator(matchId, currentUser) {
   const snap = await getDoc(matchRef);
   if (!snap.exists()) return;
   const m = snap.data();
-  const newSpecs = (m.spectators || []).filter(s => s.id !== currentUser.id);
+  const newSpecs = (Array.isArray(m.spectators) ? m.spectators : []).filter(s => s.id !== currentUser.id);
   await updateDoc(matchRef, { spectators: newSpecs });
 }
 
@@ -659,7 +659,7 @@ function computeMatchDerivedStats(m, currentUser) {
   const checkComeback = result === 'win';
   let myRunning = 0, oppRunning = 0, wasBehind5 = false;
 
-  for (const mv of m.game.moves || []) {
+  for (const mv of Array.isArray(m.game.moves) ? m.game.moves : []) {
     if (mv.by === currentUser.id) {
       if (mv.claimed > myBiggestChain) myBiggestChain = mv.claimed;
       if (checkComeback) myRunning += mv.claimed;
@@ -693,7 +693,7 @@ function computeMatchDerivedStats(m, currentUser) {
 function computeUpdatedUserStats(u, m, matchId, derivedStats) {
   // The authoritative idempotency gate. Inside the transaction, this read
   // is guaranteed to reflect any prior finalize that committed first.
-  const finalized = u.finalizedMatches || [];
+  const finalized = Array.isArray(u.finalizedMatches) ? u.finalizedMatches : [];
   if (finalized.includes(matchId)) return null;
 
   const {
@@ -805,13 +805,13 @@ function computeUpdatedUserStats(u, m, matchId, derivedStats) {
     rows: m.rows, cols: m.cols,
     finishedAt: Date.now(),
   };
-  const existingHistory = u.matchHistory || [];
+  const existingHistory = Array.isArray(u.matchHistory) ? u.matchHistory : [];
   const trimmedHistory = existingHistory.length >= MATCH_HISTORY_CAP
     ? [...existingHistory.slice(existingHistory.length - MATCH_HISTORY_CAP + 1), newHistoryEntry]
     : [...existingHistory, newHistoryEntry];
   newStats.matchHistory = trimmedHistory;
 
-  const existingFinalized = u.finalizedMatches || [];
+  const existingFinalized = Array.isArray(u.finalizedMatches) ? u.finalizedMatches : [];
   const trimmedFinalized = existingFinalized.length >= FINALIZED_MATCHES_CAP
     ? [...existingFinalized.slice(existingFinalized.length - FINALIZED_MATCHES_CAP + 1), matchId]
     : [...existingFinalized, matchId];
@@ -819,7 +819,7 @@ function computeUpdatedUserStats(u, m, matchId, derivedStats) {
 
   // Check achievements with the projected stats
   const projectedStats = { ...u, ...newStats, friends: Array.isArray(u.friends) ? u.friends.length : 0 };
-  const newlyUnlocked = checkUnlocks(projectedStats, u.unlockedAchievements || []);
+  const newlyUnlocked = checkUnlocks(projectedStats, Array.isArray(u.unlockedAchievements) ? u.unlockedAchievements : []);
   if (newlyUnlocked.length > 0) {
     // Achievements never roll off; there are only ~23 of them, so the array
     // size is bounded by the catalog. Safe to arrayUnion.
@@ -897,8 +897,8 @@ export async function sendFriendRequest(currentUser, targetUsername) {
   const target = await lookupUserByUsername(targetUsername);
   if (!target) throw new Error('User not found');
   if (target.id === currentUser.id) throw new Error("You can't friend yourself");
-  if ((currentUser.friends || []).includes(target.id)) throw new Error('Already friends');
-  if ((target.blocked || []).includes(currentUser.id)) throw new Error('Cannot send request');
+  if ((Array.isArray(currentUser.friends) ? currentUser.friends : []).includes(target.id)) throw new Error('Already friends');
+  if ((Array.isArray(target.blocked) ? target.blocked : []).includes(currentUser.id)) throw new Error('Cannot send request');
 
   const batch = writeBatch(db);
   batch.update(doc(db, 'users', target.id), {
@@ -933,13 +933,13 @@ export async function acceptFriendRequest(currentUser, fromId) {
     const mySnap = await tx.get(myRef);
     if (!mySnap.exists()) return;
     const me = mySnap.data();
-    const currentReqs = me.friendRequests || [];
+    const currentReqs = Array.isArray(me.friendRequests) ? me.friendRequests : [];
     // Filter on the *current* value inside the tx, so any request that
     // arrived between this user's last profile snapshot and now survives.
     const newReqs = currentReqs.filter(r => r.fromId !== fromId);
     // arrayUnion would also work, but listing the full array makes the
     // intent explicit and matches the legacy doc shape exactly.
-    const myFriends = me.friends || [];
+    const myFriends = Array.isArray(me.friends) ? me.friends : [];
     const newFriends = myFriends.includes(fromId) ? myFriends : [...myFriends, fromId];
     tx.update(myRef, { friends: newFriends, friendRequests: newReqs });
   });
@@ -969,7 +969,7 @@ export async function declineFriendRequest(currentUser, fromId) {
   await runTransaction(db, async (tx) => {
     const mySnap = await tx.get(myRef);
     if (!mySnap.exists()) return;
-    const currentReqs = mySnap.data().friendRequests || [];
+    const currentReqs = Array.isArray(mySnap.data().friendRequests) ? mySnap.data().friendRequests : [];
     const newReqs = currentReqs.filter(r => r.fromId !== fromId);
     tx.update(myRef, { friendRequests: newReqs });
   });

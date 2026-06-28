@@ -22,7 +22,7 @@ export default function Header() {
   const settingsRef = useRef(null);
   const isAdmin = profile?.role === 'admin';
   const activeExperience = findExperienceByPath(loc.pathname);
-  const sectionNavItems = activeExperience.navItems || [];
+  const sectionNavItems = Array.isArray(activeExperience.navItems) ? activeExperience.navItems : [];
   const sharedNavItems = SHARED_NAV_ITEMS.map(item => ({
     ...item,
     badge: item.badge === 'unread' ? unreadCount : item.badge,

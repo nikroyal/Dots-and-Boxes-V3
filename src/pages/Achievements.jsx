@@ -4,7 +4,7 @@ import { ACHIEVEMENTS } from '../lib/achievements';
 export default function Achievements() {
   const { profile } = useAuth();
   if (!profile) return null;
-  const unlocked = profile.unlockedAchievements || [];
+  const unlocked = Array.isArray(profile.unlockedAchievements) ? profile.unlockedAchievements : [];
   const progress = Math.round((unlocked.length / ACHIEVEMENTS.length) * 100);
 
   return (

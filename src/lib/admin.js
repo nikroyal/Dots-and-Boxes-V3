@@ -107,7 +107,7 @@ export async function forceFinishMatch(admin, match) {
     finishedAt: serverTimestamp(),
   });
   await audit(admin, 'force_finish_match', 'match', match.id, {
-    players: match.players || [],
+    players: Array.isArray(match.players) ? match.players : [],
   });
 }
 

@@ -35,8 +35,8 @@ export default function Leaderboard() {
   // leaderboard isn't a place I want to bump into people I'm avoiding.
   const visibleUsers = profile
     ? users.filter(u => {
-        const myBlocked = profile.blocked || [];
-        const theirBlocked = u.blocked || [];
+        const myBlocked = Array.isArray(profile.blocked) ? profile.blocked : [];
+        const theirBlocked = Array.isArray(u.blocked) ? u.blocked : [];
         return !myBlocked.includes(u.id) && !theirBlocked.includes(profile.id);
       })
     : users;

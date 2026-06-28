@@ -6,7 +6,7 @@ export default function History() {
   const { profile } = useAuth();
   if (!profile) return null;
 
-  const history = [...(profile.matchHistory || [])].reverse();
+  const history = [...(Array.isArray(profile.matchHistory) ? profile.matchHistory : [])].reverse();
 
   return (
     <div className="fade-in space-y-8">

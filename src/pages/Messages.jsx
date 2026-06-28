@@ -43,7 +43,7 @@ export default function Messages() {
     } catch (err) { toast(err.message, 'error'); }
   };
 
-  const list = conversations || [];
+  const list = Array.isArray(conversations) ? conversations : [];
 
   return (
     <div className="fade-in">

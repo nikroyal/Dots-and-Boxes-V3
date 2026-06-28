@@ -208,7 +208,7 @@ function MatchButton({ match, active, onClick }) {
 }
 
 function TinyMatch({ match }) {
-  const players = match.players || [];
+  const players = Array.isArray(match.players) ? match.players : [];
   const names = players.map(id => match.playerInfo?.[id]?.username || id.slice(0, 6)).join(' vs ');
   return (
     <div className="min-w-0 p-3">
@@ -222,7 +222,7 @@ function TinyMatch({ match }) {
 
 function MatchInspector({ admin, match }) {
   if (!match) return <div className="border hairline p-6 font-mono text-[0.65rem] opacity-40 uppercase tracking-widest">No game selected</div>;
-  const players = match.players || [];
+  const players = Array.isArray(match.players) ? match.players : [];
   return (
     <section className="border hairline p-4 space-y-4">
       <div className="flex items-start justify-between gap-3 flex-wrap">

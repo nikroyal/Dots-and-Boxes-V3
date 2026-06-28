@@ -23,3 +23,6 @@
 ## 2024-05-18 - Missing preventDefault on pointer inputs
 **Learning:** Native scrolling behaviors intercept user input across some touch events.
 **Action:** Use `e.preventDefault()` inside specific custom UI handles like `onPointerDown` to safely stop scroll behavior overriding intended app input.
+## 2024-11-20 - Unsafe array default evaluations (`|| []`)
+**Learning:** Defaulting arrays inline using `obj.array || []` is dangerous because if the data contains a truthy non-array type (like a number or string from a legacy schema), operations like `.map()`, `.filter()`, or `.length` will fail and potentially crash the application.
+**Action:** Use `Array.isArray(obj.array) ? obj.array : []` to guarantee type safety before array iteration or length checks.

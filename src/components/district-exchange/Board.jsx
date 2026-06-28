@@ -42,9 +42,9 @@ export default function Board({ gameState, isRolling }) {
   // twice per render (once for upgrades, once for owner bar). This Map turns those into O(1) lookups.
   const propertyOwners = React.useMemo(() => {
     const map = new Map();
-    for (const player of gameState.players || []) {
+    for (const player of Array.isArray(gameState.players) ? gameState.players : []) {
       if (player.bankrupt) continue;
-      for (const spaceId of player.properties || []) {
+      for (const spaceId of Array.isArray(player.properties) ? player.properties : []) {
         map.set(spaceId, player);
       }
     }

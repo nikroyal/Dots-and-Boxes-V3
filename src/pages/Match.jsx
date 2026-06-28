@@ -132,7 +132,7 @@ export default function Match() {
   useEffect(() => {
     if (!match || !profile) return;
     if (match.players.includes(profile.id)) return;
-    if ((match.spectators || []).some(s => s.id === profile.id)) return;
+    if ((Array.isArray(match.spectators) ? match.spectators : []).some(s => s.id === profile.id)) return;
     joinAsSpectator(id, profile).catch(() => {});
     return () => { leaveSpectator(id, profile).catch(() => {}); };
     // eslint-disable-next-line
@@ -508,7 +508,7 @@ export default function Match() {
               No messages yet
             </div>
           )}
-          {(match.chat || []).map(msg => {
+          {(Array.isArray(match.chat) ? match.chat : []).map(msg => {
             const isPlayerMsg = match.players.includes(msg.userId);
             const playerIdx = match.players.indexOf(msg.userId);
             const color = isPlayerMsg ? PLAYER_COLORS[playerIdx].hex : '#888';

@@ -42,8 +42,8 @@ function useUserDocs(ids) {
 
 export default function Friends() {
   const { profile } = useAuth();
-  const friendIds = profile?.friends || [];
-  const blockedIds = profile?.blocked || [];
+  const friendIds = Array.isArray(profile?.friends) ? profile?.friends : [];
+  const blockedIds = Array.isArray(profile?.blocked) ? profile?.blocked : [];
   const friendsData = useUserDocs(friendIds);
   const blockedData = useUserDocs(blockedIds);
   const [addInput, setAddInput] = useState('');
@@ -52,7 +52,7 @@ export default function Friends() {
   const { confirm, dialog: confirmDialogEl } = useConfirm();
 
   if (!profile) return null;
-  const requests = profile.friendRequests || [];
+  const requests = Array.isArray(profile.friendRequests) ? profile.friendRequests : [];
 
   const handleAdd = async (e) => {
     e.preventDefault();
