@@ -23,3 +23,10 @@
 ## 2024-06-28 - Fix final WPM calculation in Typing Speed game
 **Learning:** Stale closures in timer callbacks (setTimeout/setInterval) lead to using initial or outdated state values. This is common when game timers end and need to calculate final scores using live typing state.
 **Action:** To prevent stale closure issues when accessing React state inside timer callbacks, store the required state values (userInput and currentQuote) in mutable refs (useRef) and synchronize them using useEffect whenever the state changes. Then use the .current property of the refs inside the callback.
+## 2026-06-28 - Full Game Integration Steps
+**Learning:** To completely integrate a new game or experience into the app, you must create its React component file in `src/pages/`, add its `<Route>` declaration in `src/App.jsx` (ensuring correct placement, often both in unauthenticated and authenticated blocks), and register its metadata configuration object within the `EXPERIENCE_CATALOG` array in `src/lib/experiences.js`.
+**Action:** Always include all three of these integration points when adding a new game, and verify their correctness by examining the files fully.
+
+## 2026-06-28 - Groundedness in Patching
+**Learning:** When modifying existing files with search/replace blocks, do not guess the contents or structure based on truncated file reads. Guessing leads to failed patches or mangled files.
+**Action:** Always use `grep` with context flags (e.g., `grep -C 5`) to confirm the exact lines and sequence before constructing the patch to avoid Groundedness Rule violations.
