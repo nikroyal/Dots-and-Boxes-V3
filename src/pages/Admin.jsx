@@ -145,7 +145,7 @@ function UsersPanel({ admin, users, onViewAs }) {
 
   return (
     <section className="space-y-3">
-      <input value={filter} onChange={e => setFilter(e.target.value)} className="input-field max-w-sm" placeholder="Search players" />
+      <input value={filter} onChange={e => setFilter(e.target.value)} className="input-field max-w-sm" placeholder="Search players" aria-label="Search players" />
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
         {filtered.map(user => <UserRow key={user.id} admin={admin} user={user} onViewAs={onViewAs} />)}
       </div>
