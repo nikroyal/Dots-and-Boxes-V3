@@ -1,6 +1,3 @@
-## 2024-02-23 - SVG Board Re-render Bottleneck on Ticker Updates
-**Learning:** The `Match` components (`Match.jsx`, `MatchConnect4.jsx`, `MatchTicTacToe.jsx`, `MatchChess.jsx`) use a 1-second `setInterval` to update a `now` state variable that drives the visual turn timer. Because this state is at the root of the match component, it causes full re-renders every second, including the heavy, SVG-dense `Board` component.
-**Action:** Always wrap complex, pure visualization components like `Board` and `ConcealedBoard` in `React.memo` and ensure callback props like `handleMove` are stabilized using `useCallback` when they are placed under a component with a frequently ticking state (like a clock or timer).
 ## 2024-05-24 - Array over Map for Dense IDs
 **Learning:** For dense integer IDs, allocating an array dynamically sized by the maximum ID is extremely fast in Javascript and effectively works as O(1) indexing, whereas maps have more overhead.
 **Action:** When repeatedly looking up counts by integer ID where max ID is relatively small, use an array constructed up to maxId + 1. Ensure sizing to the maximum ID instead of array length to prevent out of bounds when entities are added dynamically (monotonically increasing IDs).
@@ -21,7 +18,7 @@
 **Learning:** Iterating through a large array multiple times for independent aggregations (like finding the maximum value and calculating a running total) is computationally expensive and scales poorly with array size.
 **Action:** When computing multiple derived statistics or validations from a single collection of data (such as game moves), merge the operations into a single pass or loop to minimize loop overhead and redundant property access.
 
-## 2026-06-18 - O(1) Component Lookups in CircuitMaker
+## $(date +%Y-%m-%d) - O(1) Component Lookups in CircuitMaker
 **Learning:** Reconstructing a Map inside a React render loop to optimize lookups is an anti-pattern. Building a Map takes O(N) time and creates memory churn on every render cycle, degrading performance.
 **Action:** Always wrap performance-oriented Map generation from arrays in `useMemo()` to ensure the O(N) cost is only incurred when the underlying array dependency changes.
 ## 2026-06-18 - Nested `Array.find` within Multiple Loops
@@ -30,9 +27,6 @@
 ## 2024-11-20 - O(1) Map lookups in render loops
 **Learning:** Using `Array.find()` inside a `.map()` render loop creates an O(N²) time complexity bottleneck which blocks the main thread during renders, especially for large arrays like chat history. While replacing it with a Map lookup (`Map.get()`) makes it O(1), recreating the Map from the array on every render cycle introduces unnecessary O(N) computational overhead and memory allocation churn, which can degrade performance rather than improve it.
 **Action:** Always memoize the Map creation (e.g., using `useMemo`) so the O(N) map generation cost is only paid when the underlying array changes, ensuring true O(1) lookup performance in the render loop.
-## 2026-06-26 - O(1) Map Lookups In Render Loops
-**Learning:** Re-computing a map structure like `new Map(array)` directly inside a React component render block will incur an O(N) cost and create new references every render. This completely defeats the performance benefits of transitioning from `Array.find()` to `Map.get()`.
-**Action:** When migrating O(N) repeated array iterations inside a component down to O(1) indexing, always wrap the map instantiation in a `useMemo(() => new Map(...), [dependencies])` so the structure is built strictly only when its dependencies update.
 ## 2024-05-24 - Array over Map for Dense IDs
 **Learning:** For dense integer IDs, allocating an array dynamically sized by the maximum ID is extremely fast in Javascript and effectively works as O(1) indexing, whereas maps have more overhead.
 **Action:** When repeatedly looking up counts by integer ID where max ID is relatively small, use an array constructed up to maxId + 1. Ensure sizing to the maximum ID instead of array length to prevent out of bounds when entities are added dynamically (monotonically increasing IDs).
@@ -65,6 +59,3 @@
 ## 2024-06-25 - Replace Array.find for Static Configuration Lookups
 **Learning:** Calling `Array.find()` repeatedly within render functions to look up metadata from static configuration arrays (like `ACHIEVEMENTS`) introduces O(N) overhead in hot paths without memoization benefits.
 **Action:** Pre-compute a module-level `Map` for static configuration arrays (like `ACHIEVEMENTS`) and expose an O(1) getter function (like `getAchievementById`) to eliminate repetitive loop overhead in component renders.
-## 2025-02-23 - Pre-computing Maps for static lookups
-**Learning:** O(N) array scans (`Array.find()`) over static config data (like `EXPERIENCE_CATALOG`) during component renders can accumulate to unnecessary overhead.
-**Action:** When data structures like catalogs are statically defined, pre-compute a `Map` keyed by their ID at the module level. This exposes an O(1) getter to the rest of the application and completely bypasses the need to iterate or use `useMemo` at the component layer.

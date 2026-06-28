@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../lib/AuthContext';
 import { recordActivity, ACTIVITY_TYPES } from '../lib/activity';
-import { updateArcadeBest } from '../lib/actions';
 import { sfx } from '../lib/sound';
 
 const CHOICES = ['Rock', 'Paper', 'Scissors'];
@@ -78,7 +77,6 @@ export default function RockPaperScissors() {
         localStorage.setItem('axiom-rps-best', streak.toString());
       } catch {}
       recordActivity(profile, ACTIVITY_TYPES.ARCADE_BEST, { game: 'Rock Paper Scissors', score: streak + ' streak' });
-      updateArcadeBest(profile, 'rock-paper-scissors', 'Rock Paper Scissors', streak, streak + ' streak');
     }
   }, [gameState, streak, bestStreak, profile]);
 

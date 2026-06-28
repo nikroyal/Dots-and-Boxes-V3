@@ -38,7 +38,7 @@ export default function Replay() {
   const cache = useMemo(() => ({ step: -1, game: null }), [match]);
   const game = useMemo(() => {
     if (!match) return null;
-    const moves = Array.isArray(match.game?.moves) ? match.game.moves : [];
+    const moves = Array.isArray(match.game.moves) ? match.game.moves : [];
     const target = Math.min(step, moves.length);
     // If we can step forward from cache (typical playback), do incremental work.
     if (cache.game && target >= cache.step) {
@@ -78,7 +78,7 @@ export default function Replay() {
   if (!profile) return null;
   if (!match || !game) return <div className="font-mono text-xs opacity-50 text-center py-20">LOADING…</div>;
 
-  const moves = Array.isArray(match.game?.moves) ? match.game.moves : [];
+  const moves = Array.isArray(match.game.moves) ? match.game.moves : [];
   const totalSteps = moves.length;
 
   const cell = Math.min(60, Math.max(28, 480 / Math.max(match.rows, match.cols)));

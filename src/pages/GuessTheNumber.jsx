@@ -58,13 +58,6 @@ export default function GuessTheNumber() {
       return;
     }
 
-    if (guess < minBound || guess > maxBound) {
-      setMessage(`Pay attention! The number is between ${minBound} and ${maxBound}.`);
-      sfx.click();
-      setCurrentGuess('');
-      return;
-    }
-
     const newAttempts = attempts + 1;
     setAttempts(newAttempts);
 

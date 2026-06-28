@@ -180,7 +180,7 @@ export default function Connect4Hub() {
         <StatCard icon={<Trophy size={14} />} label="Wins" value={profile.wins || 0} />
         <StatCard icon={<Target size={14} />} label="Games" value={profile.gamesPlayed || 0} />
         <StatCard icon={<TrendingUp size={14} />} label="Win Rate" value={`${winRate}%`} />
-        <StatCard icon={<Users size={14} />} label="Friends" value={Array.isArray(profile.friends) ? profile.friends.length : 0} />
+        <StatCard icon={<Users size={14} />} label="Friends" value={(Array.isArray(profile.friends) ? profile.friends : []).length} />
       </section>
 
       {/* ELO trend */}

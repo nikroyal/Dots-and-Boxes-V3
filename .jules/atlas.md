@@ -55,6 +55,3 @@
 ## 2026-06-27 - Anti-Spam Penalties
 **Learning:** In games where players must click specific targets (like Whack-a-Mole), the lack of a penalty for missing encourages a degenerate strategy where the player just spams clicks everywhere.
 **Action:** Always implement a miss penalty (e.g., negative points) with clear visual feedback to enforce precision and increase the skill ceiling.
-## 2026-06-28 - Fast Input Responsiveness
-**Learning:** In fast-paced or reaction-based arcade games (like Click The Target), using standard `onClick` handlers introduces an inherent 100-300ms touch delay on mobile devices, which makes the game feel sluggish and unresponsive.
-**Action:** Always use `onPointerDown` instead of `onClick` for interactive game elements to eliminate touch delay. Ensure you use `e.stopPropagation()` to prevent misclicks on background elements.
