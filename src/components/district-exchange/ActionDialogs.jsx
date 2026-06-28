@@ -407,7 +407,7 @@ function ProposeTradeDialog({ gameState, currentPlayerId, onClose, onAction, pla
   const me = playerMap ? playerMap.get(currentPlayerId) : gameState.players.find(p => p.id === currentPlayerId);
   const otherPlayers = gameState.players.filter(p => p.id !== currentPlayerId && !p.bankrupt);
 
-  const target = playerMap ? playerMap.get(targetId) : gameState.players.find(p => p.id === targetId);
+  const target = playerMap.get(targetId);
 
   const toggleProp = (pid, isOffer) => {
     if (isOffer) {
