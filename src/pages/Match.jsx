@@ -12,11 +12,12 @@ import { PLAYER_COLORS, hKey, vKey, bKey } from '../lib/gameLogic';
 import { sfx } from '../lib/sound';
 import { toast } from '../components/Notifications';
 import { ACHIEVEMENTS, getAchievementById, getRankInfo } from '../lib/achievements';
+import { getDailyGoal, getLocalYYYYMMDD } from '../lib/daily';
 import Confetti from '../components/Confetti';
 import BoxParticles from '../components/BoxParticles';
 import { useConfirm } from '../components/ConfirmDialog';
 import { isDisconnected } from '../lib/presence';
-import { Pause, Play, Flag, Send, Eye, Trophy, RotateCcw, Home, Repeat, Clock, WifiOff, Handshake, UserPlus } from 'lucide-react';
+import { Pause, Play, Flag, Send, Eye, Trophy, RotateCcw, Home, Repeat, Clock, WifiOff, Handshake, UserPlus, Target } from 'lucide-react';
 
 export default function Match() {
   const { id } = useParams();
@@ -943,6 +944,12 @@ function WinScreen({ match, profile, achievementToasts, onHome, onReplay }) {
   const nextRank = rankInfo.nextRank;
   const rankProgress = rankInfo.progress;
 
+  const today = getLocalYYYYMMDD();
+  const dailyGoal = getDailyGoal(today);
+  const dailyStats = profile?.dailyStats?.date === today ? profile.dailyStats : { wins: 0, gamesPlayed: 0, totalBoxes: 0, biggestChain: 0 };
+  const dailyGoalCompleted = profile?.dailyGoalDate === today || dailyGoal.check(dailyStats);
+  const goalProgress = dailyGoalCompleted ? dailyGoal.max : dailyGoal.getProgress(dailyStats);
+
 
   const [rematchState, setRematchState] = useState('idle'); // idle | sending | sent | error
   const [friendRequestState, setFriendRequestState] = useState('idle');
@@ -1056,6 +1063,31 @@ function WinScreen({ match, profile, achievementToasts, onHome, onReplay }) {
               🔥 {profile.winStreak} Win Streak
             </div>
           )}
+          {/* Daily Goal Progress */}
+          <div className="mt-4 pt-4 border-t hairline flex flex-col gap-2">
+            <div className="flex justify-between items-end">
+              <div className="font-mono text-xs tracking-widest uppercase flex items-center gap-2">
+                <Target size={12} /> Daily Goal
+              </div>
+              <div className="font-mono text-[0.6rem] tracking-widest uppercase opacity-60">
+                {dailyGoalCompleted ? 'Completed' : `${goalProgress} / ${dailyGoal.max}`}
+              </div>
+            </div>
+            <div className="font-display text-sm opacity-80">{dailyGoal.text}</div>
+            {!dailyGoalCompleted && (
+               <div className="h-1 w-full bg-black/10 rounded-full overflow-hidden mt-1">
+                 <div
+                   className="h-full transition-all duration-1000 ease-out"
+                   style={{ width: `${(goalProgress / dailyGoal.max) * 100}%`, background: 'var(--forest)' }}
+                 />
+               </div>
+            )}
+            {dailyGoalCompleted && (
+              <div className="font-mono text-[0.65rem] tracking-widest uppercase" style={{ color: 'var(--forest)' }}>
+                ✓ Come back tomorrow to keep your streak going!
+              </div>
+            )}
+          </div>
         </div>
       )}
 
