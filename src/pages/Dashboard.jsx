@@ -135,7 +135,7 @@ export default function Dashboard() {
   const winRate = profile.gamesPlayed > 0
     ? Math.round(((profile.wins || 0) / profile.gamesPlayed) * 100)
     : 0;
-  const recentAchievements = (profile.unlockedAchievements || []).slice(-3).reverse();
+  const recentAchievements = (Array.isArray(profile.unlockedAchievements) ? profile.unlockedAchievements : []).slice(-3).reverse();
   const friendRequests = profile.friendRequests || [];
 
   const today = getLocalYYYYMMDD();

@@ -48,7 +48,7 @@ export default function LocalDistrictExchange() {
   const { confirm, dialog: confirmDialogEl } = useConfirm();
 
   // Optimization (Bolt): Pre-compute player map to avoid repeated O(N) array.find lookups in LocalDistrictExchange
-  const playerMap = useMemo(() => new Map((gameState?.players || []).map(p => [p.id, p])), [gameState?.players]);
+  const playerMap = useMemo(() => new Map((Array.isArray(gameState?.players) ? gameState?.players : []).map(p => [p.id, p])), [gameState?.players]);
 
   // Handle AI Turns and Auctions
   useEffect(() => {

@@ -132,7 +132,7 @@ export default function Match() {
   useEffect(() => {
     if (!match || !profile) return;
     if (match.players.includes(profile.id)) return;
-    if ((match.spectators || []).some(s => s.id === profile.id)) return;
+    if ((Array.isArray(match.spectators) ? match.spectators : []).some(s => s.id === profile.id)) return;
     joinAsSpectator(id, profile).catch(() => {});
     return () => { leaveSpectator(id, profile).catch(() => {}); };
     // eslint-disable-next-line
@@ -508,7 +508,7 @@ export default function Match() {
               No messages yet
             </div>
           )}
-          {(match.chat || []).map(msg => {
+          {(Array.isArray(match.chat) ? match.chat : []).map(msg => {
             const isPlayerMsg = match.players.includes(msg.userId);
             const playerIdx = match.players.indexOf(msg.userId);
             const color = isPlayerMsg ? PLAYER_COLORS[playerIdx].hex : '#888';
@@ -935,7 +935,7 @@ function WinScreen({ match, profile, achievementToasts, onHome, onReplay }) {
   const youWon = match.winner === profile.id;
   const wasResigned = !!match.resignedBy;
 
-  const historyEntry = (profile?.matchHistory || []).find(h => h.matchId === match.id);
+  const historyEntry = (Array.isArray(profile?.matchHistory) ? profile?.matchHistory : []).find(h => h.matchId === match.id);
   const eloDelta = historyEntry?.eloDelta;
   const newElo = historyEntry?.eloAfter ?? profile?.elo ?? 1000;
   const rankInfo = getRankInfo(newElo);

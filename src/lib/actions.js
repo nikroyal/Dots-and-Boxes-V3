@@ -56,7 +56,7 @@ export async function sendInvite(fromUser, toUsername, rows, cols, gameType = 'd
   const target = await lookupUserByUsername(toUsername);
   if (!target) throw new Error('User not found');
   if (target.id === fromUser.id) throw new Error("You can't invite yourself");
-  if ((target.blocked || []).includes(fromUser.id)) throw new Error('Cannot invite this user');
+  if ((Array.isArray(target.blocked) ? target.blocked : []).includes(fromUser.id)) throw new Error('Cannot invite this user');
 
   // Prevent duplicate pending invites — if I already have one outstanding
   // to this user, surface a friendlier error rather than piling up cards.
@@ -228,7 +228,7 @@ export async function quickMatch(currentUser, rows = 5, cols = 5, gameType = 'do
     .filter(u =>
       u.id !== currentUser.id
       && !blockedByMe.includes(u.id)
-      && !(u.blocked || []).includes(currentUser.id)
+      && !(Array.isArray(u.blocked) ? u.blocked : []).includes(currentUser.id)
       && !recentlyInvited.has(u.id)
       && Math.abs((u.elo || 1000) - myElo) <= 200
     );
@@ -636,7 +636,7 @@ export async function leaveSpectator(matchId, currentUser) {
   const snap = await getDoc(matchRef);
   if (!snap.exists()) return;
   const m = snap.data();
-  const newSpecs = (m.spectators || []).filter(s => s.id !== currentUser.id);
+  const newSpecs = (Array.isArray(m.spectators) ? m.spectators : []).filter(s => s.id !== currentUser.id);
   await updateDoc(matchRef, { spectators: newSpecs });
 }
 
@@ -897,8 +897,8 @@ export async function sendFriendRequest(currentUser, targetUsername) {
   const target = await lookupUserByUsername(targetUsername);
   if (!target) throw new Error('User not found');
   if (target.id === currentUser.id) throw new Error("You can't friend yourself");
-  if ((currentUser.friends || []).includes(target.id)) throw new Error('Already friends');
-  if ((target.blocked || []).includes(currentUser.id)) throw new Error('Cannot send request');
+  if ((Array.isArray(currentUser.friends) ? currentUser.friends : []).includes(target.id)) throw new Error('Already friends');
+  if ((Array.isArray(target.blocked) ? target.blocked : []).includes(currentUser.id)) throw new Error('Cannot send request');
 
   const batch = writeBatch(db);
   batch.update(doc(db, 'users', target.id), {

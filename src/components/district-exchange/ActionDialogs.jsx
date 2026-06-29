@@ -5,7 +5,7 @@ export function ActionDialogs({ gameState, currentPlayerId, onAction }) {
   if (!gameState) return null;
 
   // Optimization (Bolt): Pre-compute player map to avoid repeated O(N) array.find lookups
-  const playerMap = useMemo(() => new Map((gameState.players || []).map(p => [p.id, p])), [gameState.players]);
+  const playerMap = useMemo(() => new Map((Array.isArray(gameState.players) ? gameState.players : []).map(p => [p.id, p])), [gameState.players]);
 
   const cp = gameState.players[gameState.currentPlayerIdx];
   const isMyTurn = cp.id === currentPlayerId && !cp.isAI;
@@ -225,7 +225,7 @@ export function ControlsPanel({ gameState, currentPlayerId, onAction, isRolling,
   const [showMortgages, setShowMortgages] = useState(false);
 
   // Fallback map if not provided
-  const localPlayerMap = useMemo(() => new Map((gameState?.players || []).map(p => [p.id, p])), [gameState?.players]);
+  const localPlayerMap = useMemo(() => new Map((Array.isArray(gameState?.players) ? gameState?.players : []).map(p => [p.id, p])), [gameState?.players]);
   const playerMap = parentPlayerMap || localPlayerMap;
 
   if (!gameState) return null;
