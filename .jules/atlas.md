@@ -58,3 +58,4 @@
 ## 2026-06-28 - Fast Input Responsiveness
 **Learning:** In fast-paced or reaction-based arcade games (like Click The Target), using standard `onClick` handlers introduces an inherent 100-300ms touch delay on mobile devices, which makes the game feel sluggish and unresponsive.
 **Action:** Always use `onPointerDown` instead of `onClick` for interactive game elements to eliminate touch delay. Ensure you use `e.stopPropagation()` to prevent misclicks on background elements.
+## 2026-06-29 - Descriptive Tiers and Learning Loops   **Learning:** Adding descriptive skill tiers to result screens and resolving skipped/failed states (like showing missed words) prevents frustration, boosts shareability, and creates micro-goals that improve replayability.   **Action:** Always include tier-based feedback and ensure failure states still close the loop on what the player missed.

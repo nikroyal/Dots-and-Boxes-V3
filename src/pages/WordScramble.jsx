@@ -39,6 +39,7 @@ export default function WordScramble() {
   const [currentWord, setCurrentWord] = useState('');
   const [scrambledWord, setScrambledWord] = useState('');
   const [userInput, setUserInput] = useState('');
+  const [skippedWord, setSkippedWord] = useState('');
   const [bestScore, setBestScore] = useState(() => {
     try {
       const saved = localStorage.getItem('axiom-wordscramble-best');
@@ -224,13 +225,24 @@ export default function WordScramble() {
           </form>
 
           <div className="flex gap-2">
-            <button
-              onClick={() => loadNewWord()}
-              disabled={gameState !== 'playing'}
-              className="btn-ghost text-xs"
-            >
-              Skip
-            </button>
+            <div className="flex flex-col items-center gap-2">
+              <button
+                onClick={() => {
+                  setSkippedWord(currentWord);
+                  setTimeout(() => setSkippedWord(''), 1500);
+                  loadNewWord();
+                }}
+                disabled={gameState !== 'playing'}
+                className="btn-ghost text-xs"
+              >
+                Skip
+              </button>
+              {skippedWord && (
+                <div className="font-mono text-sm text-[var(--crimson)] fade-in">
+                  Was: {skippedWord}
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
