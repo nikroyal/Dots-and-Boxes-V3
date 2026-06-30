@@ -49,3 +49,9 @@
 **Learning:** When players finish an intense or enjoyable online multiplayer match, their emotional engagement is high, making it the perfect moment to build motivation to play again. Displaying a clear progress visualization (such as ELO rank progression and win streak celebrations) on the victory screen capitalizes on this high-engagement moment by giving them an immediate, tangible reason to start another match (e.g., reaching the next rank).
 
 **Action:** Whenever a shared competitive or progress-oriented experience concludes, prioritize displaying dynamic progression elements (progress bars, delta numbers) rather than static states to encourage repeat play.
+
+## 2024-06-30 - Post-Match Momentum Visualization II
+
+**Learning:** Players' highest engagement peaks right when they win or lose a multiplayer match. While long-term rank progression (ELO) is motivating, surfacing short-term, immediately attainable goals (like the next Daily Goal or an Up Next Achievement) right on the Win Screen gives players an explicit, bite-sized reason to play "just one more." This reduces friction in deciding whether to click "Rematch" or "Home" by providing an immediate secondary objective.
+
+**Action:** Whenever a player completes a core gameplay loop (like a match), inject dynamic, personalized short-term goals (daily goals, closest achievements) into the post-match resolution screen to convert the momentum of a finished session into motivation for the next one.
