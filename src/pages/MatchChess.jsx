@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef, memo, useCallback } from 'react';
+import { useEffect, useState, useRef, memo, useCallback, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { doc, onSnapshot } from 'firebase/firestore';
 import { db } from '../lib/firebase';
@@ -516,14 +516,16 @@ export default function MatchChess() {
   const concealBoard = match.status === 'paused' && match.pauseConcealed;
   const lastMove = (Array.isArray(displayGame.moves) ? displayGame.moves : []).slice(-1)[0];
 
-  const customSquareStyles = {
-    ...(lastMove ? {
-      [lastMove.from]: { backgroundColor: 'rgba(255, 255, 0, 0.4)' },
-      [lastMove.to]: { backgroundColor: 'rgba(255, 255, 0, 0.4)' }
-    } : {}),
-    ...optionSquares,
-    ...(selectedSquare ? { [selectedSquare]: { backgroundColor: 'rgba(255, 0, 0, 0.4)' } } : {})
-  };
+  const customSquareStyles = useMemo(() => {
+    return {
+      ...(lastMove ? {
+        [lastMove.from]: { backgroundColor: 'rgba(255, 255, 0, 0.4)' },
+        [lastMove.to]: { backgroundColor: 'rgba(255, 255, 0, 0.4)' }
+      } : {}),
+      ...optionSquares,
+      ...(selectedSquare ? { [selectedSquare]: { backgroundColor: 'rgba(255, 0, 0, 0.4)' } } : {})
+    };
+  }, [lastMove?.from, lastMove?.to, optionSquares, selectedSquare]);
 
   return (
     <>
