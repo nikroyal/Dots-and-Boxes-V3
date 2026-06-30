@@ -19,18 +19,18 @@ import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBVGeK5bxFKRidj-UkNnTXlHmZ40A9_-2s",
-  authDomain: "dots-and-boxes-1a5f9.firebaseapp.com",
-  projectId: "dots-and-boxes-1a5f9",
-  storageBucket: "dots-and-boxes-1a5f9.firebasestorage.app",
-  messagingSenderId: "709974944953",
-  appId: "1:709974944953:web:9e1542ed1108723ec3ff68"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID
 };
 
 
 // Fail loudly if the placeholder wasn't replaced. We check apiKey because
 // it's the most visible value and the one that's hardest to forget.
-if (firebaseConfig.apiKey === "YOUR_API_KEY") {
+if (!firebaseConfig.apiKey || firebaseConfig.apiKey === "YOUR_API_KEY") {
   const msg =
     'Firebase is not configured. Create a .env file and paste your own ' +
     'Firebase project config. See the comment at the ' +
