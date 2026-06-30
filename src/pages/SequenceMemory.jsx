@@ -47,6 +47,36 @@ export default function SequenceMemory() {
     return () => clearAllTimeouts();
   }, []);
 
+  const handlePadClickRef = useRef(null);
+
+  // Stale closure workaround: update ref to latest handlePadClick
+  useEffect(() => {
+    handlePadClickRef.current = handlePadClick;
+  });
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if ((gameState === 'waiting' || gameState === 'gameover') && e.key === 'Enter') {
+        e.preventDefault();
+        startGame();
+        return;
+      }
+
+      if (gameState === 'playing' && !isPlayingSequence) {
+        const keyMap = { '1': 0, '2': 1, '3': 2, '4': 3 };
+        if (keyMap[e.key] !== undefined) {
+          e.preventDefault();
+          if (handlePadClickRef.current) {
+            handlePadClickRef.current(keyMap[e.key]);
+          }
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [gameState, isPlayingSequence]);
+
   const playSequence = (seq) => {
     setIsPlayingSequence(true);
     clearAllTimeouts();
@@ -198,7 +228,7 @@ export default function SequenceMemory() {
         {gameState === 'waiting' && (
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/5 z-10 backdrop-blur-[1px]">
             <button onClick={startGame} className="btn-primary">
-              Start Game
+              Start Game <span className="hidden sm:inline opacity-50 font-mono text-xs ml-2">(Enter)</span>
             </button>
           </div>
         )}
@@ -210,7 +240,7 @@ export default function SequenceMemory() {
             <p className="font-display text-xl mb-6 text-[var(--ink)] opacity-90">{getRatingMessage(Math.max(0, level - 1))}</p>
             <div className="flex gap-4">
               <button onClick={startGame} className="btn-primary">
-                Play Again
+                Play Again <span className="hidden sm:inline opacity-50 font-mono text-xs ml-2">(Enter)</span>
               </button>
               <button onClick={handleShare} className="btn-ghost">
                 {copied ? 'Copied!' : 'Share Result'}
@@ -225,10 +255,14 @@ export default function SequenceMemory() {
               key={pad.id}
               onClick={() => handlePadClick(pad.id)}
               disabled={gameState !== 'playing' || isPlayingSequence}
-              className={`w-full h-full rounded-2xl transition-all duration-150 flex items-center justify-center ${activePad === pad.id ? 'opacity-100 scale-95 shadow-inner' : 'opacity-40 hover:opacity-60'} border border-black/10`}
+              className={`relative w-full h-full rounded-2xl transition-all duration-150 flex items-center justify-center ${activePad === pad.id ? 'opacity-100 scale-95 shadow-inner' : 'opacity-40 hover:opacity-60'} border border-black/10`}
               style={{ backgroundColor: pad.color }}
               aria-label={`Memory pad ${pad.id + 1}`}
-            />
+            >
+              <div className="hidden sm:block absolute top-2 left-3 font-mono text-xs opacity-30 pointer-events-none text-white">
+                {pad.id + 1}
+              </div>
+            </button>
           ))}
         </div>
       </div>

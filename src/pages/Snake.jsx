@@ -162,7 +162,13 @@ export default function Snake() {
 
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if (gameStateRef.current !== 'playing') return;
+      if (gameStateRef.current !== 'playing') {
+        if ((gameStateRef.current === 'waiting' || gameStateRef.current === 'gameover') && e.key === 'Enter') {
+          e.preventDefault();
+          startGame();
+        }
+        return;
+      }
 
       const { x, y } = lastMoveDirectionRef.current;
 
@@ -253,7 +259,7 @@ export default function Snake() {
         {gameState === 'waiting' && (
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/5 z-10">
             <button onClick={startGame} className="btn-primary mb-4">
-              Start Game
+              Start Game <span className="hidden sm:inline opacity-50 font-mono text-xs ml-2">(Enter)</span>
             </button>
           </div>
         )}
@@ -264,7 +270,7 @@ export default function Snake() {
             <p className="font-mono text-sm opacity-80 mb-4">{getGameOverMessage(score)}</p>
             <div className="flex gap-4">
               <button onClick={startGame} className="btn-primary">
-                Play Again
+                Play Again <span className="hidden sm:inline opacity-50 font-mono text-xs ml-2">(Enter)</span>
               </button>
               <button onClick={handleShare} className="btn-secondary">
                 {copied ? 'Copied!' : 'Share Result'}

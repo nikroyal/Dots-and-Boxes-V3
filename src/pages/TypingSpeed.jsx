@@ -46,6 +46,8 @@ export default function TypingSpeed() {
       return 0;
     }
   });
+  const [isNewBest, setIsNewBest] = useState(false);
+  const [prevBestWpm, setPrevBestWpm] = useState(0);
 
   const timerRef = useRef(null);
   const inputRef = useRef(null);
@@ -92,7 +94,13 @@ export default function TypingSpeed() {
     const finalWpm = Math.floor((totalCharactersRef.current / 5) / (GAME_DURATION / 60));
     setWpm(finalWpm);
 
+    if (bestWpm > 0 && finalWpm <= bestWpm) {
+      setIsNewBest(false);
+    }
+
     if (finalWpm > bestWpm) {
+      setPrevBestWpm(bestWpm);
+      setIsNewBest(true);
       setBestWpm(finalWpm);
       try {
         localStorage.setItem('axiom-typingspeed-best', finalWpm.toString());
@@ -107,6 +115,17 @@ export default function TypingSpeed() {
       endGame();
     }
   }, [timeLeft, gameState, endGame]);
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if ((gameState === 'waiting' || gameState === 'result') && e.key === 'Enter') {
+        e.preventDefault();
+        startGame();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [gameState, startGame]);
 
   const handleShare = (e) => {
     e.stopPropagation();
@@ -188,7 +207,7 @@ export default function TypingSpeed() {
               Type the phrases as fast and accurately as possible in 60 seconds!
             </p>
             <button onClick={startGame} className="btn-primary">
-              Start Test
+              Start Test <span className="hidden sm:inline opacity-50 font-mono text-xs ml-2">(Enter)</span>
             </button>
           </div>
         )}
@@ -196,10 +215,22 @@ export default function TypingSpeed() {
         {gameState === 'result' && (
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-[var(--paper-tint)]/90 z-10 backdrop-blur-sm">
              <div className="font-display text-4xl mb-2 text-[var(--crimson)]">Time's Up!</div>
-             <div className="font-display text-3xl mb-6 opacity-90 text-[var(--forest)]">{wpm} WPM</div>
+             <div className="flex flex-col items-center mb-6">
+               <div className="font-display text-3xl opacity-90 text-[var(--forest)]">{wpm} WPM</div>
+               {isNewBest && prevBestWpm > 0 && (
+                 <div className="font-mono text-xs text-[var(--forest)] tracking-widest uppercase mt-2 pulse-soft">
+                   +{wpm - prevBestWpm} WPM faster!
+                 </div>
+               )}
+               {!isNewBest && bestWpm > 0 && (
+                 <div className="font-mono text-xs opacity-60 tracking-widest uppercase mt-2">
+                   {bestWpm - wpm} WPM slower than best
+                 </div>
+               )}
+             </div>
              <div className="flex gap-4">
                <button onClick={startGame} className="btn-primary">
-                  Try Again
+                  Try Again <span className="hidden sm:inline opacity-50 font-mono text-xs ml-2">(Enter)</span>
                </button>
                <button onClick={handleShare} className="btn-ghost">
                  {copied ? 'Copied!' : 'Share Result'}
