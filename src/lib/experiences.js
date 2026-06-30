@@ -237,6 +237,21 @@ export const EXPERIENCE_CATALOG = [
     routePrefixes: ['/word-scramble'],
   },
   {
+    id: 'math-sprint',
+    name: 'Math Sprint',
+    shortName: 'Math Sprint',
+    path: '/math-sprint',
+    kind: 'Arcade',
+    status: 'Live',
+    accent: 'var(--crimson)',
+    description: 'Solve as many math equations as you can in 60 seconds.',
+    features: ['Local play', 'Best score'],
+    navItems: [
+      { to: '/math-sprint', label: 'Play' },
+    ],
+    routePrefixes: ['/math-sprint'],
+  },
+  {
     id: 'whack-a-mole',
     name: 'Whack-A-Mole',
     shortName: 'Whack-A-Mole',
