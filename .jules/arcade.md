@@ -23,3 +23,6 @@
 ## 2024-06-28 - Fix final WPM calculation in Typing Speed game
 **Learning:** Stale closures in timer callbacks (setTimeout/setInterval) lead to using initial or outdated state values. This is common when game timers end and need to calculate final scores using live typing state.
 **Action:** To prevent stale closure issues when accessing React state inside timer callbacks, store the required state values (userInput and currentQuote) in mutable refs (useRef) and synchronize them using useEffect whenever the state changes. Then use the .current property of the refs inside the callback.
+## 2024-11-20 - Numeric Input in Games
+**Learning:** When creating games that require quick numeric input (like math games), using `type="text"` with `inputMode="numeric"` provides a better user experience across devices than `type="number"`, which often introduces unwanted browser UI elements (like spin buttons) and can complicate exact string matching due to parsing differences.
+**Action:** Always prefer `type="text"` with `inputMode="numeric"` for rapid number entry fields to ensure UI consistency and simpler validation.

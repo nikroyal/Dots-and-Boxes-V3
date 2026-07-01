@@ -39,6 +39,7 @@ import WordScramble from './pages/WordScramble';
 import RockPaperScissors from './pages/RockPaperScissors';
 import GuessTheNumber from './pages/GuessTheNumber';
 import ClickTheTarget from './pages/ClickTheTarget';
+import QuickMath from './pages/QuickMath';
 import SequenceMemory from './pages/SequenceMemory';
 import TypingSpeed from './pages/TypingSpeed';
 
@@ -117,6 +118,7 @@ function Shell() {
         <Route path="/rock-paper-scissors" element={<RockPaperScissors />} />
         <Route path="/guess-the-number" element={<GuessTheNumber />} />
         <Route path="/click-the-target" element={<ClickTheTarget />} />
+        <Route path="/quick-math" element={<QuickMath />} />
         <Route path="/sequence-memory" element={<SequenceMemory />} />
         <Route path="/typing-speed" element={<TypingSpeed />} />
         <Route path="/district-exchange/local" element={<LocalDistrictExchange />} />
@@ -171,6 +173,7 @@ function Shell() {
               <Route path="/guess-the-number" element={<GuessTheNumber />} />
               <Route path="/sequence-memory" element={<SequenceMemory />} />
               <Route path="/click-the-target" element={<ClickTheTarget />} />
+              <Route path="/quick-math" element={<QuickMath />} />
               <Route path="/typing-speed" element={<TypingSpeed />} />
               <Route path="/snake" element={<Snake />} />
               <Route path="/guess-the-number" element={<GuessTheNumber />} />
