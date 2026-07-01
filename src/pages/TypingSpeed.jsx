@@ -61,13 +61,31 @@ export default function TypingSpeed() {
     totalCharactersRef.current = totalCharactersTyped;
   }, [totalCharactersTyped]);
 
+  const startGameRef = useRef();
+  const gameStateRef = useRef(gameState);
+
+  useEffect(() => {
+    gameStateRef.current = gameState;
+  }, [gameState]);
+
+  useEffect(() => {
+    const handleGlobalKeyDown = (e) => {
+      if (e.key === 'Enter' && gameStateRef.current !== 'playing') {
+        e.preventDefault();
+        if (startGameRef.current) startGameRef.current();
+      }
+    };
+    window.addEventListener('keydown', handleGlobalKeyDown);
+    return () => window.removeEventListener('keydown', handleGlobalKeyDown);
+  }, []);
+
   const loadNewQuote = useCallback(() => {
     const randomQuote = QUOTES[Math.floor(Math.random() * QUOTES.length)];
     setCurrentQuote(randomQuote);
     setUserInput('');
   }, []);
 
-  const startGame = () => {
+  const startGame = useCallback(() => {
     sfx.click();
     setGameState('playing');
     setTimeLeft(GAME_DURATION);
@@ -80,7 +98,11 @@ export default function TypingSpeed() {
     timerRef.current = setInterval(() => {
       setTimeLeft((prev) => Math.max(0, prev - 1));
     }, 1000);
-  };
+  }, [loadNewQuote]);
+
+  useEffect(() => {
+    startGameRef.current = startGame;
+  }, [startGame]);
 
   const endGame = useCallback(() => {
     if (timerRef.current) clearInterval(timerRef.current);

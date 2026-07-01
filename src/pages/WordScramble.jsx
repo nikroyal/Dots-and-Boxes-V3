@@ -62,6 +62,24 @@ export default function WordScramble() {
     scoreRef.current = score;
   }, [score]);
 
+  const startGameRef = useRef();
+  const gameStateRef = useRef(gameState);
+
+  useEffect(() => {
+    gameStateRef.current = gameState;
+  }, [gameState]);
+
+  useEffect(() => {
+    const handleGlobalKeyDown = (e) => {
+      if (e.key === 'Enter' && gameStateRef.current !== 'playing') {
+        e.preventDefault();
+        if (startGameRef.current) startGameRef.current();
+      }
+    };
+    window.addEventListener('keydown', handleGlobalKeyDown);
+    return () => window.removeEventListener('keydown', handleGlobalKeyDown);
+  }, []);
+
   const loadNewWord = useCallback(() => {
     const randomWord = WORDS[Math.floor(Math.random() * WORDS.length)];
     let scrambled = shuffleString(randomWord);
@@ -74,7 +92,7 @@ export default function WordScramble() {
     setUserInput('');
   }, []);
 
-  const startGame = () => {
+  const startGame = useCallback(() => {
     sfx.click();
     setGameState('playing');
     setScore(0);
@@ -86,7 +104,11 @@ export default function WordScramble() {
     timerRef.current = setInterval(() => {
       setTimeLeft((prev) => Math.max(0, prev - 1));
     }, 1000);
-  };
+  }, [loadNewWord]);
+
+  useEffect(() => {
+    startGameRef.current = startGame;
+  }, [startGame]);
 
   const endGame = useCallback(() => {
     if (timerRef.current) clearInterval(timerRef.current);
@@ -166,7 +188,7 @@ export default function WordScramble() {
         {gameState === 'waiting' && (
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/5 z-10 backdrop-blur-[1px]">
             <button onClick={startGame} className="btn-primary">
-              Start Game
+              Start Game <span className="hidden sm:inline opacity-50 font-mono text-xs ml-2">(Enter)</span>
             </button>
           </div>
         )}
@@ -175,10 +197,11 @@ export default function WordScramble() {
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/10 z-10 backdrop-blur-[2px]">
             <p className="font-display text-3xl mb-2 text-[var(--crimson)]">Time's Up!</p>
             <p className="font-mono text-lg mb-1">Final Score: {score}</p>
+            <p className="font-mono text-sm opacity-80 mb-2">The word was: <span className="text-[var(--ink)] font-bold">{currentWord}</span></p>
             <p className="font-display text-xl mb-6 text-[var(--ink)] opacity-90">{getRatingMessage(score)}</p>
             <div className="flex gap-4">
               <button onClick={startGame} className="btn-primary">
-                Play Again
+                Play Again <span className="hidden sm:inline opacity-50 font-mono text-xs ml-2">(Enter)</span>
               </button>
               <button onClick={handleShare} className="btn-ghost">
                 {copied ? 'Copied!' : 'Share Result'}
