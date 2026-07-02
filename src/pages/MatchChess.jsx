@@ -14,6 +14,7 @@ import { sfx } from '../lib/sound';
 import { toast } from '../components/Notifications';
 import { ACHIEVEMENTS, getAchievementById, getRankInfo } from '../lib/achievements';
 import Confetti from '../components/Confetti';
+import PostMatchGoals from '../components/PostMatchGoals';
 import { useConfirm } from '../components/ConfirmDialog';
 import { usePrompt } from '../components/PromptDialog';
 import { isDisconnected } from '../lib/presence';
@@ -1034,6 +1035,8 @@ function WinScreen({ match, profile, achievementToasts, onHome, onReplay }) {
           )}
         </div>
       )}
+
+      {isPlayer && <PostMatchGoals profile={profile} />}
 
       {/* Achievement unlocks */}
       {achievementToasts.length > 0 && (
