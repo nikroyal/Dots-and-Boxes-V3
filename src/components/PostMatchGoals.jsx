@@ -57,7 +57,7 @@ export default function PostMatchGoals({ profile }) {
         <div className="border hairline p-3 bg-black/5" style={{ borderColor: 'var(--ochre)' }}>
           <div className="font-mono text-[0.55rem] tracking-widest uppercase mb-1" style={{ color: 'var(--ochre)' }}>Up Next</div>
           <div className="font-display text-base">{upNextAchievement.a.name}</div>
-          <div className="font-mono text-[0.65rem] tracking-wide opacity-60 mt-1 mb-2 leading-relaxed truncate">{upNextAchievement.a.desc}</div>
+          <div className="font-mono text-[0.65rem] tracking-wide opacity-60 mt-1 mb-2 leading-relaxed">{upNextAchievement.a.desc}</div>
           <div>
             <div className="flex justify-between font-mono text-[0.55rem] tracking-widest uppercase opacity-50 mb-1">
               <span>Progress</span>
