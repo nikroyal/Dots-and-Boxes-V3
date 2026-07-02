@@ -68,3 +68,6 @@
 ## 2025-02-23 - Pre-computing Maps for static lookups
 **Learning:** O(N) array scans (`Array.find()`) over static config data (like `EXPERIENCE_CATALOG`) during component renders can accumulate to unnecessary overhead.
 **Action:** When data structures like catalogs are statically defined, pre-compute a `Map` keyed by their ID at the module level. This exposes an O(1) getter to the rest of the application and completely bypasses the need to iterate or use `useMemo` at the component layer.
+## 2025-02-24 - Memoize external library components in Match Pages
+**Learning:** In the Match components, a 1-second ticker state (`now`) drives the turn timer. Expensive child components like `Chessboard` from `react-chessboard` will re-render on every clock tick unless they are explicitly wrapped in `React.memo` and passed stable callbacks and memoized object props.
+**Action:** Always wrap heavy third-party React components in `React.memo` when rendering them inside ticker-driven parent components, and ensure all object arrays/styles are memoized with `useMemo`.
