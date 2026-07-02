@@ -63,7 +63,7 @@ export default function PostMatchGoals({ profile }) {
               <span>Progress</span>
               <span>{Math.floor(upNextAchievement.curr)} / {upNextAchievement.max}</span>
             </div>
-            <div className="h-1.5 w-full bg-black/10 rounded-full overflow-hidden" role="progressbar" aria-valuenow={Math.floor(upNextAchievement.curr)} aria-valuemin={0} aria-valuemax={upNextAchievement.max}>
+            <div className="h-1.5 w-full bg-black/10 rounded-full overflow-hidden" role="progressbar" aria-label="Achievement progress" aria-valuenow={Math.floor(upNextAchievement.curr)} aria-valuemin={0} aria-valuemax={upNextAchievement.max}>
               <div className="h-full transition-all duration-500" style={{ width: `${upNextAchievement.pct}%`, background: 'var(--ochre)' }} />
             </div>
           </div>
