@@ -24,6 +24,14 @@ export default function ClickTheTarget() {
   const timerRef = useRef(null);
   const containerRef = useRef(null);
 
+  const getRating = (s) => {
+    if (s >= 40) return "🦅 Hawkeye!";
+    if (s >= 30) return "🎯 Sharpshooter!";
+    if (s >= 20) return "🏹 Good Aim!";
+    if (s >= 10) return "🚶 Getting There.";
+    return "🐢 Keep practicing!";
+  };
+
   const startGame = () => {
     sfx.click();
     setScore(0);
@@ -97,7 +105,7 @@ export default function ClickTheTarget() {
   const handleShare = (e) => {
     e.stopPropagation();
     e.preventDefault();
-    const text = `I scored ${score} in Axiom Click The Target! 🎯`;
+    const text = `I scored ${score} in Axiom Click The Target! 🎯 ${getRating(score)}`;
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(text).then(() => {
         sfx.notify();
@@ -176,7 +184,8 @@ export default function ClickTheTarget() {
         {gameState === 'result' && (
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-[var(--paper-tint)] fade-in">
              <div className="font-display text-4xl mb-2">Time's Up!</div>
-             <div className="font-display text-2xl mb-6 opacity-80 text-[var(--forest)]">Score: {score}</div>
+             <div className="font-display text-2xl mb-2 opacity-80 text-[var(--forest)]">Score: {score}</div>
+             <div className="font-display text-xl mb-6 text-[var(--ink)] opacity-80 pulse-soft">{getRating(score)}</div>
              <div className="flex gap-4">
                <button onClick={startGame} className="btn-primary">
                   Play Again

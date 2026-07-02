@@ -50,12 +50,35 @@ export default function TypingSpeed() {
   const timerRef = useRef(null);
   const inputRef = useRef(null);
   const totalCharactersRef = useRef(0);
+  const gameStateRef = useRef(gameState);
 
   useEffect(() => {
+    gameStateRef.current = gameState;
+  }, [gameState]);
+
+  useEffect(() => {
+    const handleGlobalKeyDown = (e) => {
+      if (e.key === 'Enter') {
+        if (gameStateRef.current === 'waiting' || gameStateRef.current === 'result') {
+          e.preventDefault();
+          startGame();
+        }
+      }
+    };
+    window.addEventListener('keydown', handleGlobalKeyDown);
     return () => {
+      window.removeEventListener('keydown', handleGlobalKeyDown);
       if (timerRef.current) clearInterval(timerRef.current);
     };
   }, []);
+
+  const getRating = (score) => {
+    if (score >= 100) return "🚀 Typing God!";
+    if (score >= 80) return "⚡ Speedster!";
+    if (score >= 60) return "🏃 Fast!";
+    if (score >= 40) return "🚶 Average.";
+    return "🐢 Keep practicing!";
+  };
 
   useEffect(() => {
     totalCharactersRef.current = totalCharactersTyped;
@@ -111,7 +134,7 @@ export default function TypingSpeed() {
   const handleShare = (e) => {
     e.stopPropagation();
     e.preventDefault();
-    const text = `I typed ${wpm} WPM in Axiom Typing Speed! ⌨️`;
+    const text = `I typed ${wpm} WPM in Axiom Typing Speed! ⌨️ ${getRating(wpm)}`;
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(text).then(() => {
         sfx.notify();
@@ -196,7 +219,8 @@ export default function TypingSpeed() {
         {gameState === 'result' && (
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-[var(--paper-tint)]/90 z-10 backdrop-blur-sm">
              <div className="font-display text-4xl mb-2 text-[var(--crimson)]">Time's Up!</div>
-             <div className="font-display text-3xl mb-6 opacity-90 text-[var(--forest)]">{wpm} WPM</div>
+             <div className="font-display text-3xl mb-2 opacity-90 text-[var(--forest)]">{wpm} WPM</div>
+             <div className="font-display text-xl mb-6 text-[var(--ink)] opacity-80 pulse-soft">{getRating(wpm)}</div>
              <div className="flex gap-4">
                <button onClick={startGame} className="btn-primary">
                   Try Again
