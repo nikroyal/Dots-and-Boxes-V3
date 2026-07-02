@@ -45,7 +45,7 @@ export default function PostMatchGoals({ profile }) {
               <span>Progress</span>
               <span>{dailyGoal.getProgress(dailyStats)} / {dailyGoal.max}</span>
             </div>
-            <div className="h-1.5 w-full bg-black/10 rounded-full overflow-hidden" role="progressbar" aria-valuenow={dailyGoal.getProgress(dailyStats)} aria-valuemin={0} aria-valuemax={dailyGoal.max}>
+            <div className="h-1.5 w-full bg-black/10 rounded-full overflow-hidden" role="progressbar" aria-label="Daily goal progress" aria-valuenow={dailyGoal.getProgress(dailyStats)} aria-valuemin={0} aria-valuemax={dailyGoal.max}>
               <div className="h-full transition-all duration-500 bg-current opacity-60" style={{ width: `${(dailyGoal.getProgress(dailyStats) / dailyGoal.max) * 100}%` }} />
             </div>
           </div>
