@@ -10,6 +10,7 @@ import { useConfirm } from '../components/ConfirmDialog';
 import { Edit2, UserPlus, Ban, Check } from 'lucide-react';
 import EloChart from '../components/EloChart';
 import ActivityFeed from '../components/ActivityFeed';
+import { calculateXP, getLevelInfo } from '../lib/xp';
 
 export default function Profile() {
   const { username } = useParams();
@@ -250,6 +251,39 @@ export default function Profile() {
           </div>
         </section>
       )}
+
+      {/* Progression */}
+      <section className="mb-8">
+        <div className="font-mono text-[0.65rem] tracking-widest uppercase opacity-50 mb-3">Progression</div>
+        {(() => {
+          const xp = calculateXP(target);
+          const levelInfo = getLevelInfo(xp);
+          return (
+            <div className="border hairline p-5 sm:p-6" style={{ background: 'var(--paper-tint)' }}>
+              <div className="flex items-end justify-between mb-4">
+                <div>
+                  <div className="font-mono text-[0.65rem] tracking-widest uppercase opacity-60 mb-1">Axiom Level</div>
+                  <div className="font-display text-5xl leading-none">{levelInfo.level}</div>
+                </div>
+                <div className="text-right">
+                  <div className="font-mono text-[0.65rem] tracking-widest uppercase opacity-60 mb-1">Total XP</div>
+                  <div className="font-display text-2xl leading-none">{xp}</div>
+                </div>
+              </div>
+
+              <div className="relative pt-2">
+                <div className="flex justify-between font-mono text-[0.55rem] tracking-widest uppercase opacity-50 mb-2">
+                  <span>Current Tier</span>
+                  <span>{levelInfo.currentXP} / {levelInfo.xpRequired} to Next</span>
+                </div>
+                <div className="h-2 w-full bg-black/10 rounded-full overflow-hidden" role="progressbar" aria-valuenow={levelInfo.currentXP} aria-valuemin={0} aria-valuemax={levelInfo.xpRequired}>
+                  <div className="h-full bg-current opacity-60 transition-all duration-1000 ease-out" style={{ width: `${levelInfo.progressPercent}%` }} />
+                </div>
+              </div>
+            </div>
+          );
+        })()}
+      </section>
 
       {/* Stats grid */}
       <section>

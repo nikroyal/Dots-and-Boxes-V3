@@ -49,3 +49,8 @@
 **Learning:** When players finish an intense or enjoyable online multiplayer match, their emotional engagement is high, making it the perfect moment to build motivation to play again. Displaying a clear progress visualization (such as ELO rank progression and win streak celebrations) on the victory screen capitalizes on this high-engagement moment by giving them an immediate, tangible reason to start another match (e.g., reaching the next rank).
 
 **Action:** Whenever a shared competitive or progress-oriented experience concludes, prioritize displaying dynamic progression elements (progress bars, delta numbers) rather than static states to encourage repeat play.
+## 2024-07-02 - Unified Progression via Axiom Level
+
+**Learning:** Axiom has highly fragmented progression. ELO applies only to strategy matchmaking, Arcade records are isolated per game, and achievements are binary. There is no unified metric that rewards a user for engaging with the entire platform.
+
+**Action:** Implement a unified 'Axiom Level' computed from all activities (matches, arcade, social, daily goals) to provide a single, always-upward metric of progress, ensuring all forms of engagement feel persistently rewarding.

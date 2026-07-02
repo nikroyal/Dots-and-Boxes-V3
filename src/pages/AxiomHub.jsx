@@ -4,6 +4,7 @@ import { Play, Star, Target, Trophy, Users, Zap, LayoutGrid } from 'lucide-react
 import { EXPERIENCE_CATALOG } from '../lib/experiences';
 import { useAuth } from '../lib/AuthContext';
 import { sfx } from '../lib/sound';
+import { calculateXP, getLevelInfo } from '../lib/xp';
 
 const FAVORITES_KEY = 'axiom-favorite-experiences';
 
@@ -68,10 +69,25 @@ export default function AxiomHub() {
             </div>
           </div>
           <div className="grid grid-cols-3 gap-2 text-center">
-            <MiniStat label="Things" value={EXPERIENCE_CATALOG.length} />
+            <MiniStat label="Level" value={profile ? getLevelInfo(calculateXP(profile)).level : 1} />
             <MiniStat label="Favorites" value={favoriteIds.length} />
             <MiniStat label="Friends" value={Array.isArray(profile?.friends) ? profile.friends.length : 0} />
           </div>
+
+          {profile && (() => {
+            const levelInfo = getLevelInfo(calculateXP(profile));
+            return (
+              <div className="mt-4 pt-3 border-t hairline">
+                <div className="flex justify-between font-mono text-[0.55rem] tracking-widest uppercase opacity-60 mb-1.5">
+                  <span>XP Progress</span>
+                  <span>{levelInfo.currentXP} / {levelInfo.xpRequired}</span>
+                </div>
+                <div className="h-1 w-full bg-black/10 rounded-full overflow-hidden" role="progressbar" aria-valuenow={levelInfo.currentXP} aria-valuemin={0} aria-valuemax={levelInfo.xpRequired}>
+                  <div className="h-full bg-current opacity-40 transition-all duration-500" style={{ width: `${levelInfo.progressPercent}%` }} />
+                </div>
+              </div>
+            );
+          })()}
         </div>
       </section>
 

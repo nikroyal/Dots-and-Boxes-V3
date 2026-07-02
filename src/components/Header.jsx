@@ -10,6 +10,7 @@ import {
 import { watchTotalUnread } from '../lib/dms';
 import { startHeartbeat, stopHeartbeat } from '../lib/presence';
 import { findExperienceByPath, SHARED_NAV_ITEMS } from '../lib/experiences';
+import { calculateXP, getLevelInfo } from '../lib/xp';
 
 export default function Header() {
   const { profile, isImpersonating, logout } = useAuth();
@@ -188,7 +189,7 @@ export default function Header() {
               <div className="text-right hidden sm:block">
                 <div className="font-display text-sm leading-tight">{profile.username}</div>
                 <div className="font-mono text-[0.6rem] tracking-widest opacity-60" style={{ color: rank?.color }}>
-                  {isAdmin ? 'Admin' : rank?.name} · {profile.elo || 1000}
+                  Lvl {getLevelInfo(calculateXP(profile)).level} · {isAdmin ? 'Admin' : rank?.name} · {profile.elo || 1000}
                 </div>
               </div>
             </Link>
