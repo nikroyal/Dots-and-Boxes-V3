@@ -30,7 +30,7 @@ export default function PostMatchGoals({ profile }) {
   if (!upNextAchievement && dailyGoalCompleted) return null;
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-8 text-left max-w-sm mx-auto sm:max-w-none">
+    <div className={`grid gap-3 mb-8 text-left max-w-sm mx-auto ${upNextAchievement ? 'grid-cols-1 sm:grid-cols-2 sm:max-w-none' : 'grid-cols-1'}`}>
       {/* Daily Goal */}
       <div className="border hairline p-3 bg-black/5" style={{ borderColor: dailyGoalCompleted ? 'var(--forest)' : 'var(--hairline)' }}>
         <div className="font-mono text-[0.55rem] tracking-widest uppercase mb-1 opacity-60">Daily Goal</div>
