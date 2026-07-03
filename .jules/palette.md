@@ -25,3 +25,6 @@
 ## 2026-06-28 - ARIA labels on text inputs lacking explicit labels
 **Learning:** Text inputs that visually lack explicit `<label>` tags (such as compact inline search bars) are not accessible to screen readers and need an explicit `aria-label` to be correctly interpreted.
 **Action:** Always ensure that inline inputs, like search bars or generic prompt fields, include descriptive `aria-label` attributes.
+## 2024-05-19 - ARIA labels on dynamic input lists and inline controls
+**Learning:** Sometimes form elements are rendered sequentially or dynamically (e.g. checkboxes inside a map loop in `ActionDialogs.jsx`) without explicit `<label>` tags having the `htmlFor` attribute. Similarly, standalone inputs like `<input type="color">` and `<input type="range">` are often placed inline without any visual label text.
+**Action:** Always ensure any unassociated inputs have descriptive `aria-label`s, especially when they are rendered inside loops where typical `id` and `htmlFor` might be more complex to manage, or when they are standalone inline controls.

@@ -495,7 +495,7 @@ function ProposeTradeDialog({ gameState, currentPlayerId, onClose, onAction, pla
                   <div className="space-y-1">
                     {me.properties.map(pid => (
                       <label key={pid} className="flex items-center gap-2 text-sm cursor-pointer hover:bg-black/5 p-1 rounded">
-                        <input type="checkbox" checked={offerProps.includes(pid)} onChange={() => toggleProp(pid, true)} />
+                        <input type="checkbox" checked={offerProps.includes(pid)} onChange={() => toggleProp(pid, true)} aria-label={`Offer ${gameState.boardSpaces[pid].name}`} />
                         {gameState.boardSpaces[pid].name}
                       </label>
                     ))}
@@ -542,7 +542,7 @@ function ProposeTradeDialog({ gameState, currentPlayerId, onClose, onAction, pla
                   <div className="space-y-1">
                     {target.properties.map(pid => (
                       <label key={pid} className="flex items-center gap-2 text-sm cursor-pointer hover:bg-black/5 p-1 rounded">
-                        <input type="checkbox" checked={reqProps.includes(pid)} onChange={() => toggleProp(pid, false)} />
+                        <input type="checkbox" checked={reqProps.includes(pid)} onChange={() => toggleProp(pid, false)} aria-label={`Request ${gameState.boardSpaces[pid].name}`} />
                         {gameState.boardSpaces[pid].name}
                       </label>
                     ))}

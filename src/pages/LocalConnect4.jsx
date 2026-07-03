@@ -70,14 +70,14 @@ export default function LocalConnect4() {
         <form onSubmit={handleStart} className="card space-y-6">
           <div className="space-y-4">
             <div className="flex items-center gap-4">
-              <input type="color" value={p1Color} onChange={e => setP1Color(e.target.value)} className="w-10 h-10 p-0 border-0 cursor-pointer" />
+              <input type="color" value={p1Color} onChange={e => setP1Color(e.target.value)} className="w-10 h-10 p-0 border-0 cursor-pointer" aria-label="Player 1 Color" />
               <div className="flex-1">
                 <label htmlFor="p1-name" className="font-mono text-[0.65rem] tracking-widest uppercase opacity-60 mb-1 block">Player 1 Name</label>
                 <input id="p1-name" value={p1Name} onChange={e => setP1Name(e.target.value)} className="w-full bg-black/5 dark:bg-white/5 border hairline px-3 py-2 font-display outline-none focus-ring" required maxLength={15} />
               </div>
             </div>
             <div className="flex items-center gap-4">
-              <input type="color" value={p2Color} onChange={e => setP2Color(e.target.value)} className="w-10 h-10 p-0 border-0 cursor-pointer" />
+              <input type="color" value={p2Color} onChange={e => setP2Color(e.target.value)} className="w-10 h-10 p-0 border-0 cursor-pointer" aria-label="Player 2 Color" />
               <div className="flex-1">
                 <label htmlFor="p2-name" className="font-mono text-[0.65rem] tracking-widest uppercase opacity-60 mb-1 block">Player 2 Name</label>
                 <input id="p2-name" value={p2Name} onChange={e => setP2Name(e.target.value)} className="w-full bg-black/5 dark:bg-white/5 border hairline px-3 py-2 font-display outline-none focus-ring" required maxLength={15} />

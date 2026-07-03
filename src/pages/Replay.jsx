@@ -202,7 +202,7 @@ export default function Replay() {
         </div>
         <input type="range" min={0} max={totalSteps} value={step}
                onChange={e => { setStep(Number(e.target.value)); setPlaying(false); }}
-               className="w-full" />
+               className="w-full" aria-label="Replay progress" />
         <div className="flex justify-between font-mono text-[0.6rem] tracking-widest uppercase opacity-60">
           <span>Move {step} / {totalSteps}</span>
           <button onClick={() => navigate('/history')} className="hover:opacity-100"><Home size={12} className="inline" /> Back</button>
