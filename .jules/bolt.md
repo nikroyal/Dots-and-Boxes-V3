@@ -68,3 +68,6 @@
 ## 2025-02-23 - Pre-computing Maps for static lookups
 **Learning:** O(N) array scans (`Array.find()`) over static config data (like `EXPERIENCE_CATALOG`) during component renders can accumulate to unnecessary overhead.
 **Action:** When data structures like catalogs are statically defined, pre-compute a `Map` keyed by their ID at the module level. This exposes an O(1) getter to the rest of the application and completely bypasses the need to iterate or use `useMemo` at the component layer.
+## 2024-07-04 - Memoizing expensive child components against 1-second ticker state
+**Learning:** React components containing a 1-second ticker state (like a clock or timer) will force full re-renders of all child components every second. If those children are expensive (like an SVG chessboard) and receive dynamically generated objects as props, it causes severe performance degradation.
+**Action:** Always wrap heavy child components in `React.memo` and explicitly `useMemo` any object/array props when the parent contains a fast-updating ticker state.
