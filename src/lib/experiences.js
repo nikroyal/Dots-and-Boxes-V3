@@ -192,6 +192,21 @@ export const EXPERIENCE_CATALOG = [
     routePrefixes: ['/guess-the-number'],
   },
   {
+    id: 'speed-math',
+    name: 'Speed Math',
+    shortName: 'Speed Math',
+    path: '/speed-math',
+    kind: 'Arcade',
+    status: 'Live',
+    accent: 'var(--forest)',
+    description: 'Solve as many math problems as you can in 60 seconds!',
+    features: ['Local play', 'Best score'],
+    navItems: [
+      { to: '/speed-math', label: 'Play' },
+    ],
+    routePrefixes: ['/speed-math'],
+  },
+  {
     id: 'typing-speed',
     name: 'Typing Speed',
     shortName: 'Typing',

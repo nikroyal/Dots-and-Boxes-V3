@@ -23,3 +23,4 @@
 ## 2024-06-28 - Fix final WPM calculation in Typing Speed game
 **Learning:** Stale closures in timer callbacks (setTimeout/setInterval) lead to using initial or outdated state values. This is common when game timers end and need to calculate final scores using live typing state.
 **Action:** To prevent stale closure issues when accessing React state inside timer callbacks, store the required state values (userInput and currentQuote) in mutable refs (useRef) and synchronize them using useEffect whenever the state changes. Then use the .current property of the refs inside the callback.
+## 2024-05-18 - Keyboard Shortcuts for Fast Restart   **Learning:** Stale closures occur when attaching global event listeners in typing-based arcade games, which break restart logic.   **Action:** Always store the latest callback in a useRef and execute ref.current() within the event listener for safe shortcuts.
