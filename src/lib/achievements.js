@@ -87,6 +87,7 @@ export const UNLOCKABLE_AVATARS = [
   { val: '✧', req: 'Reach 2000 ELO', check: s => (s.elo || 1000) >= 2000 },
   { val: '◉', req: 'Claim 1000 boxes', check: s => (s.totalBoxes || 0) >= 1000 },
   { val: '⬢', req: 'Complete 10 Daily Goals', check: s => (s.dailyGoalsCompleted || 0) >= 10 },
+  { val: '❂', req: 'Complete 50 Daily Goals', check: s => (s.dailyGoalsCompleted || 0) >= 50 },
 ];
 
 export const AVATAR_OPTIONS = UNLOCKABLE_AVATARS.map(a => a.val);
@@ -103,6 +104,8 @@ export const UNLOCKABLE_TITLES = [
   { val: 'Legend', req: 'Reach 3000 ELO', check: s => (s.elo || 1000) >= 3000 },
   { val: 'The Patient', req: 'Lose 25 games', check: s => (s.losses || 0) >= 25 },
   { val: 'The Bold', req: 'Win in under 2 minutes', check: s => (s.fastestWin ?? Infinity) < 120000 },
+  { val: 'Regular', req: 'Complete 3 Daily Goals', check: s => (s.dailyGoalsCompleted || 0) >= 3 },
+  { val: 'Dedicated', req: 'Complete 30 Daily Goals', check: s => (s.dailyGoalsCompleted || 0) >= 30 },
 ];
 
 export const TITLE_OPTIONS = UNLOCKABLE_TITLES.map(t => t.val);

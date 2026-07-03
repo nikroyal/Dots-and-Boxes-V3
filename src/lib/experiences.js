@@ -351,6 +351,18 @@ export function findExperienceByPath(pathname) {
   }) || DEFAULT_EXPERIENCE;
 }
 
+export function getGameOfTheDay(dateStr) {
+  const games = EXPERIENCE_CATALOG.filter(e => e.kind === 'Arcade' || e.id === 'chess' || e.id === 'connect4');
+  let hash = 0;
+  for (let i = 0; i < dateStr.length; i++) {
+    const char = dateStr.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash;
+  }
+  const index = Math.abs(hash) % games.length;
+  return games[index];
+}
+
 export function isImmersivePath(pathname) {
   return !!EXPERIENCE_CATALOG.find(experience => {
     if (!experience.immersive) return false;

@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Play, Star, Target, Trophy, Users, Zap, LayoutGrid } from 'lucide-react';
-import { EXPERIENCE_CATALOG } from '../lib/experiences';
+import { EXPERIENCE_CATALOG, getGameOfTheDay } from '../lib/experiences';
+import { getLocalYYYYMMDD } from '../lib/daily';
 import { useAuth } from '../lib/AuthContext';
 import { sfx } from '../lib/sound';
 
@@ -30,6 +31,9 @@ function readFavorites() {
 export default function AxiomHub() {
   const { profile } = useAuth();
   const [favoriteIds, setFavoriteIds] = useState(readFavorites);
+
+  const today = getLocalYYYYMMDD();
+  const gameOfTheDay = useMemo(() => getGameOfTheDay(today), [today]);
 
   useEffect(() => {
     try {
@@ -72,6 +76,23 @@ export default function AxiomHub() {
             <MiniStat label="Favorites" value={favoriteIds.length} />
             <MiniStat label="Friends" value={Array.isArray(profile?.friends) ? profile.friends.length : 0} />
           </div>
+        </div>
+      </section>
+
+      <section>
+        <div className="flex items-end justify-between gap-4 mb-3">
+          <h2 className="font-display text-2xl font-medium tracking-tight flex items-center gap-2">
+            <Star size={20} style={{ color: 'var(--ochre)', fill: 'var(--ochre)' }} aria-hidden="true" />
+            Game of the Day
+          </h2>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
+          <ExperienceCard
+            experience={gameOfTheDay}
+            isFavorite={favoriteSet.has(gameOfTheDay.id)}
+            onToggleFavorite={() => toggleFavorite(gameOfTheDay.id)}
+            featured={true}
+          />
         </div>
       </section>
 
@@ -127,11 +148,11 @@ function ExperienceSection({ title, experiences, favoriteSet, onToggleFavorite }
   );
 }
 
-function ExperienceCard({ experience, isFavorite, onToggleFavorite }) {
+function ExperienceCard({ experience, isFavorite, onToggleFavorite, featured = false }) {
   const Icon = iconByExperience[experience.id] || Play;
 
   return (
-    <article className="border hairline p-5 flex flex-col min-h-[260px]" style={{ background: 'var(--paper-tint)' }}>
+    <article className="border p-5 flex flex-col min-h-[260px]" style={{ background: 'var(--paper-tint)', borderColor: featured ? 'var(--ochre)' : 'var(--hairline)', boxShadow: featured ? '0 0 15px rgba(183, 121, 31, 0.1)' : 'none' }}>
       <div className="flex items-start justify-between gap-3 mb-5">
         <div className="flex items-center gap-3 min-w-0">
           <div className="border hairline flex items-center justify-center shrink-0" style={{ width: 42, height: 42, color: experience.accent }}>

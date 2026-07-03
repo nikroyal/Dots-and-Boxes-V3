@@ -186,7 +186,10 @@ export default function Header() {
                   aria-label={`Open profile, ${profile.username}, rank ${rank?.name}, ${profile.elo || 1000} ELO`}>
               <span className="font-display text-lg leading-none" aria-hidden="true">{profile.avatar}</span>
               <div className="text-right hidden sm:block">
-                <div className="font-display text-sm leading-tight">{profile.username}</div>
+                <div className="font-display text-sm leading-tight flex items-center justify-end gap-1">
+                  {(profile.winStreak || 0) >= 3 && <span title={`${profile.winStreak} Win Streak`}>🔥</span>}
+                  {profile.username}
+                </div>
                 <div className="font-mono text-[0.6rem] tracking-widest opacity-60" style={{ color: rank?.color }}>
                   {isAdmin ? 'Admin' : rank?.name} · {profile.elo || 1000}
                 </div>
