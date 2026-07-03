@@ -50,6 +50,18 @@ export default function TypingSpeed() {
   const timerRef = useRef(null);
   const inputRef = useRef(null);
   const totalCharactersRef = useRef(0);
+  const startGameRef = useRef(null);
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Enter' && (gameState === 'waiting' || gameState === 'result')) {
+        e.preventDefault();
+        startGameRef.current?.();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [gameState]);
 
   useEffect(() => {
     return () => {
@@ -80,7 +92,12 @@ export default function TypingSpeed() {
     timerRef.current = setInterval(() => {
       setTimeLeft((prev) => Math.max(0, prev - 1));
     }, 1000);
+    setTimeout(() => inputRef.current?.focus(), 50);
   };
+
+  useEffect(() => {
+    startGameRef.current = startGame;
+  }, [startGame]);
 
   const endGame = useCallback(() => {
     if (timerRef.current) clearInterval(timerRef.current);
@@ -199,7 +216,7 @@ export default function TypingSpeed() {
              <div className="font-display text-3xl mb-6 opacity-90 text-[var(--forest)]">{wpm} WPM</div>
              <div className="flex gap-4">
                <button onClick={startGame} className="btn-primary">
-                  Try Again
+                  Try Again (Enter)
                </button>
                <button onClick={handleShare} className="btn-ghost">
                  {copied ? 'Copied!' : 'Share Result'}

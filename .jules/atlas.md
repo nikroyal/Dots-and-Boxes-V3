@@ -58,3 +58,4 @@
 ## 2026-06-28 - Fast Input Responsiveness
 **Learning:** In fast-paced or reaction-based arcade games (like Click The Target), using standard `onClick` handlers introduces an inherent 100-300ms touch delay on mobile devices, which makes the game feel sluggish and unresponsive.
 **Action:** Always use `onPointerDown` instead of `onClick` for interactive game elements to eliminate touch delay. Ensure you use `e.stopPropagation()` to prevent misclicks on background elements.
+## 2024-07-03 - Keyboard-Heavy Arcades   **Learning:** Keyboard-heavy games like typing speed and word scramble need 'Enter' shortcuts to restart, should auto-focus text inputs, and Word Scramble should reveal the missed word to close the learning loop.   **Action:** Add global Enter key listeners, auto-focus, and missed-word revelations to keyboard games.
