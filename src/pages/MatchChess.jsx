@@ -4,6 +4,11 @@ import { doc, onSnapshot } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { useAuth } from '../lib/AuthContext';
 import {
+  watchMatch, makeMove, requestPause, respondToPause, resumeMatch, resignMatch,
+  proposeTimer, acceptTimer, rejectTimer,
+  sendChatAs, joinAsSpectator, leaveSpectator, finalizeStats, requestRematch, sendFriendRequest,
+  forfeitOnTimeout,
+} from '../lib/actions';
 import { PLAYER_COLORS, hKey, vKey, bKey } from '../lib/gameLogic';
 import { sfx } from '../lib/sound';
 import { toast } from '../components/Notifications';
@@ -21,11 +26,6 @@ import { applyMove } from '../lib/chessLogic.js';
 const MemoizedChessboard = memo(Chessboard);
 const CUSTOM_DARK_SQUARE_STYLE = { backgroundColor: 'var(--ochre)' };
 const CUSTOM_LIGHT_SQUARE_STYLE = { backgroundColor: 'var(--paper-tint)' };
-  watchMatch, makeMove, requestPause, respondToPause, resumeMatch, resignMatch,
-  proposeTimer, acceptTimer, rejectTimer,
-  sendChatAs, joinAsSpectator, leaveSpectator, finalizeStats, requestRematch, sendFriendRequest,
-  forfeitOnTimeout,
-} from '../lib/actions';
 
 export default function MatchChess() {
   const { id } = useParams();
@@ -925,6 +925,7 @@ function WinScreen({ match, profile, achievementToasts, onHome, onReplay }) {
   const nextRank = rankInfo.nextRank;
   const rankProgress = rankInfo.progress;
 
+
   const [rematchState, setRematchState] = useState('idle'); // idle | sending | sent | error
   const [friendRequestState, setFriendRequestState] = useState('idle');
 
@@ -1006,6 +1007,7 @@ function WinScreen({ match, profile, achievementToasts, onHome, onReplay }) {
           </div>
         ))}
       </div>
+
 
       {/* Post-Match Progression (ELO & Streak) */}
       {isPlayer && historyEntry && (
