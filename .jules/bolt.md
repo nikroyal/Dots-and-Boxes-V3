@@ -68,3 +68,6 @@
 ## 2025-02-23 - Pre-computing Maps for static lookups
 **Learning:** O(N) array scans (`Array.find()`) over static config data (like `EXPERIENCE_CATALOG`) during component renders can accumulate to unnecessary overhead.
 **Action:** When data structures like catalogs are statically defined, pre-compute a `Map` keyed by their ID at the module level. This exposes an O(1) getter to the rest of the application and completely bypasses the need to iterate or use `useMemo` at the component layer.
+## 2024-07-24 - Chessboard Re-rendering Bottleneck
+**Learning:** Passing inline style objects to a memoized component breaks reference equality and causes unnecessary re-renders on every clock tick.
+**Action:** Extract static styles to module constants and wrap dynamic styles in useMemo.

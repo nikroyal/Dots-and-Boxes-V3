@@ -1,14 +1,9 @@
-import { useEffect, useState, useRef, memo, useCallback } from 'react';
+import { useEffect, useState, useRef, memo, useCallback, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { doc, onSnapshot } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { useAuth } from '../lib/AuthContext';
 import {
-  watchMatch, makeMove, requestPause, respondToPause, resumeMatch, resignMatch,
-  proposeTimer, acceptTimer, rejectTimer,
-  sendChatAs, joinAsSpectator, leaveSpectator, finalizeStats, requestRematch, sendFriendRequest,
-  forfeitOnTimeout,
-} from '../lib/actions';
 import { PLAYER_COLORS, hKey, vKey, bKey } from '../lib/gameLogic';
 import { sfx } from '../lib/sound';
 import { toast } from '../components/Notifications';
@@ -22,6 +17,15 @@ import { Pause, Play, Flag, Send, Eye, Trophy, RotateCcw, Home, Repeat, Clock, W
 import { Chessboard } from 'react-chessboard';
 import { Chess } from 'chess.js';
 import { applyMove } from '../lib/chessLogic.js';
+
+const MemoizedChessboard = memo(Chessboard);
+const CUSTOM_DARK_SQUARE_STYLE = { backgroundColor: 'var(--ochre)' };
+const CUSTOM_LIGHT_SQUARE_STYLE = { backgroundColor: 'var(--paper-tint)' };
+  watchMatch, makeMove, requestPause, respondToPause, resumeMatch, resignMatch,
+  proposeTimer, acceptTimer, rejectTimer,
+  sendChatAs, joinAsSpectator, leaveSpectator, finalizeStats, requestRematch, sendFriendRequest,
+  forfeitOnTimeout,
+} from '../lib/actions';
 
 export default function MatchChess() {
   const { id } = useParams();
@@ -517,14 +521,15 @@ export default function MatchChess() {
   const concealBoard = match.status === 'paused' && match.pauseConcealed;
   const lastMove = (Array.isArray(displayGame.moves) ? displayGame.moves : []).slice(-1)[0];
 
-  const customSquareStyles = {
+  const boardOrientation = useMemo(() => match.players.indexOf(profile?.id) === 1 ? 'black' : 'white', [match.players, profile?.id]);
+  const customSquareStyles = useMemo(() => ({
     ...(lastMove ? {
       [lastMove.from]: { backgroundColor: 'rgba(255, 255, 0, 0.4)' },
       [lastMove.to]: { backgroundColor: 'rgba(255, 255, 0, 0.4)' }
     } : {}),
     ...optionSquares,
     ...(selectedSquare ? { [selectedSquare]: { backgroundColor: 'rgba(255, 0, 0, 0.4)' } } : {})
-  };
+  }), [lastMove?.from, lastMove?.to, optionSquares, selectedSquare]);
 
   return (
     <>
@@ -631,13 +636,13 @@ export default function MatchChess() {
             <div className="text-center italic opacity-50 py-10">Board hidden while paused</div>
           ) : (
             <div className="w-full max-w-[500px]">
-              <Chessboard
+              <MemoizedChessboard
                 position={displayGame.fen}
                 onPieceDrop={onDrop}
                 onSquareClick={onSquareClick}
-                boardOrientation={match.players.indexOf(profile?.id) === 1 ? 'black' : 'white'}
-                customDarkSquareStyle={{ backgroundColor: 'var(--ochre)' }}
-                customLightSquareStyle={{ backgroundColor: 'var(--paper-tint)' }}
+                boardOrientation={boardOrientation}
+                customDarkSquareStyle={CUSTOM_DARK_SQUARE_STYLE}
+                customLightSquareStyle={CUSTOM_LIGHT_SQUARE_STYLE}
                 customSquareStyles={customSquareStyles}
               />
             </div>
@@ -920,7 +925,6 @@ function WinScreen({ match, profile, achievementToasts, onHome, onReplay }) {
   const nextRank = rankInfo.nextRank;
   const rankProgress = rankInfo.progress;
 
-
   const [rematchState, setRematchState] = useState('idle'); // idle | sending | sent | error
   const [friendRequestState, setFriendRequestState] = useState('idle');
 
@@ -1002,7 +1006,6 @@ function WinScreen({ match, profile, achievementToasts, onHome, onReplay }) {
           </div>
         ))}
       </div>
-
 
       {/* Post-Match Progression (ELO & Streak) */}
       {isPlayer && historyEntry && (
