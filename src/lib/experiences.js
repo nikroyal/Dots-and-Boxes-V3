@@ -192,6 +192,21 @@ export const EXPERIENCE_CATALOG = [
     routePrefixes: ['/guess-the-number'],
   },
   {
+    id: 'math-sprint',
+    name: 'Math Sprint',
+    shortName: 'Math',
+    path: '/math-sprint',
+    kind: 'Arcade',
+    status: 'Live',
+    accent: 'var(--crimson)',
+    description: 'Solve as many math problems as you can in 60 seconds.',
+    features: ['Local play', 'Best score'],
+    navItems: [
+      { to: '/math-sprint', label: 'Play' },
+    ],
+    routePrefixes: ['/math-sprint'],
+  },
+  {
     id: 'typing-speed',
     name: 'Typing Speed',
     shortName: 'Typing',
