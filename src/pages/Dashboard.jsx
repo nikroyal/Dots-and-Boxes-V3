@@ -13,7 +13,9 @@ import { getRankInfo, ACHIEVEMENTS, getAchievementById } from '../lib/achievemen
 import { getDailyGoal, getLocalYYYYMMDD } from '../lib/daily';
 import EloChart from '../components/EloChart';
 import ActivityFeed from '../components/ActivityFeed';
-import { Send, X, Trophy, Target, TrendingUp, Users, Zap, Check } from 'lucide-react';
+import { Send, X, Trophy, Target, TrendingUp, Users, Zap, Check, Play } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { EXPERIENCE_CATALOG } from '../lib/experiences';
 
 export default function Dashboard() {
   const { profile } = useAuth();
@@ -143,6 +145,15 @@ export default function Dashboard() {
   const dailyStats = profile.dailyStats?.date === today ? profile.dailyStats : { wins: 0, gamesPlayed: 0, totalBoxes: 0, biggestChain: 0 };
   const dailyGoalCompleted = profile.dailyGoalDate === today || dailyGoal.check(dailyStats);
 
+  // Calculate Game of the Day deterministically
+  const arcadeGames = EXPERIENCE_CATALOG.filter(e => e.kind === 'Arcade');
+  let gameHash = 0;
+  for (let i = 0; i < today.length; i++) {
+    gameHash = ((gameHash << 5) - gameHash) + today.charCodeAt(i);
+    gameHash = gameHash & gameHash;
+  }
+  const gameOfTheDay = arcadeGames[Math.abs(gameHash) % arcadeGames.length];
+
   // Find the locked achievement with the highest progress percentage
   const upNextAchievement = (() => {
     let best = null;
@@ -225,36 +236,58 @@ export default function Dashboard() {
         )}
       </section>
 
-      {/* Daily Goal */}
-      <section className="card" style={{ borderColor: dailyGoalCompleted ? 'var(--forest)' : 'var(--hairline)' }}>
-        <div className="flex items-center justify-between gap-4 flex-wrap">
-          <div>
-            <div className="font-mono text-[0.65rem] tracking-widest uppercase mb-1 flex items-center gap-2">
-              <span className="opacity-50 flex items-center gap-1.5"><Target size={12} /> Daily Goal</span>
-              {(profile.dailyGoalStreak || 0) > 0 && (
-                <span className="px-1.5 py-0.5 rounded-sm flex items-center gap-1" style={{ background: 'var(--bg-soft)', color: 'var(--ochre)' }}>
-                  🔥 {profile.dailyGoalStreak} Day Streak
-                </span>
-              )}
+      {/* Daily Challenges Row */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        {/* Daily Goal */}
+        <section className="card flex flex-col justify-center h-full" style={{ borderColor: dailyGoalCompleted ? 'var(--forest)' : 'var(--hairline)' }}>
+          <div className="flex items-center justify-between gap-4 flex-wrap">
+            <div>
+              <div className="font-mono text-[0.65rem] tracking-widest uppercase mb-1 flex items-center gap-2">
+                <span className="opacity-50 flex items-center gap-1.5"><Target size={12} /> Daily Goal</span>
+                {(profile.dailyGoalStreak || 0) > 0 && (
+                  <span className="px-1.5 py-0.5 rounded-sm flex items-center gap-1" style={{ background: 'var(--bg-soft)', color: 'var(--ochre)' }}>
+                    🔥 {profile.dailyGoalStreak} Day Streak
+                  </span>
+                )}
+              </div>
+              <div className="font-display text-xl">{dailyGoal.text}</div>
             </div>
-            <div className="font-display text-xl">{dailyGoal.text}</div>
+            {dailyGoalCompleted ? (
+              <div className="flex flex-col items-end gap-1.5 mt-1 sm:mt-0">
+                <div className="flex items-center gap-2 font-mono text-[0.7rem] tracking-widest uppercase px-3 py-1.5 rounded-full" style={{ background: 'var(--forest)', color: 'var(--paper)' }}>
+                  <Check size={14} /> Completed
+                </div>
+                <div className="font-mono text-[0.55rem] tracking-widest uppercase opacity-60">
+                  Come back tomorrow to keep your streak going
+                </div>
+              </div>
+            ) : (
+              <div className="font-mono text-xs opacity-60">
+                {dailyGoal.getProgress(dailyStats)} / {dailyGoal.max}
+              </div>
+            )}
           </div>
-          {dailyGoalCompleted ? (
-            <div className="flex flex-col items-end gap-1.5 mt-1 sm:mt-0">
-              <div className="flex items-center gap-2 font-mono text-[0.7rem] tracking-widest uppercase px-3 py-1.5 rounded-full" style={{ background: 'var(--forest)', color: 'var(--paper)' }}>
-                <Check size={14} /> Completed
+        </section>
+
+        {/* Game of the Day */}
+        {gameOfTheDay && (
+          <section className="card flex flex-col justify-center h-full" style={{ borderColor: 'var(--hairline)' }}>
+            <div className="flex items-center justify-between gap-4 flex-wrap">
+              <div>
+                <div className="font-mono text-[0.65rem] tracking-widest uppercase mb-1 flex items-center gap-2">
+                  <span className="opacity-50 flex items-center gap-1.5"><Zap size={12} /> Game of the Day</span>
+                </div>
+                <div className="font-display text-xl">{gameOfTheDay.name}</div>
               </div>
-              <div className="font-mono text-[0.55rem] tracking-widest uppercase opacity-60">
-                Come back tomorrow to keep your streak going
+              <div className="mt-1 sm:mt-0">
+                <Link to={gameOfTheDay.path} className="btn-primary py-1.5 px-3 flex items-center gap-1.5 font-mono text-[0.7rem] tracking-widest uppercase">
+                  <Play size={12} /> Play
+                </Link>
               </div>
             </div>
-          ) : (
-            <div className="font-mono text-xs opacity-60">
-              {dailyGoal.getProgress(dailyStats)} / {dailyGoal.max}
-            </div>
-          )}
-        </div>
-      </section>
+          </section>
+        )}
+      </div>
 
       {/* Stat cards */}
       <section className="grid grid-cols-2 md:grid-cols-4 gap-3">

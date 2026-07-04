@@ -55,3 +55,9 @@
 **Learning:** Players' highest engagement peaks right when they win or lose a multiplayer match. While long-term rank progression (ELO) is motivating, surfacing short-term, immediately attainable goals (like the next Daily Goal or an Up Next Achievement) right on the Win Screen gives players an explicit, bite-sized reason to play "just one more." This reduces friction in deciding whether to click "Rematch" or "Home" by providing an immediate secondary objective.
 
 **Action:** Whenever a player completes a core gameplay loop (like a match), inject dynamic, personalized short-term goals (daily goals, closest achievements) into the post-match resolution screen to convert the momentum of a finished session into motivation for the next one.
+
+## 2024-05-18 - Daily Discovery and Arcade Mastery
+
+**Learning:** Players may forget about isolated solo arcade games if they aren't naturally funneled to them. By rotating a "Game of the Day" on the dashboard and adding explicit unlockable cosmetics (avatars, titles) tied directly to those solo arcade records, we turn solitary minigames into daily habits and social status symbols.
+
+**Action:** Whenever introducing smaller, isolated experiences or minigames, tie them back to the primary progression or discovery loops (like a rotating dashboard highlight or global profile unlocks) to ensure they drive daily engagement.

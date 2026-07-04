@@ -87,6 +87,9 @@ export const UNLOCKABLE_AVATARS = [
   { val: '✧', req: 'Reach 2000 ELO', check: s => (s.elo || 1000) >= 2000 },
   { val: '◉', req: 'Claim 1000 boxes', check: s => (s.totalBoxes || 0) >= 1000 },
   { val: '⬢', req: 'Complete 10 Daily Goals', check: s => (s.dailyGoalsCompleted || 0) >= 10 },
+  { val: '⚡', req: 'Sub-250ms reaction', check: s => s.arcadeBests?.['reaction-timer']?.scoreValue < 250 },
+  { val: '🧠', req: '100+ Scramble score', check: s => s.arcadeBests?.['word-scramble']?.scoreValue >= 100 },
+  { val: '🔨', req: '200+ Whack-A-Mole', check: s => s.arcadeBests?.['whack-a-mole']?.scoreValue >= 200 },
 ];
 
 export const AVATAR_OPTIONS = UNLOCKABLE_AVATARS.map(a => a.val);
@@ -103,6 +106,10 @@ export const UNLOCKABLE_TITLES = [
   { val: 'Legend', req: 'Reach 3000 ELO', check: s => (s.elo || 1000) >= 3000 },
   { val: 'The Patient', req: 'Lose 25 games', check: s => (s.losses || 0) >= 25 },
   { val: 'The Bold', req: 'Win in under 2 minutes', check: s => (s.fastestWin ?? Infinity) < 120000 },
+  { val: 'The Flash', req: 'Sub-200ms reaction', check: s => s.arcadeBests?.['reaction-timer']?.scoreValue < 200 },
+  { val: 'Wordsmith', req: '200+ Scramble score', check: s => s.arcadeBests?.['word-scramble']?.scoreValue >= 200 },
+  { val: 'Mole Hunter', req: '300+ Whack-A-Mole', check: s => s.arcadeBests?.['whack-a-mole']?.scoreValue >= 300 },
+  { val: 'Mind Reader', req: 'Guess in <= 3 attempts', check: s => s.arcadeBests?.['guess-the-number']?.scoreValue <= 3 && s.arcadeBests?.['guess-the-number']?.scoreValue > 0 },
 ];
 
 export const TITLE_OPTIONS = UNLOCKABLE_TITLES.map(t => t.val);
