@@ -38,6 +38,7 @@ import WhackAMole from './pages/WhackAMole';
 import WordScramble from './pages/WordScramble';
 import RockPaperScissors from './pages/RockPaperScissors';
 import GuessTheNumber from './pages/GuessTheNumber';
+import SpeedMath from './pages/SpeedMath';
 import ClickTheTarget from './pages/ClickTheTarget';
 import SequenceMemory from './pages/SequenceMemory';
 import TypingSpeed from './pages/TypingSpeed';
@@ -124,6 +125,7 @@ function Shell() {
         <Route path="/guess-the-number" element={<GuessTheNumber />} />
         <Route path="/battleships" element={<Battleships />} />
         <Route path="/paper-io" element={<PaperIo />} />
+        <Route path="/speed-math" element={<SpeedMath />} />
         <Route path="*" element={<Navigate to="/login" />} />
       </Routes>
     );
@@ -175,6 +177,7 @@ function Shell() {
               <Route path="/snake" element={<Snake />} />
               <Route path="/guess-the-number" element={<GuessTheNumber />} />
               <Route path="/battleships" element={<Battleships />} />
+              <Route path="/speed-math" element={<SpeedMath />} />
               <Route path="/lobby" element={<Lobby />} />
               <Route path="/match/:id" element={<Match />} />
               <Route path="/connect4/match/:id" element={<MatchConnect4 />} />
