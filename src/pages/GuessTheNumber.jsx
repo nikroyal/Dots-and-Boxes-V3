@@ -26,6 +26,12 @@ export default function GuessTheNumber() {
   });
 
   const inputRef = useRef(null);
+  const initGameRef = useRef(null);
+  const gameStateRef = useRef(gameState);
+
+  useEffect(() => {
+    gameStateRef.current = gameState;
+  }, [gameState]);
 
   const initGame = () => {
     setTargetNumber(Math.floor(Math.random() * 100) + 1);
@@ -42,7 +48,27 @@ export default function GuessTheNumber() {
   };
 
   useEffect(() => {
+    initGameRef.current = initGame;
+  }, [initGame]);
+
+  useEffect(() => {
     initGame();
+  }, []);
+
+  useEffect(() => {
+    const handleGlobalKeyDown = (e) => {
+      if (e.key === 'Enter') {
+        if (gameStateRef.current === 'won') {
+          e.preventDefault();
+          if (initGameRef.current) {
+            sfx.click();
+            initGameRef.current();
+          }
+        }
+      }
+    };
+    window.addEventListener('keydown', handleGlobalKeyDown);
+    return () => window.removeEventListener('keydown', handleGlobalKeyDown);
   }, []);
 
   const handleGuess = (e) => {
@@ -162,11 +188,15 @@ export default function GuessTheNumber() {
           <form onSubmit={handleGuess} className="w-full flex flex-col items-center gap-4">
             <input
               ref={inputRef}
-              type="number"
+              type="text"
+              inputMode="numeric"
               min="1"
               max="100"
               value={currentGuess}
-              onChange={(e) => setCurrentGuess(e.target.value)}
+              onChange={(e) => {
+                const val = e.target.value.replace(/\D/g, '');
+                setCurrentGuess(val);
+              }}
               className="w-full text-center text-4xl font-mono p-4 border hairline bg-[var(--bg-soft)] rounded focus-ring"
               placeholder="?"
               autoFocus
@@ -177,13 +207,14 @@ export default function GuessTheNumber() {
             </button>
           </form>
         ) : (
-          <div className="flex flex-col gap-4 w-full fade-in">
+          <div className="flex flex-col gap-4 w-full fade-in items-center">
             <button onClick={() => { sfx.click(); initGame(); }} className="btn-primary w-full">
               Play Again
             </button>
             <button onClick={handleShare} className="btn-secondary w-full">
               {copied ? 'Copied!' : 'Share Result'}
             </button>
+            <p className="font-mono text-xs opacity-60">Press Enter to restart</p>
           </div>
         )}
 

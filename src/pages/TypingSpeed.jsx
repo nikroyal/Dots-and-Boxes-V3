@@ -50,6 +50,12 @@ export default function TypingSpeed() {
   const timerRef = useRef(null);
   const inputRef = useRef(null);
   const totalCharactersRef = useRef(0);
+  const startGameRef = useRef(null);
+  const gameStateRef = useRef(gameState);
+
+  useEffect(() => {
+    gameStateRef.current = gameState;
+  }, [gameState]);
 
   useEffect(() => {
     return () => {
@@ -67,7 +73,7 @@ export default function TypingSpeed() {
     setUserInput('');
   }, []);
 
-  const startGame = () => {
+  const startGame = useCallback(() => {
     sfx.click();
     setGameState('playing');
     setTimeLeft(GAME_DURATION);
@@ -80,7 +86,27 @@ export default function TypingSpeed() {
     timerRef.current = setInterval(() => {
       setTimeLeft((prev) => Math.max(0, prev - 1));
     }, 1000);
-  };
+  }, [loadNewQuote]);
+
+  useEffect(() => {
+    startGameRef.current = startGame;
+  }, [startGame]);
+
+  useEffect(() => {
+    const handleGlobalKeyDown = (e) => {
+      if (e.key === 'Enter') {
+        if (gameStateRef.current === 'waiting' || gameStateRef.current === 'result') {
+          e.preventDefault();
+          if (startGameRef.current) {
+            startGameRef.current();
+          }
+        }
+      }
+    };
+    window.addEventListener('keydown', handleGlobalKeyDown);
+    return () => window.removeEventListener('keydown', handleGlobalKeyDown);
+  }, []);
+
 
   const endGame = useCallback(() => {
     if (timerRef.current) clearInterval(timerRef.current);
@@ -187,9 +213,10 @@ export default function TypingSpeed() {
             <p className="mb-6 font-display text-xl opacity-80 text-center px-4">
               Type the phrases as fast and accurately as possible in 60 seconds!
             </p>
-            <button onClick={startGame} className="btn-primary">
+            <button onClick={startGame} className="btn-primary mb-2">
               Start Test
             </button>
+            <p className="font-mono text-xs opacity-60">Press Enter</p>
           </div>
         )}
 
@@ -197,7 +224,7 @@ export default function TypingSpeed() {
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-[var(--paper-tint)]/90 z-10 backdrop-blur-sm">
              <div className="font-display text-4xl mb-2 text-[var(--crimson)]">Time's Up!</div>
              <div className="font-display text-3xl mb-6 opacity-90 text-[var(--forest)]">{wpm} WPM</div>
-             <div className="flex gap-4">
+             <div className="flex gap-4 mb-2">
                <button onClick={startGame} className="btn-primary">
                   Try Again
                </button>
@@ -205,6 +232,7 @@ export default function TypingSpeed() {
                  {copied ? 'Copied!' : 'Share Result'}
                </button>
              </div>
+             <p className="font-mono text-xs opacity-60">Press Enter to try again</p>
           </div>
         )}
 

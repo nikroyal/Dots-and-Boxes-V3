@@ -51,6 +51,12 @@ export default function WordScramble() {
   const timerRef = useRef(null);
   const scoreRef = useRef(score);
   const inputRef = useRef(null);
+  const startGameRef = useRef(null);
+  const gameStateRef = useRef(gameState);
+
+  useEffect(() => {
+    gameStateRef.current = gameState;
+  }, [gameState]);
 
   useEffect(() => {
     return () => {
@@ -74,7 +80,7 @@ export default function WordScramble() {
     setUserInput('');
   }, []);
 
-  const startGame = () => {
+  const startGame = useCallback(() => {
     sfx.click();
     setGameState('playing');
     setScore(0);
@@ -86,7 +92,27 @@ export default function WordScramble() {
     timerRef.current = setInterval(() => {
       setTimeLeft((prev) => Math.max(0, prev - 1));
     }, 1000);
-  };
+  }, [loadNewWord]);
+
+  useEffect(() => {
+    startGameRef.current = startGame;
+  }, [startGame]);
+
+  useEffect(() => {
+    const handleGlobalKeyDown = (e) => {
+      if (e.key === 'Enter') {
+        if (gameStateRef.current === 'waiting' || gameStateRef.current === 'gameover') {
+          e.preventDefault();
+          if (startGameRef.current) {
+            startGameRef.current();
+          }
+        }
+      }
+    };
+    window.addEventListener('keydown', handleGlobalKeyDown);
+    return () => window.removeEventListener('keydown', handleGlobalKeyDown);
+  }, []);
+
 
   const endGame = useCallback(() => {
     if (timerRef.current) clearInterval(timerRef.current);
@@ -165,18 +191,24 @@ export default function WordScramble() {
       <div className="relative border hairline card bg-[var(--paper-tint)] p-6 sm:p-8 w-full max-w-md">
         {gameState === 'waiting' && (
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/5 z-10 backdrop-blur-[1px]">
-            <button onClick={startGame} className="btn-primary">
+            <button onClick={startGame} className="btn-primary mb-2">
               Start Game
             </button>
+            <p className="font-mono text-xs opacity-60">Press Enter</p>
           </div>
         )}
 
         {gameState === 'gameover' && (
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/10 z-10 backdrop-blur-[2px]">
             <p className="font-display text-3xl mb-2 text-[var(--crimson)]">Time's Up!</p>
+            {currentWord && (
+              <p className="font-mono text-sm mb-2 opacity-80">
+                The word was: <span className="font-bold text-[var(--ink)]">{currentWord}</span>
+              </p>
+            )}
             <p className="font-mono text-lg mb-1">Final Score: {score}</p>
             <p className="font-display text-xl mb-6 text-[var(--ink)] opacity-90">{getRatingMessage(score)}</p>
-            <div className="flex gap-4">
+            <div className="flex gap-4 mb-2">
               <button onClick={startGame} className="btn-primary">
                 Play Again
               </button>
@@ -184,6 +216,7 @@ export default function WordScramble() {
                 {copied ? 'Copied!' : 'Share Result'}
               </button>
             </div>
+            <p className="font-mono text-xs opacity-60">Press Enter to restart</p>
           </div>
         )}
 
