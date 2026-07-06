@@ -209,8 +209,13 @@ export default function WordScramble() {
                 }
               }}
               onKeyDown={(e) => {
-                if (e.key === 'Enter' && !userInput.trim()) {
+                if (e.key === 'Enter') {
                   e.preventDefault();
+                  if (!userInput.trim()) {
+                    loadNewWord();
+                  } else {
+                    setUserInput('');
+                  }
                 }
               }}
               className="w-full text-center text-2xl font-display uppercase tracking-widest p-4 border hairline bg-[var(--bg-soft)] focus:outline-none focus:ring-2 focus:ring-[var(--forest)]"
@@ -229,7 +234,7 @@ export default function WordScramble() {
               disabled={gameState !== 'playing'}
               className="btn-ghost text-xs"
             >
-              Skip
+              Skip <span className="opacity-50 ml-1">(Enter)</span>
             </button>
           </div>
         </div>

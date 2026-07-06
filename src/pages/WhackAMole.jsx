@@ -180,9 +180,21 @@ export default function WhackAMole() {
     }
   };
 
+  const startGameRef = useRef(null);
+  useEffect(() => {
+    startGameRef.current = startGame;
+  }, [startGame]);
+
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if (gameState !== 'playing') return;
+      if (gameState !== 'playing') {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          if (startGameRef.current) startGameRef.current();
+        }
+        return;
+      }
+
       const keyMap = {
         '1': 0, '2': 1, '3': 2,
         '4': 3, '5': 4, '6': 5,
@@ -215,7 +227,7 @@ export default function WhackAMole() {
         {gameState === 'waiting' && (
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/5 z-10 backdrop-blur-[1px]">
             <button onClick={startGame} className="btn-primary">
-              Start Game
+              Start Game <span className="opacity-50 font-mono text-xs ml-1">(Enter)</span>
             </button>
           </div>
         )}
@@ -227,7 +239,7 @@ export default function WhackAMole() {
             <p className="font-display text-xl mb-6 text-[var(--ink)] opacity-90">{getRatingMessage(score)}</p>
             <div className="flex gap-4">
               <button onClick={startGame} className="btn-primary">
-                Play Again
+                Play Again <span className="opacity-50 font-mono text-xs ml-1">(Enter)</span>
               </button>
               <button onClick={handleShare} className="btn-secondary">
                 {copied ? 'Copied!' : 'Share Result'}

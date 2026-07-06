@@ -108,10 +108,19 @@ export default function TypingSpeed() {
     }
   }, [timeLeft, gameState, endGame]);
 
+  const getRatingMessage = (wpm) => {
+    if (wpm >= 100) return "⚡ Supersonic";
+    if (wpm >= 80) return "🚀 Blazing Fast";
+    if (wpm >= 60) return "🏃 Fast";
+    if (wpm >= 40) return "🚶 Average";
+    return "🐢 Keep Practicing";
+  };
+
   const handleShare = (e) => {
     e.stopPropagation();
     e.preventDefault();
-    const text = `I typed ${wpm} WPM in Axiom Typing Speed! ⌨️`;
+    const rating = getRatingMessage(wpm);
+    const text = `I typed ${wpm} WPM in Axiom Typing Speed! ${rating}`;
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(text).then(() => {
         sfx.notify();
@@ -196,7 +205,8 @@ export default function TypingSpeed() {
         {gameState === 'result' && (
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-[var(--paper-tint)]/90 z-10 backdrop-blur-sm">
              <div className="font-display text-4xl mb-2 text-[var(--crimson)]">Time's Up!</div>
-             <div className="font-display text-3xl mb-6 opacity-90 text-[var(--forest)]">{wpm} WPM</div>
+             <div className="font-display text-3xl mb-1 opacity-90 text-[var(--forest)]">{wpm} WPM</div>
+             <div className="font-display text-xl mb-6 text-[var(--ink)] opacity-90">{getRatingMessage(wpm)}</div>
              <div className="flex gap-4">
                <button onClick={startGame} className="btn-primary">
                   Try Again
