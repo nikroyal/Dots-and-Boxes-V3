@@ -1,9 +1,11 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Play, Star, Target, Trophy, Users, Zap, LayoutGrid } from 'lucide-react';
+import { Play, Star, Target, Trophy, Users, Zap, LayoutGrid, Check } from 'lucide-react';
 import { EXPERIENCE_CATALOG } from '../lib/experiences';
 import { useAuth } from '../lib/AuthContext';
 import { sfx } from '../lib/sound';
+import { getRankInfo, ACHIEVEMENTS } from '../lib/achievements';
+import { getDailyGoal, getLocalYYYYMMDD } from '../lib/daily';
 
 const FAVORITES_KEY = 'axiom-favorite-experiences';
 
@@ -41,6 +43,33 @@ export default function AxiomHub() {
   const favorites = EXPERIENCE_CATALOG.filter(experience => favoriteSet.has(experience.id));
   const others = EXPERIENCE_CATALOG.filter(experience => !favoriteSet.has(experience.id));
 
+  const today = getLocalYYYYMMDD();
+  const dailyGoal = getDailyGoal(today);
+  const dailyStats = profile?.dailyStats?.date === today ? profile.dailyStats : { wins: 0, gamesPlayed: 0, totalBoxes: 0, biggestChain: 0 };
+  const dailyGoalCompleted = profile?.dailyGoalDate === today || dailyGoal.check(dailyStats);
+
+  const rankInfo = getRankInfo(profile?.elo ?? 1000);
+  const rank = rankInfo.rank;
+  const rankProgress = rankInfo.progress;
+
+  const upNextAchievement = (() => {
+    let best = null;
+    let highestPct = -1;
+    const unlocked = profile?.unlockedAchievements || [];
+    for (const a of ACHIEVEMENTS) {
+      if (!unlocked.includes(a.id) && a.progress) {
+        const [curr, max, min = 0] = a.progress(profile || {});
+        const pct = max === min ? 0 : Math.min(100, Math.max(0, ((curr - min) / (max - min)) * 100));
+        if (pct > 0 && max > 1 && pct > highestPct) {
+          highestPct = pct;
+          best = { a, curr, max, pct };
+        }
+      }
+    }
+    return best;
+  })();
+
+
   const toggleFavorite = (id) => {
     setFavoriteIds(current => {
       if (current.includes(id)) return current.filter(item => item !== id);
@@ -59,12 +88,19 @@ export default function AxiomHub() {
             Pick a game, build a circuit, or jump back into your Dots & Boxes world.
           </p>
         </div>
-        <div className="border hairline p-5" style={{ background: 'var(--paper-tint)' }}>
-          <div className="flex items-center gap-3 mb-4">
-            <Users size={16} aria-hidden="true" />
-            <div>
+        <Link to="/profile" className="border hairline p-5 block hover:bg-black/5 transition-colors" style={{ background: 'var(--paper-tint)' }}>
+          <div className="flex items-center gap-4 mb-4">
+            <div className="font-display text-4xl">{profile?.avatar || '◆'}</div>
+            <div className="flex-1">
               <div className="font-display text-lg leading-tight">{profile?.displayName || profile?.username}</div>
-              <div className="font-mono text-[0.65rem] tracking-widest uppercase opacity-50">Axiom profile</div>
+              <div className="flex justify-between items-end mt-1">
+                <div className="font-mono text-[0.65rem] tracking-widest uppercase" style={{ color: rank.color }}>
+                  {rank.name} · {profile?.elo ?? 1000} ELO
+                </div>
+              </div>
+              <div className="mt-1.5 h-1.5 w-full bg-black/10 rounded-full overflow-hidden">
+                <div className="h-full transition-all duration-1000 ease-out" style={{ width: `${rankProgress}%`, background: rank.color }} />
+              </div>
             </div>
           </div>
           <div className="grid grid-cols-3 gap-2 text-center">
@@ -72,8 +108,51 @@ export default function AxiomHub() {
             <MiniStat label="Favorites" value={favoriteIds.length} />
             <MiniStat label="Friends" value={Array.isArray(profile?.friends) ? profile.friends.length : 0} />
           </div>
-        </div>
+        </Link>
       </section>
+
+
+      {/* Active Objectives */}
+      {(upNextAchievement || !dailyGoalCompleted) && (
+        <section className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {!dailyGoalCompleted && (
+            <Link to="/dots-and-boxes" className="block border hairline p-4 bg-black/5 hover:bg-black/10 transition-colors" style={{ borderColor: 'var(--hairline)' }}>
+              <div className="font-mono text-[0.55rem] tracking-widest uppercase mb-1 flex items-center gap-2 opacity-60">
+                <Target size={12} /> Daily Goal
+              </div>
+              <div className="font-display text-lg mb-3">{dailyGoal.text}</div>
+              <div>
+                <div className="flex justify-between font-mono text-[0.55rem] tracking-widest uppercase opacity-50 mb-1">
+                  <span>Progress</span>
+                  <span>{dailyGoal.getProgress(dailyStats)} / {dailyGoal.max}</span>
+                </div>
+                <div className="h-1.5 w-full bg-black/10 rounded-full overflow-hidden" role="progressbar" aria-label="Daily goal progress" aria-valuenow={dailyGoal.getProgress(dailyStats)} aria-valuemin={0} aria-valuemax={dailyGoal.max}>
+                  <div className="h-full transition-all duration-500 bg-current opacity-60" style={{ width: `${(dailyGoal.getProgress(dailyStats) / dailyGoal.max) * 100}%` }} />
+                </div>
+              </div>
+            </Link>
+          )}
+
+          {upNextAchievement && (
+            <Link to="/achievements" className="block border hairline p-4 bg-black/5 hover:bg-black/10 transition-colors" style={{ borderColor: 'var(--ochre)' }}>
+              <div className="font-mono text-[0.55rem] tracking-widest uppercase mb-1 flex items-center gap-2" style={{ color: 'var(--ochre)' }}>
+                <Trophy size={12} /> Up Next
+              </div>
+              <div className="font-display text-lg truncate">{upNextAchievement.a.name}</div>
+              <div className="font-mono text-[0.6rem] tracking-wide opacity-60 mt-1 mb-2 truncate">{upNextAchievement.a.desc}</div>
+              <div>
+                <div className="flex justify-between font-mono text-[0.55rem] tracking-widest uppercase opacity-50 mb-1">
+                  <span>Progress</span>
+                  <span>{Math.floor(upNextAchievement.curr)} / {upNextAchievement.max}</span>
+                </div>
+                <div className="h-1.5 w-full bg-black/10 rounded-full overflow-hidden" role="progressbar" aria-label="Achievement progress" aria-valuenow={Math.floor(upNextAchievement.curr)} aria-valuemin={0} aria-valuemax={upNextAchievement.max}>
+                  <div className="h-full transition-all duration-500" style={{ width: `${upNextAchievement.pct}%`, background: 'var(--ochre)' }} />
+                </div>
+              </div>
+            </Link>
+          )}
+        </section>
+      )}
 
       <ExperienceSection
         title="Favorites"
