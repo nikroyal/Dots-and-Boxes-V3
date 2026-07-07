@@ -439,12 +439,12 @@ function SettingsModal({ club, members, channels, requests, onClose, currentUser
             <div className="max-w-md space-y-6">
               <h2 className="font-display text-2xl mb-6">General Settings</h2>
               <div>
-                <label className="font-mono block mb-2 text-[0.65rem] tracking-widest uppercase opacity-55">Club Name</label>
-                <input className="input-field" value={name} onChange={e => setName(e.target.value)} />
+                <label htmlFor="club-name" className="font-mono block mb-2 text-[0.65rem] tracking-widest uppercase opacity-55">Club Name</label>
+                <input id="club-name" className="input-field" value={name} onChange={e => setName(e.target.value)} />
               </div>
               <div>
-                <label className="font-mono block mb-2 text-[0.65rem] tracking-widest uppercase opacity-55">Description</label>
-                <textarea className="input-field" value={desc} onChange={e => setDesc(e.target.value)} style={{ minHeight: 80 }} />
+                <label htmlFor="club-desc" className="font-mono block mb-2 text-[0.65rem] tracking-widest uppercase opacity-55">Description</label>
+                <textarea id="club-desc" className="input-field" value={desc} onChange={e => setDesc(e.target.value)} style={{ minHeight: 80 }} />
               </div>
               <div className="flex items-center gap-3">
                 <input type="checkbox" id="isPublic" checked={isPublic} onChange={e => setIsPublic(e.target.checked)} className="accent-[var(--ink)]" />
@@ -464,6 +464,7 @@ function SettingsModal({ club, members, channels, requests, onClose, currentUser
                     value={newChanName} 
                     onChange={e => setNewChanName(e.target.value)}
                     className="bg-black/5 border hairline rounded px-3 py-1.5 text-sm outline-none focus:border-[var(--ink)]"
+                    aria-label="New channel name"
                   />
                   <button type="submit" disabled={busy || !newChanName.trim()} className="btn-primary text-xs py-1.5 px-3" aria-label="Create channel"><Plus size={14}/></button>
                 </form>
