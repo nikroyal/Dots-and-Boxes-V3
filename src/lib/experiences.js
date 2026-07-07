@@ -207,6 +207,21 @@ export const EXPERIENCE_CATALOG = [
     routePrefixes: ['/typing-speed'],
   },
   {
+    id: 'math-flash',
+    name: 'Math Flash',
+    shortName: 'Math Flash',
+    path: '/math-flash',
+    kind: 'Arcade',
+    status: 'Live',
+    accent: 'var(--crimson)',
+    description: 'Solve as many math equations as you can in 30 seconds.',
+    features: ['Local play', 'Best score'],
+    navItems: [
+      { to: '/math-flash', label: 'Play' },
+    ],
+    routePrefixes: ['/math-flash'],
+  },
+  {
     id: 'reaction-timer',
     name: 'Reaction Timer',
     shortName: 'Reaction',

@@ -23,3 +23,6 @@
 ## 2024-06-28 - Fix final WPM calculation in Typing Speed game
 **Learning:** Stale closures in timer callbacks (setTimeout/setInterval) lead to using initial or outdated state values. This is common when game timers end and need to calculate final scores using live typing state.
 **Action:** To prevent stale closure issues when accessing React state inside timer callbacks, store the required state values (userInput and currentQuote) in mutable refs (useRef) and synchronize them using useEffect whenever the state changes. Then use the .current property of the refs inside the callback.
+## 2024-11-21 - Autofocus on State Change
+**Learning:** For fast-paced games where an input field transitions from `disabled` to enabled based on a state change (e.g., clicking "Start Test"), React's `autoFocus` prop will not trigger because the element is already mounted.
+**Action:** When enabling inputs that require immediate focus, manually call `inputRef.current.focus()` inside the state-transition handler (often wrapped in a short `setTimeout` to ensure React has completed the render cycle).
