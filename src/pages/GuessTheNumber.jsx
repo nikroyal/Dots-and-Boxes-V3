@@ -162,11 +162,10 @@ export default function GuessTheNumber() {
           <form onSubmit={handleGuess} className="w-full flex flex-col items-center gap-4">
             <input
               ref={inputRef}
-              type="number"
-              min="1"
-              max="100"
+              type="text"
+              inputMode="numeric"
               value={currentGuess}
-              onChange={(e) => setCurrentGuess(e.target.value)}
+              onChange={(e) => setCurrentGuess(e.target.value.replace(/\D/g, ''))}
               className="w-full text-center text-4xl font-mono p-4 border hairline bg-[var(--bg-soft)] rounded focus-ring"
               placeholder="?"
               autoFocus
