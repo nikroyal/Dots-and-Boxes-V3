@@ -1,5 +1,21 @@
 export const EXPERIENCE_CATALOG = [
   {
+    id: 'speed-math',
+    name: 'Speed Math',
+    shortName: 'Math',
+    path: '/speed-math',
+    kind: 'Arcade',
+    status: 'Live',
+    accent: 'var(--crimson)',
+    description: 'Solve as many math problems as you can in 60 seconds.',
+    features: ['Local play', 'Best score'],
+    navItems: [
+      { to: '/speed-math', label: 'Play' },
+    ],
+    routePrefixes: ['/speed-math'],
+  },
+
+  {
     id: 'dots-and-boxes',
     name: 'Dots & Boxes',
     shortName: 'Dots',
