@@ -20,7 +20,6 @@ import { usePrompt } from '../components/PromptDialog';
 import { isDisconnected } from '../lib/presence';
 import { Pause, Play, Flag, Send, Eye, Trophy, RotateCcw, Home, Repeat, Clock, WifiOff, Handshake, UserPlus } from 'lucide-react';
 import { Chessboard } from 'react-chessboard';
-
 import { Chess } from 'chess.js';
 import { applyMove } from '../lib/chessLogic.js';
 
@@ -42,14 +41,7 @@ export default function MatchChess() {
   const [finalized, setFinalized] = useState(false);
   const [achievementToasts, setAchievementToasts] = useState([]);
   const [now, setNow] = useState(Date.now()); // drives ticker
-  const [opponentDoc, setOpponentDoc] = use\n
-// Optimization (Bolt): Static styles extracted outside component to prevent re-creation on render
-const CUSTOM_DARK_SQUARE_STYLE = { backgroundColor: 'var(--ochre)' };
-const CUSTOM_LIGHT_SQUARE_STYLE = { backgroundColor: 'var(--paper-tint)' };
-
-// Optimization (Bolt): React.memo prevents the heavy SVG chessboard from re-rendering
-// every single second when the parent's `now` ticker updates the timer banner.
-const MemoizedChessboard = memo(Chessboard);State(null); // for disconnect detection
+  const [opponentDoc, setOpponentDoc] = useState(null); // for disconnect detection
   // Track which action button is currently in-flight so we can disable it
   // (prevents spam-clicking Resign / Claim Victory / Pause etc. firing
   // multiple round-trips while the first is still pending).
