@@ -80,6 +80,12 @@ export default function TypingSpeed() {
     timerRef.current = setInterval(() => {
       setTimeLeft((prev) => Math.max(0, prev - 1));
     }, 1000);
+
+    setTimeout(() => {
+      if (inputRef.current) {
+        inputRef.current.focus();
+      }
+    }, 10);
   };
 
   const endGame = useCallback(() => {
@@ -107,6 +113,21 @@ export default function TypingSpeed() {
       endGame();
     }
   }, [timeLeft, gameState, endGame]);
+
+  const startGameRef = useRef(startGame);
+  useEffect(() => {
+    startGameRef.current = startGame;
+  }, [startGame]);
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Enter' && (gameState === 'waiting' || gameState === 'result')) {
+        startGameRef.current();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [gameState]);
 
   const handleShare = (e) => {
     e.stopPropagation();
@@ -188,7 +209,7 @@ export default function TypingSpeed() {
               Type the phrases as fast and accurately as possible in 60 seconds!
             </p>
             <button onClick={startGame} className="btn-primary">
-              Start Test
+              Start Test (Enter)
             </button>
           </div>
         )}
@@ -199,7 +220,7 @@ export default function TypingSpeed() {
              <div className="font-display text-3xl mb-6 opacity-90 text-[var(--forest)]">{wpm} WPM</div>
              <div className="flex gap-4">
                <button onClick={startGame} className="btn-primary">
-                  Try Again
+                  Try Again (Enter)
                </button>
                <button onClick={handleShare} className="btn-ghost">
                  {copied ? 'Copied!' : 'Share Result'}

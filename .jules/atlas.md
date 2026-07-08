@@ -58,3 +58,6 @@
 ## 2026-06-28 - Fast Input Responsiveness
 **Learning:** In fast-paced or reaction-based arcade games (like Click The Target), using standard `onClick` handlers introduces an inherent 100-300ms touch delay on mobile devices, which makes the game feel sluggish and unresponsive.
 **Action:** Always use `onPointerDown` instead of `onClick` for interactive game elements to eliminate touch delay. Ensure you use `e.stopPropagation()` to prevent misclicks on background elements.
+## 2024-11-21 - Visual Hints for Shortcuts
+**Learning:** Players may not discover keyboard shortcuts unless they are explicitly indicated in the UI.
+**Action:** Always append the corresponding shortcut key to the primary action button's text (e.g., "Start Game (Enter)").
