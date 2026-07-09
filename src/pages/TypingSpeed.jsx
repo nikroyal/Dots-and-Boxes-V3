@@ -108,10 +108,26 @@ export default function TypingSpeed() {
     }
   }, [timeLeft, gameState, endGame]);
 
+  const getRatingMessage = (w) => {
+    if (w >= 100) return "⚡ Superhuman!";
+    if (w >= 80) return "🐆 Excellent!";
+    if (w >= 60) return "🏃 Good!";
+    if (w >= 40) return "🚶 Average!";
+    return "🐢 Keep practicing!";
+  };
+
+  const getNextTierMessage = (w) => {
+    if (w >= 100) return "You're at the top tier!";
+    if (w >= 80) return `${100 - w} WPM to Superhuman tier`;
+    if (w >= 60) return `${80 - w} WPM to Excellent tier`;
+    if (w >= 40) return `${60 - w} WPM to Good tier`;
+    return `${40 - w} WPM to Average tier`;
+  };
+
   const handleShare = (e) => {
     e.stopPropagation();
     e.preventDefault();
-    const text = `I typed ${wpm} WPM in Axiom Typing Speed! ⌨️`;
+    const text = `I typed ${wpm} WPM in Axiom Typing Speed! ${getRatingMessage(wpm)}`;
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(text).then(() => {
         sfx.notify();
@@ -148,6 +164,17 @@ export default function TypingSpeed() {
         loadNewQuote();
     }
   };
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Enter' && (gameState === 'waiting' || gameState === 'result')) {
+        e.preventDefault();
+        startGame();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [gameState, startGame]);
 
   const renderQuote = () => {
     return currentQuote.split('').map((char, index) => {
@@ -188,7 +215,7 @@ export default function TypingSpeed() {
               Type the phrases as fast and accurately as possible in 60 seconds!
             </p>
             <button onClick={startGame} className="btn-primary">
-              Start Test
+              Start Test (Enter)
             </button>
           </div>
         )}
@@ -196,10 +223,12 @@ export default function TypingSpeed() {
         {gameState === 'result' && (
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-[var(--paper-tint)]/90 z-10 backdrop-blur-sm">
              <div className="font-display text-4xl mb-2 text-[var(--crimson)]">Time's Up!</div>
-             <div className="font-display text-3xl mb-6 opacity-90 text-[var(--forest)]">{wpm} WPM</div>
+             <div className="font-display text-3xl mb-1 opacity-90 text-[var(--forest)]">{wpm} WPM</div>
+             <div className="font-display text-xl mb-1 text-[var(--ink)] opacity-90">{getRatingMessage(wpm)}</div>
+             <div className="font-mono text-xs opacity-60 tracking-widest uppercase mb-6">{getNextTierMessage(wpm)}</div>
              <div className="flex gap-4">
                <button onClick={startGame} className="btn-primary">
-                  Try Again
+                  Try Again (Enter)
                </button>
                <button onClick={handleShare} className="btn-ghost">
                  {copied ? 'Copied!' : 'Share Result'}

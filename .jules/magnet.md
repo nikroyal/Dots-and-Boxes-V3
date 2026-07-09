@@ -55,3 +55,8 @@
 **Learning:** Players' highest engagement peaks right when they win or lose a multiplayer match. While long-term rank progression (ELO) is motivating, surfacing short-term, immediately attainable goals (like the next Daily Goal or an Up Next Achievement) right on the Win Screen gives players an explicit, bite-sized reason to play "just one more." This reduces friction in deciding whether to click "Rematch" or "Home" by providing an immediate secondary objective.
 
 **Action:** Whenever a player completes a core gameplay loop (like a match), inject dynamic, personalized short-term goals (daily goals, closest achievements) into the post-match resolution screen to convert the momentum of a finished session into motivation for the next one.
+## 2024-11-20 - Arcade Micro-Goals and Friction Reduction
+
+**Learning:** Solo arcade games can lose retention if failure states feel abrupt and the restart loop requires manual mouse navigation. By explicitly revealing missed answers (closing the learning loop), outlining clear score micro-goals for the next tier, and implementing universal keyboard shortcuts (like 'Enter') to immediately restart, we significantly reduce friction and encourage a "just one more try" mentality.
+
+**Action:** For arcade games, always close the learning loop on failure, provide a micro-goal for the next attempt, and implement zero-friction keyboard shortcuts for restarting the game.
