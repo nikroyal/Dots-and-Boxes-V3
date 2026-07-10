@@ -545,6 +545,8 @@ export default function Match() {
         </div>
         <form onSubmit={handleSendChat} className="border-t hairline p-2 flex gap-2 items-center">
           <input
+            id="chat-input"
+            aria-label="Chat input"
             value={chatInput}
             onChange={e => setChatInput(e.target.value.slice(0, 200))}
             placeholder="Say something…"
@@ -1104,8 +1106,8 @@ function WinScreen({ match, profile, achievementToasts, onHome, onReplay }) {
             )}
           </>
         )}
-        <button onClick={onReplay} className="btn-ghost"><RotateCcw size={14} /> Watch Replay</button>
-        <button onClick={onHome} className="btn-primary"><Home size={14} /> Home</button>
+        <button onClick={onReplay} className="btn-ghost"><RotateCcw size={14} aria-hidden="true" /> Watch Replay</button>
+        <button onClick={onHome} className="btn-primary"><Home size={14} aria-hidden="true" /> Home</button>
       </div>
     </div>
   );

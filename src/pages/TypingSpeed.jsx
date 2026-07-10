@@ -218,6 +218,7 @@ export default function TypingSpeed() {
             type="text"
             value={userInput}
             onChange={handleChange}
+            aria-label="Type the quote"
             className="w-full max-w-lg text-center text-xl font-display p-4 border hairline bg-[var(--bg-soft)] focus:outline-none focus:ring-2 focus:ring-[var(--forest)]"
             placeholder="Start typing..."
             disabled={gameState !== 'playing'}
