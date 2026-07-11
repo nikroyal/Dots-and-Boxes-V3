@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef, memo, useCallback } from 'react';
+import { useEffect, useState, useRef, memo, useCallback, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { doc, onSnapshot } from 'firebase/firestore';
 import { db } from '../lib/firebase';
@@ -517,14 +517,14 @@ export default function MatchChess() {
   const concealBoard = match.status === 'paused' && match.pauseConcealed;
   const lastMove = (Array.isArray(displayGame.moves) ? displayGame.moves : []).slice(-1)[0];
 
-  const customSquareStyles = {
+  const customSquareStyles = useMemo(() => ({
     ...(lastMove ? {
       [lastMove.from]: { backgroundColor: 'rgba(255, 255, 0, 0.4)' },
       [lastMove.to]: { backgroundColor: 'rgba(255, 255, 0, 0.4)' }
     } : {}),
     ...optionSquares,
     ...(selectedSquare ? { [selectedSquare]: { backgroundColor: 'rgba(255, 0, 0, 0.4)' } } : {})
-  };
+  }), [lastMove?.from, lastMove?.to, optionSquares, selectedSquare]);
 
   return (
     <>
@@ -631,13 +631,11 @@ export default function MatchChess() {
             <div className="text-center italic opacity-50 py-10">Board hidden while paused</div>
           ) : (
             <div className="w-full max-w-[500px]">
-              <Chessboard
+              <MemoizedBoard
                 position={displayGame.fen}
                 onPieceDrop={onDrop}
                 onSquareClick={onSquareClick}
                 boardOrientation={match.players.indexOf(profile?.id) === 1 ? 'black' : 'white'}
-                customDarkSquareStyle={{ backgroundColor: 'var(--ochre)' }}
-                customLightSquareStyle={{ backgroundColor: 'var(--paper-tint)' }}
                 customSquareStyles={customSquareStyles}
               />
             </div>
@@ -841,6 +839,25 @@ const PLAYER_STROKE_PATTERNS = [
   '2 3',               // P3: dotted
   '8 3 2 3',           // P4: dash-dot
 ];
+
+const DARK_SQUARE_STYLE = { backgroundColor: 'var(--ochre)' };
+const LIGHT_SQUARE_STYLE = { backgroundColor: 'var(--paper-tint)' };
+
+// Optimization (Bolt): React.memo prevents the heavy SVG board from re-rendering
+// every single second when the parent's `now` ticker updates the timer banner.
+const MemoizedBoard = memo(function MemoizedBoard({ position, onPieceDrop, onSquareClick, boardOrientation, customSquareStyles }) {
+  return (
+    <Chessboard
+      position={position}
+      onPieceDrop={onPieceDrop}
+      onSquareClick={onSquareClick}
+      boardOrientation={boardOrientation}
+      customDarkSquareStyle={DARK_SQUARE_STYLE}
+      customLightSquareStyle={LIGHT_SQUARE_STYLE}
+      customSquareStyles={customSquareStyles}
+    />
+  );
+});
 
 // Optimization (Bolt): React.memo prevents the concealed board from re-rendering every second.
 const ConcealedBoard = memo(function ConcealedBoard({ rows, cols }) {

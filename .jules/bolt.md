@@ -68,3 +68,6 @@
 ## 2025-02-23 - Pre-computing Maps for static lookups
 **Learning:** O(N) array scans (`Array.find()`) over static config data (like `EXPERIENCE_CATALOG`) during component renders can accumulate to unnecessary overhead.
 **Action:** When data structures like catalogs are statically defined, pre-compute a `Map` keyed by their ID at the module level. This exposes an O(1) getter to the rest of the application and completely bypasses the need to iterate or use `useMemo` at the component layer.
+## 2024-07-11 - Match timer triggering heavy re-renders
+**Learning:** The `MatchChess.jsx` uses a 1-second interval (`now`) that updates a state triggering component re-renders to show the remaining timer. This caused the heavy `<Chessboard>` component to re-render every second because its `customSquareStyles` prop was defined as an inline un-memoized object, failing the shallow equality check.
+**Action:** When a parent component uses a high-frequency ticker state (like `now`), always wrap heavy child components in `React.memo`, pass them static or memoized reference props, and extract inline style configurations to module-level constants or `useMemo`.
