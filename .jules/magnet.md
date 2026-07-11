@@ -55,3 +55,8 @@
 **Learning:** Players' highest engagement peaks right when they win or lose a multiplayer match. While long-term rank progression (ELO) is motivating, surfacing short-term, immediately attainable goals (like the next Daily Goal or an Up Next Achievement) right on the Win Screen gives players an explicit, bite-sized reason to play "just one more." This reduces friction in deciding whether to click "Rematch" or "Home" by providing an immediate secondary objective.
 
 **Action:** Whenever a player completes a core gameplay loop (like a match), inject dynamic, personalized short-term goals (daily goals, closest achievements) into the post-match resolution screen to convert the momentum of a finished session into motivation for the next one.
+## 2024-07-11 - Public Profile Up Next Achievement
+
+**Learning:** When players look at their own or others' public profiles, seeing a massive list of static, mostly-locked achievements can be overwhelming rather than motivating. Surfacing a dynamically calculated "Up Next" achievement directly at the top of the profile focuses their attention on a single, immediately attainable goal, converting static profile views into actionable play sessions.
+
+**Action:** Whenever displaying long lists of progression milestones (like achievements or ranks) on a profile, always highlight the single most attainable next milestone to give the user a clear, immediate reason to play another match.
