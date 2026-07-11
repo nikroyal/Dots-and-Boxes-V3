@@ -23,3 +23,6 @@
 ## 2024-06-28 - Fix final WPM calculation in Typing Speed game
 **Learning:** Stale closures in timer callbacks (setTimeout/setInterval) lead to using initial or outdated state values. This is common when game timers end and need to calculate final scores using live typing state.
 **Action:** To prevent stale closure issues when accessing React state inside timer callbacks, store the required state values (userInput and currentQuote) in mutable refs (useRef) and synchronize them using useEffect whenever the state changes. Then use the .current property of the refs inside the callback.
+## 2024-07-12 - Rapid Input Arcade Games Validation
+**Learning:** For continuous, rapid-fire input-based games where answers can be typed sequentially without pressing Enter, validating the input directly inside the `onChange` handler and clearing the state immediately on a correct answer provides an excellent user experience.
+**Action:** Use auto-submit/auto-clear patterns in `onChange` handlers for fast-paced text input games, and validate input aggressively (e.g. `!/^-?\d*$/.test(val)`) to prevent entering incorrect characters that could break parsing logic.
