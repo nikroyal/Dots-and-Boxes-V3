@@ -26,6 +26,23 @@ export default function GuessTheNumber() {
   });
 
   const inputRef = useRef(null);
+  const initGameRef = useRef(null);
+
+  useEffect(() => {
+    initGameRef.current = initGame;
+  });
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (gameState === 'won' && e.key === 'Enter' && e.target.tagName !== 'BUTTON') {
+        e.preventDefault();
+        sfx.click();
+        if (initGameRef.current) initGameRef.current();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [gameState]);
 
   const initGame = () => {
     setTargetNumber(Math.floor(Math.random() * 100) + 1);
@@ -179,7 +196,7 @@ export default function GuessTheNumber() {
         ) : (
           <div className="flex flex-col gap-4 w-full fade-in">
             <button onClick={() => { sfx.click(); initGame(); }} className="btn-primary w-full">
-              Play Again
+              Play Again <span className="hidden sm:inline opacity-50 font-mono text-xs ml-2">(Enter)</span>
             </button>
             <button onClick={handleShare} className="btn-secondary w-full">
               {copied ? 'Copied!' : 'Share Result'}

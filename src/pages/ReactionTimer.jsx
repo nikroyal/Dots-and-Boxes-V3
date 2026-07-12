@@ -104,7 +104,7 @@ export default function ReactionTimer() {
   };
 
   const handleKeyDown = (e) => {
-    if (e.key === ' ' || e.key === 'Enter') {
+    if ((e.key === ' ' || e.key === 'Enter') && e.target.tagName !== 'BUTTON') {
       if (e.repeat) return;
       e.preventDefault();
       handleTrigger();

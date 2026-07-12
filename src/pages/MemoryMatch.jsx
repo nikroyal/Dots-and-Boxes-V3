@@ -23,6 +23,23 @@ export default function MemoryMatch() {
   const [isPeeking, setIsPeeking] = useState(false);
   const timeoutRef = useRef(null);
   const peekTimeoutRef = useRef(null);
+  const initializeGameRef = useRef(null);
+
+  useEffect(() => {
+    initializeGameRef.current = initializeGame;
+  });
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (isGameWon && e.key === 'Enter' && e.target.tagName !== 'BUTTON') {
+        e.preventDefault();
+        sfx.click();
+        if (initializeGameRef.current) initializeGameRef.current();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isGameWon]);
 
   // Cleanup timeout on unmount
   useEffect(() => {
@@ -191,7 +208,7 @@ export default function MemoryMatch() {
 
       <div className="flex justify-center gap-4">
         <button onClick={() => { sfx.click(); initializeGame(); }} className="btn-primary">
-          Restart Game
+          Restart Game <span className="hidden sm:inline opacity-50 font-mono text-xs ml-2">(Enter)</span>
         </button>
         {isGameWon && (
           <button onClick={handleShare} className="btn-secondary">

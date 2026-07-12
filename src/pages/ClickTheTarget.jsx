@@ -23,6 +23,22 @@ export default function ClickTheTarget() {
 
   const timerRef = useRef(null);
   const containerRef = useRef(null);
+  const startGameRef = useRef(null);
+
+  useEffect(() => {
+    startGameRef.current = startGame;
+  });
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if ((gameState === 'waiting' || gameState === 'result') && e.key === 'Enter' && e.target.tagName !== 'BUTTON') {
+        e.preventDefault();
+        if (startGameRef.current) startGameRef.current();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [gameState]);
 
   const startGame = () => {
     sfx.click();
@@ -168,7 +184,7 @@ export default function ClickTheTarget() {
               Click the target as many times as you can in 30 seconds!
             </p>
             <button onClick={startGame} className="btn-primary">
-              Start Game
+              Start Game <span className="hidden sm:inline opacity-50 font-mono text-xs ml-2">(Enter)</span>
             </button>
           </div>
         )}
@@ -179,7 +195,7 @@ export default function ClickTheTarget() {
              <div className="font-display text-2xl mb-6 opacity-80 text-[var(--forest)]">Score: {score}</div>
              <div className="flex gap-4">
                <button onClick={startGame} className="btn-primary">
-                  Play Again
+                  Play Again <span className="hidden sm:inline opacity-50 font-mono text-xs ml-2">(Enter)</span>
                </button>
                <button onClick={handleShare} className="btn-ghost">
                  {copied ? 'Copied!' : 'Share Result'}

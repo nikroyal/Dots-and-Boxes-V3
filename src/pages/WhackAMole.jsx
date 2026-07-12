@@ -30,6 +30,22 @@ export default function WhackAMole() {
   const timerRef = useRef(null);
   const moleTimerRef = useRef(null);
   const hitTimeoutsRef = useRef([]);
+  const startGameRef = useRef(null);
+
+  useEffect(() => {
+    startGameRef.current = startGame;
+  });
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if ((gameState === 'waiting' || gameState === 'gameover') && e.key === 'Enter' && e.target.tagName !== 'BUTTON') {
+        e.preventDefault();
+        if (startGameRef.current) startGameRef.current();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [gameState]);
   const scoreRef = useRef(score);
 
   useEffect(() => {
@@ -215,7 +231,7 @@ export default function WhackAMole() {
         {gameState === 'waiting' && (
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/5 z-10 backdrop-blur-[1px]">
             <button onClick={startGame} className="btn-primary">
-              Start Game
+              Start Game <span className="hidden sm:inline opacity-50 font-mono text-xs ml-2">(Enter)</span>
             </button>
           </div>
         )}
@@ -227,7 +243,7 @@ export default function WhackAMole() {
             <p className="font-display text-xl mb-6 text-[var(--ink)] opacity-90">{getRatingMessage(score)}</p>
             <div className="flex gap-4">
               <button onClick={startGame} className="btn-primary">
-                Play Again
+                Play Again <span className="hidden sm:inline opacity-50 font-mono text-xs ml-2">(Enter)</span>
               </button>
               <button onClick={handleShare} className="btn-secondary">
                 {copied ? 'Copied!' : 'Share Result'}

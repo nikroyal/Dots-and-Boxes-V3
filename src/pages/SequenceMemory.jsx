@@ -34,6 +34,22 @@ export default function SequenceMemory() {
 
   const timeoutsRef = useRef([]);
   const clickTimeoutRef = useRef(null);
+  const startGameRef = useRef(null);
+
+  useEffect(() => {
+    startGameRef.current = startGame;
+  });
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if ((gameState === 'waiting' || gameState === 'gameover') && e.key === 'Enter' && e.target.tagName !== 'BUTTON') {
+        e.preventDefault();
+        if (startGameRef.current) startGameRef.current();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [gameState]);
 
   const clearAllTimeouts = () => {
     timeoutsRef.current.forEach(clearTimeout);
@@ -198,7 +214,7 @@ export default function SequenceMemory() {
         {gameState === 'waiting' && (
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/5 z-10 backdrop-blur-[1px]">
             <button onClick={startGame} className="btn-primary">
-              Start Game
+              Start Game <span className="hidden sm:inline opacity-50 font-mono text-xs ml-2">(Enter)</span>
             </button>
           </div>
         )}
@@ -210,7 +226,7 @@ export default function SequenceMemory() {
             <p className="font-display text-xl mb-6 text-[var(--ink)] opacity-90">{getRatingMessage(Math.max(0, level - 1))}</p>
             <div className="flex gap-4">
               <button onClick={startGame} className="btn-primary">
-                Play Again
+                Play Again <span className="hidden sm:inline opacity-50 font-mono text-xs ml-2">(Enter)</span>
               </button>
               <button onClick={handleShare} className="btn-ghost">
                 {copied ? 'Copied!' : 'Share Result'}

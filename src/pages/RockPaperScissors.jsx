@@ -101,7 +101,7 @@ export default function RockPaperScissors() {
         if (e.key === '2') handleChoice('Paper');
         if (e.key === '3') handleChoice('Scissors');
       } else if (gameState === 'result') {
-        if (e.key === 'Enter' || e.key === ' ') {
+        if ((e.key === 'Enter' || e.key === ' ') && e.target.tagName !== 'BUTTON') {
           e.preventDefault();
           resetGame();
         }
