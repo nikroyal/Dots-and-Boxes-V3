@@ -317,6 +317,21 @@ export const EXPERIENCE_CATALOG = [
     ],
     routePrefixes: ['/circuit-maker'],
   },
+  {
+    id: 'quick-math',
+    name: 'Quick Math',
+    shortName: 'Math',
+    path: '/quick-math',
+    kind: 'Arcade',
+    status: 'Live',
+    accent: 'var(--ochre)',
+    description: 'Solve as many simple math equations as possible in 60 seconds.',
+    features: ['Local play', 'Best score'],
+    navItems: [
+      { to: '/quick-math', label: 'Play' },
+    ],
+    routePrefixes: ['/quick-math'],
+  },
 ];
 
 export const DEFAULT_EXPERIENCE = {
