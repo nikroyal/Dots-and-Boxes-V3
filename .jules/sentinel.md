@@ -6,3 +6,7 @@
 **Vulnerability:** A custom float division (`/ 4294967296 * length`) combined with `Math.floor` was used with `crypto.getRandomValues` to generate random array indices for avatars.
 **Learning:** This approach recreates a pseudo `Math.random()` leading to floating point precision issues. While low impact for avatars, it demonstrates poor cryptographic hygiene and is prone to errors.
 **Prevention:** Always use standard modulo arithmetic (`crypto.getRandomValues(array)[0] % length`) or unbiased random selection algorithms when choosing a random element from an array based on cryptographic values.
+## 2024-05-30 - Missing array data retention validation
+**Vulnerability:** Array properties like `friends`, `chat`, and `spectators` could have arbitrary elements replaced when items were added/removed if `.hasAll()` is not checked.
+**Learning:** `changedKeys().hasOnly()` and size validations are insufficient to prevent array element overwrite and data loss/manipulation by malicious actors.
+**Prevention:** Always enforce `.hasAll(resource.data.get('arrayField', []))` when allowing clients to add elements to an array, and ensure `resource.data.arrayField.hasAll(request.resource.data.arrayField)` when clients remove elements.
