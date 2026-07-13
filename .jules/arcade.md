@@ -23,3 +23,7 @@
 ## 2024-06-28 - Fix final WPM calculation in Typing Speed game
 **Learning:** Stale closures in timer callbacks (setTimeout/setInterval) lead to using initial or outdated state values. This is common when game timers end and need to calculate final scores using live typing state.
 **Action:** To prevent stale closure issues when accessing React state inside timer callbacks, store the required state values (userInput and currentQuote) in mutable refs (useRef) and synchronize them using useEffect whenever the state changes. Then use the .current property of the refs inside the callback.
+
+## 2024-07-25 - Quick Math validation logic
+**Learning:** For continuous numeric input games, using `<input type="text" inputMode="numeric">` combined with explicit bounds checking and digit regex matching (`/^[0-9]+$/`) in the `onChange` handler provides a smoother experience than `type="number"`, as it avoids spin buttons and simplifies validation.
+**Action:** Use `type="text"` with `inputMode="numeric"` for rapid number input games and manually enforce length and character restrictions in the event handler.
