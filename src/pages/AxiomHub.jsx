@@ -4,6 +4,7 @@ import { Play, Star, Target, Trophy, Users, Zap, LayoutGrid } from 'lucide-react
 import { EXPERIENCE_CATALOG } from '../lib/experiences';
 import { useAuth } from '../lib/AuthContext';
 import { sfx } from '../lib/sound';
+import { ACHIEVEMENTS, getRankInfo } from '../lib/achievements';
 
 const FAVORITES_KEY = 'axiom-favorite-experiences';
 
@@ -41,6 +42,26 @@ export default function AxiomHub() {
   const favorites = EXPERIENCE_CATALOG.filter(experience => favoriteSet.has(experience.id));
   const others = EXPERIENCE_CATALOG.filter(experience => !favoriteSet.has(experience.id));
 
+  const rank = profile ? getRankInfo(profile.elo ?? 1000).rank : null;
+  const upNextAchievement = useMemo(() => {
+    if (!profile) return null;
+    let best = null;
+    let highestPct = -1;
+    const unlocked = profile.unlockedAchievements || [];
+    for (const a of ACHIEVEMENTS) {
+      if (!unlocked.includes(a.id) && a.progress) {
+        const [curr, max, min = 0] = a.progress(profile);
+        const pct = max === min ? 0 : Math.min(100, Math.max(0, ((curr - min) / (max - min)) * 100));
+        // Only show if it has some progress (not 0/1 binary)
+        if (pct > 0 && max > 1 && pct > highestPct) {
+          highestPct = pct;
+          best = { a, curr, max, pct };
+        }
+      }
+    }
+    return best;
+  }, [profile]);
+
   const toggleFavorite = (id) => {
     setFavoriteIds(current => {
       if (current.includes(id)) return current.filter(item => item !== id);
@@ -64,16 +85,39 @@ export default function AxiomHub() {
             <Users size={16} aria-hidden="true" />
             <div>
               <div className="font-display text-lg leading-tight">{profile?.displayName || profile?.username}</div>
-              <div className="font-mono text-[0.65rem] tracking-widest uppercase opacity-50">Axiom profile</div>
+              <div className="font-mono text-[0.65rem] tracking-widest uppercase opacity-60" style={{ color: rank?.color }}>
+                {rank?.name || 'Axiom profile'}
+              </div>
             </div>
           </div>
           <div className="grid grid-cols-3 gap-2 text-center">
-            <MiniStat label="Things" value={EXPERIENCE_CATALOG.length} />
-            <MiniStat label="Favorites" value={favoriteIds.length} />
+            <MiniStat label="Rating" value={profile?.elo || 1000} />
+            <MiniStat label="Awards" value={Array.isArray(profile?.unlockedAchievements) ? profile.unlockedAchievements.length : 0} />
             <MiniStat label="Friends" value={Array.isArray(profile?.friends) ? profile.friends.length : 0} />
           </div>
         </div>
       </section>
+
+      {upNextAchievement && (
+        <section>
+          <div className="font-display text-2xl font-medium tracking-tight mb-3">Up Next For You</div>
+          <div className="border hairline p-5 flex items-center justify-between flex-wrap gap-4" style={{ background: 'var(--bg-soft)', borderColor: 'var(--ochre)' }}>
+            <div>
+              <div className="font-mono text-[0.55rem] tracking-widest uppercase mb-1" style={{ color: 'var(--ochre)' }}>Goal</div>
+              <div className="font-display text-lg">{upNextAchievement.a.name}</div>
+              <div className="font-mono text-[0.65rem] tracking-wide opacity-60 mt-1">{upNextAchievement.a.desc}</div>
+            </div>
+            <div className="text-right sm:ml-auto min-w-[150px] w-full sm:w-auto">
+              <div className="font-mono text-[0.65rem] tracking-widest uppercase opacity-60 mb-2">
+                {Math.floor(upNextAchievement.curr)} / {upNextAchievement.max}
+              </div>
+              <div className="h-1.5 w-full bg-black/10 rounded-full overflow-hidden">
+                <div className="h-full transition-all duration-500" style={{ width: `${upNextAchievement.pct}%`, background: 'var(--ochre)' }} />
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
 
       <ExperienceSection
         title="Favorites"
