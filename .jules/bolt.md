@@ -68,3 +68,6 @@
 ## 2025-02-23 - Pre-computing Maps for static lookups
 **Learning:** O(N) array scans (`Array.find()`) over static config data (like `EXPERIENCE_CATALOG`) during component renders can accumulate to unnecessary overhead.
 **Action:** When data structures like catalogs are statically defined, pre-compute a `Map` keyed by their ID at the module level. This exposes an O(1) getter to the rest of the application and completely bypasses the need to iterate or use `useMemo` at the component layer.
+## 2024-05-19 - [Memoizing Chessboard for 1Hz Ticker]
+**Learning:** The heavy Chessboard component re-rendered every second during matches due to inline object props and a 1Hz clock ticker state update in the parent. Module-level style constants and Memoization of both the component and object props prevent these massive CPU spikes.
+**Action:** Always extract static style objects to module-level constants, wrap heavy child components in React.memo, and useMemo for derived object props in components containing high-frequency timers.
