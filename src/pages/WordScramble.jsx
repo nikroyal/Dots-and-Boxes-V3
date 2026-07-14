@@ -74,6 +74,25 @@ export default function WordScramble() {
     setUserInput('');
   }, []);
 
+  const gameStateRef = useRef(gameState);
+  const startGameRef = useRef(startGame);
+
+  useEffect(() => {
+    gameStateRef.current = gameState;
+    startGameRef.current = startGame;
+  }, [gameState, startGame]);
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Enter' && (gameStateRef.current === 'waiting' || gameStateRef.current === 'gameover')) {
+        e.preventDefault();
+        startGameRef.current();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
   const startGame = () => {
     sfx.click();
     setGameState('playing');
@@ -86,6 +105,10 @@ export default function WordScramble() {
     timerRef.current = setInterval(() => {
       setTimeLeft((prev) => Math.max(0, prev - 1));
     }, 1000);
+
+    setTimeout(() => {
+      if (inputRef.current) inputRef.current.focus();
+    }, 10);
   };
 
   const endGame = useCallback(() => {
@@ -166,7 +189,7 @@ export default function WordScramble() {
         {gameState === 'waiting' && (
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/5 z-10 backdrop-blur-[1px]">
             <button onClick={startGame} className="btn-primary">
-              Start Game
+              Start Game (Enter)
             </button>
           </div>
         )}
@@ -178,7 +201,7 @@ export default function WordScramble() {
             <p className="font-display text-xl mb-6 text-[var(--ink)] opacity-90">{getRatingMessage(score)}</p>
             <div className="flex gap-4">
               <button onClick={startGame} className="btn-primary">
-                Play Again
+                Play Again (Enter)
               </button>
               <button onClick={handleShare} className="btn-ghost">
                 {copied ? 'Copied!' : 'Share Result'}
