@@ -207,6 +207,21 @@ export const EXPERIENCE_CATALOG = [
     routePrefixes: ['/typing-speed'],
   },
   {
+    id: 'quick-math',
+    name: 'Quick Math',
+    shortName: 'Math',
+    path: '/quick-math',
+    kind: 'Arcade',
+    status: 'Live',
+    accent: 'var(--crimson)',
+    description: 'Solve as many math problems as you can in 60 seconds.',
+    features: ['Local play', 'High score'],
+    navItems: [
+      { to: '/quick-math', label: 'Play' },
+    ],
+    routePrefixes: ['/quick-math'],
+  },
+  {
     id: 'reaction-timer',
     name: 'Reaction Timer',
     shortName: 'Reaction',
