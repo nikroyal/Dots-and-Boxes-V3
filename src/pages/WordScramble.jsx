@@ -51,6 +51,35 @@ export default function WordScramble() {
   const timerRef = useRef(null);
   const scoreRef = useRef(score);
   const inputRef = useRef(null);
+  const startGameRef = useRef(startGame);
+  useEffect(() => {
+    startGameRef.current = startGame;
+  });
+
+  const gameStateRef = useRef(gameState);
+  useEffect(() => {
+    gameStateRef.current = gameState;
+  }, [gameState]);
+
+  const loadNewWordRef = useRef(loadNewWord);
+  useEffect(() => {
+    loadNewWordRef.current = loadNewWord;
+  });
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Enter' && (gameStateRef.current === 'waiting' || gameStateRef.current === 'gameover')) {
+        e.preventDefault();
+        startGameRef.current();
+      } else if (e.key === 'Escape' && gameStateRef.current === 'playing') {
+        e.preventDefault();
+        loadNewWordRef.current();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
 
   useEffect(() => {
     return () => {
@@ -166,7 +195,7 @@ export default function WordScramble() {
         {gameState === 'waiting' && (
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/5 z-10 backdrop-blur-[1px]">
             <button onClick={startGame} className="btn-primary">
-              Start Game
+              Start Game <span className="hidden sm:inline opacity-50 font-mono text-xs ml-2">(Enter)</span>
             </button>
           </div>
         )}
@@ -178,7 +207,7 @@ export default function WordScramble() {
             <p className="font-display text-xl mb-6 text-[var(--ink)] opacity-90">{getRatingMessage(score)}</p>
             <div className="flex gap-4">
               <button onClick={startGame} className="btn-primary">
-                Play Again
+                Play Again <span className="hidden sm:inline opacity-50 font-mono text-xs ml-2">(Enter)</span>
               </button>
               <button onClick={handleShare} className="btn-ghost">
                 {copied ? 'Copied!' : 'Share Result'}
@@ -229,7 +258,7 @@ export default function WordScramble() {
               disabled={gameState !== 'playing'}
               className="btn-ghost text-xs"
             >
-              Skip
+              Skip <span className="hidden sm:inline opacity-50 font-mono text-xs ml-2">(Esc)</span>
             </button>
           </div>
         </div>
