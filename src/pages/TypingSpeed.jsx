@@ -67,6 +67,13 @@ export default function TypingSpeed() {
     setUserInput('');
   }, []);
 
+  const getRating = (w) => {
+    if (w >= 80) return "⚡ Hacker";
+    if (w >= 60) return "🚀 Fast";
+    if (w >= 40) return "🏃 Average";
+    return "🐢 Beginner";
+  };
+
   const gameStateRef = useRef(gameState);
   const startGameRef = useRef(null);
 
@@ -85,6 +92,12 @@ export default function TypingSpeed() {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
+
+  useEffect(() => {
+    if (gameState === 'playing' && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [gameState]);
 
   const startGame = () => {
     sfx.click();
@@ -134,7 +147,8 @@ export default function TypingSpeed() {
   const handleShare = (e) => {
     e.stopPropagation();
     e.preventDefault();
-    const text = `I typed ${wpm} WPM in Axiom Typing Speed! ⌨️`;
+    const rating = getRating(wpm);
+    const text = `I typed ${wpm} WPM in Axiom Typing Speed! ${rating}`;
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(text).then(() => {
         sfx.notify();
@@ -208,10 +222,11 @@ export default function TypingSpeed() {
         {gameState === 'waiting' && (
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-[var(--paper-tint)] z-10">
             <p className="mb-6 font-display text-xl opacity-80 text-center px-4">
-              Type the phrases as fast and accurately as possible in 60 seconds!
+              Type the phrases as fast and accurately as possible in 60 seconds!<br/>
+              <span className="text-sm opacity-60 mt-2 block font-mono tracking-widest uppercase">Target: ≥ 60 WPM for 🚀</span>
             </p>
             <button onClick={startGame} className="btn-primary">
-              Start Test (Enter)
+              Start Test <span className="hidden sm:inline opacity-50 font-mono text-xs ml-2">(Enter)</span>
             </button>
           </div>
         )}
@@ -219,10 +234,11 @@ export default function TypingSpeed() {
         {gameState === 'result' && (
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-[var(--paper-tint)]/90 z-10 backdrop-blur-sm">
              <div className="font-display text-4xl mb-2 text-[var(--crimson)]">Time's Up!</div>
-             <div className="font-display text-3xl mb-6 opacity-90 text-[var(--forest)]">{wpm} WPM</div>
+             <div className="font-display text-3xl mb-2 opacity-90 text-[var(--forest)]">{wpm} WPM</div>
+             <div className="font-display text-2xl mb-6 opacity-90 text-[var(--ink)]">{getRating(wpm)}</div>
              <div className="flex gap-4">
                <button onClick={startGame} className="btn-primary">
-                  Try Again (Enter)
+                  Try Again <span className="hidden sm:inline opacity-50 font-mono text-xs ml-2">(Enter)</span>
                </button>
                <button onClick={handleShare} className="btn-ghost">
                  {copied ? 'Copied!' : 'Share Result'}
