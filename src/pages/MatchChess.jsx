@@ -23,9 +23,12 @@ import { Chessboard } from 'react-chessboard';
 import { Chess } from 'chess.js';
 import { applyMove } from '../lib/chessLogic.js';
 
+// Optimization (Bolt): React.memo prevents the heavy SVG board from re-rendering
+// every single second when the parent's `now` ticker updates the timer banner.
+const MemoizedChessboard = memo(Chessboard);
+
 const CUSTOM_DARK_SQUARE_STYLE = { backgroundColor: 'var(--ochre)' };
 const CUSTOM_LIGHT_SQUARE_STYLE = { backgroundColor: 'var(--paper-tint)' };
-const MemoizedChessboard = memo(Chessboard);
 
 export default function MatchChess() {
   const { id } = useParams();
@@ -521,6 +524,8 @@ export default function MatchChess() {
   const concealBoard = match.status === 'paused' && match.pauseConcealed;
   const lastMove = (Array.isArray(displayGame.moves) ? displayGame.moves : []).slice(-1)[0];
 
+  const boardOrientation = match.players.indexOf(profile?.id) === 1 ? 'black' : 'white';
+
   const customSquareStyles = useMemo(() => ({
     ...(lastMove ? {
       [lastMove.from]: { backgroundColor: 'rgba(255, 255, 0, 0.4)' },
@@ -528,7 +533,7 @@ export default function MatchChess() {
     } : {}),
     ...optionSquares,
     ...(selectedSquare ? { [selectedSquare]: { backgroundColor: 'rgba(255, 0, 0, 0.4)' } } : {})
-  }), [lastMove?.from, lastMove?.to, optionSquares, selectedSquare]);
+  }), [lastMove, optionSquares, selectedSquare]);
 
   return (
     <>
@@ -639,7 +644,7 @@ export default function MatchChess() {
                 position={displayGame.fen}
                 onPieceDrop={onDrop}
                 onSquareClick={onSquareClick}
-                boardOrientation={match.players.indexOf(profile?.id) === 1 ? 'black' : 'white'}
+                boardOrientation={boardOrientation}
                 customDarkSquareStyle={CUSTOM_DARK_SQUARE_STYLE}
                 customLightSquareStyle={CUSTOM_LIGHT_SQUARE_STYLE}
                 customSquareStyles={customSquareStyles}
