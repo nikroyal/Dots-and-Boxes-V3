@@ -92,7 +92,16 @@ export default function TypingSpeed() {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
-setGameState('playing');
+
+  useEffect(() => {
+    if (gameState === 'playing' && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [gameState]);
+
+  const startGame = () => {
+    sfx.click();
+    setGameState('playing');
     setTimeLeft(GAME_DURATION);
     setWpm(0);
     setTotalCharactersTyped(0);

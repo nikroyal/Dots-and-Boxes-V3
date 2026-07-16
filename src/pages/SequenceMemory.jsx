@@ -43,6 +43,7 @@ export default function SequenceMemory() {
 
   useEffect(() => {
     const handleKeyDown = (e) => {
+      if (e.repeat) return;
       if (gameState === 'waiting' || gameState === 'gameover') {
         if (e.key === 'Enter') {
           e.preventDefault();
@@ -249,7 +250,10 @@ export default function SequenceMemory() {
           {PADS.map((pad) => (
             <button
               key={pad.id}
-              onClick={() => handlePadClick(pad.id)}
+              onPointerDown={(e) => {
+                e.stopPropagation();
+                handlePadClick(pad.id);
+              }}
               disabled={gameState !== 'playing' || isPlayingSequence}
               className={`relative w-full h-full rounded-2xl transition-all duration-150 flex items-center justify-center ${activePad === pad.id ? 'opacity-100 scale-95 shadow-inner' : 'opacity-40 hover:opacity-60'} border border-black/10`}
               style={{ backgroundColor: pad.color }}

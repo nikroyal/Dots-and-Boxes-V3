@@ -22,7 +22,6 @@ import { Pause, Play, Flag, Send, Eye, Trophy, RotateCcw, Home, Repeat, Clock, W
 import { Chessboard } from 'react-chessboard';
 import { Chess } from 'chess.js';
 import { applyMove } from '../lib/chessLogic.js';
-
 // Optimization (Bolt): React.memo prevents the heavy SVG board from re-rendering
 // every single second when the parent's `now` ticker updates the timer banner.
 const MemoizedChessboard = memo(Chessboard);
