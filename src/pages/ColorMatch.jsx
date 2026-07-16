@@ -51,6 +51,7 @@ export default function ColorMatch() {
 
   const startGame = useCallback(() => {
     sfx.click();
+    if (timerRef.current) clearInterval(timerRef.current);
     setScore(0);
     setGameState('playing');
     setTimeLeft(GAME_DURATION);
@@ -75,12 +76,12 @@ export default function ColorMatch() {
         localStorage.setItem('axiom-colormatch-best', score.toString());
       } catch {}
       recordActivity(profile, ACTIVITY_TYPES.ARCADE_BEST, { game: 'Color Match', score: score.toString() });
-      updateArcadeBest(profile, 'color-match', 'Color Match', -score, score.toString()); // negative for ascending order on leaderboard if ever supported, though arcade bests just take what we pass
+      updateArcadeBest(profile, 'color-match', 'Color Match', score, score.toString());
     }
   }, [score, bestScore, profile]);
 
   useEffect(() => {
-    if (timeLeft === 0 && gameState === 'playing') {
+    if (timeLeft <= 0 && gameState === 'playing') {
       endGame();
     }
   }, [timeLeft, gameState, endGame]);
@@ -111,12 +112,15 @@ export default function ColorMatch() {
     handleKeyDownRef.current = (e) => {
       if (gameState === 'playing') {
         if (e.key === 'ArrowLeft') {
+          e.preventDefault();
           handleAnswer(true);
         } else if (e.key === 'ArrowRight') {
+          e.preventDefault();
           handleAnswer(false);
         }
       } else if (gameState === 'start' || gameState === 'gameover') {
         if (e.key === 'Enter') {
+          e.preventDefault();
           startGame();
         }
       }
