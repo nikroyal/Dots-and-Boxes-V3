@@ -532,7 +532,7 @@ export default function MatchChess() {
     } : {}),
     ...optionSquares,
     ...(selectedSquare ? { [selectedSquare]: { backgroundColor: 'rgba(255, 0, 0, 0.4)' } } : {})
-  }), [lastMove?.from, lastMove?.to, optionSquares, selectedSquare]);
+  }), [lastMove, optionSquares, selectedSquare]);
 
   return (
     <>
