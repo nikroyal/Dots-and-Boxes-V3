@@ -84,6 +84,11 @@ export default function QuickMath() {
     }
   }, [timeLeft, gameState, endGame]);
 
+  const loadNewQuestion = useCallback(() => {
+    setQuestion(generateQuestion());
+    setUserInput('');
+  }, []);
+
   const startGame = useCallback(() => {
     sfx.click();
     setGameState('playing');
@@ -96,34 +101,24 @@ export default function QuickMath() {
     timerRef.current = setInterval(() => {
       setTimeLeft((prev) => Math.max(0, prev - 1));
     }, 1000);
+  }, [loadNewQuestion]);
 
-    setTimeout(() => {
-      if (inputRef.current) inputRef.current.focus();
-    }, 10);
-  }, []);
-
-  const handleGlobalKeyDown = useCallback((e) => {
-    if (e.key === 'Enter' && (gameState === 'waiting' || gameState === 'gameover')) {
-      e.preventDefault();
-      startGame();
+  useEffect(() => {
+    if (gameState === 'playing') {
+      inputRef.current?.focus();
     }
+  }, [gameState]);
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Enter' && (gameState === 'waiting' || gameState === 'gameover')) {
+        e.preventDefault();
+        startGame();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
   }, [gameState, startGame]);
-
-  const keydownRef = useRef(handleGlobalKeyDown);
-  useEffect(() => {
-    keydownRef.current = handleGlobalKeyDown;
-  }, [handleGlobalKeyDown]);
-
-  useEffect(() => {
-    const handler = (e) => keydownRef.current(e);
-    window.addEventListener('keydown', handler);
-    return () => window.removeEventListener('keydown', handler);
-  }, []);
-
-    const loadNewQuestion = useCallback(() => {
-    setQuestion(generateQuestion());
-    setUserInput('');
-  }, []);
 
   const getRatingMessage = (s) => {
     if (s >= 40) return "🚀 Human Calculator";
