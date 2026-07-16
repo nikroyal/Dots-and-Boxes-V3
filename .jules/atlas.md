@@ -58,3 +58,6 @@
 ## 2026-06-28 - Fast Input Responsiveness
 **Learning:** In fast-paced or reaction-based arcade games (like Click The Target), using standard `onClick` handlers introduces an inherent 100-300ms touch delay on mobile devices, which makes the game feel sluggish and unresponsive.
 **Action:** Always use `onPointerDown` instead of `onClick` for interactive game elements to eliminate touch delay. Ensure you use `e.stopPropagation()` to prevent misclicks on background elements.
+## 2024-11-20 - Global Keyboard Shortcuts and Stale Closures
+**Learning:** Adding window-level 'keydown' event listeners in a React component for fast-replay shortcuts (like 'Enter' to restart) requires storing both the target callback function and relevant state checks (e.g., \`gameState\`) in \`useRef\`. Failing to do so causes stale closures, where the event listener uses the initial render state and either fails to trigger or triggers the wrong action.
+**Action:** When implementing global keyboard shortcuts in React for arcade games, always wrap the necessary state variables and callback functions in \`useRef\` and update them within a \`useEffect\`, then invoke the ref in the keydown handler.
