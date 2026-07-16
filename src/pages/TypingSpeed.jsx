@@ -67,7 +67,6 @@ export default function TypingSpeed() {
     setUserInput('');
   }, []);
 
-
   const getRating = (w) => {
     if (w >= 80) return "⚡ Hacker";
     if (w >= 60) return "🚀 Fast";
@@ -75,20 +74,25 @@ export default function TypingSpeed() {
     return "🐢 Beginner";
   };
 
+  const gameStateRef = useRef(gameState);
+  const startGameRef = useRef(null);
+
+  useEffect(() => {
+    gameStateRef.current = gameState;
+    startGameRef.current = startGame;
+  }, [gameState, startGame]);
+
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if ((gameState === 'waiting' || gameState === 'result') && e.key === 'Enter') {
+      if (e.key === 'Enter' && (gameStateRef.current === 'waiting' || gameStateRef.current === 'result')) {
         e.preventDefault();
-        startGame();
+        startGameRef.current();
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [gameState]);
-
-  const startGame = () => {
-    sfx.click();
-    setGameState('playing');
+  }, []);
+setGameState('playing');
     setTimeLeft(GAME_DURATION);
     setWpm(0);
     setTotalCharactersTyped(0);
@@ -99,6 +103,10 @@ export default function TypingSpeed() {
     timerRef.current = setInterval(() => {
       setTimeLeft((prev) => Math.max(0, prev - 1));
     }, 1000);
+
+    setTimeout(() => {
+      if (inputRef.current) inputRef.current.focus();
+    }, 10);
   };
 
   const endGame = useCallback(() => {
