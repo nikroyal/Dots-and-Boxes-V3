@@ -68,7 +68,7 @@ export default function TypingSpeed() {
   }, []);
 
   const gameStateRef = useRef(gameState);
-  const startGameRef = useRef(startGame);
+  const startGameRef = useRef(null);
 
   useEffect(() => {
     gameStateRef.current = gameState;

@@ -75,7 +75,7 @@ export default function WordScramble() {
   }, []);
 
   const gameStateRef = useRef(gameState);
-  const startGameRef = useRef(startGame);
+  const startGameRef = useRef(null);
 
   useEffect(() => {
     gameStateRef.current = gameState;

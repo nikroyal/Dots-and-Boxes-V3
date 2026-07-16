@@ -28,7 +28,7 @@ export default function GuessTheNumber() {
   const inputRef = useRef(null);
 
 
-  const initGameRef = useRef(initGame);
+  const initGameRef = useRef(null);
   const gameStateRef = useRef(gameState);
 
   useEffect(() => {
