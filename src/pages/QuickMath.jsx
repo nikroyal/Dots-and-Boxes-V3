@@ -28,10 +28,12 @@ export default function QuickMath() {
   const timerRef = useRef(null);
   const scoreRef = useRef(score);
   const inputRef = useRef(null);
+  const timeoutRef = useRef(null);
 
   useEffect(() => {
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
     };
   }, []);
 
@@ -152,7 +154,8 @@ export default function QuickMath() {
       navigator.clipboard.writeText(text).then(() => {
         sfx.notify();
         setCopied(true);
-        setTimeout(() => setCopied(false), 2000);
+        if (timeoutRef.current) clearTimeout(timeoutRef.current);
+        timeoutRef.current = setTimeout(() => setCopied(false), 2000);
       }).catch(err => console.warn("Clipboard copy failed", err));
     } else {
       console.warn("Clipboard API not supported");
