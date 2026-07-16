@@ -22,12 +22,11 @@ import { Pause, Play, Flag, Send, Eye, Trophy, RotateCcw, Home, Repeat, Clock, W
 import { Chessboard } from 'react-chessboard';
 import { Chess } from 'chess.js';
 import { applyMove } from '../lib/chessLogic.js';
-// Optimization (Bolt): React.memo prevents the heavy SVG board from re-rendering
-// every single second when the parent's `now` ticker updates the timer banner.
-const MemoizedChessboard = memo(Chessboard);
-
+// Optimization (Bolt): Extracted static style objects to module-level constants to prevent creating new object references on every 1Hz ticker render.
 const CUSTOM_DARK_SQUARE_STYLE = { backgroundColor: 'var(--ochre)' };
 const CUSTOM_LIGHT_SQUARE_STYLE = { backgroundColor: 'var(--paper-tint)' };
+// Optimization (Bolt): Wrapped heavy Chessboard component in React.memo to prevent unnecessary re-renders driven by the parent's 1Hz ticker.
+const MemoizedChessboard = memo(Chessboard);
 
 export default function MatchChess() {
   const { id } = useParams();
@@ -525,6 +524,7 @@ export default function MatchChess() {
 
   const boardOrientation = match.players.indexOf(profile?.id) === 1 ? 'black' : 'white';
 
+  // Optimization (Bolt): Memoized derived object props using useMemo to maintain a stable reference across the 1Hz ticker updates.
   const customSquareStyles = useMemo(() => ({
     ...(lastMove ? {
       [lastMove.from]: { backgroundColor: 'rgba(255, 255, 0, 0.4)' },
