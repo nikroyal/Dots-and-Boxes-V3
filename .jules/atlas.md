@@ -58,3 +58,7 @@
 ## 2026-06-28 - Fast Input Responsiveness
 **Learning:** In fast-paced or reaction-based arcade games (like Click The Target), using standard `onClick` handlers introduces an inherent 100-300ms touch delay on mobile devices, which makes the game feel sluggish and unresponsive.
 **Action:** Always use `onPointerDown` instead of `onClick` for interactive game elements to eliminate touch delay. Ensure you use `e.stopPropagation()` to prevent misclicks on background elements.
+
+## 2024-07-16 - Shareable Qualitative Ratings
+**Learning:** Adding performance-based qualitative tiers (like "Aimbot" or "Hacker") and including them in the clipboard share text significantly boosts the fun factor and replayability of arcade games.
+**Action:** When adding sharing to games, map numerical scores/times to qualitative rating strings and display them on the result screen and in the copy-paste string.
