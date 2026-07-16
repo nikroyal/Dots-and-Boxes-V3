@@ -53,8 +53,8 @@ service cloud.firestore {
         )
         || (
           changedKeys().hasOnly(['friends', 'outgoingFriendRequests'])
-          && request.resource.data.friends.size() == (resource.data.friends.size() + 1)
-          && request.resource.data.friends.hasAll(resource.data.friends)
+          && request.resource.data.friends.size() == (resource.data.get('friends', []).size() + 1)
+          && request.resource.data.friends.hasAll(resource.data.get('friends', []))
           && request.resource.data.friends[request.resource.data.friends.size() - 1] == request.auth.uid
           && (request.auth.uid in resource.data.get('outgoingFriendRequests', []))
           && !(request.auth.uid in request.resource.data.get('outgoingFriendRequests', []))
@@ -62,10 +62,10 @@ service cloud.firestore {
         )
         || (
           changedKeys().hasOnly(['friends'])
-          && request.resource.data.friends.size() == (resource.data.friends.size() - 1)
+          && request.resource.data.friends.size() == (resource.data.get('friends', []).size() - 1)
           && !(request.auth.uid in request.resource.data.friends)
-          && (request.auth.uid in resource.data.friends)
-          && resource.data.friends.hasAll(request.resource.data.friends)
+          && (request.auth.uid in resource.data.get('friends', []))
+          && resource.data.get('friends', []).hasAll(request.resource.data.friends)
         )
         || (
           changedKeys().hasOnly(['outgoingFriendRequests'])
@@ -76,7 +76,7 @@ service cloud.firestore {
         )
         || (
           changedKeys().hasOnly(['friendRequests'])
-          && request.resource.data.friendRequests.size() == (resource.data.friendRequests.size() + 1)
+          && request.resource.data.friendRequests.size() == (resource.data.get('friendRequests', []).size() + 1)
           && request.resource.data.friendRequests.hasAll(resource.data.get('friendRequests', []))
           && request.resource.data.friendRequests[request.resource.data.friendRequests.size() - 1].fromId == request.auth.uid
         )
@@ -119,6 +119,8 @@ service cloud.firestore {
           && request.resource.data.spectators[request.resource.data.spectators.size() - 1].id == request.auth.uid;
       }
       function specLeave() {
+        // Note: spectators is kept as an array of maps for frontend compatibility;
+        // checking request.auth.uid inside list of maps is limited by Firestore rule capabilities.
         return changedKeys().hasOnly(['spectators'])
           && request.resource.data.spectators.size() == (resource.data.get('spectators', []).size() - 1)
           && resource.data.get('spectators', []).hasAll(request.resource.data.spectators);
