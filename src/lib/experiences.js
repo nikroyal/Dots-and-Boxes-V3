@@ -317,6 +317,21 @@ export const EXPERIENCE_CATALOG = [
     ],
     routePrefixes: ['/circuit-maker'],
   },
+  {
+    id: 'color-match',
+    name: 'Color Match',
+    shortName: 'Colors',
+    path: '/color-match',
+    kind: 'Arcade',
+    status: 'Live',
+    accent: 'var(--crimson)',
+    description: 'Test your brain. Does the word match the color?',
+    features: ['Local play', 'Best score'],
+    navItems: [
+      { to: '/color-match', label: 'Play' },
+    ],
+    routePrefixes: ['/color-match'],
+  },
 ];
 
 export const DEFAULT_EXPERIENCE = {
