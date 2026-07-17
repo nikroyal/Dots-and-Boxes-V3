@@ -6,6 +6,10 @@
 **Vulnerability:** A custom float division (`/ 4294967296 * length`) combined with `Math.floor` was used with `crypto.getRandomValues` to generate random array indices for avatars.
 **Learning:** This approach recreates a pseudo `Math.random()` leading to floating point precision issues. While low impact for avatars, it demonstrates poor cryptographic hygiene and is prone to errors.
 **Prevention:** Always use standard modulo arithmetic (`crypto.getRandomValues(array)[0] % length`) or unbiased random selection algorithms when choosing a random element from an array based on cryptographic values.
+## 2024-06-25 - Missing Array Enforcement (hasAll) on size increments
+**Vulnerability:** A user could maliciously overwrite array fields in Firestore (like `friends`, `spectators`, or `chat`) by passing a completely modified array that merely satisfies the size constraint (e.g., `newSize = oldSize + 1`) and the required element addition.
+**Learning:** In Firestore rules, validating `size()` and checking for the presence/absence of a specific element is insufficient to prevent users from manipulating the rest of the array elements.
+**Prevention:** Always enforce strict retention of existing array elements during updates by chaining `.hasAll()` methods (e.g., `request.resource.data.arrayField.hasAll(resource.data.arrayField)` when adding, or reversed when removing).
 ## 2024-05-30 - Missing array data retention validation
 **Vulnerability:** Array properties like `friends`, `chat`, and `spectators` could have arbitrary elements replaced when items were added/removed if `.hasAll()` is not checked.
 **Learning:** `changedKeys().hasOnly()` and size validations are insufficient to prevent array element overwrite and data loss/manipulation by malicious actors.
