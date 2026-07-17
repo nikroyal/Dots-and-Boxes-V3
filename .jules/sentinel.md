@@ -7,6 +7,6 @@
 **Learning:** This approach recreates a pseudo `Math.random()` leading to floating point precision issues. While low impact for avatars, it demonstrates poor cryptographic hygiene and is prone to errors.
 **Prevention:** Always use standard modulo arithmetic (`crypto.getRandomValues(array)[0] % length`) or unbiased random selection algorithms when choosing a random element from an array based on cryptographic values.
 ## 2024-07-09 - [Array Retention Enforcement in Firestore]
-**Vulnerability:** [Relying only on `size()` changes for arrays allows arbitrary modification of existing array elements.]
-**Learning:** [Array fields require explicitly enforcing retention using `.hasAll()` to avoid data tampering or overwriting existing entries.]
-**Prevention:** [Always check for array modifications that don't enforce retention via `.hasAll()` in array size updates.]
+**Vulnerability:** [Relying only on `size()` changes or `.hasAll()` for arrays allows arbitrary modification or duplication of existing array elements.]
+**Learning:** [Array fields require explicitly enforcing retention using both `.hasAll()` and `.removeAll()` to avoid data tampering, element duplication, or overwriting existing entries.]
+**Prevention:** [Always check for array modifications using both `.hasAll()` and `.removeAll()` to ensure exact element addition or removal without duplication.]

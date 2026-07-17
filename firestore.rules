@@ -63,21 +63,20 @@ service cloud.firestore {
           changedKeys().hasOnly(['friends'])
           && request.resource.data.friends.size() == (resource.data.friends.size() - 1)
           && resource.data.friends.hasAll(request.resource.data.friends)
-          && !(request.auth.uid in request.resource.data.friends)
-          && (request.auth.uid in resource.data.friends)
+          && resource.data.friends.removeAll(request.resource.data.friends) == [request.auth.uid]
         )
         || (
           changedKeys().hasOnly(['outgoingFriendRequests'])
           && request.resource.data.get('outgoingFriendRequests', []).size() == (resource.data.get('outgoingFriendRequests', []).size() - 1)
           && resource.data.get('outgoingFriendRequests', []).hasAll(request.resource.data.get('outgoingFriendRequests', []))
-          && !(request.auth.uid in request.resource.data.get('outgoingFriendRequests', []))
-          && (request.auth.uid in resource.data.get('outgoingFriendRequests', []))
+          && resource.data.get('outgoingFriendRequests', []).removeAll(request.resource.data.get('outgoingFriendRequests', [])) == [request.auth.uid]
         )
         || (
           changedKeys().hasOnly(['friendRequests'])
           && request.resource.data.friendRequests.size() == (resource.data.friendRequests.size() + 1)
           && request.resource.data.friendRequests.hasAll(resource.data.friendRequests)
-          && request.resource.data.friendRequests[request.resource.data.friendRequests.size() - 1].fromId == request.auth.uid
+          && request.resource.data.friendRequests.removeAll(resource.data.friendRequests).size() == 1
+          && request.resource.data.friendRequests.removeAll(resource.data.friendRequests)[0].fromId == request.auth.uid
         )
       );
 
@@ -115,18 +114,22 @@ service cloud.firestore {
         return changedKeys().hasOnly(['spectators'])
           && request.resource.data.spectators.size() == (resource.data.get('spectators', []).size() + 1)
           && request.resource.data.spectators.hasAll(resource.data.get('spectators', []))
-          && request.resource.data.spectators[request.resource.data.spectators.size() - 1].id == request.auth.uid;
+          && request.resource.data.spectators.removeAll(resource.data.get('spectators', [])).size() == 1
+          && request.resource.data.spectators.removeAll(resource.data.get('spectators', []))[0].id == request.auth.uid;
       }
       function specLeave() {
         return changedKeys().hasOnly(['spectators'])
           && request.resource.data.spectators.size() == (resource.data.get('spectators', []).size() - 1)
-          && resource.data.get('spectators', []).hasAll(request.resource.data.spectators);
+          && resource.data.get('spectators', []).hasAll(request.resource.data.spectators)
+          && resource.data.get('spectators', []).removeAll(request.resource.data.spectators).size() == 1
+          && resource.data.get('spectators', []).removeAll(request.resource.data.spectators)[0].id == request.auth.uid;
       }
       function chatAppend() {
         return changedKeys().hasOnly(['chat'])
           && request.resource.data.chat.size() == (resource.data.get('chat', []).size() + 1)
           && request.resource.data.chat.hasAll(resource.data.get('chat', []))
-          && request.resource.data.chat[request.resource.data.chat.size() - 1].userId == request.auth.uid;
+          && request.resource.data.chat.removeAll(resource.data.get('chat', [])).size() == 1
+          && request.resource.data.chat.removeAll(resource.data.get('chat', []))[0].userId == request.auth.uid;
       }
       function isHostJoining() {
         return isSignedIn()
