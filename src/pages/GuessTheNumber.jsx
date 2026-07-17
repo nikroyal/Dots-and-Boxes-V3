@@ -27,25 +27,6 @@ export default function GuessTheNumber() {
 
   const inputRef = useRef(null);
   const initGameRef = useRef(null);
-
-  useEffect(() => {
-    initGameRef.current = initGame;
-  });
-
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (gameState === 'won' && e.key === 'Enter' && e.target.tagName !== 'BUTTON') {
-        e.preventDefault();
-        sfx.click();
-        if (initGameRef.current) initGameRef.current();
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [gameState]);
-
-
-  const initGameRef = useRef(null);
   const gameStateRef = useRef(gameState);
 
   useEffect(() => {
@@ -55,10 +36,10 @@ export default function GuessTheNumber() {
 
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if (e.key === 'Enter' && gameStateRef.current === 'won') {
+      if (e.key === 'Enter' && gameStateRef.current === 'won' && e.target.tagName !== 'BUTTON') {
         e.preventDefault();
         sfx.click();
-        initGameRef.current();
+        initGameRef.current?.();
       }
     };
     window.addEventListener('keydown', handleKeyDown);
