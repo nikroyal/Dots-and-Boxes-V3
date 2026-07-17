@@ -313,6 +313,21 @@ export const EXPERIENCE_CATALOG = [
     routePrefixes: ['/district-exchange'],
   },
   {
+    id: 'speed-math',
+    name: 'Speed Math',
+    shortName: 'Math',
+    path: '/speed-math',
+    kind: 'Arcade',
+    status: 'Live',
+    accent: 'var(--ochre)',
+    description: 'Solve as many basic math problems as you can in 60 seconds.',
+    features: ['Local play', 'Best score'],
+    navItems: [
+      { to: '/speed-math', label: 'Play' },
+    ],
+    routePrefixes: ['/speed-math'],
+  },
+  {
     id: 'circuit-maker',
     name: 'Circuit Maker',
     shortName: 'Circuits',
