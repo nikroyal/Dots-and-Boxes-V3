@@ -21,6 +21,8 @@ export default function ColorMatch() {
   const [timeLeft, setTimeLeft] = useState(GAME_DURATION);
   const [colorText, setColorText] = useState(COLORS[0]);
   const [colorFill, setColorFill] = useState(COLORS[0]);
+  const [copied, setCopied] = useState(false);
+  const shareTimeoutRef = useRef(null);
   const [bestScore, setBestScore] = useState(() => {
     try {
       const saved = localStorage.getItem('axiom-colormatch-best');
@@ -89,8 +91,34 @@ export default function ColorMatch() {
   useEffect(() => {
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
+      if (shareTimeoutRef.current) clearTimeout(shareTimeoutRef.current);
     };
   }, []);
+
+
+  const getRating = (s) => {
+    if (s >= 50) return "🦅 Eagle Eye";
+    if (s >= 30) return "🦉 Sharp";
+    if (s >= 15) return "🕊️ Good";
+    return "🐢 Keep practicing";
+  };
+
+  const handleShare = (e) => {
+    e.stopPropagation();
+    e.preventDefault();
+    const rating = getRating(score);
+    const text = `I scored ${score} in Axiom Color Match! ${rating}`;
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(() => {
+        sfx.notify();
+        setCopied(true);
+        if (shareTimeoutRef.current) clearTimeout(shareTimeoutRef.current);
+        shareTimeoutRef.current = setTimeout(() => setCopied(false), 2000);
+      }).catch(err => console.warn("Clipboard copy failed", err));
+    } else {
+      console.warn("Clipboard API not supported");
+    }
+  };
 
   const handleAnswer = useCallback((isMatchClaim) => {
     if (gameState !== 'playing') return;
@@ -187,14 +215,20 @@ export default function ColorMatch() {
           )}
 
           {gameState === 'gameover' && (
-            <div className="text-center fade-in">
+            <div className="text-center fade-in w-full flex flex-col items-center">
               <div className="font-display text-3xl mb-2">Game Over!</div>
-              <div className="font-display text-5xl text-[var(--crimson)] mb-6 pulse-soft">
+              <div className="font-display text-5xl text-[var(--crimson)] mb-2 pulse-soft">
                 Score: {score}
               </div>
-              <button onClick={startGame} className="btn-primary w-full text-lg py-3">
-                Play Again (Enter)
-              </button>
+              <div className="font-display text-xl mb-6 opacity-90">{getRating(score)}</div>
+              <div className="flex gap-4 w-full">
+                <button onClick={startGame} className="btn-primary flex-1 text-lg py-3">
+                  Play Again (Enter)
+                </button>
+                <button onClick={handleShare} className="btn-secondary flex-1 text-lg py-3">
+                  {copied ? 'Copied!' : 'Share Result'}
+                </button>
+              </div>
             </div>
           )}
         </div>
