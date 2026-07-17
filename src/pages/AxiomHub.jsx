@@ -46,10 +46,18 @@ export default function AxiomHub() {
       if (!unlocked.includes(a.id) && a.progress) {
         const [curr, max, min = 0] = a.progress(profile);
         const pct = max === min ? 0 : Math.min(100, Math.max(0, ((curr - min) / (max - min)) * 100));
-        if (pct > 0 && max > 1 && pct > highestPct) {
+        if (pct > 0 && pct < 100 && pct > highestPct) {
           highestPct = pct;
           best = { a, curr, max, pct };
         }
+      }
+    }
+    if (!best) {
+      const firstLocked = ACHIEVEMENTS.find(a => !unlocked.includes(a.id));
+      if (firstLocked && firstLocked.progress) {
+        const [curr, max, min = 0] = firstLocked.progress(profile);
+        const pct = max === min ? 0 : Math.min(100, Math.max(0, ((curr - min) / (max - min)) * 100));
+        best = { a: firstLocked, curr, max, pct };
       }
     }
     return best;
@@ -88,7 +96,7 @@ export default function AxiomHub() {
             <div className="flex items-center gap-3">
               <span className="font-display text-3xl">{profile?.avatar || '◆'}</span>
               <div>
-                <div className="font-display text-xl leading-tight">{profile?.username}</div>
+                <div className="font-display text-xl leading-tight">{profile?.displayName || profile?.username}</div>
                 {rank && (
                   <div className="font-mono text-[0.65rem] tracking-widest uppercase mt-1" style={{ color: rank.color }}>
                     {rank.name} · {profile.elo || 1000} ELO
