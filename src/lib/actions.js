@@ -25,6 +25,13 @@ const PREGAME_COUNTDOWN_MS = 3500;
 // safety net for abandoned games.
 const TURN_TIMEOUT_MS = 60 * 1000;
 
+const GAMES_LOWER_SCORE_IS_BETTER = new Set([
+  'reaction-timer',
+  'memory-match',
+  'guess-the-number',
+  'speed-grid',
+]);
+
 // ─── Guard ────────────────────────────────────────────────────────────────
 function guard(user) {
   if (user?._isImpersonated) {
@@ -1141,7 +1148,7 @@ export async function updateArcadeBest(currentUser, gameId, gameName, scoreValue
   }
 
   if (existingScore !== undefined && existingScore !== null) {
-    const isLowerBetter = gameId === 'reaction-timer' || gameId === 'memory-match' || gameId === 'guess-the-number' || gameId === 'speed-grid';
+    const isLowerBetter = GAMES_LOWER_SCORE_IS_BETTER.has(gameId);
     const isNewBest = isLowerBetter
       ? scoreValue < existingScore
       : scoreValue > existingScore;
@@ -1167,7 +1174,7 @@ export async function updateArcadeBest(currentUser, gameId, gameName, scoreValue
       }
 
       if (existingDbScore !== undefined && existingDbScore !== null) {
-        const isLowerBetter = gameId === 'reaction-timer' || gameId === 'memory-match' || gameId === 'guess-the-number' || gameId === 'speed-grid';
+        const isLowerBetter = GAMES_LOWER_SCORE_IS_BETTER.has(gameId);
         const isNewBest = isLowerBetter
           ? scoreValue < existingDbScore
           : scoreValue > existingDbScore;

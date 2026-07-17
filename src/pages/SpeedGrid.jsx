@@ -4,6 +4,15 @@ import { recordActivity, ACTIVITY_TYPES } from '../lib/activity';
 import { updateArcadeBest } from '../lib/actions';
 import { sfx } from '../lib/sound';
 
+function createShuffledGrid() {
+  const nums = Array.from({ length: 25 }, (_, i) => i + 1);
+  for (let i = nums.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [nums[i], nums[j]] = [nums[j], nums[i]];
+  }
+  return nums;
+}
+
 export default function SpeedGrid() {
   const { profile } = useAuth();
 
@@ -24,33 +33,25 @@ export default function SpeedGrid() {
   const timerRef = useRef(null);
   const startTimeRef = useRef(null);
 
-  const initGrid = () => {
-    const nums = Array.from({ length: 25 }, (_, i) => i + 1);
-    for (let i = nums.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [nums[i], nums[j]] = [nums[j], nums[i]];
-    }
-    setGrid(nums);
-  };
-
   const startGame = useCallback(() => {
     sfx.click();
-    if (timerRef.current) clearInterval(timerRef.current);
+    if (timerRef.current) cancelAnimationFrame(timerRef.current);
 
-    initGrid();
+    setGrid(createShuffledGrid());
     setNextNumber(1);
     setTime(0);
     setGameState('playing');
 
     startTimeRef.current = performance.now();
-    timerRef.current = setInterval(() => {
-      const elapsed = performance.now() - startTimeRef.current;
-      setTime(elapsed);
-    }, 16);
+    const animate = () => {
+      setTime(performance.now() - startTimeRef.current);
+      timerRef.current = requestAnimationFrame(animate);
+    };
+    timerRef.current = requestAnimationFrame(animate);
   }, []);
 
   const endGame = useCallback((finalTime) => {
-    if (timerRef.current) clearInterval(timerRef.current);
+    if (timerRef.current) cancelAnimationFrame(timerRef.current);
     sfx.win();
     setGameState('gameover');
     setTime(finalTime);
@@ -81,7 +82,7 @@ export default function SpeedGrid() {
 
   useEffect(() => {
     return () => {
-      if (timerRef.current) clearInterval(timerRef.current);
+      if (timerRef.current) cancelAnimationFrame(timerRef.current);
     };
   }, []);
 
@@ -128,11 +129,11 @@ export default function SpeedGrid() {
 
         {gameState === 'playing' && (
           <div className="grid grid-cols-5 gap-2 sm:gap-3 w-full max-w-[320px]">
-            {grid.map((num, i) => {
+            {grid.map((num) => {
               const isClicked = num < nextNumber;
               return (
                 <button
-                  key={i}
+                  key={num}
                   onClick={() => handleCellClick(num)}
                   disabled={isClicked}
                   className={`aspect-square flex items-center justify-center font-display text-2xl ${isClicked ? 'opacity-0' : 'bg-[var(--bg-soft)] border hairline hover:bg-[var(--ink)] hover:text-[var(--paper)] transition-colors'}`}
