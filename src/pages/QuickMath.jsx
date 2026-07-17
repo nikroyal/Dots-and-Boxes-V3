@@ -4,7 +4,7 @@ import { recordActivity, ACTIVITY_TYPES } from '../lib/activity';
 import { updateArcadeBest } from '../lib/actions';
 import { sfx } from '../lib/sound';
 
-const GAME_DURATION = 60;
+const GAME_DURATION = 60; // 60 seconds
 
 const generateQuestion = () => {
   const operations = ['+', '-', '*'];
@@ -31,13 +31,13 @@ const generateQuestion = () => {
 export default function QuickMath() {
   const { profile } = useAuth();
 
+  // states: 'waiting' | 'playing' | 'gameover'
   const [gameState, setGameState] = useState('waiting');
   const [timeLeft, setTimeLeft] = useState(GAME_DURATION);
   const [score, setScore] = useState(0);
   const [copied, setCopied] = useState(false);
   const [question, setQuestion] = useState({ text: '', answer: 0 });
   const [userInput, setUserInput] = useState('');
-
   const [bestScore, setBestScore] = useState(() => {
     try {
       const saved = localStorage.getItem('axiom-quickmath-best');
@@ -50,16 +50,41 @@ export default function QuickMath() {
   const timerRef = useRef(null);
   const scoreRef = useRef(score);
   const inputRef = useRef(null);
+  const timeoutRef = useRef(null);
 
-    useEffect(() => {
+  useEffect(() => {
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
     };
   }, []);
 
   useEffect(() => {
     scoreRef.current = score;
   }, [score]);
+
+  const loadNewQuestion = useCallback(() => {
+    setQuestion(generateQuestion());
+    setUserInput('');
+  }, []);
+
+  const startGame = useCallback(() => {
+    sfx.click();
+    setGameState('playing');
+    setScore(0);
+    setTimeLeft(GAME_DURATION);
+    scoreRef.current = 0;
+    loadNewQuestion();
+
+    setTimeout(() => {
+      if (inputRef.current) inputRef.current.focus();
+    }, 50);
+
+    if (timerRef.current) clearInterval(timerRef.current);
+    timerRef.current = setInterval(() => {
+      setTimeLeft((prev) => Math.max(0, prev - 1));
+    }, 1000);
+  }, [loadNewQuestion]);
 
   const endGame = useCallback(() => {
     if (timerRef.current) clearInterval(timerRef.current);
@@ -84,41 +109,29 @@ export default function QuickMath() {
     }
   }, [timeLeft, gameState, endGame]);
 
-  const loadNewQuestion = useCallback(() => {
-    setQuestion(generateQuestion());
-    setUserInput('');
-  }, []);
-
-  const startGame = useCallback(() => {
-    sfx.click();
-    setGameState('playing');
-    setScore(0);
-    setTimeLeft(GAME_DURATION);
-    scoreRef.current = 0;
-    loadNewQuestion();
-
-    if (timerRef.current) clearInterval(timerRef.current);
-    timerRef.current = setInterval(() => {
-      setTimeLeft((prev) => Math.max(0, prev - 1));
-    }, 1000);
-  }, [loadNewQuestion]);
-
   useEffect(() => {
     if (gameState === 'playing') {
       inputRef.current?.focus();
     }
   }, [gameState]);
 
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter' && (gameState === 'waiting' || gameState === 'gameover')) {
+      e.preventDefault();
+      startGame();
+    }
+  };
+
+  const handleKeyDownRef = useRef(handleKeyDown);
   useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (e.key === 'Enter' && (gameState === 'waiting' || gameState === 'gameover')) {
-        e.preventDefault();
-        startGame();
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [gameState, startGame]);
+    handleKeyDownRef.current = handleKeyDown;
+  });
+
+  useEffect(() => {
+    const listener = (e) => handleKeyDownRef.current(e);
+    window.addEventListener('keydown', listener);
+    return () => window.removeEventListener('keydown', listener);
+  }, []);
 
   const getRatingMessage = (s) => {
     if (s >= 40) return "🚀 Human Calculator";
@@ -131,12 +144,13 @@ export default function QuickMath() {
     e.stopPropagation();
     e.preventDefault();
     const rating = getRatingMessage(score);
-    const text = `I scored ${score} in Axiom Quick Math! ${rating}`;
+    const text = `I solved ${score} problems in Axiom Quick Math! ${rating}`;
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(text).then(() => {
         sfx.notify();
         setCopied(true);
-        setTimeout(() => setCopied(false), 2000);
+        if (timeoutRef.current) clearTimeout(timeoutRef.current);
+        timeoutRef.current = setTimeout(() => setCopied(false), 2000);
       }).catch(err => console.warn("Clipboard copy failed", err));
     } else {
       console.warn("Clipboard API not supported");
@@ -216,8 +230,8 @@ export default function QuickMath() {
               className="w-full text-center text-4xl font-mono p-4 border hairline bg-[var(--bg-soft)] focus:outline-none focus:ring-2 focus:ring-[var(--forest)]"
               placeholder="?"
               disabled={gameState !== 'playing'}
-              autoFocus
               autoComplete="off"
+              spellCheck="false"
             />
           </form>
 

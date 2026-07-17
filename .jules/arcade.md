@@ -23,6 +23,14 @@
 ## 2024-06-28 - Fix final WPM calculation in Typing Speed game
 **Learning:** Stale closures in timer callbacks (setTimeout/setInterval) lead to using initial or outdated state values. This is common when game timers end and need to calculate final scores using live typing state.
 **Action:** To prevent stale closure issues when accessing React state inside timer callbacks, store the required state values (userInput and currentQuote) in mutable refs (useRef) and synchronize them using useEffect whenever the state changes. Then use the .current property of the refs inside the callback.
+## 2026-07-15 - Double Route Registration for Arcade Games
+**Learning:** When adding new Arcade games that should be accessible without authentication, ensure the route is injected into both the unauthenticated (`if (!user)`) and authenticated (`if (!profile)`) routing blocks in `src/App.jsx` to prevent redirection to the login page.
+**Action:** Always verify if a game should be playable without logging in, and if so, register its route in both sections of the `App.jsx` component.
+
+## 2026-07-15 - Avoiding Stale Closures in Global Event Listeners
+**Learning:** In React components, when attaching global event listeners (like `keydown`) that depend on state variables, using a `useRef` to store the latest callback function prevents stale closures while avoiding constant re-attachment of the event listener.
+**Action:** Use the `useRef` pattern for event listeners that need access to the latest state but should only be attached once on mount.
+
 ## 2024-07-25 - Quick Math validation logic
 **Learning:** For continuous numeric input games, using `<input type="text" inputMode="numeric">` combined with explicit bounds checking and digit regex matching (`/^[0-9]+$/`) in the `onChange` handler provides a smoother experience than `type="number"`, as it avoids spin buttons and simplifies validation.
 **Action:** Use `type="text"` with `inputMode="numeric"` for rapid number input games and manually enforce length and character restrictions in the event handler.
