@@ -25,10 +25,16 @@ export default function QuickMath() {
     }
   });
 
+  useEffect(() => {
+    const dbBest = profile?.arcadeBests?.['quick-math']?.scoreValue;
+    if (dbBest !== undefined && dbBest > bestScore) {
+      setBestScore(dbBest);
+    }
+  }, [profile, bestScore]);
+
   const timerRef = useRef(null);
   const scoreRef = useRef(score);
   const inputRef = useRef(null);
-  const startGameRef = useRef(null);
 
   useEffect(() => {
     return () => {
@@ -75,17 +81,13 @@ export default function QuickMath() {
     timerRef.current = setInterval(() => {
       setTimeLeft((prev) => Math.max(0, prev - 1));
     }, 1000);
-
-    setTimeout(() => {
-      if (inputRef.current) {
-        inputRef.current.focus();
-      }
-    }, 50);
   }, [generateEquation]);
 
   useEffect(() => {
-    startGameRef.current = startGame;
-  }, [startGame]);
+    if (gameState === 'playing' && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [gameState]);
 
   const endGame = useCallback(() => {
     if (timerRef.current) clearInterval(timerRef.current);
@@ -150,12 +152,12 @@ export default function QuickMath() {
     const handleKeyDown = (e) => {
       if (e.key === 'Enter' && (gameState === 'waiting' || gameState === 'gameover')) {
         e.preventDefault();
-        if (startGameRef.current) startGameRef.current();
+        startGame();
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [gameState]);
+  }, [gameState, startGame]);
 
   return (
     <div className="fade-in max-w-2xl mx-auto flex flex-col items-center justify-center min-h-[60vh]">
