@@ -49,6 +49,22 @@ export default function TypingSpeed() {
 
   const timerRef = useRef(null);
   const inputRef = useRef(null);
+  const startGameRef = useRef(null);
+  useEffect(() => {
+    startGameRef.current = startGame;
+  });
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Enter' && (gameState === 'waiting' || gameState === 'result')) {
+        e.preventDefault();
+        startGameRef.current?.();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [gameState]);
+
   const totalCharactersRef = useRef(0);
 
   useEffect(() => {
@@ -74,24 +90,7 @@ export default function TypingSpeed() {
     return "🐢 Beginner";
   };
 
-  const gameStateRef = useRef(gameState);
-  const startGameRef = useRef(null);
 
-  useEffect(() => {
-    gameStateRef.current = gameState;
-    startGameRef.current = startGame;
-  }, [gameState, startGame]);
-
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (e.key === 'Enter' && (gameStateRef.current === 'waiting' || gameStateRef.current === 'result')) {
-        e.preventDefault();
-        startGameRef.current();
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
 
   useEffect(() => {
     if (gameState === 'playing' && inputRef.current) {

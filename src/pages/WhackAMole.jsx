@@ -90,7 +90,7 @@ export default function WhackAMole() {
     }
   }, [gameState, spawnMole]);
 
-  const startGame = () => {
+  const startGame = useCallback(() => {
     sfx.click();
     setGameState('playing');
     setScore(0);
@@ -105,7 +105,7 @@ export default function WhackAMole() {
     timerRef.current = setInterval(() => {
       setTimeLeft((prev) => Math.max(0, prev - 1));
     }, 1000);
-  };
+  }, []);
 
   const endGame = useCallback(() => {
     if (timerRef.current) clearInterval(timerRef.current);
@@ -187,9 +187,9 @@ export default function WhackAMole() {
 
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if ((gameState === 'waiting' || gameState === 'gameover') && e.key === 'Enter') {
+      if (e.key === 'Enter' && (gameState === 'waiting' || gameState === 'gameover')) {
         e.preventDefault();
-        if (startGameRef.current) startGameRef.current();
+        startGame();
         return;
       }
       if (gameState !== 'playing') return;
@@ -205,7 +205,7 @@ export default function WhackAMole() {
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [gameState, activeMole]);
+  }, [gameState, activeMole, startGame]);
 
   return (
     <div className="fade-in max-w-2xl mx-auto flex flex-col items-center justify-center min-h-[60vh]">
