@@ -4,7 +4,7 @@ import { Play, Star, Target, Trophy, Users, Zap, LayoutGrid } from 'lucide-react
 import { EXPERIENCE_CATALOG } from '../lib/experiences';
 import { useAuth } from '../lib/AuthContext';
 import { sfx } from '../lib/sound';
-import { getRankInfo, ACHIEVEMENTS } from '../lib/achievements';
+import { ACHIEVEMENTS, getRankInfo } from '../lib/achievements';
 
 const FAVORITES_KEY = 'axiom-favorite-experiences';
 
@@ -46,7 +46,7 @@ export default function AxiomHub() {
       if (!unlocked.includes(a.id) && a.progress) {
         const [curr, max, min = 0] = a.progress(profile);
         const pct = max === min ? 0 : Math.min(100, Math.max(0, ((curr - min) / (max - min)) * 100));
-        if (pct > 0 && pct < 100 && pct > highestPct) {
+        if (pct > 0 && pct < 100 && max > 1 && pct > highestPct) {
           highestPct = pct;
           best = { a, curr, max, pct };
         }
@@ -72,6 +72,8 @@ export default function AxiomHub() {
   const favoriteSet = useMemo(() => new Set(favoriteIds), [favoriteIds]);
   const favorites = EXPERIENCE_CATALOG.filter(experience => favoriteSet.has(experience.id));
   const others = EXPERIENCE_CATALOG.filter(experience => !favoriteSet.has(experience.id));
+
+
 
   const toggleFavorite = (id) => {
     setFavoriteIds(current => {
@@ -109,6 +111,12 @@ export default function AxiomHub() {
             </Link>
           </div>
 
+          <div className="grid grid-cols-3 gap-2 text-center">
+            <MiniStat label="Rating" value={profile?.elo || 1000} />
+            <MiniStat label="Awards" value={Array.isArray(profile?.unlockedAchievements) ? profile.unlockedAchievements.length : 0} />
+            <MiniStat label="Friends" value={Array.isArray(profile?.friends) ? profile.friends.length : 0} />
+          </div>
+
           {nextRank && (
             <div>
               <div className="flex justify-between font-mono text-[0.55rem] tracking-widest uppercase opacity-50 mb-1">
@@ -133,7 +141,14 @@ export default function AxiomHub() {
                   <span>Progress</span>
                   <span>{Math.floor(upNextAchievement.curr)} / {upNextAchievement.max}</span>
                 </div>
-                <div className="h-1 w-full bg-black/10 rounded-full overflow-hidden">
+                <div
+                  className="h-1.5 w-full bg-black/10 rounded-full overflow-hidden"
+                  role="progressbar"
+                  aria-valuenow={Math.round(upNextAchievement.pct)}
+                  aria-valuemin="0"
+                  aria-valuemax="100"
+                  aria-label={`Progress towards ${upNextAchievement.a.name}`}
+                >
                   <div className="h-full transition-all duration-500" style={{ width: `${upNextAchievement.pct}%`, background: 'var(--ochre)' }} />
                 </div>
               </div>
