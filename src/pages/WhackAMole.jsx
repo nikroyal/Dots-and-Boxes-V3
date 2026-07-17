@@ -35,7 +35,7 @@ export default function WhackAMole() {
 
   useEffect(() => {
     startGameRef.current = startGame;
-  }, [gameState]);
+  });
 
   useEffect(() => {
     return () => {

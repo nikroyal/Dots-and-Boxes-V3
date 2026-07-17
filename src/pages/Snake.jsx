@@ -46,7 +46,7 @@ export default function Snake() {
 
   useEffect(() => {
     startGameRef.current = startGame;
-  }, [gameState]);
+  });
 
   // Sync refs
   useEffect(() => {

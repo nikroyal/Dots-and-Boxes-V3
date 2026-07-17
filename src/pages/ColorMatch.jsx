@@ -22,6 +22,7 @@ export default function ColorMatch() {
   const [colorText, setColorText] = useState(COLORS[0]);
   const [colorFill, setColorFill] = useState(COLORS[0]);
   const [copied, setCopied] = useState(false);
+  const shareTimeoutRef = useRef(null);
   const [bestScore, setBestScore] = useState(() => {
     try {
       const saved = localStorage.getItem('axiom-colormatch-best');
@@ -90,6 +91,7 @@ export default function ColorMatch() {
   useEffect(() => {
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
+      if (shareTimeoutRef.current) clearTimeout(shareTimeoutRef.current);
     };
   }, []);
 
@@ -110,7 +112,8 @@ export default function ColorMatch() {
       navigator.clipboard.writeText(text).then(() => {
         sfx.notify();
         setCopied(true);
-        setTimeout(() => setCopied(false), 2000);
+        if (shareTimeoutRef.current) clearTimeout(shareTimeoutRef.current);
+        shareTimeoutRef.current = setTimeout(() => setCopied(false), 2000);
       }).catch(err => console.warn("Clipboard copy failed", err));
     } else {
       console.warn("Clipboard API not supported");
