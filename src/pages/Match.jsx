@@ -545,12 +545,10 @@ export default function Match() {
         </div>
         <form onSubmit={handleSendChat} className="border-t hairline p-2 flex gap-2 items-center">
           <input
-            id="chat-input"
             aria-label="Chat input"
             value={chatInput}
             onChange={e => setChatInput(e.target.value.slice(0, 200))}
             placeholder="Say something…"
-            aria-label="Chat message"
             maxLength={200}
             className="flex-1 bg-transparent font-display text-base outline-none px-2"
           />

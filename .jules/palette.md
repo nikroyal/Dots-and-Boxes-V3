@@ -27,5 +27,5 @@
 **Action:** Always ensure that inline inputs, like search bars or generic prompt fields, include descriptive `aria-label` attributes.
 
 ## 2026-07-10 - ARIA Labels on Inline Form Fields
-**Learning:** Text inputs that visually lack explicit `<label>` tags (like the chat inputs in Match components) or rely on placeholder text are inaccessible to screen readers and need explicit `id` and `aria-label`s to be correctly interpreted. Similarly, icon-only buttons (like `Quit` or `Rematch` buttons with just a `lucide-react` icon) need `aria-label`s and `aria-hidden="true"` on the icon itself for accessibility.
-**Action:** Always ensure that inline inputs include descriptive `aria-label` attributes and an `id`, and add `aria-label` to buttons without visible text.
+**Learning:** Text inputs that visually lack explicit label tags (like the chat inputs in Match components) or rely on placeholder text are inaccessible to screen readers and need explicit aria-labels to be correctly interpreted. Similarly, icon-only buttons (like Quit or Rematch buttons with just a lucide-react icon) need aria-labels and aria-hidden="true" on the icon itself for accessibility.
+**Action:** Always ensure that inline inputs include descriptive aria-label attributes, and add aria-label to buttons without visible text.
