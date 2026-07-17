@@ -64,8 +64,8 @@ export default function PostMatchGoals({ profile }) {
 
 
       {/* Rank Progress */}
-      <div className="border hairline p-3 bg-black/5" style={{ borderColor: rank.color }}>
-        <div className="font-mono text-[0.55rem] tracking-widest uppercase mb-1 opacity-60" style={{ color: rank.color }}>Rank Progress</div>
+      <div className="border hairline p-3 bg-black/5" style={{ borderColor: 'var(--hairline)' }}>
+        <div className="font-mono text-[0.55rem] tracking-widest uppercase mb-1 opacity-60">Rank Progress</div>
         <div className="font-display text-base mb-2">{rank.name}</div>
         <div>
           <div className="flex justify-between font-mono text-[0.55rem] tracking-widest uppercase opacity-50 mb-1">
