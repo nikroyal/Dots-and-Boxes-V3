@@ -47,7 +47,6 @@ export default function Snake() {
   useEffect(() => {
     startGameRef.current = startGame;
   });
-
   useEffect(() => {
     const handleKeyDown = (e) => {
       if ((gameStateRef.current === 'waiting' || gameStateRef.current === 'gameover') && e.key === 'Enter' && e.target.tagName !== 'BUTTON') {
@@ -178,6 +177,14 @@ export default function Snake() {
 
   useEffect(() => {
     const handleKeyDown = (e) => {
+      if (gameStateRef.current === 'waiting' || gameStateRef.current === 'gameover') {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          if (startGameRef.current) startGameRef.current();
+        }
+        return;
+      }
+
       if (gameStateRef.current !== 'playing') return;
 
       const { x, y } = lastMoveDirectionRef.current;

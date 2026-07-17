@@ -40,6 +40,25 @@ export default function ClickTheTarget() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [gameState]);
 
+
+  const getRating = (s) => {
+    if (s >= 40) return "🎯 Aimbot";
+    if (s >= 30) return "🦅 Sharpshooter";
+    if (s >= 20) return "🏃 Good";
+    return "🐢 Keep practicing";
+  };
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if ((gameState === 'waiting' || gameState === 'result') && e.key === 'Enter') {
+        e.preventDefault();
+        startGame();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [gameState]);
+
   const startGame = () => {
     sfx.click();
     setScore(0);
@@ -113,7 +132,8 @@ export default function ClickTheTarget() {
   const handleShare = (e) => {
     e.stopPropagation();
     e.preventDefault();
-    const text = `I scored ${score} in Axiom Click The Target! 🎯`;
+    const rating = getRating(score);
+    const text = `I scored ${score} in Axiom Click The Target! ${rating}`;
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(text).then(() => {
         sfx.notify();
@@ -181,7 +201,8 @@ export default function ClickTheTarget() {
         {gameState === 'waiting' && (
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-[var(--paper-tint)]">
             <p className="mb-6 font-display text-xl opacity-80 text-center px-4">
-              Click the target as many times as you can in 30 seconds!
+              Click the target as many times as you can in 30 seconds!<br/>
+              <span className="text-sm opacity-60 mt-2 block font-mono tracking-widest uppercase">Target: ≥ 40 for 🎯 Aimbot</span>
             </p>
             <button onClick={startGame} className="btn-primary">
               Start Game <span className="hidden sm:inline opacity-50 font-mono text-xs ml-2">(Enter)</span>
@@ -192,7 +213,8 @@ export default function ClickTheTarget() {
         {gameState === 'result' && (
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-[var(--paper-tint)] fade-in">
              <div className="font-display text-4xl mb-2">Time's Up!</div>
-             <div className="font-display text-2xl mb-6 opacity-80 text-[var(--forest)]">Score: {score}</div>
+             <div className="font-display text-2xl mb-2 opacity-80 text-[var(--forest)]">Score: {score}</div>
+             <div className="font-display text-xl mb-6 opacity-90">{getRating(score)}</div>
              <div className="flex gap-4">
                <button onClick={startGame} className="btn-primary">
                   Play Again <span className="hidden sm:inline opacity-50 font-mono text-xs ml-2">(Enter)</span>

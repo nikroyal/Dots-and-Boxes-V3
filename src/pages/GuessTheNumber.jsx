@@ -44,6 +44,27 @@ export default function GuessTheNumber() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [gameState]);
 
+
+  const initGameRef = useRef(null);
+  const gameStateRef = useRef(gameState);
+
+  useEffect(() => {
+    initGameRef.current = initGame;
+    gameStateRef.current = gameState;
+  }, [initGame, gameState]);
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Enter' && gameStateRef.current === 'won') {
+        e.preventDefault();
+        sfx.click();
+        initGameRef.current();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
   const initGame = () => {
     setTargetNumber(Math.floor(Math.random() * 100) + 1);
     setCurrentGuess('');
@@ -179,11 +200,26 @@ export default function GuessTheNumber() {
           <form onSubmit={handleGuess} className="w-full flex flex-col items-center gap-4">
             <input
               ref={inputRef}
-              type="number"
-              min="1"
-              max="100"
+              type="text"
+              inputMode="numeric"
               value={currentGuess}
-              onChange={(e) => setCurrentGuess(e.target.value)}
+              onChange={(e) => {
+                const val = e.target.value.replace(/[^0-9]/g, '');
+                // Bounds checking
+                if (val === '') {
+                  setCurrentGuess('');
+                  return;
+                }
+                const num = parseInt(val, 10);
+                if (num > 100) {
+                  setCurrentGuess('100');
+                } else if (num < 1 && val !== '') {
+                  // Allow empty string to reset, otherwise we shouldn't force min during typing because they might want to type "10" by typing "1" then "0"
+                  setCurrentGuess(val);
+                } else {
+                  setCurrentGuess(val);
+                }
+              }}
               className="w-full text-center text-4xl font-mono p-4 border hairline bg-[var(--bg-soft)] rounded focus-ring"
               placeholder="?"
               autoFocus
