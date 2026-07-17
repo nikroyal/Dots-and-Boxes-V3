@@ -33,7 +33,7 @@ export default function ClickTheTarget() {
     const handleKeyDown = (e) => {
       if ((gameState === 'waiting' || gameState === 'result') && e.key === 'Enter' && e.target.tagName !== 'BUTTON') {
         e.preventDefault();
-        if (startGameRef.current) startGameRef.current();
+        startGameRef.current?.();
       }
     };
     window.addEventListener('keydown', handleKeyDown);
@@ -47,17 +47,6 @@ export default function ClickTheTarget() {
     if (s >= 20) return "🏃 Good";
     return "🐢 Keep practicing";
   };
-
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if ((gameState === 'waiting' || gameState === 'result') && e.key === 'Enter') {
-        e.preventDefault();
-        startGame();
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [gameState]);
 
   const startGame = () => {
     sfx.click();

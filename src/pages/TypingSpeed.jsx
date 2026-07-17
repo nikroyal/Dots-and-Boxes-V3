@@ -49,22 +49,6 @@ export default function TypingSpeed() {
 
   const timerRef = useRef(null);
   const inputRef = useRef(null);
-  const startGameRef = useRef(null);
-  useEffect(() => {
-    startGameRef.current = startGame;
-  });
-
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (e.key === 'Enter' && (gameState === 'waiting' || gameState === 'result')) {
-        e.preventDefault();
-        startGameRef.current?.();
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [gameState]);
-
   const totalCharactersRef = useRef(0);
   const startGameRef = useRef(null);
 
@@ -76,7 +60,7 @@ export default function TypingSpeed() {
     const handleKeyDown = (e) => {
       if ((gameState === 'waiting' || gameState === 'result') && e.key === 'Enter' && e.target.tagName !== 'BUTTON') {
         e.preventDefault();
-        if (startGameRef.current) startGameRef.current();
+        startGameRef.current?.();
       }
     };
     window.addEventListener('keydown', handleKeyDown);
