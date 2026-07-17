@@ -55,6 +55,12 @@
 **Learning:** Players' highest engagement peaks right when they win or lose a multiplayer match. While long-term rank progression (ELO) is motivating, surfacing short-term, immediately attainable goals (like the next Daily Goal or an Up Next Achievement) right on the Win Screen gives players an explicit, bite-sized reason to play "just one more." This reduces friction in deciding whether to click "Rematch" or "Home" by providing an immediate secondary objective.
 
 **Action:** Whenever a player completes a core gameplay loop (like a match), inject dynamic, personalized short-term goals (daily goals, closest achievements) into the post-match resolution screen to convert the momentum of a finished session into motivation for the next one.
+## 2024-07-12 - Eliminating the "Done" State
+
+**Learning:** Hiding progress components when short-term goals (like a Daily Goal) are completed reduces post-match engagement because it removes immediate explicit motivation.
+
+**Action:** When short-term goals are completed, explicitly celebrate them (e.g., "Come back tomorrow!") to create a returning habit, and ensure they are always displayed alongside long-term goals (like ELO rank progress) to maintain momentum.
+
 ## 2024-07-25 - Front-Door Progression Hooks
 
 **Learning:** When users land on the central hub (`AxiomHub`), they are met with static information (total available games, number of friends). This lacks immediate motivation to engage. By surfacing their personal progression (ELO rating, unlocked achievements, and specifically their closest locked achievement with a progress bar) directly on the landing page, we turn a static directory into an active engagement loop, giving them a specific reason ("I am 80% to my next award") to dive into an experience immediately.
