@@ -47,6 +47,16 @@ export default function Snake() {
   useEffect(() => {
     startGameRef.current = startGame;
   });
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if ((gameStateRef.current === 'waiting' || gameStateRef.current === 'gameover') && e.key === 'Enter' && e.target.tagName !== 'BUTTON') {
+        e.preventDefault();
+        if (startGameRef.current) startGameRef.current();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   // Sync refs
   useEffect(() => {

@@ -52,18 +52,15 @@ export default function WordScramble() {
   const scoreRef = useRef(score);
   const inputRef = useRef(null);
   const startGameRef = useRef(null);
-  useEffect(() => {
-    startGameRef.current = startGame;
-  });
-
   const loadNewWordRef = useRef(null);
   useEffect(() => {
+    startGameRef.current = startGame;
     loadNewWordRef.current = loadNewWord;
   });
 
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if (e.key === 'Enter' && (gameState === 'waiting' || gameState === 'gameover')) {
+      if (e.key === 'Enter' && (gameState === 'waiting' || gameState === 'gameover') && e.target.tagName !== 'BUTTON') {
         e.preventDefault();
         startGameRef.current?.();
       } else if (e.key === 'Escape' && gameState === 'playing') {
@@ -74,7 +71,6 @@ export default function WordScramble() {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [gameState]);
-
 
   useEffect(() => {
     return () => {
