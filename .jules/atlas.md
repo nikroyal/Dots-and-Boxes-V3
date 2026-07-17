@@ -10,7 +10,6 @@
 ## 2026-06-18 - Avoid Shallow Copying Reducer State
 **Learning:** Relying on shallow copies (e.g. `{ ...state }`) within game state reducers, especially nested objects and arrays, leads to mutation issues that crash React Strict Mode apps.
 **Action:** Always use deep copying methods like `structuredClone(state)` at the start of a reducer function that performs multiple mutations.
-=======
 ## 2026-06-19 - Adding Dynamic Contextual Feedback
 **Learning:** Adding lightweight conditional UI messaging mapped directly to the final user state (e.g., scores, moves) creates an immediate qualitative assessment that is highly satisfying.
 **Action:** In small arcade games, always consider replacing generic "Game Over" or "You Win" states with performance-based qualitative tiers (like stars or descriptive ratings) to instantly improve the replay loop.
@@ -58,3 +57,14 @@
 ## 2026-06-28 - Fast Input Responsiveness
 **Learning:** In fast-paced or reaction-based arcade games (like Click The Target), using standard `onClick` handlers introduces an inherent 100-300ms touch delay on mobile devices, which makes the game feel sluggish and unresponsive.
 **Action:** Always use `onPointerDown` instead of `onClick` for interactive game elements to eliminate touch delay. Ensure you use `e.stopPropagation()` to prevent misclicks on background elements.
+
+## 2024-07-16 - Shareable Qualitative Ratings
+**Learning:** Adding performance-based qualitative tiers (like "Aimbot" or "Hacker") and including them in the clipboard share text significantly boosts the fun factor and replayability of arcade games.
+**Action:** When adding sharing to games, map numerical scores/times to qualitative rating strings and display them on the result screen and in the copy-paste string.
+
+## 2024-11-20 - Global Keyboard Shortcuts and Stale Closures
+**Learning:** Adding window-level 'keydown' event listeners in a React component for fast-replay shortcuts (like 'Enter' to restart) requires storing both the target callback function and relevant state checks (e.g., ) in . Failing to do so causes stale closures, where the event listener uses the initial render state and either fails to trigger or triggers the wrong action.
+**Action:** When implementing global keyboard shortcuts in React for arcade games, always wrap the necessary state variables and callback functions in  and update them within a , then invoke the ref in the keydown handler.
+## 2026-07-17 - Safe Fast Keyboard Shortcuts in React
+**Learning:** Implementing window-level `keydown` event listeners in React for fast core loops requires updating a mutable `ref` containing the execution callback (e.g., `startGame`) triggered within a `useEffect` with no dependency array (or specific dependency) so the listener always invokes the absolute latest function closure, preventing stale state errors and buggy behavior during fast restarts.
+**Action:** When adding global keyboard shortcuts to React games for quick restarting, use a `useRef` to store the target callback and update it during every render cycle or `useEffect`, rather than binding it directly into the listener.
