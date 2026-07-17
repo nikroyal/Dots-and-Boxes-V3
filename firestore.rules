@@ -154,12 +154,20 @@ service cloud.firestore {
                     && convId == (request.resource.data.participants[0] + '_' + request.resource.data.participants[1]);
 
       function protectedConvKeysChanged() {
-        return changedKeys().hasAny(['participants', 'requestedBy', 'createdAt']);
+        return changedKeys().hasAny(['participants', 'requestedBy', 'requestedAt', 'createdAt', 'participantInfo']);
+      }
+
+      function isValidStatusTransition() {
+        return !changedKeys().hasAny(['status'])
+          || (resource.data.status == 'pending'
+              && (request.resource.data.status == 'accepted' || request.resource.data.status == 'declined')
+              && request.auth.uid != resource.data.requestedBy);
       }
 
       allow update: if isAdmin() || (isSignedIn()
                     && request.auth.uid in resource.data.participants
-                    && !protectedConvKeysChanged());
+                    && !protectedConvKeysChanged()
+                    && isValidStatusTransition());
       allow delete: if isAdmin();
 
       match /messages/{msgId} {
