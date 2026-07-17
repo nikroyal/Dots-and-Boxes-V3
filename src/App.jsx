@@ -43,6 +43,7 @@ import ClickTheTarget from './pages/ClickTheTarget';
 import SequenceMemory from './pages/SequenceMemory';
 import ColorMatch from './pages/ColorMatch';
 import SpeedGrid from './pages/SpeedGrid';
+import NumberMemory from './pages/NumberMemory';
 
 import TypingSpeed from './pages/TypingSpeed';
 import SpeedMath from './pages/SpeedMath';
@@ -133,6 +134,7 @@ function Shell() {
         <Route path="/snake" element={<Snake />} />
         <Route path="/battleships" element={<Battleships />} />
         <Route path="/paper-io" element={<PaperIo />} />
+        <Route path="/number-memory" element={<NumberMemory />} />
         <Route path="*" element={<Navigate to="/login" />} />
       </Routes>
     );
@@ -211,6 +213,7 @@ function Shell() {
               <Route path="/chess/local" element={<LocalChess />} />
               <Route path="/district-exchange/local" element={<LocalDistrictExchange />} />
               {isAdmin && <Route path="/admin" element={<Admin />} />}
+              <Route path="/number-memory" element={<NumberMemory />} />
               <Route path="*" element={<Navigate to="/" />} />
             </Routes>
           </Suspense>

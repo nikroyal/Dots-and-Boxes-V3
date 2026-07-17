@@ -392,6 +392,22 @@ export const EXPERIENCE_CATALOG = [
     ],
     routePrefixes: ['/speed-grid'],
   },
+  {
+    id: 'number-memory',
+    name: 'Number Memory',
+    shortName: 'Num Memory',
+    path: '/number-memory',
+    kind: 'Arcade',
+    status: 'Live',
+    accent: 'var(--ochre)',
+    description: 'Remember the longest number you can.',
+    features: ['Local play', 'Best level'],
+    navItems: [
+      { to: '/number-memory', label: 'Play' },
+    ],
+    routePrefixes: ['/number-memory'],
+  },
+
 ];
 
 export const DEFAULT_EXPERIENCE = {

@@ -49,3 +49,6 @@
 ## 2024-11-20 - Fast Timer Rendering
 **Learning:** Rendering a timer down to milliseconds using `setInterval` that triggers a React state update ~60 times a second can cause performance overhead by constantly re-rendering the entire component.
 **Action:** For highly precise sub-second timers, prefer using `requestAnimationFrame` attached directly to a DOM ref to avoid frequent, expensive React render cycles.
+## 2024-11-20 - Global Keydown Listeners Stale Closures
+**Learning:** When attaching a global `window.addEventListener('keydown', callback)` inside a `useEffect` with an empty dependency array to prevent multiple registrations, the `callback` often accesses stale React state (like `gameState` or `score`) because it closes over the initial render variables.
+**Action:** To reliably access the latest state in global event listeners without constantly removing/re-adding the listener (which can lose events), store the latest function reference in a `useRef` (e.g., `const callbackRef = useRef(callback)`) that updates on every dependency change, and then simply invoke `callbackRef.current(e)` inside the stable event listener.
