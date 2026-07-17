@@ -95,7 +95,7 @@ export default function LocalChess() {
     }, 3000);
 
     return true;
-  }, [game, pendingGame]);
+  }, [game, pendingGame, useTimer]);
 
   const undoMove = () => {
     if (pendingTimeoutRef.current) {
