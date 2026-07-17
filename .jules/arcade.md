@@ -23,3 +23,29 @@
 ## 2024-06-28 - Fix final WPM calculation in Typing Speed game
 **Learning:** Stale closures in timer callbacks (setTimeout/setInterval) lead to using initial or outdated state values. This is common when game timers end and need to calculate final scores using live typing state.
 **Action:** To prevent stale closure issues when accessing React state inside timer callbacks, store the required state values (userInput and currentQuote) in mutable refs (useRef) and synchronize them using useEffect whenever the state changes. Then use the .current property of the refs inside the callback.
+## 2026-06-25 - Speed Math Keyboard Event Stale Closure Fix
+**Learning:** Attaching global event listeners (like window.addEventListener('keydown')) using a React callback that has external state/function dependencies causes the listener to be constantly detached and re-attached unless you wrap the handler in `useCallback` and ensure dependencies are stable, or just store a ref.
+**Action:** Use `useCallback` for global event handlers to keep event bindings stable and prevent excessive DOM manipulations.
+
+## 2024-07-12 - Rapid Input Arcade Games Validation
+**Learning:** For continuous, rapid-fire input-based games where answers can be typed sequentially without pressing Enter, validating the input directly inside the `onChange` handler and clearing the state immediately on a correct answer provides an excellent user experience.
+**Action:** Use auto-submit/auto-clear patterns in `onChange` handlers for fast-paced text input games, and validate input aggressively (e.g. `!/^-?\d*$/.test(val)`) to prevent entering incorrect characters that could break parsing logic.
+
+## 2026-07-15 - Double Route Registration for Arcade Games
+**Learning:** When adding new Arcade games that should be accessible without authentication, ensure the route is injected into both the unauthenticated (`if (!user)`) and authenticated (`if (!profile)`) routing blocks in `src/App.jsx` to prevent redirection to the login page.
+**Action:** Always verify if a game should be playable without logging in, and if so, register its route in both sections of the `App.jsx` component.
+
+## 2026-07-15 - Avoiding Stale Closures in Global Event Listeners
+**Learning:** In React components, when attaching global event listeners (like `keydown`) that depend on state variables, using a `useRef` to store the latest callback function prevents stale closures while avoiding constant re-attachment of the event listener.
+**Action:** Use the `useRef` pattern for event listeners that need access to the latest state but should only be attached once on mount.
+
+## 2024-07-25 - Quick Math validation logic
+**Learning:** For continuous numeric input games, using `<input type="text" inputMode="numeric">` combined with explicit bounds checking and digit regex matching (`/^[0-9]+$/`) in the `onChange` handler provides a smoother experience than `type="number"`, as it avoids spin buttons and simplifies validation.
+**Action:** Use `type="text"` with `inputMode="numeric"` for rapid number input games and manually enforce length and character restrictions in the event handler.
+
+## 2024-11-20 - Global Keydown Listeners Stale Closures
+**Learning:** When attaching a global `window.addEventListener('keydown', callback)` inside a `useEffect` with an empty dependency array to prevent multiple registrations, the `callback` often accesses stale React state (like `gameState` or `score`) because it closes over the initial render variables.
+**Action:** To reliably access the latest state in global event listeners without constantly removing/re-adding the listener (which can lose events), store the latest function reference in a `useRef` (e.g., `const callbackRef = useRef(callback)`) that updates on every dependency change, and then simply invoke `callbackRef.current(e)` inside the stable event listener.
+## 2024-11-20 - Fast Timer Rendering
+**Learning:** Rendering a timer down to milliseconds using `setInterval` that triggers a React state update ~60 times a second can cause performance overhead by constantly re-rendering the entire component.
+**Action:** For highly precise sub-second timers, prefer using `requestAnimationFrame` attached directly to a DOM ref to avoid frequent, expensive React render cycles.
