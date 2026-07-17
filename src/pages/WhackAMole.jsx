@@ -31,6 +31,11 @@ export default function WhackAMole() {
   const moleTimerRef = useRef(null);
   const hitTimeoutsRef = useRef([]);
   const scoreRef = useRef(score);
+  const startGameRef = useRef(null);
+
+  useEffect(() => {
+    startGameRef.current = startGame;
+  });
 
   useEffect(() => {
     return () => {
@@ -219,6 +224,9 @@ export default function WhackAMole() {
       <div className="relative border hairline card bg-[var(--paper-tint)] p-4 sm:p-6 w-full max-w-md">
         {gameState === 'waiting' && (
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/5 z-10 backdrop-blur-[1px]">
+            <p className="mb-4 text-center font-mono text-sm uppercase tracking-widest opacity-80">
+              Target: ≥ 300 for 🔨 Master
+            </p>
             <button onClick={startGame} className="btn-primary">
               Start Game <span className="hidden sm:inline opacity-50 font-mono text-xs ml-2">(Enter)</span>
             </button>

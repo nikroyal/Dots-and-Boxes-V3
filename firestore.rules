@@ -53,26 +53,31 @@ service cloud.firestore {
         )
         || (
           changedKeys().hasOnly(['friends', 'outgoingFriendRequests'])
-          && request.resource.data.friends.size() == (resource.data.friends.size() + 1)
+          && request.resource.data.friends.size() == (resource.data.get('friends', []).size() + 1)
+          && request.resource.data.friends.hasAll(resource.data.get('friends', []))
           && request.resource.data.friends[request.resource.data.friends.size() - 1] == request.auth.uid
           && (request.auth.uid in resource.data.get('outgoingFriendRequests', []))
           && !(request.auth.uid in request.resource.data.get('outgoingFriendRequests', []))
+          && resource.data.get('outgoingFriendRequests', []).hasAll(request.resource.data.get('outgoingFriendRequests', []))
         )
         || (
           changedKeys().hasOnly(['friends'])
-          && request.resource.data.friends.size() == (resource.data.friends.size() - 1)
+          && request.resource.data.friends.size() == (resource.data.get('friends', []).size() - 1)
+          && resource.data.get('friends', []).hasAll(request.resource.data.friends)
           && !(request.auth.uid in request.resource.data.friends)
-          && (request.auth.uid in resource.data.friends)
+          && (request.auth.uid in resource.data.get('friends', []))
         )
         || (
           changedKeys().hasOnly(['outgoingFriendRequests'])
           && request.resource.data.get('outgoingFriendRequests', []).size() == (resource.data.get('outgoingFriendRequests', []).size() - 1)
           && !(request.auth.uid in request.resource.data.get('outgoingFriendRequests', []))
           && (request.auth.uid in resource.data.get('outgoingFriendRequests', []))
+          && resource.data.get('outgoingFriendRequests', []).hasAll(request.resource.data.get('outgoingFriendRequests', []))
         )
         || (
           changedKeys().hasOnly(['friendRequests'])
-          && request.resource.data.friendRequests.size() == (resource.data.friendRequests.size() + 1)
+          && request.resource.data.friendRequests.size() == (resource.data.get('friendRequests', []).size() + 1)
+          && request.resource.data.friendRequests.hasAll(resource.data.get('friendRequests', []))
           && request.resource.data.friendRequests[request.resource.data.friendRequests.size() - 1].fromId == request.auth.uid
         )
       );
@@ -110,15 +115,20 @@ service cloud.firestore {
       function specJoin() {
         return changedKeys().hasOnly(['spectators'])
           && request.resource.data.spectators.size() == (resource.data.get('spectators', []).size() + 1)
+          && request.resource.data.spectators.hasAll(resource.data.get('spectators', []))
           && request.resource.data.spectators[request.resource.data.spectators.size() - 1].id == request.auth.uid;
       }
       function specLeave() {
+        // Note: spectators is kept as an array of maps for frontend compatibility;
+        // checking request.auth.uid inside list of maps is limited by Firestore rule capabilities.
         return changedKeys().hasOnly(['spectators'])
-          && request.resource.data.spectators.size() == (resource.data.get('spectators', []).size() - 1);
+          && request.resource.data.spectators.size() == (resource.data.get('spectators', []).size() - 1)
+          && resource.data.get('spectators', []).hasAll(request.resource.data.spectators);
       }
       function chatAppend() {
         return changedKeys().hasOnly(['chat'])
           && request.resource.data.chat.size() == (resource.data.get('chat', []).size() + 1)
+          && request.resource.data.chat.hasAll(resource.data.get('chat', []))
           && request.resource.data.chat[request.resource.data.chat.size() - 1].userId == request.auth.uid;
       }
       function isHostJoining() {
@@ -143,8 +153,21 @@ service cloud.firestore {
                     && request.resource.data.participants[0] < request.resource.data.participants[1]
                     && convId == (request.resource.data.participants[0] + '_' + request.resource.data.participants[1]);
 
+      function protectedConvKeysChanged() {
+        return changedKeys().hasAny(['participants', 'requestedBy', 'requestedAt', 'createdAt', 'participantInfo']);
+      }
+
+      function isValidStatusTransition() {
+        return !changedKeys().hasAny(['status'])
+          || (resource.data.status == 'pending'
+              && (request.resource.data.status == 'accepted' || request.resource.data.status == 'declined')
+              && request.auth.uid != resource.data.requestedBy);
+      }
+
       allow update: if isAdmin() || (isSignedIn()
-                    && request.auth.uid in resource.data.participants);
+                    && request.auth.uid in resource.data.participants
+                    && !protectedConvKeysChanged()
+                    && isValidStatusTransition());
       allow delete: if isAdmin();
 
       match /messages/{msgId} {

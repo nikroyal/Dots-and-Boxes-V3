@@ -98,6 +98,8 @@ export default function WordScramble() {
     setUserInput('');
   }, []);
 
+
+
   const startGame = () => {
     sfx.click();
     setGameState('playing');
@@ -110,6 +112,10 @@ export default function WordScramble() {
     timerRef.current = setInterval(() => {
       setTimeLeft((prev) => Math.max(0, prev - 1));
     }, 1000);
+
+    setTimeout(() => {
+      if (inputRef.current) inputRef.current.focus();
+    }, 10);
   };
 
   const endGame = useCallback(() => {
