@@ -347,6 +347,21 @@ export const EXPERIENCE_CATALOG = [
     ],
     routePrefixes: ['/color-match'],
   },
+  {
+    id: 'speed-grid',
+    name: 'Speed Grid',
+    shortName: 'Speed Grid',
+    path: '/speed-grid',
+    kind: 'Arcade',
+    status: 'Live',
+    accent: 'var(--ochre)',
+    description: 'Click the numbers from 1 to 25 as fast as you can.',
+    features: ['Local play', 'Best time'],
+    navItems: [
+      { to: '/speed-grid', label: 'Play' },
+    ],
+    routePrefixes: ['/speed-grid'],
+  },
 ];
 
 export const DEFAULT_EXPERIENCE = {
