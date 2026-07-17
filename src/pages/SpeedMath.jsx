@@ -9,8 +9,7 @@ const GAME_DURATION = 60; // 60 seconds
 export default function SpeedMath() {
   const { profile } = useAuth();
 
-  // states: 'waiting' | 'playing' | 'result'
-  const [gameState, setGameState] = useState('waiting');
+  const [gameState, setGameState] = useState('waiting'); // 'waiting' | 'playing' | 'result'
   const [timeLeft, setTimeLeft] = useState(GAME_DURATION);
   const [score, setScore] = useState(0);
   const [problem, setProblem] = useState({ text: '', answer: 0 });
@@ -27,33 +26,39 @@ export default function SpeedMath() {
   });
 
   const timerRef = useRef(null);
+  const startTimeRef = useRef(null);
   const inputRef = useRef(null);
 
   useEffect(() => {
     return () => {
-      if (timerRef.current) clearInterval(timerRef.current);
+      if (timerRef.current) cancelAnimationFrame(timerRef.current);
     };
   }, []);
 
   const generateProblem = useCallback(() => {
-    const operators = ['+', '-', '*'];
-    const operator = operators[Math.floor(Math.random() * operators.length)];
+    const ops = ['+', '-', '*'];
+    const op = ops[Math.floor(Math.random() * ops.length)];
     let a, b, text, answer;
 
-    if (operator === '+') {
-      a = Math.floor(Math.random() * 50) + 1;
-      b = Math.floor(Math.random() * 50) + 1;
+    if (op === '+') {
+      a = Math.floor(Math.random() * 90) + 10;
+      b = Math.floor(Math.random() * 90) + 10;
       text = `${a} + ${b}`;
       answer = a + b;
-    } else if (operator === '-') {
-      a = Math.floor(Math.random() * 50) + 20;
-      b = Math.floor(Math.random() * 20) + 1;
+    } else if (op === '-') {
+      a = Math.floor(Math.random() * 90) + 10;
+      b = Math.floor(Math.random() * 90) + 10;
+      if (a < b) {
+        let temp = a;
+        a = b;
+        b = temp;
+      }
       text = `${a} - ${b}`;
       answer = a - b;
-    } else if (operator === '*') {
-      a = Math.floor(Math.random() * 12) + 2;
-      b = Math.floor(Math.random() * 12) + 2;
-      text = `${a} × ${b}`;
+    } else {
+      a = Math.floor(Math.random() * 11) + 2;
+      b = Math.floor(Math.random() * 11) + 2;
+      text = `${a} * ${b}`;
       answer = a * b;
     }
 
@@ -68,10 +73,21 @@ export default function SpeedMath() {
     setScore(0);
     generateProblem();
 
-    if (timerRef.current) clearInterval(timerRef.current);
-    timerRef.current = setInterval(() => {
-      setTimeLeft((prev) => Math.max(0, prev - 1));
-    }, 1000);
+    startTimeRef.current = performance.now();
+
+    const tick = () => {
+      const now = performance.now();
+      const elapsed = (now - startTimeRef.current) / 1000;
+      const remaining = Math.max(0, GAME_DURATION - elapsed);
+      setTimeLeft(Math.ceil(remaining));
+
+      if (remaining > 0) {
+        timerRef.current = requestAnimationFrame(tick);
+      }
+    };
+
+    if (timerRef.current) cancelAnimationFrame(timerRef.current);
+    timerRef.current = requestAnimationFrame(tick);
   }, [generateProblem]);
 
   useEffect(() => {
@@ -81,7 +97,7 @@ export default function SpeedMath() {
   }, [gameState]);
 
   const endGame = useCallback(() => {
-    if (timerRef.current) clearInterval(timerRef.current);
+    if (timerRef.current) cancelAnimationFrame(timerRef.current);
 
     sfx.win();
     setGameState('result');
@@ -91,8 +107,8 @@ export default function SpeedMath() {
       try {
         localStorage.setItem('axiom-speedmath-best', score.toString());
       } catch {}
-      recordActivity(profile, ACTIVITY_TYPES.ARCADE_BEST, { game: 'Speed Math', score: score + ' pts' });
-      updateArcadeBest(profile, 'speed-math', 'Speed Math', score, score + ' pts');
+      recordActivity(profile, ACTIVITY_TYPES.ARCADE_BEST, { game: 'Speed Math', score: score });
+      updateArcadeBest(profile, 'speed-math', 'Speed Math', score, score.toString());
     }
   }, [bestScore, profile, score]);
 
@@ -102,10 +118,40 @@ export default function SpeedMath() {
     }
   }, [timeLeft, gameState, endGame]);
 
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (gameState !== 'playing' && e.key === 'Enter') {
+        e.preventDefault();
+        startGame();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [gameState, startGame]);
+
+  const handleChange = (e) => {
+    if (gameState !== 'playing') return;
+    const val = e.target.value;
+
+    // Allow only numbers and minus sign
+    if (!/^-?\d*$/.test(val)) return;
+
+    setUserInput(val);
+
+    if (val !== '' && val !== '-') {
+      const parsedVal = parseInt(val, 10);
+      if (parsedVal === problem.answer) {
+        sfx.piece();
+        setScore(s => s + 1);
+        generateProblem();
+      }
+    }
+  };
+
   const handleShare = (e) => {
     e.stopPropagation();
     e.preventDefault();
-    const text = `I scored ${score} in Axiom Speed Math! 🧮`;
+    const text = `I solved ${score} math problems in 60s in Axiom Speed Math! 🧮`;
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(text).then(() => {
         sfx.notify();
@@ -117,48 +163,15 @@ export default function SpeedMath() {
     }
   };
 
-  const handleChange = (e) => {
-    if (gameState !== 'playing') return;
-    const value = e.target.value;
-
-    // Only allow numbers and minus sign
-    if (!/^-?\d*$/.test(value)) return;
-
-    setUserInput(value);
-
-    // Auto-submit if the typed answer is fully correct
-    if (value !== '' && value !== '-' && parseInt(value, 10) === problem.answer) {
-      sfx.piece();
-      setScore(prev => prev + 1);
-      generateProblem();
-    } else if (value.length >= problem.answer.toString().length + 1) {
-       // if we exceeded max characters and it's wrong, we could just clear it, but let's just let it be.
-    }
-  };
-
-  const handleKeyDown = useCallback((e) => {
-    if (gameState === 'waiting' || gameState === 'result') {
-        if (e.key === 'Enter') {
-            e.preventDefault();
-            startGame();
-        }
-    }
-  }, [gameState, startGame]);
-
-  useEffect(() => {
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [handleKeyDown]);
-
   return (
     <div className="fade-in max-w-2xl mx-auto flex flex-col items-center justify-center min-h-[60vh] px-4">
       <section className="text-center mb-8">
         <h1 className="font-display text-5xl font-medium tracking-tight mb-2">Speed Math</h1>
         <p className="font-mono text-sm tracking-widest uppercase opacity-60 mb-2">
-          Time: {timeLeft}s | Score: {score}
+          Score: <span className="score-display">{score}</span> <span className="ml-4">Time: {timeLeft}s</span>
         </p>
         {bestScore > 0 && (
-          <p className="font-mono text-xs tracking-widest uppercase opacity-80 mt-2 text-[var(--ochre)]">
+          <p className="font-mono text-xs tracking-widest uppercase opacity-80 mt-2 text-[var(--forest)]">
             Best Score: {bestScore}
           </p>
         )}
@@ -168,7 +181,7 @@ export default function SpeedMath() {
         {gameState === 'waiting' && (
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-[var(--paper-tint)] z-10">
             <p className="mb-6 font-display text-xl opacity-80 text-center px-4">
-              Solve as many math problems as you can in 60 seconds!
+              Solve as many basic math problems as you can in 60 seconds!
             </p>
             <button onClick={startGame} className="btn-primary">
               Start Game (Enter)
@@ -179,7 +192,7 @@ export default function SpeedMath() {
         {gameState === 'result' && (
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-[var(--paper-tint)]/90 z-10 backdrop-blur-sm">
              <div className="font-display text-4xl mb-2 text-[var(--crimson)]">Time's Up!</div>
-             <div className="font-display text-3xl mb-6 opacity-90 text-[var(--ochre)]">{score} Points</div>
+             <div className="font-display text-3xl mb-6 opacity-90 text-[var(--forest)]">{score} Solved</div>
              <div className="flex gap-4">
                <button onClick={startGame} className="btn-primary">
                   Try Again (Enter)
@@ -191,9 +204,9 @@ export default function SpeedMath() {
           </div>
         )}
 
-        <div className="flex flex-col items-center justify-center space-y-8 min-h-[200px]">
-          <div className="text-5xl font-display leading-relaxed text-center tracking-widest pointer-events-none">
-            {problem.text}
+        <div className="flex flex-col items-center justify-center space-y-8 min-h-[150px]">
+          <div className="text-4xl sm:text-5xl font-mono tracking-widest font-bold text-[var(--ink)] text-center problem-text">
+            {problem.text || '?'}
           </div>
 
           <input
@@ -202,10 +215,9 @@ export default function SpeedMath() {
             inputMode="numeric"
             value={userInput}
             onChange={handleChange}
-            className="w-full text-center text-3xl font-display p-4 border hairline bg-[var(--bg-soft)] focus:outline-none focus:ring-2 focus:ring-[var(--ochre)]"
-            placeholder="?"
+            className="w-full text-center text-3xl font-display p-4 border hairline bg-[var(--bg-soft)] focus:outline-none focus:ring-2 focus:ring-[var(--forest)]"
+            placeholder="Answer..."
             disabled={gameState !== 'playing'}
-            autoFocus
             autoComplete="off"
             spellCheck="false"
           />
