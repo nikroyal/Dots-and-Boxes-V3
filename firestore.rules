@@ -123,7 +123,9 @@ service cloud.firestore {
         // checking request.auth.uid inside list of maps is limited by Firestore rule capabilities.
         return changedKeys().hasOnly(['spectators'])
           && request.resource.data.spectators.size() == (resource.data.get('spectators', []).size() - 1)
-          && resource.data.get('spectators', []).hasAll(request.resource.data.spectators);
+          && resource.data.get('spectators', []).hasAll(request.resource.data.spectators)
+          && resource.data.get('spectators', []).any(s, s.id == request.auth.uid)
+          && !request.resource.data.spectators.any(s, s.id == request.auth.uid);
       }
       function chatAppend() {
         return changedKeys().hasOnly(['chat'])
