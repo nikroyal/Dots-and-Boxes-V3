@@ -153,8 +153,13 @@ service cloud.firestore {
                     && request.resource.data.participants[0] < request.resource.data.participants[1]
                     && convId == (request.resource.data.participants[0] + '_' + request.resource.data.participants[1]);
 
+      function protectedConvKeysChanged() {
+        return changedKeys().hasAny(['participants', 'requestedBy', 'createdAt']);
+      }
+
       allow update: if isAdmin() || (isSignedIn()
-                    && request.auth.uid in resource.data.participants);
+                    && request.auth.uid in resource.data.participants
+                    && !protectedConvKeysChanged());
       allow delete: if isAdmin();
 
       match /messages/{msgId} {
