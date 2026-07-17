@@ -57,6 +57,7 @@ service cloud.firestore {
           && request.resource.data.friends.hasAll(resource.data.get('friends', []))
           && request.resource.data.friends[request.resource.data.friends.size() - 1] == request.auth.uid
           && (request.auth.uid in resource.data.get('outgoingFriendRequests', []))
+          && resource.data.get('outgoingFriendRequests', []).hasAll(request.resource.data.get('outgoingFriendRequests', []))
           && !(request.auth.uid in request.resource.data.get('outgoingFriendRequests', []))
           && resource.data.get('outgoingFriendRequests', []).hasAll(request.resource.data.get('outgoingFriendRequests', []))
         )
@@ -129,7 +130,9 @@ service cloud.firestore {
         // checking request.auth.uid inside list of maps is limited by Firestore rule capabilities.
         return changedKeys().hasOnly(['spectators'])
           && request.resource.data.spectators.size() == (resource.data.get('spectators', []).size() - 1)
-          && resource.data.get('spectators', []).hasAll(request.resource.data.spectators);
+          && resource.data.get('spectators', []).hasAll(request.resource.data.spectators)
+          && resource.data.get('spectators', []).any(s, s.id == request.auth.uid)
+          && !request.resource.data.spectators.any(s, s.id == request.auth.uid);
       }
       function chatAppend() {
         return changedKeys().hasOnly(['chat'])
