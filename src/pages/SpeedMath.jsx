@@ -71,7 +71,7 @@ export default function SpeedMath() {
     setUserInput('');
   }, []);
 
-  const startGame = () => {
+  const startGame = useCallback(() => {
     sfx.click();
     setGameState('playing');
     setTimeLeft(GAME_DURATION);
@@ -93,14 +93,12 @@ export default function SpeedMath() {
 
       if (remaining > 0) {
         timerRef.current = requestAnimationFrame(tick);
-      } else {
-        endGame();
       }
     };
 
     if (timerRef.current) cancelAnimationFrame(timerRef.current);
     timerRef.current = requestAnimationFrame(tick);
-  };
+  }, [generateProblem]);
 
   const endGame = useCallback(() => {
     if (timerRef.current) cancelAnimationFrame(timerRef.current);
@@ -120,25 +118,22 @@ export default function SpeedMath() {
     }
   }, [bestScore, profile]);
 
-
-  const handleKeyDownRef = useRef();
+  useEffect(() => {
+    if (gameState === 'playing' && timeLeft === 0) {
+      endGame();
+    }
+  }, [timeLeft, gameState, endGame]);
 
   useEffect(() => {
-    handleKeyDownRef.current = (e) => {
-      if (gameState !== 'playing') {
-        if (e.key === 'Enter') {
-          e.preventDefault();
-          startGame();
-        }
+    const handleKeyDown = (e) => {
+      if (gameState !== 'playing' && e.key === 'Enter') {
+        e.preventDefault();
+        startGame();
       }
     };
-  }, [gameState, startGame]);
-
-  useEffect(() => {
-    const handleKeyDown = (e) => handleKeyDownRef.current(e);
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
+  }, [gameState, startGame]);
 
   const handleChange = (e) => {
     if (gameState !== 'playing') return;
