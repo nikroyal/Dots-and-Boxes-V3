@@ -50,6 +50,22 @@ export default function TypingSpeed() {
   const timerRef = useRef(null);
   const inputRef = useRef(null);
   const totalCharactersRef = useRef(0);
+  const startGameRef = useRef(null);
+
+  useEffect(() => {
+    startGameRef.current = startGame;
+  });
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if ((gameState === 'waiting' || gameState === 'result') && e.key === 'Enter' && e.target.tagName !== 'BUTTON') {
+        e.preventDefault();
+        startGameRef.current?.();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [gameState]);
 
   useEffect(() => {
     return () => {
@@ -67,6 +83,21 @@ export default function TypingSpeed() {
     setUserInput('');
   }, []);
 
+  const getRating = (w) => {
+    if (w >= 80) return "⚡ Hacker";
+    if (w >= 60) return "🚀 Fast";
+    if (w >= 40) return "🏃 Average";
+    return "🐢 Beginner";
+  };
+
+
+
+  useEffect(() => {
+    if (gameState === 'playing' && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [gameState]);
+
   const startGame = () => {
     sfx.click();
     setGameState('playing');
@@ -80,6 +111,10 @@ export default function TypingSpeed() {
     timerRef.current = setInterval(() => {
       setTimeLeft((prev) => Math.max(0, prev - 1));
     }, 1000);
+
+    setTimeout(() => {
+      if (inputRef.current) inputRef.current.focus();
+    }, 10);
   };
 
   const endGame = useCallback(() => {
@@ -111,7 +146,8 @@ export default function TypingSpeed() {
   const handleShare = (e) => {
     e.stopPropagation();
     e.preventDefault();
-    const text = `I typed ${wpm} WPM in Axiom Typing Speed! ⌨️`;
+    const rating = getRating(wpm);
+    const text = `I typed ${wpm} WPM in Axiom Typing Speed! ${rating}`;
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(text).then(() => {
         sfx.notify();
@@ -185,10 +221,11 @@ export default function TypingSpeed() {
         {gameState === 'waiting' && (
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-[var(--paper-tint)] z-10">
             <p className="mb-6 font-display text-xl opacity-80 text-center px-4">
-              Type the phrases as fast and accurately as possible in 60 seconds!
+              Type the phrases as fast and accurately as possible in 60 seconds!<br/>
+              <span className="text-sm opacity-60 mt-2 block font-mono tracking-widest uppercase">Target: ≥ 60 WPM for 🚀</span>
             </p>
             <button onClick={startGame} className="btn-primary">
-              Start Test
+              Start Test <span className="hidden sm:inline opacity-50 font-mono text-xs ml-2">(Enter)</span>
             </button>
           </div>
         )}
@@ -196,10 +233,11 @@ export default function TypingSpeed() {
         {gameState === 'result' && (
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-[var(--paper-tint)]/90 z-10 backdrop-blur-sm">
              <div className="font-display text-4xl mb-2 text-[var(--crimson)]">Time's Up!</div>
-             <div className="font-display text-3xl mb-6 opacity-90 text-[var(--forest)]">{wpm} WPM</div>
+             <div className="font-display text-3xl mb-2 opacity-90 text-[var(--forest)]">{wpm} WPM</div>
+             <div className="font-display text-2xl mb-6 opacity-90 text-[var(--ink)]">{getRating(wpm)}</div>
              <div className="flex gap-4">
                <button onClick={startGame} className="btn-primary">
-                  Try Again
+                  Try Again <span className="hidden sm:inline opacity-50 font-mono text-xs ml-2">(Enter)</span>
                </button>
                <button onClick={handleShare} className="btn-ghost">
                  {copied ? 'Copied!' : 'Share Result'}
@@ -218,6 +256,7 @@ export default function TypingSpeed() {
             type="text"
             value={userInput}
             onChange={handleChange}
+            aria-label="Type the quote"
             className="w-full max-w-lg text-center text-xl font-display p-4 border hairline bg-[var(--bg-soft)] focus:outline-none focus:ring-2 focus:ring-[var(--forest)]"
             placeholder="Start typing..."
             disabled={gameState !== 'playing'}
