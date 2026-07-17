@@ -52,7 +52,6 @@ service cloud.firestore {
           && !protectedUserKeysChanged()
         )
         || (
-          changedKeys().hasOnly(['friends', 'outgoingFriendRequests'])
           && request.resource.data.friends.size() == (resource.data.get('friends', []).size() + 1)
           && request.resource.data.friends[request.resource.data.friends.size() - 1] == request.auth.uid
           && request.resource.data.friends.hasAll(resource.data.get('friends', []))
@@ -120,7 +119,6 @@ service cloud.firestore {
       function specJoin() {
         return changedKeys().hasOnly(['spectators'])
           && request.resource.data.spectators.size() == (resource.data.get('spectators', []).size() + 1)
-          && request.resource.data.spectators.hasAll(resource.data.get('spectators', []))
           && request.resource.data.spectators[request.resource.data.spectators.size() - 1].id == request.auth.uid
           && request.resource.data.spectators[request.resource.data.spectators.size() - 1].username is string
           && request.resource.data.spectators[request.resource.data.spectators.size() - 1].avatar is string;
@@ -138,7 +136,6 @@ service cloud.firestore {
       function chatAppend() {
         return changedKeys().hasOnly(['chat'])
           && request.resource.data.chat.size() == (resource.data.get('chat', []).size() + 1)
-          && request.resource.data.chat.hasAll(resource.data.get('chat', []))
           && request.resource.data.chat[request.resource.data.chat.size() - 1].userId == request.auth.uid
           && request.resource.data.chat[request.resource.data.chat.size() - 1].username is string
           && request.resource.data.chat[request.resource.data.chat.size() - 1].avatar is string
