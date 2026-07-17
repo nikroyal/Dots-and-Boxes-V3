@@ -6,15 +6,37 @@ import { sfx } from '../lib/sound';
 
 const GAME_DURATION = 60; // 60 seconds
 
+const generateQuestion = () => {
+  const operations = ['+', '-', '*'];
+  const op = operations[Math.floor(Math.random() * operations.length)];
+  let num1, num2, answer;
+
+  if (op === '+') {
+    num1 = Math.floor(Math.random() * 50) + 1;
+    num2 = Math.floor(Math.random() * 50) + 1;
+    answer = num1 + num2;
+  } else if (op === '-') {
+    num1 = Math.floor(Math.random() * 50) + 20;
+    num2 = Math.floor(Math.random() * 20) + 1;
+    answer = num1 - num2;
+  } else if (op === '*') {
+    num1 = Math.floor(Math.random() * 12) + 1;
+    num2 = Math.floor(Math.random() * 12) + 1;
+    answer = num1 * num2;
+  }
+
+  return { text: `${num1} ${op} ${num2}`, answer };
+};
+
 export default function QuickMath() {
   const { profile } = useAuth();
 
   // states: 'waiting' | 'playing' | 'gameover'
   const [gameState, setGameState] = useState('waiting');
+  const [timeLeft, setTimeLeft] = useState(GAME_DURATION);
   const [score, setScore] = useState(0);
   const [copied, setCopied] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(GAME_DURATION);
-  const [equation, setEquation] = useState({ text: '', answer: 0 });
+  const [question, setQuestion] = useState({ text: '', answer: 0 });
   const [userInput, setUserInput] = useState('');
   const [bestScore, setBestScore] = useState(() => {
     try {
@@ -35,10 +57,12 @@ export default function QuickMath() {
   const timerRef = useRef(null);
   const scoreRef = useRef(score);
   const inputRef = useRef(null);
+  const timeoutRef = useRef(null);
 
   useEffect(() => {
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
     };
   }, []);
 
@@ -46,26 +70,8 @@ export default function QuickMath() {
     scoreRef.current = score;
   }, [score]);
 
-  const generateEquation = useCallback(() => {
-    const ops = ['+', '-', '*'];
-    const op = ops[Math.floor(Math.random() * ops.length)];
-    let num1, num2, answer;
-
-    if (op === '+') {
-      num1 = Math.floor(Math.random() * 50) + 1;
-      num2 = Math.floor(Math.random() * 50) + 1;
-      answer = num1 + num2;
-    } else if (op === '-') {
-      num1 = Math.floor(Math.random() * 50) + 20;
-      num2 = Math.floor(Math.random() * 20) + 1;
-      answer = num1 - num2;
-    } else if (op === '*') {
-      num1 = Math.floor(Math.random() * 12) + 1;
-      num2 = Math.floor(Math.random() * 12) + 1;
-      answer = num1 * num2;
-    }
-
-    setEquation({ text: `${num1} ${op} ${num2}`, answer });
+  const loadNewQuestion = useCallback(() => {
+    setQuestion(generateQuestion());
     setUserInput('');
   }, []);
 
@@ -75,19 +81,13 @@ export default function QuickMath() {
     setScore(0);
     setTimeLeft(GAME_DURATION);
     scoreRef.current = 0;
-    generateEquation();
+    loadNewQuestion();
 
     if (timerRef.current) clearInterval(timerRef.current);
     timerRef.current = setInterval(() => {
       setTimeLeft((prev) => Math.max(0, prev - 1));
     }, 1000);
-  }, [generateEquation]);
-
-  useEffect(() => {
-    if (gameState === 'playing' && inputRef.current) {
-      inputRef.current.focus();
-    }
-  }, [gameState]);
+  }, [loadNewQuestion]);
 
   const endGame = useCallback(() => {
     if (timerRef.current) clearInterval(timerRef.current);
@@ -112,41 +112,11 @@ export default function QuickMath() {
     }
   }, [timeLeft, gameState, endGame]);
 
-  const getRatingMessage = (s) => {
-    if (s >= 50) return "🧮 Math Genius";
-    if (s >= 30) return "🧮 Math Whiz";
-    if (s >= 15) return "🧮 Good";
-    return "🧮 Beginner";
-  };
-
-  const handleShare = (e) => {
-    e.stopPropagation();
-    e.preventDefault();
-    const rating = getRatingMessage(score);
-    const text = `I scored ${score} in Axiom Quick Math! ${rating}`;
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(text).then(() => {
-        sfx.notify();
-        setCopied(true);
-        setTimeout(() => setCopied(false), 2000);
-      }).catch(err => console.warn("Clipboard copy failed", err));
-    } else {
-      console.warn("Clipboard API not supported");
+  useEffect(() => {
+    if (gameState === 'playing') {
+      inputRef.current?.focus();
     }
-  };
-
-  const handleChange = (e) => {
-    if (gameState !== 'playing') return;
-    // Strip non-numeric characters for simple bounds checking and validation
-    const rawValue = e.target.value.replace(/[^0-9-]/g, '');
-    setUserInput(rawValue);
-
-    if (rawValue && parseInt(rawValue, 10) === equation.answer) {
-      sfx.piece();
-      setScore((s) => s + 1);
-      generateEquation();
-    }
-  };
+  }, [gameState]);
 
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -159,6 +129,48 @@ export default function QuickMath() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [gameState, startGame]);
 
+  const getRatingMessage = (s) => {
+    if (s >= 40) return "🚀 Human Calculator";
+    if (s >= 25) return "⚡ Lightning Fast";
+    if (s >= 15) return "🧠 Smart Cookie";
+    return "🐢 Beginner";
+  };
+
+  const handleShare = (e) => {
+    e.stopPropagation();
+    e.preventDefault();
+    const rating = getRatingMessage(score);
+    const text = `I solved ${score} problems in Axiom Quick Math! ${rating}`;
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(() => {
+        sfx.notify();
+        setCopied(true);
+        if (timeoutRef.current) clearTimeout(timeoutRef.current);
+        timeoutRef.current = setTimeout(() => setCopied(false), 2000);
+      }).catch(err => console.warn("Clipboard copy failed", err));
+    } else {
+      console.warn("Clipboard API not supported");
+    }
+  };
+
+  const handleChange = (e) => {
+    if (gameState !== 'playing') return;
+
+    const val = e.target.value;
+
+    // Only allow numbers and max length of 6
+    if (val !== '' && !/^[0-9]+$/.test(val)) return;
+    if (val.length > 6) return;
+
+    setUserInput(val);
+
+    if (val !== '' && parseInt(val, 10) === question.answer) {
+      sfx.piece();
+      setScore((s) => s + 1);
+      loadNewQuestion();
+    }
+  };
+
   return (
     <div className="fade-in max-w-2xl mx-auto flex flex-col items-center justify-center min-h-[60vh]">
       <section className="text-center mb-8">
@@ -167,7 +179,7 @@ export default function QuickMath() {
           Score: {score} <span className="ml-4">Time: {timeLeft}s</span>
         </p>
         {bestScore > 0 && (
-          <p className="font-mono text-xs tracking-widest uppercase opacity-80 mt-2 text-[var(--ochre)]">
+          <p className="font-mono text-xs tracking-widest uppercase opacity-80 mt-2 text-[var(--forest)]">
             Best Score: {bestScore}
           </p>
         )}
@@ -198,29 +210,44 @@ export default function QuickMath() {
           </div>
         )}
 
-        <div className="flex flex-col items-center justify-center space-y-6 min-h-[150px]">
-          <div className="text-5xl sm:text-6xl font-mono uppercase font-bold text-[var(--ink)] text-center">
-            {equation.text || '...'}
+        <div className="flex flex-col items-center justify-center space-y-6">
+          <div className="text-5xl font-display tracking-widest text-[var(--ink)] break-all text-center">
+            {question.text || '?'}
           </div>
 
-          <input
-            ref={inputRef}
-            type="text"
-            inputMode="numeric"
-            aria-label="Type answer"
-            value={userInput}
-            onChange={handleChange}
-            className="w-full max-w-[200px] text-center text-3xl font-display p-4 border hairline bg-[var(--bg-soft)] focus:outline-none focus:ring-2 focus:ring-[var(--ochre)]"
-            placeholder="?"
-            disabled={gameState !== 'playing'}
-            autoFocus
-            autoComplete="off"
-          />
+          <form onSubmit={(e) => e.preventDefault()} className="w-full flex flex-col items-center">
+            <input
+              ref={inputRef}
+              type="text"
+              inputMode="numeric"
+              aria-label="Type answer"
+              value={userInput}
+              onChange={handleChange}
+              className="w-full text-center text-4xl font-mono p-4 border hairline bg-[var(--bg-soft)] focus:outline-none focus:ring-2 focus:ring-[var(--forest)]"
+              placeholder="?"
+              disabled={gameState !== 'playing'}
+              autoComplete="off"
+              spellCheck="false"
+            />
+          </form>
+
+          <div className="flex gap-2">
+            <button
+              onClick={() => {
+                sfx.click();
+                loadNewQuestion();
+              }}
+              disabled={gameState !== 'playing'}
+              className="btn-ghost text-xs"
+            >
+              Skip
+            </button>
+          </div>
         </div>
       </div>
 
       <p className="mt-8 font-mono text-xs opacity-50 hidden sm:block text-center max-w-xs">
-        Solve as many equations as you can in 60 seconds!
+        Solve as many math problems as you can in 60 seconds!
       </p>
     </div>
   );
