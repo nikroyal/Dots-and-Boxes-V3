@@ -45,7 +45,6 @@ import ColorMatch from './pages/ColorMatch';
 import SpeedGrid from './pages/SpeedGrid';
 
 import TypingSpeed from './pages/TypingSpeed';
-import QuickMath from './pages/QuickMath';
 
 import LocalDistrictExchange from './pages/LocalDistrictExchange';
 import DistrictExchangeHub from './pages/DistrictExchangeHub';
@@ -128,10 +127,8 @@ function Shell() {
         <Route path="/speed-grid" element={<SpeedGrid />} />
 
         <Route path="/typing-speed" element={<TypingSpeed />} />
-        <Route path="/quick-math" element={<QuickMath />} />
         <Route path="/district-exchange/local" element={<LocalDistrictExchange />} />
         <Route path="/snake" element={<Snake />} />
-        <Route path="/guess-the-number" element={<GuessTheNumber />} />
         <Route path="/battleships" element={<Battleships />} />
         <Route path="/paper-io" element={<PaperIo />} />
         <Route path="*" element={<Navigate to="/login" />} />
@@ -186,9 +183,7 @@ function Shell() {
 
               <Route path="/click-the-target" element={<ClickTheTarget />} />
               <Route path="/typing-speed" element={<TypingSpeed />} />
-              <Route path="/quick-math" element={<QuickMath />} />
               <Route path="/snake" element={<Snake />} />
-              <Route path="/guess-the-number" element={<GuessTheNumber />} />
               <Route path="/battleships" element={<Battleships />} />
               <Route path="/lobby" element={<Lobby />} />
               <Route path="/match/:id" element={<Match />} />
