@@ -208,7 +208,7 @@ export default function MemoryMatch() {
 
       <div className="flex justify-center gap-4">
         <button onClick={() => { sfx.click(); initializeGame(); }} className="btn-primary">
-          Restart Game <span className="hidden sm:inline opacity-50 font-mono text-xs ml-2">(Enter)</span>
+          Restart Game {isGameWon && <span className="hidden sm:inline opacity-50 font-mono text-xs ml-2">(Enter)</span>}
         </button>
         {isGameWon && (
           <button onClick={handleShare} className="btn-secondary">
