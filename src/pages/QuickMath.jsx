@@ -6,16 +6,38 @@ import { sfx } from '../lib/sound';
 
 const GAME_DURATION = 60; // 60 seconds
 
+const generateQuestion = () => {
+  const operations = ['+', '-', '*'];
+  const op = operations[Math.floor(Math.random() * operations.length)];
+  let num1, num2, answer;
+
+  if (op === '+') {
+    num1 = Math.floor(Math.random() * 50) + 1;
+    num2 = Math.floor(Math.random() * 50) + 1;
+    answer = num1 + num2;
+  } else if (op === '-') {
+    num1 = Math.floor(Math.random() * 50) + 20;
+    num2 = Math.floor(Math.random() * 20) + 1;
+    answer = num1 - num2;
+  } else if (op === '*') {
+    num1 = Math.floor(Math.random() * 12) + 1;
+    num2 = Math.floor(Math.random() * 12) + 1;
+    answer = num1 * num2;
+  }
+
+  return { text: `${num1} ${op} ${num2}`, answer };
+};
+
 export default function QuickMath() {
   const { profile } = useAuth();
 
   // states: 'waiting' | 'playing' | 'gameover'
   const [gameState, setGameState] = useState('waiting');
-  const [score, setScore] = useState(0);
   const [timeLeft, setTimeLeft] = useState(GAME_DURATION);
-  const [problem, setProblem] = useState({ text: '', answer: 0 });
-  const [userInput, setUserInput] = useState('');
+  const [score, setScore] = useState(0);
   const [copied, setCopied] = useState(false);
+  const [question, setQuestion] = useState({ text: '', answer: 0 });
+  const [userInput, setUserInput] = useState('');
   const [bestScore, setBestScore] = useState(() => {
     try {
       const saved = localStorage.getItem('axiom-quickmath-best');
@@ -41,36 +63,18 @@ export default function QuickMath() {
     scoreRef.current = score;
   }, [score]);
 
-  const generateProblem = useCallback(() => {
-    const ops = ['+', '-', '*'];
-    const op = ops[Math.floor(Math.random() * ops.length)];
-    let a, b, answer;
-
-    if (op === '+') {
-      a = Math.floor(Math.random() * 50) + 1;
-      b = Math.floor(Math.random() * 50) + 1;
-      answer = a + b;
-    } else if (op === '-') {
-      a = Math.floor(Math.random() * 50) + 20;
-      b = Math.floor(Math.random() * a) + 1;
-      answer = a - b;
-    } else {
-      a = Math.floor(Math.random() * 12) + 2;
-      b = Math.floor(Math.random() * 12) + 2;
-      answer = a * b;
-    }
-
-    setProblem({ text: `${a} ${op} ${b}`, answer });
+  const loadNewQuestion = useCallback(() => {
+    setQuestion(generateQuestion());
     setUserInput('');
   }, []);
 
-  const startGame = () => {
+  const startGame = useCallback(() => {
     sfx.click();
     setGameState('playing');
     setScore(0);
     setTimeLeft(GAME_DURATION);
     scoreRef.current = 0;
-    generateProblem();
+    loadNewQuestion();
 
     setTimeout(() => {
       if (inputRef.current) inputRef.current.focus();
@@ -80,7 +84,7 @@ export default function QuickMath() {
     timerRef.current = setInterval(() => {
       setTimeLeft((prev) => Math.max(0, prev - 1));
     }, 1000);
-  };
+  }, [loadNewQuestion]);
 
   const endGame = useCallback(() => {
     if (timerRef.current) clearInterval(timerRef.current);
@@ -105,12 +109,16 @@ export default function QuickMath() {
     }
   }, [timeLeft, gameState, endGame]);
 
+  useEffect(() => {
+    if (gameState === 'playing') {
+      inputRef.current?.focus();
+    }
+  }, [gameState]);
+
   const handleKeyDown = (e) => {
-    if (gameState === 'waiting' || gameState === 'gameover') {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        startGame();
-      }
+    if (e.key === 'Enter' && (gameState === 'waiting' || gameState === 'gameover')) {
+      e.preventDefault();
+      startGame();
     }
   };
 
@@ -125,24 +133,11 @@ export default function QuickMath() {
     return () => window.removeEventListener('keydown', listener);
   }, []);
 
-  const handleChange = (e) => {
-    if (gameState !== 'playing') return;
-    const value = e.target.value.replace(/[^0-9-]/g, '');
-    setUserInput(value);
-
-    if (parseInt(value, 10) === problem.answer) {
-      sfx.piece();
-      setScore((s) => s + 1);
-      generateProblem();
-    }
-  };
-
   const getRatingMessage = (s) => {
-    if (s >= 40) return "🧮 Calculator!";
-    if (s >= 30) return "🧮 Math Genius!";
-    if (s >= 20) return "🧮 Number Ninja!";
-    if (s >= 10) return "🧮 Good!";
-    return "🧮 Keep practicing!";
+    if (s >= 40) return "🚀 Human Calculator";
+    if (s >= 25) return "⚡ Lightning Fast";
+    if (s >= 15) return "🧠 Smart Cookie";
+    return "🐢 Beginner";
   };
 
   const handleShare = (e) => {
@@ -159,6 +154,24 @@ export default function QuickMath() {
       }).catch(err => console.warn("Clipboard copy failed", err));
     } else {
       console.warn("Clipboard API not supported");
+    }
+  };
+
+  const handleChange = (e) => {
+    if (gameState !== 'playing') return;
+
+    const val = e.target.value;
+
+    // Only allow numbers and max length of 6
+    if (val !== '' && !/^[0-9]+$/.test(val)) return;
+    if (val.length > 6) return;
+
+    setUserInput(val);
+
+    if (val !== '' && parseInt(val, 10) === question.answer) {
+      sfx.piece();
+      setScore((s) => s + 1);
+      loadNewQuestion();
     }
   };
 
@@ -202,29 +215,32 @@ export default function QuickMath() {
         )}
 
         <div className="flex flex-col items-center justify-center space-y-6">
-          <div className="text-5xl sm:text-6xl font-mono tracking-widest font-bold text-[var(--ink)] text-center h-20 flex items-center justify-center">
-            {problem.text || '?'}
+          <div className="text-5xl font-display tracking-widest text-[var(--ink)] break-all text-center">
+            {question.text || '?'}
           </div>
 
-          <div className="w-full flex flex-col items-center">
+          <form onSubmit={(e) => e.preventDefault()} className="w-full flex flex-col items-center">
             <input
               ref={inputRef}
               type="text"
               inputMode="numeric"
-              aria-label="Answer"
+              aria-label="Type answer"
               value={userInput}
               onChange={handleChange}
               className="w-full text-center text-4xl font-mono p-4 border hairline bg-[var(--bg-soft)] focus:outline-none focus:ring-2 focus:ring-[var(--forest)]"
-              placeholder="="
+              placeholder="?"
               disabled={gameState !== 'playing'}
               autoComplete="off"
               spellCheck="false"
             />
-          </div>
+          </form>
 
           <div className="flex gap-2">
             <button
-              onClick={() => generateProblem()}
+              onClick={() => {
+                sfx.click();
+                loadNewQuestion();
+              }}
               disabled={gameState !== 'playing'}
               className="btn-ghost text-xs"
             >
