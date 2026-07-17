@@ -222,6 +222,21 @@ export const EXPERIENCE_CATALOG = [
     routePrefixes: ['/typing-speed'],
   },
   {
+    id: 'quick-math',
+    name: 'Quick Math',
+    shortName: 'Math',
+    path: '/quick-math',
+    kind: 'Arcade',
+    status: 'Live',
+    accent: 'var(--crimson)',
+    description: 'Solve as many math problems as you can in 60 seconds.',
+    features: ['Local play', 'High score'],
+    navItems: [
+      { to: '/quick-math', label: 'Play' },
+    ],
+    routePrefixes: ['/quick-math'],
+  },
+  {
     id: 'reaction-timer',
     name: 'Reaction Timer',
     shortName: 'Reaction',
@@ -346,6 +361,21 @@ export const EXPERIENCE_CATALOG = [
       { to: '/color-match', label: 'Play' },
     ],
     routePrefixes: ['/color-match'],
+  },
+  {
+    id: 'speed-grid',
+    name: 'Speed Grid',
+    shortName: 'Speed Grid',
+    path: '/speed-grid',
+    kind: 'Arcade',
+    status: 'Live',
+    accent: 'var(--ochre)',
+    description: 'Click the numbers from 1 to 25 as fast as you can.',
+    features: ['Local play', 'Best time'],
+    navItems: [
+      { to: '/speed-grid', label: 'Play' },
+    ],
+    routePrefixes: ['/speed-grid'],
   },
 ];
 

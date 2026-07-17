@@ -71,6 +71,7 @@ service cloud.firestore {
           changedKeys().hasOnly(['outgoingFriendRequests'])
           && request.resource.data.get('outgoingFriendRequests', []).size() == (resource.data.get('outgoingFriendRequests', []).size() - 1)
           && !(request.auth.uid in request.resource.data.get('outgoingFriendRequests', []))
+          && resource.data.get('outgoingFriendRequests', []).hasAll(request.resource.data.get('outgoingFriendRequests', []))
           && (request.auth.uid in resource.data.get('outgoingFriendRequests', []))
           && resource.data.get('outgoingFriendRequests', []).hasAll(request.resource.data.get('outgoingFriendRequests', []))
         )
@@ -79,6 +80,9 @@ service cloud.firestore {
           && request.resource.data.friendRequests.size() == (resource.data.get('friendRequests', []).size() + 1)
           && request.resource.data.friendRequests.hasAll(resource.data.get('friendRequests', []))
           && request.resource.data.friendRequests[request.resource.data.friendRequests.size() - 1].fromId == request.auth.uid
+          && request.resource.data.friendRequests[request.resource.data.friendRequests.size() - 1].fromUsername is string
+          && request.resource.data.friendRequests[request.resource.data.friendRequests.size() - 1].fromAvatar is string
+          && request.resource.data.friendRequests[request.resource.data.friendRequests.size() - 1].ts is number
         )
       );
 
@@ -116,7 +120,9 @@ service cloud.firestore {
         return changedKeys().hasOnly(['spectators'])
           && request.resource.data.spectators.size() == (resource.data.get('spectators', []).size() + 1)
           && request.resource.data.spectators.hasAll(resource.data.get('spectators', []))
-          && request.resource.data.spectators[request.resource.data.spectators.size() - 1].id == request.auth.uid;
+          && request.resource.data.spectators[request.resource.data.spectators.size() - 1].id == request.auth.uid
+          && request.resource.data.spectators[request.resource.data.spectators.size() - 1].username is string
+          && request.resource.data.spectators[request.resource.data.spectators.size() - 1].avatar is string;
       }
       function specLeave() {
         // Note: spectators is kept as an array of maps for frontend compatibility;
@@ -131,7 +137,13 @@ service cloud.firestore {
         return changedKeys().hasOnly(['chat'])
           && request.resource.data.chat.size() == (resource.data.get('chat', []).size() + 1)
           && request.resource.data.chat.hasAll(resource.data.get('chat', []))
-          && request.resource.data.chat[request.resource.data.chat.size() - 1].userId == request.auth.uid;
+          && request.resource.data.chat[request.resource.data.chat.size() - 1].userId == request.auth.uid
+          && request.resource.data.chat[request.resource.data.chat.size() - 1].username is string
+          && request.resource.data.chat[request.resource.data.chat.size() - 1].avatar is string
+          && request.resource.data.chat[request.resource.data.chat.size() - 1].text is string
+          && request.resource.data.chat[request.resource.data.chat.size() - 1].text.size() <= 500
+          && request.resource.data.chat[request.resource.data.chat.size() - 1].ts is number
+          && request.resource.data.chat[request.resource.data.chat.size() - 1].isSpectator is bool;
       }
       function isHostJoining() {
         return isSignedIn()
@@ -155,8 +167,21 @@ service cloud.firestore {
                     && request.resource.data.participants[0] < request.resource.data.participants[1]
                     && convId == (request.resource.data.participants[0] + '_' + request.resource.data.participants[1]);
 
+      function protectedConvKeysChanged() {
+        return changedKeys().hasAny(['participants', 'requestedBy', 'requestedAt', 'createdAt', 'participantInfo']);
+      }
+
+      function isValidStatusTransition() {
+        return !changedKeys().hasAny(['status'])
+          || (resource.data.status == 'pending'
+              && (request.resource.data.status == 'accepted' || request.resource.data.status == 'declined')
+              && request.auth.uid != resource.data.requestedBy);
+      }
+
       allow update: if isAdmin() || (isSignedIn()
-                    && request.auth.uid in resource.data.participants);
+                    && request.auth.uid in resource.data.participants
+                    && !protectedConvKeysChanged()
+                    && isValidStatusTransition());
       allow delete: if isAdmin();
 
       match /messages/{msgId} {
