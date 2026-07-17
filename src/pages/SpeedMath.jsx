@@ -37,6 +37,12 @@ export default function SpeedMath() {
   }, []);
 
   useEffect(() => {
+    if (gameState === 'playing' && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [gameState]);
+
+  useEffect(() => {
     scoreRef.current = score;
   }, [score]);
 
@@ -66,7 +72,7 @@ export default function SpeedMath() {
     setUserInput('');
   }, []);
 
-  const startGame = () => {
+  const startGame = useCallback(() => {
     sfx.click();
     setGameState('playing');
     setScore(0);
@@ -78,14 +84,7 @@ export default function SpeedMath() {
     timerRef.current = setInterval(() => {
       setTimeLeft((prev) => Math.max(0, prev - 1));
     }, 1000);
-
-    // Auto-focus after state transitions
-    setTimeout(() => {
-      if (inputRef.current) {
-        inputRef.current.focus();
-      }
-    }, 50);
-  };
+  }, [generateProblem]);
 
   const endGame = useCallback(() => {
     if (timerRef.current) clearInterval(timerRef.current);
@@ -119,7 +118,7 @@ export default function SpeedMath() {
     };
     window.addEventListener('keydown', handleGlobalKeyDown);
     return () => window.removeEventListener('keydown', handleGlobalKeyDown);
-  }, [gameState]);
+  }, [gameState, startGame]);
 
 
   const getRatingMessage = (s) => {
@@ -147,7 +146,7 @@ export default function SpeedMath() {
 
   const handleSubmit = (e) => {
     if (e) e.preventDefault();
-    if (gameState !== 'playing') return;
+    if (gameState !== 'playing' || !userInput.trim()) return;
 
     if (parseInt(userInput, 10) === problem.answer) {
       sfx.piece();
