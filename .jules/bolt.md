@@ -68,6 +68,9 @@
 ## 2025-02-23 - Pre-computing Maps for static lookups
 **Learning:** O(N) array scans (`Array.find()`) over static config data (like `EXPERIENCE_CATALOG`) during component renders can accumulate to unnecessary overhead.
 **Action:** When data structures like catalogs are statically defined, pre-compute a `Map` keyed by their ID at the module level. This exposes an O(1) getter to the rest of the application and completely bypasses the need to iterate or use `useMemo` at the component layer.
+## 2024-07-11 - Match timer triggering heavy re-renders
+**Learning:** The `MatchChess.jsx` uses a 1-second interval (`now`) that updates a state triggering component re-renders to show the remaining timer. This caused the heavy `<Chessboard>` component to re-render every second because its `customSquareStyles` prop was defined as an inline un-memoized object, failing the shallow equality check.
+**Action:** When a parent component uses a high-frequency ticker state (like `now`), always wrap heavy child components in `React.memo`, pass them static or memoized reference props, and extract inline style configurations to module-level constants or `useMemo`.
 ## 2024-05-18 - Memoize third party components rendered in ticker loops
 **Learning:** In the Match pages (e.g. `MatchChess.jsx`), the top-level component maintains a 1-second ticker state (`now`) to drive the turn timer display. This causes the entire page to re-render every second. If heavy third-party components (like `<Chessboard>`) are rendered in this tree without `React.memo` and stable props (like style objects), they will also re-render every second, causing significant CPU overhead and jitter during matches.
 **Action:** When working in these Match components, always ensure expensive child components are wrapped in `React.memo`, pass stable callbacks (via `useCallback`), and explicitly memoize any derived object/array props (via `useMemo`) or extract static props as module-level constants.
