@@ -55,3 +55,14 @@
 **Learning:** Players' highest engagement peaks right when they win or lose a multiplayer match. While long-term rank progression (ELO) is motivating, surfacing short-term, immediately attainable goals (like the next Daily Goal or an Up Next Achievement) right on the Win Screen gives players an explicit, bite-sized reason to play "just one more." This reduces friction in deciding whether to click "Rematch" or "Home" by providing an immediate secondary objective.
 
 **Action:** Whenever a player completes a core gameplay loop (like a match), inject dynamic, personalized short-term goals (daily goals, closest achievements) into the post-match resolution screen to convert the momentum of a finished session into motivation for the next one.
+## 2024-05-21 - Hub Progression Visualization
+
+**Learning:** Users lack immediate motivation when arriving at the root Hub because their progression stats (Rank, Up Next Achievements) are hidden inside their Profile or game-specific dashboards. Moving progression elements directly to the root hub creates immediate friction-less reminders of their goals, converting passive "browsing" sessions into active "goal-oriented" sessions right from the front page.
+
+**Action:** Always surface high-level progression metrics (like Rank and closest Achievements) on the highest-traffic root/hub pages, rather than burying them in secondary profile tabs, to provide immediate contextual motivation to return to the core loop.
+
+## 2025-02-28 - Post-Match Momentum Goal Granularity
+
+**Learning:** Highlighting goals that require only a binary, one-off action (like "play a game") inadvertently obscures goals that require sustained effort (like "play 100 games"). When a binary achievement completes, it hits 100% progress and dominates the immediate post-match screen, distracting the user from the actual incremental progress they are making.
+
+**Action:** When surfacing "closest" or "up next" goals/achievements, explicitly filter out binary or immediate-completion goals to ensure the user's attention is focused on targets that require ongoing engagement and repeated sessions.
