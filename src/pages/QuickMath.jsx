@@ -47,6 +47,13 @@ export default function QuickMath() {
     }
   });
 
+  useEffect(() => {
+    const dbBest = profile?.arcadeBests?.['quick-math']?.scoreValue;
+    if (dbBest !== undefined && dbBest > bestScore) {
+      setBestScore(dbBest);
+    }
+  }, [profile, bestScore]);
+
   const timerRef = useRef(null);
   const scoreRef = useRef(score);
   const inputRef = useRef(null);
@@ -75,10 +82,6 @@ export default function QuickMath() {
     setTimeLeft(GAME_DURATION);
     scoreRef.current = 0;
     loadNewQuestion();
-
-    setTimeout(() => {
-      if (inputRef.current) inputRef.current.focus();
-    }, 50);
 
     if (timerRef.current) clearInterval(timerRef.current);
     timerRef.current = setInterval(() => {
@@ -115,23 +118,16 @@ export default function QuickMath() {
     }
   }, [gameState]);
 
-  const handleKeyDown = (e) => {
-    if (e.key === 'Enter' && (gameState === 'waiting' || gameState === 'gameover')) {
-      e.preventDefault();
-      startGame();
-    }
-  };
-
-  const handleKeyDownRef = useRef(handleKeyDown);
   useEffect(() => {
-    handleKeyDownRef.current = handleKeyDown;
-  });
-
-  useEffect(() => {
-    const listener = (e) => handleKeyDownRef.current(e);
-    window.addEventListener('keydown', listener);
-    return () => window.removeEventListener('keydown', listener);
-  }, []);
+    const handleKeyDown = (e) => {
+      if (e.key === 'Enter' && (gameState === 'waiting' || gameState === 'gameover')) {
+        e.preventDefault();
+        startGame();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [gameState, startGame]);
 
   const getRatingMessage = (s) => {
     if (s >= 40) return "🚀 Human Calculator";
