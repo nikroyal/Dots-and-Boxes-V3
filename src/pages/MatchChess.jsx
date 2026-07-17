@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef, memo, useCallback } from 'react';
+import { useEffect, useState, useRef, memo, useCallback, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { doc, onSnapshot } from 'firebase/firestore';
 import { db } from '../lib/firebase';
@@ -22,6 +22,11 @@ import { Pause, Play, Flag, Send, Eye, Trophy, RotateCcw, Home, Repeat, Clock, W
 import { Chessboard } from 'react-chessboard';
 import { Chess } from 'chess.js';
 import { applyMove } from '../lib/chessLogic.js';
+// Optimization (Bolt): Extracted static style objects to module-level constants to prevent creating new object references on every 1Hz ticker render.
+const CUSTOM_DARK_SQUARE_STYLE = { backgroundColor: 'var(--ochre)' };
+const CUSTOM_LIGHT_SQUARE_STYLE = { backgroundColor: 'var(--paper-tint)' };
+// Optimization (Bolt): Wrapped heavy Chessboard component in React.memo to prevent unnecessary re-renders driven by the parent's 1Hz ticker.
+const MemoizedChessboard = memo(Chessboard);
 
 export default function MatchChess() {
   const { id } = useParams();
@@ -517,14 +522,17 @@ export default function MatchChess() {
   const concealBoard = match.status === 'paused' && match.pauseConcealed;
   const lastMove = (Array.isArray(displayGame.moves) ? displayGame.moves : []).slice(-1)[0];
 
-  const customSquareStyles = {
+  const boardOrientation = match.players.indexOf(profile?.id) === 1 ? 'black' : 'white';
+
+  // Optimization (Bolt): Memoized derived object props using useMemo to maintain a stable reference across the 1Hz ticker updates.
+  const customSquareStyles = useMemo(() => ({
     ...(lastMove ? {
       [lastMove.from]: { backgroundColor: 'rgba(255, 255, 0, 0.4)' },
       [lastMove.to]: { backgroundColor: 'rgba(255, 255, 0, 0.4)' }
     } : {}),
     ...optionSquares,
     ...(selectedSquare ? { [selectedSquare]: { backgroundColor: 'rgba(255, 0, 0, 0.4)' } } : {})
-  };
+  }), [lastMove?.from, lastMove?.to, optionSquares, selectedSquare]);
 
   return (
     <>
@@ -631,13 +639,13 @@ export default function MatchChess() {
             <div className="text-center italic opacity-50 py-10">Board hidden while paused</div>
           ) : (
             <div className="w-full max-w-[500px]">
-              <Chessboard
+              <MemoizedChessboard
                 position={displayGame.fen}
                 onPieceDrop={onDrop}
                 onSquareClick={onSquareClick}
-                boardOrientation={match.players.indexOf(profile?.id) === 1 ? 'black' : 'white'}
-                customDarkSquareStyle={{ backgroundColor: 'var(--ochre)' }}
-                customLightSquareStyle={{ backgroundColor: 'var(--paper-tint)' }}
+                boardOrientation={boardOrientation}
+                customDarkSquareStyle={CUSTOM_DARK_SQUARE_STYLE}
+                customLightSquareStyle={CUSTOM_LIGHT_SQUARE_STYLE}
                 customSquareStyles={customSquareStyles}
               />
             </div>
