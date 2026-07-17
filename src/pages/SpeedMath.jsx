@@ -28,17 +28,12 @@ export default function SpeedMath() {
   const timerRef = useRef(null);
   const startTimeRef = useRef(null);
   const inputRef = useRef(null);
-  const scoreRef = useRef(0);
 
   useEffect(() => {
     return () => {
       if (timerRef.current) cancelAnimationFrame(timerRef.current);
     };
   }, []);
-
-  useEffect(() => {
-    scoreRef.current = score;
-  }, [score]);
 
   const generateProblem = useCallback(() => {
     const ops = ['+', '-', '*'];
@@ -76,12 +71,7 @@ export default function SpeedMath() {
     setGameState('playing');
     setTimeLeft(GAME_DURATION);
     setScore(0);
-    scoreRef.current = 0;
     generateProblem();
-
-    setTimeout(() => {
-      if (inputRef.current) inputRef.current.focus();
-    }, 50);
 
     startTimeRef.current = performance.now();
 
@@ -100,23 +90,27 @@ export default function SpeedMath() {
     timerRef.current = requestAnimationFrame(tick);
   }, [generateProblem]);
 
+  useEffect(() => {
+    if (gameState === 'playing' && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [gameState]);
+
   const endGame = useCallback(() => {
     if (timerRef.current) cancelAnimationFrame(timerRef.current);
 
     sfx.win();
     setGameState('result');
 
-    const finalScore = scoreRef.current;
-
-    if (finalScore > bestScore) {
-      setBestScore(finalScore);
+    if (score > bestScore) {
+      setBestScore(score);
       try {
-        localStorage.setItem('axiom-speedmath-best', finalScore.toString());
+        localStorage.setItem('axiom-speedmath-best', score.toString());
       } catch {}
-      recordActivity(profile, ACTIVITY_TYPES.ARCADE_BEST, { game: 'Speed Math', score: finalScore });
-      updateArcadeBest(profile, 'speed-math', 'Speed Math', finalScore, finalScore.toString());
+      recordActivity(profile, ACTIVITY_TYPES.ARCADE_BEST, { game: 'Speed Math', score: score });
+      updateArcadeBest(profile, 'speed-math', 'Speed Math', score, score.toString());
     }
-  }, [bestScore, profile]);
+  }, [bestScore, profile, score]);
 
   useEffect(() => {
     if (gameState === 'playing' && timeLeft === 0) {

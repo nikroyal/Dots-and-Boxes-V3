@@ -185,7 +185,7 @@ function Shell() {
 
               <Route path="/click-the-target" element={<ClickTheTarget />} />
               <Route path="/typing-speed" element={<TypingSpeed />} />
-        <Route path="/speed-math" element={<SpeedMath />} />
+              <Route path="/speed-math" element={<SpeedMath />} />
               <Route path="/snake" element={<Snake />} />
               <Route path="/battleships" element={<Battleships />} />
               <Route path="/lobby" element={<Lobby />} />
