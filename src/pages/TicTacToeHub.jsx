@@ -259,9 +259,9 @@ export default function TicTacToeHub() {
                   <span className="font-display text-base">{req.fromUsername}</span>
                 </div>
                 <div className="flex gap-1">
-                  <button onClick={() => acceptFriendRequest(profile, req.fromId).then(() => toast('Friend added', 'success'))}
+                  <button aria-label={`Accept friend request from ${req.fromUsername}`} onClick={() => acceptFriendRequest(profile, req.fromId).then(() => toast('Friend added', 'success'))}
                           className="px-3 py-1 font-mono text-[0.65rem] tracking-widest uppercase hover:bg-black/5">Accept</button>
-                  <button onClick={() => declineFriendRequest(profile, req.fromId)}
+                  <button aria-label={`Decline friend request from ${req.fromUsername}`} onClick={() => declineFriendRequest(profile, req.fromId)}
                           className="px-3 py-1 font-mono text-[0.65rem] tracking-widest uppercase opacity-50 hover:opacity-100">Decline</button>
                 </div>
               </div>
