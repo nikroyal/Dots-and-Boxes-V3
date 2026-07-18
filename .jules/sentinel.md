@@ -6,6 +6,11 @@
 **Vulnerability:** A custom float division (`/ 4294967296 * length`) combined with `Math.floor` was used with `crypto.getRandomValues` to generate random array indices for avatars.
 **Learning:** This approach recreates a pseudo `Math.random()` leading to floating point precision issues. While low impact for avatars, it demonstrates poor cryptographic hygiene and is prone to errors.
 **Prevention:** Always use standard modulo arithmetic (`crypto.getRandomValues(array)[0] % length`) or unbiased random selection algorithms when choosing a random element from an array based on cryptographic values.
+## 2025-02-18 - Missing array retention checks in Firestore Rules
+**Vulnerability:** Attackers could overwrite elements in `friends`, `spectators`, `chat`, and request arrays while bypassing `changedKeys().hasOnly()` and size checks.
+**Learning:** Relying purely on array size changes (e.g. `size() + 1`) and `affectedKeys` does not prevent a malicious user from simultaneously modifying the existing elements within that array.
+**Prevention:** Use `.hasAll()` to explicitly enforce that the updated array still contains all elements of the original array (or vice versa for deletions).
+
 ## 2024-07-09 - Insecure Array Manipulation in Firestore Rules
 **Vulnerability:** Array modifications (like `friends`, `spectators`, `chat`) only checked `size()` differences, allowing attackers to overwrite or delete existing elements while adding their own.
 **Learning:** Relying solely on `changedKeys().hasOnly(...)` and size increments is insufficient for array appends. It allows arbitrary replacement of existing array contents as long as the final size is exactly one element larger.
