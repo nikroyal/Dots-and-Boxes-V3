@@ -118,16 +118,17 @@ export default function QuickMath() {
     }
   }, [gameState]);
 
+  const handleKeyDown = useCallback((e) => {
+    if (e.key === 'Enter' && (gameState === 'waiting' || gameState === 'gameover')) {
+      e.preventDefault();
+      startGame();
+    }
+  }, [gameState, startGame]);
+
   useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (e.key === 'Enter' && (gameState === 'waiting' || gameState === 'gameover')) {
-        e.preventDefault();
-        startGame();
-      }
-    };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [gameState, startGame]);
+  }, [handleKeyDown]);
 
   const getRatingMessage = (s) => {
     if (s >= 40) return "🚀 Human Calculator";
