@@ -148,7 +148,6 @@ service cloud.firestore {
           && request.resource.data.chat.removeAll(resource.data.get('chat', []))[0].ts is number
           && request.resource.data.chat.removeAll(resource.data.get('chat', []))[0].isSpectator is bool;
       }
-      }
       function isHostJoining() {
         return isSignedIn()
           && resource.data.status == 'waiting'
