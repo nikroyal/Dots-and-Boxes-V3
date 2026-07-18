@@ -70,7 +70,7 @@ export default function TypingSpeed() {
   const startGameRef = useRef(null);
   useEffect(() => {
     startGameRef.current = startGame;
-  }, [startGame]);
+  }, []);
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === 'Enter' && (gameState === 'waiting' || gameState === 'result')) {

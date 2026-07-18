@@ -88,7 +88,7 @@ export default function WhackAMole() {
   const startGameRef = useRef(null);
   useEffect(() => {
     startGameRef.current = startGame;
-  }, [startGame]);
+  }, []);
 
   const startGame = () => {
     sfx.click();

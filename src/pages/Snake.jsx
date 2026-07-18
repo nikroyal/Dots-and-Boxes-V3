@@ -76,7 +76,7 @@ export default function Snake() {
   const startGameRef = useRef(null);
   useEffect(() => {
     startGameRef.current = startGame;
-  }, [startGame]);
+  }, []);
 
   const startGame = () => {
     sfx.click();
