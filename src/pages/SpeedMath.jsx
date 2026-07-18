@@ -119,19 +119,33 @@ export default function SpeedMath() {
   }, [timeLeft, gameState, endGame]);
 
   useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (gameState !== 'playing' && e.key === 'Enter') {
+    const handleGlobalKeyDown = (e) => {
+      if (e.key === 'Enter' && (gameState === 'waiting' || gameState === 'result' || gameState === 'gameover')) {
         e.preventDefault();
         startGame();
       }
     };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    window.addEventListener('keydown', handleGlobalKeyDown);
+    return () => window.removeEventListener('keydown', handleGlobalKeyDown);
   }, [gameState, startGame]);
+
+  const handleSubmit = (e) => {
+    if (e) e.preventDefault();
+    if (gameState !== 'playing' || !userInput.trim()) return;
+
+    if (parseInt(userInput, 10) === problem.answer) {
+      sfx.piece();
+      setScore((s) => s + 1);
+      generateProblem();
+    } else {
+      sfx.click();
+      setUserInput('');
+    }
+  };
 
   const handleChange = (e) => {
     if (gameState !== 'playing') return;
-    const val = e.target.value;
+    const val = e.target.value.replace(/[^0-9-]/g, '');
 
     // Allow only numbers and minus sign
     if (!/^-?\d*$/.test(val)) return;
@@ -209,18 +223,22 @@ export default function SpeedMath() {
             {problem.text || '?'}
           </div>
 
-          <input
-            ref={inputRef}
-            type="text"
-            inputMode="numeric"
-            value={userInput}
-            onChange={handleChange}
-            className="w-full text-center text-3xl font-display p-4 border hairline bg-[var(--bg-soft)] focus:outline-none focus:ring-2 focus:ring-[var(--forest)]"
-            placeholder="Answer..."
-            disabled={gameState !== 'playing'}
-            autoComplete="off"
-            spellCheck="false"
-          />
+          <form onSubmit={handleSubmit} className="w-full flex flex-col items-center">
+            <input
+              ref={inputRef}
+              type="text"
+              inputMode="numeric"
+              aria-label="Answer input"
+              value={userInput}
+              onChange={handleChange}
+              className="w-full text-center text-3xl font-display p-4 border hairline bg-[var(--bg-soft)] focus:outline-none focus:ring-2 focus:ring-[var(--forest)]"
+              placeholder="Answer..."
+              disabled={gameState !== 'playing'}
+              autoComplete="off"
+              spellCheck="false"
+            />
+            <button type="submit" className="hidden">Submit</button>
+          </form>
         </div>
       </div>
     </div>
