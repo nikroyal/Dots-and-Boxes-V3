@@ -65,3 +65,6 @@
 ## 2024-11-20 - Fast Timer Rendering
 **Learning:** Rendering a timer down to milliseconds using `setInterval` that triggers a React state update ~60 times a second can cause performance overhead by constantly re-rendering the entire component.
 **Action:** For highly precise sub-second timers, prefer using `requestAnimationFrame` attached directly to a DOM ref to avoid frequent, expensive React render cycles.
+## 2026-07-18 - Number Memory Game State Transition Exploit
+**Learning:** When transitioning a game from a typing state to a success state with a delay before the next level starts, leaving the state as 'typing' allows users to exploit the delay by repeatedly pressing 'Enter' to bypass levels.
+**Action:** Always explicitly set a transitional state (like 'success') or disable inputs immediately after a correct submission to prevent double-submissions or level-skipping exploits.

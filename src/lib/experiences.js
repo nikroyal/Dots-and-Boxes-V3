@@ -282,6 +282,21 @@ export const EXPERIENCE_CATALOG = [
     routePrefixes: ['/reaction-timer'],
   },
   {
+    id: 'number-memory',
+    name: 'Number Memory',
+    shortName: 'Number Mem',
+    path: '/number-memory',
+    kind: 'Arcade',
+    status: 'Live',
+    accent: 'var(--ochre)',
+    description: 'Remember the longest number possible. The number grows longer each round.',
+    features: ['Local play', 'Best level'],
+    navItems: [
+      { to: '/number-memory', label: 'Play' },
+    ],
+    routePrefixes: ['/number-memory'],
+  },
+  {
     id: 'word-scramble',
     name: 'Word Scramble',
     shortName: 'Scramble',

@@ -36,6 +36,7 @@ import Snake from './pages/Snake';
 import Battleships from './pages/battleships/Battleships';
 import WhackAMole from './pages/WhackAMole';
 import WordScramble from './pages/WordScramble';
+import NumberMemory from './pages/NumberMemory';
 import QuickMath from './pages/QuickMath';
 import RockPaperScissors from './pages/RockPaperScissors';
 import GuessTheNumber from './pages/GuessTheNumber';
@@ -118,6 +119,7 @@ function Shell() {
         <Route path="/memory-match" element={<MemoryMatch />} />
         <Route path="/reaction-timer" element={<ReactionTimer />} />
         <Route path="/word-scramble" element={<WordScramble />} />
+        <Route path="/number-memory" element={<NumberMemory />} />
         <Route path="/quick-math" element={<QuickMath />} />
         <Route path="/whack-a-mole" element={<WhackAMole />} />
         <Route path="/rock-paper-scissors" element={<RockPaperScissors />} />
@@ -175,6 +177,7 @@ function Shell() {
               <Route path="/memory-match" element={<MemoryMatch />} />
               <Route path="/reaction-timer" element={<ReactionTimer />} />
               <Route path="/word-scramble" element={<WordScramble />} />
+              <Route path="/number-memory" element={<NumberMemory />} />
               <Route path="/quick-math" element={<QuickMath />} />
               <Route path="/whack-a-mole" element={<WhackAMole />} />
               <Route path="/rock-paper-scissors" element={<RockPaperScissors />} />
