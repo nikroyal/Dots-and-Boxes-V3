@@ -33,3 +33,7 @@
 ## 2026-06-29 - Dynamic ARIA labels on repeated generic actions
 **Learning:** In lists of items (like friend requests) where every row contains the exact same visible action buttons ("Accept", "Decline", "Buy"), screen readers will read identical button text continuously without clarifying which item the action applies to.
 **Action:** Always attach dynamic `aria-label`s to generic action buttons inside mapped lists. Ensure the label clearly states the action AND the specific item or user it affects (e.g., ``aria-label={`Accept friend request from ${req.fromUsername}`}``).
+
+## 2026-07-25 - Dynamic ARIA Labels in Lists
+**Learning:** Adding a static `aria-label` to a button inside a mapped list (like a user or match list) causes every button to read identically to a screen reader, effectively overriding any unique dynamic content inside the button and breaking accessibility.
+**Action:** When adding `aria-label`s to items within mapped lists, always ensure the label includes a unique identifier (like the item's ID or name) dynamically via template literals (e.g., \`View match ${match.id}\`).

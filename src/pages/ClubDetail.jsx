@@ -191,7 +191,7 @@ export default function ClubDetail() {
           <div className="flex items-center">
             {isAdmin && (
               <button onClick={() => setShowSettings(true)} className="p-2 opacity-40 hover:opacity-100 transition-opacity relative" aria-label="Settings">
-                <Settings size={18} />
+                <Settings size={18} aria-hidden="true" />
                 {joinRequests.length > 0 && <span className="absolute top-1 right-1 w-2 h-2 bg-[var(--crimson)] rounded-full" />}
               </button>
             )}

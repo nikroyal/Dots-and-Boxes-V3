@@ -265,7 +265,7 @@ export default function LocalMatch() {
           </div>
           <div className="flex gap-3 justify-center">
              <button onClick={() => { setGame(createEmptyGame(rows, cols, ['p1', 'p2'])); }} className="btn-primary">
-               <RotateCcw size={14} /> Play Again
+               <RotateCcw size={14} aria-hidden="true" /> Play Again
              </button>
              <button onClick={() => setSetup(true)} className="btn-ghost">
                Setup
