@@ -4,10 +4,11 @@ import { recordActivity, ACTIVITY_TYPES } from '../lib/activity';
 import { updateArcadeBest } from '../lib/actions';
 import { sfx } from '../lib/sound';
 
-const GAME_DURATION = 60;
+const GAME_DURATION = 60; // 60 seconds
 
 export default function SpeedMath() {
   const { profile } = useAuth();
+
   const [gameState, setGameState] = useState('waiting'); // 'waiting' | 'playing' | 'result'
   const [timeLeft, setTimeLeft] = useState(GAME_DURATION);
   const [score, setScore] = useState(0);
@@ -16,8 +17,8 @@ export default function SpeedMath() {
   const [copied, setCopied] = useState(false);
 
   const timerRef = useRef(null);
+  const startTimeRef = useRef(null);
   const inputRef = useRef(null);
-  const startGameRef = useRef(null);
 
   const [bestScore, setBestScore] = useState(() => {
     try {
@@ -28,7 +29,7 @@ export default function SpeedMath() {
     }
   });
 
-  const generateProblem = useCallback((currentScore) => {
+  const generateProblem = useCallback((currentScore = score) => {
     const ops = ['+', '-', '*'];
     // Weight towards + and - for speed, but include some *
     const op = ops[Math.floor(Math.random() * (currentScore > 10 ? 3 : 2))];
@@ -50,39 +51,41 @@ export default function SpeedMath() {
 
     setProblem({ text: `${a} ${op} ${b}`, answer });
     setUserInput('');
-  }, []);
+  }, [score]);
 
   const startGame = useCallback(() => {
     sfx.click();
-    setScore(0);
-    setTimeLeft(GAME_DURATION);
     setGameState('playing');
+    setTimeLeft(GAME_DURATION);
+    setScore(0);
     generateProblem(0);
 
-    if (timerRef.current) clearInterval(timerRef.current);
-    timerRef.current = setInterval(() => {
-      setTimeLeft((prev) => Math.max(0, prev - 1));
-    }, 1000);
+    startTimeRef.current = performance.now();
 
-    setTimeout(() => {
-      if (inputRef.current) inputRef.current.focus();
-    }, 50);
-  }, [generateProblem]);
+    const tick = () => {
+      const now = performance.now();
+      const elapsed = (now - startTimeRef.current) / 1000;
+      const remaining = Math.max(0, GAME_DURATION - elapsed);
+      setTimeLeft(Math.ceil(remaining));
 
-  startGameRef.current = startGame;
-
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (e.key === 'Enter' && (gameState === 'waiting' || gameState === 'result')) {
-        startGameRef.current();
+      if (remaining > 0) {
+        timerRef.current = requestAnimationFrame(tick);
       }
     };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+
+    if (timerRef.current) cancelAnimationFrame(timerRef.current);
+    timerRef.current = requestAnimationFrame(tick);
+  }, [generateProblem]);
+
+  useEffect(() => {
+    if (gameState === 'playing' && inputRef.current) {
+      inputRef.current.focus();
+    }
   }, [gameState]);
 
   const endGame = useCallback(() => {
-    if (timerRef.current) clearInterval(timerRef.current);
+    if (timerRef.current) cancelAnimationFrame(timerRef.current);
+
     sfx.win();
     setGameState('result');
 
@@ -91,10 +94,10 @@ export default function SpeedMath() {
       try {
         localStorage.setItem('axiom-speedmath-best', score.toString());
       } catch {}
-      recordActivity(profile, ACTIVITY_TYPES.ARCADE_BEST, { game: 'Speed Math', score: score + ' points' });
-      updateArcadeBest(profile, 'speed-math', 'Speed Math', score, score + ' points');
+      recordActivity(profile, ACTIVITY_TYPES.ARCADE_BEST, { game: 'Speed Math', score: score });
+      updateArcadeBest(profile, 'speed-math', 'Speed Math', score, score.toString());
     }
-  }, [bestScore, score, profile]);
+  }, [bestScore, profile, score]);
 
   useEffect(() => {
     if (gameState === 'playing' && timeLeft === 0) {
@@ -104,34 +107,60 @@ export default function SpeedMath() {
 
   useEffect(() => {
     return () => {
-      if (timerRef.current) clearInterval(timerRef.current);
+      if (timerRef.current) cancelAnimationFrame(timerRef.current);
     };
   }, []);
 
-  const handleChange = (e) => {
-    if (gameState !== 'playing') return;
+  useEffect(() => {
+    const handleGlobalKeyDown = (e) => {
+      if (e.key === 'Enter' && (gameState === 'waiting' || gameState === 'result' || gameState === 'gameover')) {
+        e.preventDefault();
+        startGame();
+      }
+    };
+    window.addEventListener('keydown', handleGlobalKeyDown);
+    return () => window.removeEventListener('keydown', handleGlobalKeyDown);
+  }, [gameState, startGame]);
 
-    // Explicitly strip non-numeric characters (allow minus for future-proofing, though problems are positive now)
-    const value = e.target.value.replace(/[^0-9-]/g, '');
+  const handleSubmit = (e) => {
+    if (e) e.preventDefault();
+    if (gameState !== 'playing' || !userInput.trim()) return;
 
-    // Enforce reasonable max length
-    if (value.length > 5) return;
-
-    setUserInput(value);
-
-    // Auto-submit on exact match
-    if (parseInt(value, 10) === problem.answer) {
+    if (parseInt(userInput, 10) === problem.answer) {
       sfx.piece();
       const nextScore = score + 1;
       setScore(nextScore);
       generateProblem(nextScore);
+    } else {
+      sfx.click();
+      setUserInput('');
+    }
+  };
+
+  const handleChange = (e) => {
+    if (gameState !== 'playing') return;
+    const val = e.target.value.replace(/[^0-9-]/g, '');
+
+    // Allow only numbers and minus sign
+    if (!/^-?\d*$/.test(val)) return;
+
+    setUserInput(val);
+
+    if (val !== '' && val !== '-') {
+      const parsedVal = parseInt(val, 10);
+      if (parsedVal === problem.answer) {
+        sfx.piece();
+        const nextScore = score + 1;
+        setScore(nextScore);
+        generateProblem(nextScore);
+      }
     }
   };
 
   const handleShare = (e) => {
     e.stopPropagation();
     e.preventDefault();
-    const text = `I scored ${score} in Axiom Speed Math! 🧮`;
+    const text = `I solved ${score} math problems in 60s in Axiom Speed Math! 🧮`;
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(text).then(() => {
         sfx.notify();
@@ -148,20 +177,20 @@ export default function SpeedMath() {
       <section className="text-center mb-8">
         <h1 className="font-display text-5xl font-medium tracking-tight mb-2">Speed Math</h1>
         <p className="font-mono text-sm tracking-widest uppercase opacity-60 mb-2">
-          Time: {Math.max(0, timeLeft)}s | Score: {score}
+          Score: <span className="score-display">{score}</span> <span className="ml-4">Time: {timeLeft}s</span>
         </p>
         {bestScore > 0 && (
-          <p className="font-mono text-xs tracking-widest uppercase opacity-80 mt-2 text-[var(--ochre)]">
+          <p className="font-mono text-xs tracking-widest uppercase opacity-80 mt-2 text-[var(--forest)]">
             Best Score: {bestScore}
           </p>
         )}
       </section>
 
-      <div className="w-full max-w-lg border hairline card bg-[var(--paper-tint)] flex flex-col items-center relative overflow-hidden p-6 sm:p-10 min-h-[300px]">
+      <div className="relative border hairline card bg-[var(--paper-tint)] p-6 sm:p-10 w-full max-w-md">
         {gameState === 'waiting' && (
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-[var(--paper-tint)] z-10">
             <p className="mb-6 font-display text-xl opacity-80 text-center px-4">
-              Solve as many math problems as you can in 60 seconds!
+              Solve as many basic math problems as you can in 60 seconds!
             </p>
             <button onClick={startGame} className="btn-primary">
               Start Game (Enter)
@@ -172,10 +201,10 @@ export default function SpeedMath() {
         {gameState === 'result' && (
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-[var(--paper-tint)]/90 z-10 backdrop-blur-sm">
              <div className="font-display text-4xl mb-2 text-[var(--crimson)]">Time's Up!</div>
-             <div className="font-display text-3xl mb-6 opacity-90 text-[var(--forest)]">Score: {score}</div>
+             <div className="font-display text-3xl mb-6 opacity-90 text-[var(--forest)]">{score} Solved</div>
              <div className="flex gap-4">
                <button onClick={startGame} className="btn-primary">
-                  Play Again (Enter)
+                  Try Again (Enter)
                </button>
                <button onClick={handleShare} className="btn-ghost">
                  {copied ? 'Copied!' : 'Share Result'}
@@ -184,22 +213,27 @@ export default function SpeedMath() {
           </div>
         )}
 
-        <div className="flex flex-col items-center justify-center space-y-8 w-full flex-1">
-          <div className="text-5xl font-display tracking-widest h-16 flex items-center justify-center">
-            {gameState === 'playing' ? `${problem.text} = ?` : ''}
+        <div className="flex flex-col items-center justify-center space-y-8 min-h-[150px]">
+          <div className="text-4xl sm:text-5xl font-mono tracking-widest font-bold text-[var(--ink)] text-center problem-text">
+            {problem.text || '?'}
           </div>
 
-          <input
-            ref={inputRef}
-            type="text"
-            inputMode="numeric"
-            value={userInput}
-            onChange={handleChange}
-            className="w-full max-w-[200px] text-center text-3xl font-display p-4 border hairline bg-[var(--bg-soft)] focus:outline-none focus:ring-2 focus:ring-[var(--forest)]"
-            placeholder=""
-            disabled={gameState !== 'playing'}
-            autoComplete="off"
-          />
+          <form onSubmit={handleSubmit} className="w-full flex flex-col items-center">
+            <input
+              ref={inputRef}
+              type="text"
+              inputMode="numeric"
+              aria-label="Answer input"
+              value={userInput}
+              onChange={handleChange}
+              className="w-full text-center text-3xl font-display p-4 border hairline bg-[var(--bg-soft)] focus:outline-none focus:ring-2 focus:ring-[var(--forest)]"
+              placeholder="Answer..."
+              disabled={gameState !== 'playing'}
+              autoComplete="off"
+              spellCheck="false"
+            />
+            <button type="submit" className="hidden">Submit</button>
+          </form>
         </div>
       </div>
     </div>

@@ -208,6 +208,21 @@ export const EXPERIENCE_CATALOG = [
     routePrefixes: ['/guess-the-number'],
   },
   {
+    id: 'quick-math',
+    name: 'Quick Math',
+    shortName: 'Math',
+    path: '/quick-math',
+    kind: 'Arcade',
+    status: 'Live',
+    accent: 'var(--crimson)',
+    description: 'Solve as many math problems as you can in 60 seconds.',
+    features: ['Local play', 'Best score'],
+    navItems: [
+      { to: '/quick-math', label: 'Play' },
+    ],
+    routePrefixes: ['/quick-math'],
+  },
+  {
     id: 'typing-speed',
     name: 'Typing Speed',
     shortName: 'Typing',
@@ -221,6 +236,21 @@ export const EXPERIENCE_CATALOG = [
       { to: '/typing-speed', label: 'Play' },
     ],
     routePrefixes: ['/typing-speed'],
+  },
+  {
+    id: 'speed-math',
+    name: 'Speed Math',
+    shortName: 'Math',
+    path: '/speed-math',
+    kind: 'Arcade',
+    status: 'Live',
+    accent: 'var(--ochre)',
+    description: 'Test your mental math speed. Solve as many basic math problems as you can in 60 seconds.',
+    features: ['Local play', 'Best score'],
+    navItems: [
+      { to: '/speed-math', label: 'Play' },
+    ],
+    routePrefixes: ['/speed-math'],
   },
   {
     id: 'reaction-timer',
@@ -313,6 +343,7 @@ export const EXPERIENCE_CATALOG = [
     ],
     routePrefixes: ['/district-exchange'],
   },
+
   {
     id: 'circuit-maker',
     name: 'Circuit Maker',
@@ -332,6 +363,36 @@ export const EXPERIENCE_CATALOG = [
       { to: '/circuit-maker#exportPng', label: 'Export' },
     ],
     routePrefixes: ['/circuit-maker'],
+  },
+  {
+    id: 'color-match',
+    name: 'Color Match',
+    shortName: 'Colors',
+    path: '/color-match',
+    kind: 'Arcade',
+    status: 'Live',
+    accent: 'var(--crimson)',
+    description: 'Test your brain. Does the word match the color?',
+    features: ['Local play', 'Best score'],
+    navItems: [
+      { to: '/color-match', label: 'Play' },
+    ],
+    routePrefixes: ['/color-match'],
+  },
+  {
+    id: 'speed-grid',
+    name: 'Speed Grid',
+    shortName: 'Speed Grid',
+    path: '/speed-grid',
+    kind: 'Arcade',
+    status: 'Live',
+    accent: 'var(--ochre)',
+    description: 'Click the numbers from 1 to 25 as fast as you can.',
+    features: ['Local play', 'Best time'],
+    navItems: [
+      { to: '/speed-grid', label: 'Play' },
+    ],
+    routePrefixes: ['/speed-grid'],
   },
 ];
 
