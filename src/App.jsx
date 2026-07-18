@@ -44,6 +44,7 @@ import SequenceMemory from './pages/SequenceMemory';
 import ColorMatch from './pages/ColorMatch';
 import SpeedGrid from './pages/SpeedGrid';
 import TypingSpeed from './pages/TypingSpeed';
+import MathFlash from './pages/MathFlash';
 import SpeedMath from './pages/SpeedMath';
 
 import LocalDistrictExchange from './pages/LocalDistrictExchange';
@@ -126,6 +127,7 @@ function Shell() {
         <Route path="/color-match" element={<ColorMatch />} />
         <Route path="/speed-grid" element={<SpeedGrid />} />
         <Route path="/typing-speed" element={<TypingSpeed />} />
+        <Route path="/math-flash" element={<MathFlash />} />
         <Route path="/speed-math" element={<SpeedMath />} />
         <Route path="/district-exchange/local" element={<LocalDistrictExchange />} />
         <Route path="/snake" element={<Snake />} />
@@ -182,6 +184,7 @@ function Shell() {
               <Route path="/speed-grid" element={<SpeedGrid />} />
               <Route path="/click-the-target" element={<ClickTheTarget />} />
               <Route path="/typing-speed" element={<TypingSpeed />} />
+              <Route path="/math-flash" element={<MathFlash />} />
               <Route path="/speed-math" element={<SpeedMath />} />
               <Route path="/snake" element={<Snake />} />
               <Route path="/battleships" element={<Battleships />} />
