@@ -18,7 +18,11 @@ export default function MathFlash() {
   const [bestScore, setBestScore] = useState(() => {
     try {
       const saved = localStorage.getItem('axiom-mathflash-best');
-      return saved ? parseInt(saved, 10) : 0;
+      if (saved) {
+        const parsed = parseInt(saved, 10);
+        return isNaN(parsed) ? 0 : parsed;
+      }
+      return 0;
     } catch {
       return 0;
     }
@@ -127,8 +131,10 @@ export default function MathFlash() {
 
   const handleChange = (e) => {
     if (gameState !== 'playing') return;
-    const value = e.target.value;
+    const value = e.target.value.replace(/[^0-9]/g, '');
     setUserInput(value);
+
+    if (value === '') return;
 
     const parsedValue = parseInt(value, 10);
     const correctAnswerStr = correctAnswer.toString();
