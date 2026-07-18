@@ -170,6 +170,10 @@ export default function SequenceMemory() {
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (gameState !== 'playing' && e.key === 'Enter') {
+        const tagName = e.target?.tagName;
+        if (tagName === 'BUTTON' || tagName === 'INPUT' || tagName === 'TEXTAREA' || tagName === 'A') {
+          return;
+        }
         e.preventDefault();
         if (startGameRef.current) startGameRef.current();
       }

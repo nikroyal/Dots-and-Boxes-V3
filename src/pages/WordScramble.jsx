@@ -214,6 +214,7 @@ export default function WordScramble() {
                   if (!userInput.trim()) {
                     loadNewWord();
                   } else {
+                    sfx.click();
                     setUserInput('');
                   }
                 }
