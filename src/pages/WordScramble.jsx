@@ -51,6 +51,35 @@ export default function WordScramble() {
   const timerRef = useRef(null);
   const scoreRef = useRef(score);
   const inputRef = useRef(null);
+  const startGameRef = useRef(null);
+  const loadNewWordRef = useRef(null);
+  useEffect(() => {
+    startGameRef.current = startGame;
+    loadNewWordRef.current = loadNewWord;
+  }, [startGame, loadNewWord]);
+
+  useEffect(() => {
+    if (gameState === 'playing' && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [gameState]);
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+        return;
+      }
+      if (e.key === 'Enter' && (gameState === 'waiting' || gameState === 'gameover')) {
+        e.preventDefault();
+        startGameRef.current?.();
+      } else if (e.key === 'Escape' && gameState === 'playing') {
+        e.preventDefault();
+        loadNewWordRef.current?.();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [gameState]);
 
   useEffect(() => {
     return () => {
@@ -74,7 +103,7 @@ export default function WordScramble() {
     setUserInput('');
   }, []);
 
-  const startGame = () => {
+  const startGame = useCallback(() => {
     sfx.click();
     setGameState('playing');
     setScore(0);
@@ -86,7 +115,20 @@ export default function WordScramble() {
     timerRef.current = setInterval(() => {
       setTimeLeft((prev) => Math.max(0, prev - 1));
     }, 1000);
-  };
+  }, [loadNewWord]);
+  useEffect(() => {
+    const handleGlobalKeyDown = (e) => {
+      if (e.key === 'Enter') {
+        if (e.target.tagName === 'BUTTON') return;
+        if (gameState === 'waiting' || gameState === 'gameover') {
+          e.preventDefault();
+          startGame();
+        }
+      }
+    };
+    window.addEventListener('keydown', handleGlobalKeyDown);
+    return () => window.removeEventListener('keydown', handleGlobalKeyDown);
+  }, [gameState, startGame]);
 
   const endGame = useCallback(() => {
     if (timerRef.current) clearInterval(timerRef.current);
@@ -111,6 +153,15 @@ export default function WordScramble() {
     }
   }, [timeLeft, gameState, endGame]);
 
+
+
+  const getNextTierMessage = (s) => {
+    if (s >= 200) return "You're at the top tier!";
+    if (s >= 100) return `${200 - s} points to Wordsmith tier`;
+    if (s >= 50) return `${100 - s} points to Smart tier`;
+    return `${50 - s} points to Good tier`;
+  };
+
   const getRatingMessage = (s) => {
     if (s >= 200) return "🧠 Wordsmith";
     if (s >= 100) return "🧠 Smart";
@@ -133,6 +184,7 @@ export default function WordScramble() {
       console.warn("Clipboard API not supported");
     }
   };
+
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -165,9 +217,10 @@ export default function WordScramble() {
       <div className="relative border hairline card bg-[var(--paper-tint)] p-6 sm:p-8 w-full max-w-md">
         {gameState === 'waiting' && (
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/5 z-10 backdrop-blur-[1px]">
-            <button onClick={startGame} className="btn-primary">
-              Start Game
+            <button onClick={startGame} className="btn-primary mb-2">
+              Start Game <span className="hidden sm:inline opacity-50 font-mono text-xs ml-2">(Enter)</span>
             </button>
+            <p className="font-mono text-xs opacity-60">Press Enter</p>
           </div>
         )}
 
@@ -175,15 +228,18 @@ export default function WordScramble() {
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/10 z-10 backdrop-blur-[2px]">
             <p className="font-display text-3xl mb-2 text-[var(--crimson)]">Time's Up!</p>
             <p className="font-mono text-lg mb-1">Final Score: {score}</p>
-            <p className="font-display text-xl mb-6 text-[var(--ink)] opacity-90">{getRatingMessage(score)}</p>
-            <div className="flex gap-4">
+            <p className="font-display text-xl mb-1 text-[var(--ink)] opacity-90">{getRatingMessage(score)}</p>
+            <p className="font-mono text-xs opacity-60 tracking-widest uppercase mb-4">{getNextTierMessage(score)}</p>
+            <p className="font-mono text-sm opacity-80 mb-6 text-[var(--crimson)]">Missed word: {currentWord}</p>
+            <div className="flex gap-4 mb-2">
               <button onClick={startGame} className="btn-primary">
-                Play Again
+                Play Again <span className="hidden sm:inline opacity-50 font-mono text-xs ml-2">(Enter)</span>
               </button>
               <button onClick={handleShare} className="btn-ghost">
                 {copied ? 'Copied!' : 'Share Result'}
               </button>
             </div>
+            <p className="font-mono text-xs opacity-60">Press Enter to restart</p>
           </div>
         )}
 
@@ -209,8 +265,14 @@ export default function WordScramble() {
                 }
               }}
               onKeyDown={(e) => {
-                if (e.key === 'Enter' && !userInput.trim()) {
+                if (e.key === 'Enter') {
                   e.preventDefault();
+                  if (!userInput.trim()) {
+                    loadNewWord();
+                  } else {
+                    sfx.click();
+                    setUserInput('');
+                  }
                 }
               }}
               className="w-full text-center text-2xl font-display uppercase tracking-widest p-4 border hairline bg-[var(--bg-soft)] focus:outline-none focus:ring-2 focus:ring-[var(--forest)]"
@@ -229,7 +291,7 @@ export default function WordScramble() {
               disabled={gameState !== 'playing'}
               className="btn-ghost text-xs"
             >
-              Skip
+              Skip <span className="hidden sm:inline opacity-50 font-mono text-xs ml-2">(Esc)</span>
             </button>
           </div>
         </div>

@@ -10,7 +10,6 @@
 ## 2026-06-18 - Avoid Shallow Copying Reducer State
 **Learning:** Relying on shallow copies (e.g. `{ ...state }`) within game state reducers, especially nested objects and arrays, leads to mutation issues that crash React Strict Mode apps.
 **Action:** Always use deep copying methods like `structuredClone(state)` at the start of a reducer function that performs multiple mutations.
-=======
 ## 2026-06-19 - Adding Dynamic Contextual Feedback
 **Learning:** Adding lightweight conditional UI messaging mapped directly to the final user state (e.g., scores, moves) creates an immediate qualitative assessment that is highly satisfying.
 **Action:** In small arcade games, always consider replacing generic "Game Over" or "You Win" states with performance-based qualitative tiers (like stars or descriptive ratings) to instantly improve the replay loop.
@@ -58,3 +57,39 @@
 ## 2026-06-28 - Fast Input Responsiveness
 **Learning:** In fast-paced or reaction-based arcade games (like Click The Target), using standard `onClick` handlers introduces an inherent 100-300ms touch delay on mobile devices, which makes the game feel sluggish and unresponsive.
 **Action:** Always use `onPointerDown` instead of `onClick` for interactive game elements to eliminate touch delay. Ensure you use `e.stopPropagation()` to prevent misclicks on background elements.
+
+## 2024-07-05 - Keyboard Accessibility and Feedback in Arcade Games
+**Learning:** Players naturally want to keep their hands on the keyboard for typing-heavy games. Missing fail-state feedback (like not showing the missed scrambled word) causes frustration. `type="number"` inputs often show annoying browser UI spinners that break visual flow.
+**Action:** Add global 'Enter' key listeners to start/restart typing games. Always provide closure (e.g. show the missed word). Prefer `<input type="text" inputMode="numeric">` for clean numerical entry.
+
+## 2024-05-18 - Keyboard Loop Friction
+**Learning:** For games heavily reliant on keyboard inputs (like typing words or mashing number keys to hit moles), requiring players to reach for the mouse to start or restart the game breaks their flow state and introduces unnecessary friction.
+**Action:** When evaluating games with heavy keyboard interaction, ensure the core loop can be started, skipped, and restarted using the keyboard (e.g., binding 'Enter' to Play Again/Start/Skip). Always remember to use the `useRef` pattern (e.g., `const callbackRef = useRef(callback)`) when binding global event listeners to avoid stale closures.
+
+## 2024-05-19 - Immediate UI Error States
+**Learning:** In typing or input-heavy games, allowing the user to blindly type incorrect characters without immediate visual feedback leads to wasted time and frustration.
+**Action:** Always provide instant visual styling (like a red border or background) the moment the input diverges from the target.
+
+## 2024-05-19 - Input Attributes for Numeric Games
+**Learning:** Using `<input type="number">` adds unwanted browser UI elements (spinners) and allows non-numeric characters like "e" to be typed, causing friction in fast-paced arcade games.
+**Action:** Replace `type="number"` with `<input type="text" inputMode="numeric">` and manually strip non-numeric characters in the `onChange` handler to ensure a clean, native-feeling mobile and desktop experience.
+
+## 2024-11-21 - Visual Hints for Shortcuts
+**Learning:** Players may not discover keyboard shortcuts unless they are explicitly indicated in the UI.
+**Action:** Always append the corresponding shortcut key to the primary action button's text (e.g., "Start Game (Enter)").
+
+## 2024-05-19 - Keyboard Shortcuts for Fast Core Loops & Closing Learning Loops
+**Learning:** Explicitly surfacing keyboard shortcuts (like Enter) directly on primary buttons reduces friction and speeds up the replay loop. Revealing missed states (like the word in Word Scramble) immediately satisfies curiosity and closes the learning loop.
+**Action:** Always ensure arcade games use explicit keyboard shortcuts to start/restart, and always reveal the final "answer" or missed objective upon failure to encourage another try.
+
+## 2024-07-16 - Shareable Qualitative Ratings
+**Learning:** Adding performance-based qualitative tiers (like "Aimbot" or "Hacker") and including them in the clipboard share text significantly boosts the fun factor and replayability of arcade games.
+**Action:** When adding sharing to games, map numerical scores/times to qualitative rating strings and display them on the result screen and in the copy-paste string.
+
+## 2024-11-20 - Global Keyboard Shortcuts and Stale Closures
+**Learning:** Adding window-level 'keydown' event listeners in a React component for fast-replay shortcuts (like 'Enter' to restart) requires storing both the target callback function and relevant state checks in refs. Failing to do so causes stale closures, where the event listener uses the initial render state and either fails to trigger or triggers the wrong action.
+**Action:** When implementing global keyboard shortcuts in React for arcade games, always wrap the necessary state variables and callback functions in refs and invoke the ref in the keydown handler, or use stable useCallback dependencies.
+
+## 2026-07-17 - Safe Fast Keyboard Shortcuts in React
+**Learning:** Implementing window-level `keydown` event listeners in React for fast core loops requires ensuring stable references or using refs so the listener invokes the latest function closure without stale state errors during fast restarts.
+**Action:** When adding global keyboard shortcuts to React games for quick restarting, ensure proper dependency arrays with useCallback or refs rather than binding stale functions directly into the listener.
