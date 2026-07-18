@@ -116,6 +116,19 @@ export default function WordScramble() {
       setTimeLeft((prev) => Math.max(0, prev - 1));
     }, 1000);
   }, [loadNewWord]);
+  useEffect(() => {
+    const handleGlobalKeyDown = (e) => {
+      if (e.key === 'Enter') {
+        if (e.target.tagName === 'BUTTON') return;
+        if (gameState === 'waiting' || gameState === 'gameover') {
+          e.preventDefault();
+          startGame();
+        }
+      }
+    };
+    window.addEventListener('keydown', handleGlobalKeyDown);
+    return () => window.removeEventListener('keydown', handleGlobalKeyDown);
+  }, [gameState, startGame]);
 
   const endGame = useCallback(() => {
     if (timerRef.current) clearInterval(timerRef.current);
@@ -204,9 +217,10 @@ export default function WordScramble() {
       <div className="relative border hairline card bg-[var(--paper-tint)] p-6 sm:p-8 w-full max-w-md">
         {gameState === 'waiting' && (
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/5 z-10 backdrop-blur-[1px]">
-            <button onClick={startGame} className="btn-primary">
+            <button onClick={startGame} className="btn-primary mb-2">
               Start Game <span className="hidden sm:inline opacity-50 font-mono text-xs ml-2">(Enter)</span>
             </button>
+            <p className="font-mono text-xs opacity-60">Press Enter</p>
           </div>
         )}
 
@@ -217,7 +231,7 @@ export default function WordScramble() {
             <p className="font-display text-xl mb-1 text-[var(--ink)] opacity-90">{getRatingMessage(score)}</p>
             <p className="font-mono text-xs opacity-60 tracking-widest uppercase mb-4">{getNextTierMessage(score)}</p>
             <p className="font-mono text-sm opacity-80 mb-6 text-[var(--crimson)]">Missed word: {currentWord}</p>
-            <div className="flex gap-4">
+            <div className="flex gap-4 mb-2">
               <button onClick={startGame} className="btn-primary">
                 Play Again <span className="hidden sm:inline opacity-50 font-mono text-xs ml-2">(Enter)</span>
               </button>
@@ -225,6 +239,7 @@ export default function WordScramble() {
                 {copied ? 'Copied!' : 'Share Result'}
               </button>
             </div>
+            <p className="font-mono text-xs opacity-60">Press Enter to restart</p>
           </div>
         )}
 

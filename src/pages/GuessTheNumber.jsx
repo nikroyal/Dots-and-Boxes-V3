@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useAuth } from '../lib/AuthContext';
 import { recordActivity, ACTIVITY_TYPES } from '../lib/activity';
 import { updateArcadeBest } from '../lib/actions';
@@ -46,7 +46,7 @@ export default function GuessTheNumber() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  const initGame = () => {
+  const initGame = useCallback(() => {
     setTargetNumber(Math.floor(Math.random() * 100) + 1);
     setCurrentGuess('');
     setAttempts(0);
@@ -58,11 +58,26 @@ export default function GuessTheNumber() {
     setTimeout(() => {
       if (inputRef.current) inputRef.current.focus();
     }, 100);
-  };
+  }, []);
 
   useEffect(() => {
     initGame();
-  }, []);
+  }, [initGame]);
+
+  useEffect(() => {
+    const handleGlobalKeyDown = (e) => {
+      if (e.key === 'Enter') {
+        if (e.target.tagName === 'BUTTON') return;
+        if (gameState === 'won') {
+          e.preventDefault();
+          sfx.click();
+          initGame();
+        }
+      }
+    };
+    window.addEventListener('keydown', handleGlobalKeyDown);
+    return () => window.removeEventListener('keydown', handleGlobalKeyDown);
+  }, [gameState, initGame]);
 
   const handleGuess = (e) => {
     e.preventDefault();
@@ -211,13 +226,14 @@ export default function GuessTheNumber() {
             </button>
           </form>
         ) : (
-          <div className="flex flex-col gap-4 w-full fade-in">
+          <div className="flex flex-col gap-4 w-full fade-in items-center">
             <button onClick={() => { sfx.click(); initGame(); }} className="btn-primary w-full">
               Play Again <span className="hidden sm:inline opacity-50 font-mono text-xs ml-2">(Enter)</span>
             </button>
             <button onClick={handleShare} className="btn-secondary w-full">
               {copied ? 'Copied!' : 'Share Result'}
             </button>
+            <p className="font-mono text-xs opacity-60">Press Enter to restart</p>
           </div>
         )}
 

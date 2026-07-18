@@ -92,19 +92,11 @@ export default function TypingSpeed() {
     setUserInput('');
   }, []);
 
-  const getRating = (w) => {
-    if (w >= 80) return "⚡ Hacker";
-    if (w >= 60) return "🚀 Fast";
-    if (w >= 40) return "🏃 Average";
-    return "🐢 Beginner";
-  };
-
   useEffect(() => {
     if (gameState === 'playing' && inputRef.current) {
       inputRef.current.focus();
     }
   }, [gameState]);
-
   const startGame = useCallback(() => {
     sfx.click();
     setGameState('playing');
@@ -119,6 +111,19 @@ export default function TypingSpeed() {
       setTimeLeft((prev) => Math.max(0, prev - 1));
     }, 1000);
   }, [loadNewQuote]);
+  useEffect(() => {
+    const handleGlobalKeyDown = (e) => {
+      if (e.key === 'Enter') {
+        if (e.target.tagName === 'BUTTON') return;
+        if (gameState === 'waiting' || gameState === 'result') {
+          e.preventDefault();
+          startGame();
+        }
+      }
+    };
+    window.addEventListener('keydown', handleGlobalKeyDown);
+    return () => window.removeEventListener('keydown', handleGlobalKeyDown);
+  }, [gameState, startGame]);
 
   const endGame = useCallback(() => {
     if (timerRef.current) clearInterval(timerRef.current);
@@ -230,9 +235,10 @@ export default function TypingSpeed() {
               Type the phrases as fast and accurately as possible in 60 seconds!<br/>
               <span className="text-sm opacity-60 mt-2 block font-mono tracking-widest uppercase">Target: ≥ 60 WPM for 🚀</span>
             </p>
-            <button onClick={startGame} className="btn-primary">
+            <button onClick={startGame} className="btn-primary mb-2">
               Start Test <span className="hidden sm:inline opacity-50 font-mono text-xs ml-2">(Enter)</span>
             </button>
+            <p className="font-mono text-xs opacity-60">Press Enter</p>
           </div>
         )}
 
@@ -242,7 +248,7 @@ export default function TypingSpeed() {
              <div className="font-display text-3xl mb-1 opacity-90 text-[var(--forest)]">{wpm} WPM</div>
              <div className="font-display text-xl mb-1 text-[var(--ink)] opacity-90">{getRatingMessage(wpm)}</div>
              <div className="font-mono text-xs opacity-60 tracking-widest uppercase mb-6">{getNextTierMessage(wpm)}</div>
-             <div className="flex gap-4">
+             <div className="flex gap-4 mb-2">
                <button onClick={startGame} className="btn-primary">
                   Try Again <span className="hidden sm:inline opacity-50 font-mono text-xs ml-2">(Enter)</span>
                </button>
@@ -250,6 +256,7 @@ export default function TypingSpeed() {
                  {copied ? 'Copied!' : 'Share Result'}
                </button>
              </div>
+             <p className="font-mono text-xs opacity-60">Press Enter to try again</p>
           </div>
         )}
 

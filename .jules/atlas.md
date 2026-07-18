@@ -57,6 +57,11 @@
 ## 2026-06-28 - Fast Input Responsiveness
 **Learning:** In fast-paced or reaction-based arcade games (like Click The Target), using standard `onClick` handlers introduces an inherent 100-300ms touch delay on mobile devices, which makes the game feel sluggish and unresponsive.
 **Action:** Always use `onPointerDown` instead of `onClick` for interactive game elements to eliminate touch delay. Ensure you use `e.stopPropagation()` to prevent misclicks on background elements.
+
+## 2024-07-05 - Keyboard Accessibility and Feedback in Arcade Games
+**Learning:** Players naturally want to keep their hands on the keyboard for typing-heavy games. Missing fail-state feedback (like not showing the missed scrambled word) causes frustration. `type="number"` inputs often show annoying browser UI spinners that break visual flow.
+**Action:** Add global 'Enter' key listeners to start/restart typing games. Always provide closure (e.g. show the missed word). Prefer `<input type="text" inputMode="numeric">` for clean numerical entry.
+
 ## 2024-05-18 - Keyboard Loop Friction
 **Learning:** For games heavily reliant on keyboard inputs (like typing words or mashing number keys to hit moles), requiring players to reach for the mouse to start or restart the game breaks their flow state and introduces unnecessary friction.
 **Action:** When evaluating games with heavy keyboard interaction, ensure the core loop can be started, skipped, and restarted using the keyboard (e.g., binding 'Enter' to Play Again/Start/Skip). Always remember to use the `useRef` pattern (e.g., `const callbackRef = useRef(callback)`) when binding global event listeners to avoid stale closures.
@@ -82,8 +87,9 @@
 **Action:** When adding sharing to games, map numerical scores/times to qualitative rating strings and display them on the result screen and in the copy-paste string.
 
 ## 2024-11-20 - Global Keyboard Shortcuts and Stale Closures
-**Learning:** Adding window-level 'keydown' event listeners in a React component for fast-replay shortcuts (like 'Enter' to restart) requires storing both the target callback function and relevant state checks (e.g., ) in . Failing to do so causes stale closures, where the event listener uses the initial render state and either fails to trigger or triggers the wrong action.
-**Action:** When implementing global keyboard shortcuts in React for arcade games, always wrap the necessary state variables and callback functions in  and update them within a , then invoke the ref in the keydown handler.
+**Learning:** Adding window-level 'keydown' event listeners in a React component for fast-replay shortcuts (like 'Enter' to restart) requires storing both the target callback function and relevant state checks in refs. Failing to do so causes stale closures, where the event listener uses the initial render state and either fails to trigger or triggers the wrong action.
+**Action:** When implementing global keyboard shortcuts in React for arcade games, always wrap the necessary state variables and callback functions in refs and invoke the ref in the keydown handler, or use stable useCallback dependencies.
+
 ## 2026-07-17 - Safe Fast Keyboard Shortcuts in React
-**Learning:** Implementing window-level `keydown` event listeners in React for fast core loops requires updating a mutable `ref` containing the execution callback (e.g., `startGame`) triggered within a `useEffect` with no dependency array (or specific dependency) so the listener always invokes the absolute latest function closure, preventing stale state errors and buggy behavior during fast restarts.
-**Action:** When adding global keyboard shortcuts to React games for quick restarting, use a `useRef` to store the target callback and update it during every render cycle or `useEffect`, rather than binding it directly into the listener.
+**Learning:** Implementing window-level `keydown` event listeners in React for fast core loops requires ensuring stable references or using refs so the listener invokes the latest function closure without stale state errors during fast restarts.
+**Action:** When adding global keyboard shortcuts to React games for quick restarting, ensure proper dependency arrays with useCallback or refs rather than binding stale functions directly into the listener.
