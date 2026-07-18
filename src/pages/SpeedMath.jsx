@@ -26,6 +26,13 @@ export default function SpeedMath() {
     }
   });
 
+  useEffect(() => {
+    const profileBest = profile?.arcadeBests?.['speed-math']?.scoreValue;
+    if (profileBest !== undefined && profileBest > bestScore) {
+      setBestScore(profileBest);
+    }
+  }, [profile, bestScore]);
+
   const timerRef = useRef(null);
   const inputRef = useRef(null);
   const scoreRef = useRef(0);
@@ -138,18 +145,18 @@ export default function SpeedMath() {
     }
   };
 
-  const handleKeyDown = (e) => {
+  const handleKeyDown = useCallback((e) => {
     if (e.key === 'Enter') {
       if (gameState === 'waiting' || gameState === 'result') {
         startGame();
       }
     }
-  };
+  }, [gameState, startGame]);
 
   useEffect(() => {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [gameState, startGame]);
+  }, [handleKeyDown]);
 
   return (
     <div className="fade-in max-w-2xl mx-auto flex flex-col items-center justify-center min-h-[60vh] px-4">
