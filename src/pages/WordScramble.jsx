@@ -74,7 +74,7 @@ export default function WordScramble() {
     setUserInput('');
   }, []);
 
-  const startGame = () => {
+  const startGame = useCallback(() => {
     sfx.click();
     setGameState('playing');
     setScore(0);
@@ -86,7 +86,7 @@ export default function WordScramble() {
     timerRef.current = setInterval(() => {
       setTimeLeft((prev) => Math.max(0, prev - 1));
     }, 1000);
-  };
+  }, [loadNewWord]);
 
   const endGame = useCallback(() => {
     if (timerRef.current) clearInterval(timerRef.current);
@@ -143,6 +143,9 @@ export default function WordScramble() {
 
   useEffect(() => {
     const handleKeyDown = (e) => {
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+        return;
+      }
       if (e.key === 'Enter' && (gameState === 'waiting' || gameState === 'gameover')) {
         e.preventDefault();
         startGame();

@@ -67,7 +67,7 @@ export default function TypingSpeed() {
     setUserInput('');
   }, []);
 
-  const startGame = () => {
+  const startGame = useCallback(() => {
     sfx.click();
     setGameState('playing');
     setTimeLeft(GAME_DURATION);
@@ -80,7 +80,7 @@ export default function TypingSpeed() {
     timerRef.current = setInterval(() => {
       setTimeLeft((prev) => Math.max(0, prev - 1));
     }, 1000);
-  };
+  }, [loadNewQuote]);
 
   const endGame = useCallback(() => {
     if (timerRef.current) clearInterval(timerRef.current);
@@ -167,6 +167,9 @@ export default function TypingSpeed() {
 
   useEffect(() => {
     const handleKeyDown = (e) => {
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+        return;
+      }
       if (e.key === 'Enter' && (gameState === 'waiting' || gameState === 'result')) {
         e.preventDefault();
         startGame();
