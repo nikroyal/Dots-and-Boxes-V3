@@ -16,6 +16,10 @@ export default function SpeedMath() {
   const [userInput, setUserInput] = useState('');
   const [copied, setCopied] = useState(false);
 
+  const timerRef = useRef(null);
+  const startTimeRef = useRef(null);
+  const inputRef = useRef(null);
+
   const [bestScore, setBestScore] = useState(() => {
     try {
       const saved = localStorage.getItem('axiom-speedmath-best');
@@ -25,53 +29,36 @@ export default function SpeedMath() {
     }
   });
 
-  const timerRef = useRef(null);
-  const startTimeRef = useRef(null);
-  const inputRef = useRef(null);
-
-  useEffect(() => {
-    return () => {
-      if (timerRef.current) cancelAnimationFrame(timerRef.current);
-    };
-  }, []);
-
-  const generateProblem = useCallback(() => {
+  const generateProblem = useCallback((currentScore = score) => {
     const ops = ['+', '-', '*'];
-    const op = ops[Math.floor(Math.random() * ops.length)];
-    let a, b, text, answer;
+    // Weight towards + and - for speed, but include some *
+    const op = ops[Math.floor(Math.random() * (currentScore > 10 ? 3 : 2))];
 
+    let a, b, answer;
     if (op === '+') {
-      a = Math.floor(Math.random() * 90) + 10;
-      b = Math.floor(Math.random() * 90) + 10;
-      text = `${a} + ${b}`;
+      a = Math.floor(Math.random() * 20) + 1;
+      b = Math.floor(Math.random() * 20) + 1;
       answer = a + b;
     } else if (op === '-') {
-      a = Math.floor(Math.random() * 90) + 10;
-      b = Math.floor(Math.random() * 90) + 10;
-      if (a < b) {
-        let temp = a;
-        a = b;
-        b = temp;
-      }
-      text = `${a} - ${b}`;
+      a = Math.floor(Math.random() * 20) + 5;
+      b = Math.floor(Math.random() * a) + 1; // Ensure a > b
       answer = a - b;
     } else {
-      a = Math.floor(Math.random() * 11) + 2;
-      b = Math.floor(Math.random() * 11) + 2;
-      text = `${a} * ${b}`;
+      a = Math.floor(Math.random() * 10) + 1;
+      b = Math.floor(Math.random() * 10) + 1;
       answer = a * b;
     }
 
-    setProblem({ text, answer });
+    setProblem({ text: `${a} ${op} ${b}`, answer });
     setUserInput('');
-  }, []);
+  }, [score]);
 
   const startGame = useCallback(() => {
     sfx.click();
     setGameState('playing');
     setTimeLeft(GAME_DURATION);
     setScore(0);
-    generateProblem();
+    generateProblem(0);
 
     startTimeRef.current = performance.now();
 
@@ -119,6 +106,12 @@ export default function SpeedMath() {
   }, [timeLeft, gameState, endGame]);
 
   useEffect(() => {
+    return () => {
+      if (timerRef.current) cancelAnimationFrame(timerRef.current);
+    };
+  }, []);
+
+  useEffect(() => {
     const handleGlobalKeyDown = (e) => {
       if (e.key === 'Enter' && (gameState === 'waiting' || gameState === 'result' || gameState === 'gameover')) {
         e.preventDefault();
@@ -135,8 +128,9 @@ export default function SpeedMath() {
 
     if (parseInt(userInput, 10) === problem.answer) {
       sfx.piece();
-      setScore((s) => s + 1);
-      generateProblem();
+      const nextScore = score + 1;
+      setScore(nextScore);
+      generateProblem(nextScore);
     } else {
       sfx.click();
       setUserInput('');
@@ -156,8 +150,9 @@ export default function SpeedMath() {
       const parsedVal = parseInt(val, 10);
       if (parsedVal === problem.answer) {
         sfx.piece();
-        setScore(s => s + 1);
-        generateProblem();
+        const nextScore = score + 1;
+        setScore(nextScore);
+        generateProblem(nextScore);
       }
     }
   };
