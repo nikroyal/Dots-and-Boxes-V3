@@ -52,13 +52,14 @@ export default function AxiomHub() {
   const rank = rankInfo.rank;
   const rankProgress = rankInfo.progress;
 
-  const upNextAchievement = (() => {
+  const upNextAchievement = useMemo(() => {
+    if (!profile) return null;
     let best = null;
     let highestPct = -1;
-    const unlocked = profile?.unlockedAchievements || [];
+    const unlocked = profile.unlockedAchievements || [];
     for (const a of ACHIEVEMENTS) {
       if (!unlocked.includes(a.id) && a.progress) {
-        const [curr, max, min = 0] = a.progress(profile || {});
+        const [curr, max, min = 0] = a.progress(profile);
         const pct = max === min ? 0 : Math.min(100, Math.max(0, ((curr - min) / (max - min)) * 100));
         if (pct > 0 && max > 1 && pct > highestPct) {
           highestPct = pct;
@@ -67,7 +68,7 @@ export default function AxiomHub() {
       }
     }
     return best;
-  })();
+  }, [profile]);
 
 
   const toggleFavorite = (id) => {
@@ -88,32 +89,49 @@ export default function AxiomHub() {
             Pick a game, build a circuit, or jump back into your Dots & Boxes world.
           </p>
         </div>
-        <Link to="/profile" className="border hairline p-5 block hover:bg-black/5 transition-colors" style={{ background: 'var(--paper-tint)' }}>
-          <div className="flex items-center gap-4 mb-4">
-            <div className="font-display text-4xl">{profile?.avatar || '◆'}</div>
-            <div className="flex-1">
-              <div className="font-display text-lg leading-tight">{profile?.displayName || profile?.username}</div>
-              <div className="flex justify-between items-end mt-1">
-                <div className="font-mono text-[0.65rem] tracking-widest uppercase" style={{ color: rank.color }}>
-                  {rank.name} · {profile?.elo ?? 1000} ELO
-                </div>
-              </div>
-              <div className="mt-1.5 h-1.5 w-full bg-black/10 rounded-full overflow-hidden">
-                <div className="h-full transition-all duration-1000 ease-out" style={{ width: `${rankProgress}%`, background: rank.color }} />
+        {!profile ? (
+          <div className="border hairline p-5 animate-pulse" style={{ background: 'var(--paper-tint)' }}>
+            <div className="flex items-center gap-4 mb-4">
+              <div className="w-10 h-10 bg-black/10 rounded-full" />
+              <div className="flex-1 space-y-2">
+                <div className="h-4 bg-black/10 rounded w-1/3" />
+                <div className="h-3 bg-black/10 rounded w-1/2" />
               </div>
             </div>
+            <div className="grid grid-cols-3 gap-2">
+              <div className="h-12 bg-black/10" />
+              <div className="h-12 bg-black/10" />
+              <div className="h-12 bg-black/10" />
+            </div>
           </div>
-          <div className="grid grid-cols-3 gap-2 text-center">
-            <MiniStat label="Things" value={EXPERIENCE_CATALOG.length} />
-            <MiniStat label="Favorites" value={favoriteIds.length} />
-            <MiniStat label="Friends" value={Array.isArray(profile?.friends) ? profile.friends.length : 0} />
-          </div>
-        </Link>
+        ) : (
+          <Link to="/profile" className="border hairline p-5 block hover:bg-black/5 transition-colors" style={{ background: 'var(--paper-tint)' }}>
+            <div className="flex items-center gap-4 mb-4">
+              <div className="font-display text-4xl">{profile.avatar || '◆'}</div>
+              <div className="flex-1">
+                <div className="font-display text-lg leading-tight">{profile.displayName || profile.username}</div>
+                <div className="flex justify-between items-end mt-1">
+                  <div className="font-mono text-[0.65rem] tracking-widest uppercase" style={{ color: rank.color }}>
+                    {rank.name} · {profile.elo ?? 1000} ELO
+                  </div>
+                </div>
+                <div className="mt-1.5 h-1.5 w-full bg-black/10 rounded-full overflow-hidden">
+                  <div className="h-full transition-all duration-1000 ease-out" style={{ width: `${rankProgress}%`, background: rank.color }} />
+                </div>
+              </div>
+            </div>
+            <div className="grid grid-cols-3 gap-2 text-center">
+              <MiniStat label="Things" value={EXPERIENCE_CATALOG.length} />
+              <MiniStat label="Favorites" value={favoriteIds.length} />
+              <MiniStat label="Friends" value={Array.isArray(profile.friends) ? profile.friends.length : 0} />
+            </div>
+          </Link>
+        )}
       </section>
 
 
       {/* Active Objectives */}
-      {(upNextAchievement || !dailyGoalCompleted) && (
+      {profile && (upNextAchievement || !dailyGoalCompleted) && (
         <section className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {!dailyGoalCompleted && (
             <Link to="/dots-and-boxes" className="block border hairline p-4 bg-black/5 hover:bg-black/10 transition-colors" style={{ borderColor: 'var(--hairline)' }}>
