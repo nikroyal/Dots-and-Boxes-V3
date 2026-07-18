@@ -28,6 +28,7 @@ const CUSTOM_LIGHT_SQUARE_STYLE = { backgroundColor: 'var(--paper-tint)' };
 // Optimization (Bolt): Wrapped heavy Chessboard component in React.memo to prevent unnecessary re-renders driven by the parent's 1Hz ticker.
 const MemoizedChessboard = memo(Chessboard);
 
+
 export default function MatchChess() {
   const { id } = useParams();
   const { profile } = useAuth();
