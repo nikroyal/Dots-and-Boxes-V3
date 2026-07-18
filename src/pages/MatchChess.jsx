@@ -22,14 +22,12 @@ import { Pause, Play, Flag, Send, Eye, Trophy, RotateCcw, Home, Repeat, Clock, W
 import { Chessboard } from 'react-chessboard';
 import { Chess } from 'chess.js';
 import { applyMove } from '../lib/chessLogic.js';
-
-// Optimization (Bolt): Static styles extracted outside component to prevent re-creation on render
+// Optimization (Bolt): Extracted static style objects to module-level constants to prevent creating new object references on every 1Hz ticker render.
 const CUSTOM_DARK_SQUARE_STYLE = { backgroundColor: 'var(--ochre)' };
 const CUSTOM_LIGHT_SQUARE_STYLE = { backgroundColor: 'var(--paper-tint)' };
-
-// Optimization (Bolt): React.memo prevents the heavy SVG chessboard from re-rendering
-// every single second when the parent's `now` ticker updates the timer banner.
+// Optimization (Bolt): Wrapped heavy Chessboard component in React.memo to prevent unnecessary re-renders driven by the parent's 1Hz ticker.
 const MemoizedChessboard = memo(Chessboard);
+
 
 export default function MatchChess() {
   const { id } = useParams();
@@ -525,7 +523,9 @@ export default function MatchChess() {
   const concealBoard = match.status === 'paused' && match.pauseConcealed;
   const lastMove = (Array.isArray(displayGame.moves) ? displayGame.moves : []).slice(-1)[0];
 
-  // Optimization (Bolt): useMemo prevents new object references from breaking MemoizedChessboard
+  const boardOrientation = match.players.indexOf(profile?.id) === 1 ? 'black' : 'white';
+
+  // Optimization (Bolt): Memoized derived object props using useMemo to maintain a stable reference across the 1Hz ticker updates.
   const customSquareStyles = useMemo(() => ({
     ...(lastMove ? {
       [lastMove.from]: { backgroundColor: 'rgba(255, 255, 0, 0.4)' },
@@ -644,7 +644,7 @@ export default function MatchChess() {
                 position={displayGame.fen}
                 onPieceDrop={onDrop}
                 onSquareClick={onSquareClick}
-                boardOrientation={match.players.indexOf(profile?.id) === 1 ? 'black' : 'white'}
+                boardOrientation={boardOrientation}
                 customDarkSquareStyle={CUSTOM_DARK_SQUARE_STYLE}
                 customLightSquareStyle={CUSTOM_LIGHT_SQUARE_STYLE}
                 customSquareStyles={customSquareStyles}
@@ -761,10 +761,10 @@ export default function MatchChess() {
         </div>
         <form onSubmit={handleSendChat} className="border-t hairline p-2 flex gap-2 items-center">
           <input
+            aria-label="Chat input"
             value={chatInput}
             onChange={e => setChatInput(e.target.value.slice(0, 200))}
             placeholder="Say something…"
-            aria-label="Chat message"
             maxLength={200}
             className="flex-1 bg-transparent font-display text-base outline-none px-2"
           />
@@ -1089,8 +1089,8 @@ function WinScreen({ match, profile, achievementToasts, onHome, onReplay }) {
             )}
           </>
         )}
-        <button onClick={onReplay} className="btn-ghost"><RotateCcw size={14} /> Watch Replay</button>
-        <button onClick={onHome} className="btn-primary"><Home size={14} /> Home</button>
+        <button onClick={onReplay} className="btn-ghost"><RotateCcw size={14} aria-hidden="true" /> Watch Replay</button>
+        <button onClick={onHome} className="btn-primary"><Home size={14} aria-hidden="true" /> Home</button>
       </div>
     </div>
   );
