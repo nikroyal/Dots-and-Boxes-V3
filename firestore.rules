@@ -53,9 +53,9 @@ service cloud.firestore {
         )
         || (
           changedKeys().hasOnly(['friends', 'outgoingFriendRequests'])
-          && request.resource.data.friends.size() == (resource.data.get('friends', []).size() + 1)
-          && request.resource.data.friends.hasAll(resource.data.get('friends', []))
-          && request.resource.data.friends[request.resource.data.friends.size() - 1] == request.auth.uid
+          && request.resource.data.get('friends', []).size() == (resource.data.get('friends', []).size() + 1)
+          && request.resource.data.get('friends', []).hasAll(resource.data.get('friends', []))
+          && request.resource.data.get('friends', [])[request.resource.data.get('friends', []).size() - 1] == request.auth.uid
           && (request.auth.uid in resource.data.get('outgoingFriendRequests', []))
           && request.resource.data.get('outgoingFriendRequests', []).size() == resource.data.get('outgoingFriendRequests', []).size() - 1
           && resource.data.get('outgoingFriendRequests', []).hasAll(request.resource.data.get('outgoingFriendRequests', []))
@@ -65,9 +65,9 @@ service cloud.firestore {
         )
         || (
           changedKeys().hasOnly(['friends'])
-          && request.resource.data.friends.size() == (resource.data.get('friends', []).size() - 1)
-          && resource.data.get('friends', []).hasAll(request.resource.data.friends)
-          && resource.data.get('friends', []).removeAll(request.resource.data.friends) == [request.auth.uid]
+          && request.resource.data.get('friends', []).size() == (resource.data.get('friends', []).size() - 1)
+          && resource.data.get('friends', []).hasAll(request.resource.data.get('friends', []))
+          && resource.data.get('friends', []).removeAll(request.resource.data.get('friends', [])) == [request.auth.uid]
         )
         || (
           changedKeys().hasOnly(['outgoingFriendRequests'])
@@ -79,13 +79,13 @@ service cloud.firestore {
         )
         || (
           changedKeys().hasOnly(['friendRequests'])
-          && request.resource.data.friendRequests.size() == (resource.data.get('friendRequests', []).size() + 1)
-          && request.resource.data.friendRequests.hasAll(resource.data.get('friendRequests', []))
-          && request.resource.data.friendRequests.removeAll(resource.data.get('friendRequests', [])).size() == 1
-          && request.resource.data.friendRequests.removeAll(resource.data.get('friendRequests', []))[0].fromId == request.auth.uid
-          && request.resource.data.friendRequests.removeAll(resource.data.get('friendRequests', []))[0].fromUsername is string
-          && request.resource.data.friendRequests.removeAll(resource.data.get('friendRequests', []))[0].fromAvatar is string
-          && request.resource.data.friendRequests.removeAll(resource.data.get('friendRequests', []))[0].ts is number
+          && request.resource.data.get('friendRequests', []).size() == (resource.data.get('friendRequests', []).size() + 1)
+          && request.resource.data.get('friendRequests', []).hasAll(resource.data.get('friendRequests', []))
+          && request.resource.data.get('friendRequests', []).removeAll(resource.data.get('friendRequests', [])).size() == 1
+          && request.resource.data.get('friendRequests', []).removeAll(resource.data.get('friendRequests', []))[0].fromId == request.auth.uid
+          && request.resource.data.get('friendRequests', []).removeAll(resource.data.get('friendRequests', []))[0].fromUsername is string
+          && request.resource.data.get('friendRequests', []).removeAll(resource.data.get('friendRequests', []))[0].fromAvatar is string
+          && request.resource.data.get('friendRequests', []).removeAll(resource.data.get('friendRequests', []))[0].ts is number
         )
       );
 
