@@ -54,7 +54,7 @@ export default function TypingSpeed() {
 
   useEffect(() => {
     startGameRef.current = startGame;
-  });
+  }, []);
 
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -82,21 +82,6 @@ export default function TypingSpeed() {
     setCurrentQuote(randomQuote);
     setUserInput('');
   }, []);
-
-  const startGameRef = useRef(null);
-  useEffect(() => {
-    startGameRef.current = startGame;
-  }, []);
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (e.key === 'Enter' && (gameState === 'waiting' || gameState === 'result')) {
-        e.preventDefault();
-        if (startGameRef.current) startGameRef.current();
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [gameState]);
 
   const getRating = (w) => {
     if (w >= 80) return "⚡ Hacker";

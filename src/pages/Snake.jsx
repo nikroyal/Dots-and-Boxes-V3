@@ -46,7 +46,8 @@ export default function Snake() {
 
   useEffect(() => {
     startGameRef.current = startGame;
-  });
+  }, []);
+
   useEffect(() => {
     const handleKeyDown = (e) => {
       if ((gameStateRef.current === 'waiting' || gameStateRef.current === 'gameover') && e.key === 'Enter' && e.target.tagName !== 'BUTTON') {
@@ -87,11 +88,6 @@ export default function Snake() {
     }
     return newFood;
   };
-
-  const startGameRef = useRef(null);
-  useEffect(() => {
-    startGameRef.current = startGame;
-  }, []);
 
   const startGame = () => {
     sfx.click();
