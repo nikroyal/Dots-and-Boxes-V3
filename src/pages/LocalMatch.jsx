@@ -130,7 +130,7 @@ export default function LocalMatch() {
       <div className="flex items-center justify-between border-b hairline pb-4">
         <div className="flex items-center gap-4">
           <button onClick={quit} className="btn-ghost" aria-label="Quit match">
-            <X size={16} aria-hidden="true" />
+            <X size={16} />
           </button>
           <div className="font-mono text-[0.65rem] tracking-widest uppercase opacity-60">
             {rows}×{cols}

@@ -73,7 +73,6 @@ export function PromptDialog({ open, title, defaultValue = '', confirmLabel = 'O
         <h2 id="prompt-dialog-title" className="font-display text-xl mb-4">{title}</h2>
         <input
           ref={inputRef}
-          aria-label="Prompt input"
           type="text"
           value={value}
           onChange={(e) => setValue(e.target.value)}

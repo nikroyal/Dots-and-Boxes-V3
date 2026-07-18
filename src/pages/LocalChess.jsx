@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, useRef, useCallback, memo } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createEmptyGame, applyMove } from '../lib/chessLogic.js';
 import { sfx } from '../lib/sound';
@@ -7,12 +7,6 @@ import Confetti from '../components/Confetti';
 import { useConfirm } from '../components/ConfirmDialog';
 import { Chessboard } from 'react-chessboard';
 import { Chess } from 'chess.js';
-
-// Optimization (Bolt): Extracted static style objects to module-level constants to prevent creating new object references on every 1Hz ticker render.
-const CUSTOM_DARK_SQUARE_STYLE = { backgroundColor: 'var(--ochre)' };
-const CUSTOM_LIGHT_SQUARE_STYLE = { backgroundColor: 'var(--paper-tint)' };
-// Optimization (Bolt): Wrapped heavy Chessboard component in React.memo to prevent unnecessary re-renders driven by the parent's 1Hz ticker.
-const MemoizedChessboard = memo(Chessboard);
 
 export default function LocalChess() {
   const navigate = useNavigate();
@@ -63,7 +57,7 @@ export default function LocalChess() {
     setSetup(false);
   };
 
-  const makeMoveObj = useCallback((sourceSquare, targetSquare, piece) => {
+  const makeMoveObj = (sourceSquare, targetSquare, piece) => {
     if (!game || game.finished) return false;
     const playerIds = ['p1', 'p2'];
     const pid = playerIds[game.currentPlayerIdx];
@@ -95,7 +89,7 @@ export default function LocalChess() {
     }, 3000);
 
     return true;
-  }, [game, pendingGame]);
+  };
 
   const undoMove = () => {
     if (pendingTimeoutRef.current) {
@@ -105,12 +99,12 @@ export default function LocalChess() {
     setPendingGame(null);
   };
 
-  const onDrop = useCallback((sourceSquare, targetSquare, piece) => {
+  const onDrop = (sourceSquare, targetSquare, piece) => {
     if (pendingGame) return false;
     return makeMoveObj(sourceSquare, targetSquare, piece);
-  }, [pendingGame, makeMoveObj]);
+  };
 
-  const onSquareClick = useCallback((square, piece) => {
+  const onSquareClick = (square, piece) => {
     if (!game || game.finished) return;
     if (pendingGame) return; // Prevent interaction during undo window
 
@@ -137,7 +131,7 @@ export default function LocalChess() {
       };
     });
     setOptionSquares(newOptions);
-  }, [game, pendingGame, optionSquares, selectedSquare, makeMoveObj]);
+  };
 
   const quit = async () => {
     if (!game.finished && await confirm({ title: 'End this match?', body: 'Progress will be lost.', confirmLabel: 'Quit' })) {
@@ -201,15 +195,14 @@ export default function LocalChess() {
 
   const lastMove = displayGame.moves && displayGame.moves.length > 0 ? displayGame.moves[displayGame.moves.length - 1] : null;
 
-  // Optimization (Bolt): Memoized derived object props using useMemo to maintain a stable reference across the 1Hz ticker updates.
-  const customSquareStyles = useMemo(() => ({
+  const customSquareStyles = {
     ...(lastMove ? {
       [lastMove.from]: { backgroundColor: 'rgba(255, 255, 0, 0.4)' },
       [lastMove.to]: { backgroundColor: 'rgba(255, 255, 0, 0.4)' }
     } : {}),
     ...optionSquares,
     ...(selectedSquare ? { [selectedSquare]: { backgroundColor: 'rgba(255, 0, 0, 0.4)' } } : {})
-  }), [lastMove, optionSquares, selectedSquare]);
+  };
 
   return (
     <div className="fade-in max-w-4xl mx-auto space-y-6">
@@ -254,13 +247,13 @@ export default function LocalChess() {
 
       <div className="flex justify-center py-8">
         <div className="w-full max-w-[500px]">
-          <MemoizedChessboard
+          <Chessboard
             position={displayGame.fen}
             onPieceDrop={onDrop}
             onSquareClick={onSquareClick}
             boardOrientation={boardOrientation}
-            customDarkSquareStyle={CUSTOM_DARK_SQUARE_STYLE}
-            customLightSquareStyle={CUSTOM_LIGHT_SQUARE_STYLE}
+            customDarkSquareStyle={{ backgroundColor: 'var(--ochre)' }}
+            customLightSquareStyle={{ backgroundColor: 'var(--paper-tint)' }}
             customSquareStyles={customSquareStyles}
           />
         </div>

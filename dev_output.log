@@ -1,0 +1,11 @@
+
+> axiom@1.0.0 dev /app
+> vite
+
+
+  VITE v5.4.21  ready in 438 ms
+
+  ➜  Local:   http://localhost:5173/
+  ➜  Network: use --host to expose
+12:23:00 PM [vite] hmr update /src/pages/SequenceMemory.jsx, /src/index.css
+12:33:36 PM [vite] hmr update /src/pages/SequenceMemory.jsx, /src/index.css

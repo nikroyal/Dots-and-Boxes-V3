@@ -544,10 +544,10 @@ export default function MatchConnect4() {
         </div>
         <form onSubmit={handleSendChat} className="border-t hairline p-2 flex gap-2 items-center">
           <input
-            aria-label="Chat input"
             value={chatInput}
             onChange={e => setChatInput(e.target.value.slice(0, 200))}
             placeholder="Say something…"
+            aria-label="Chat message"
             maxLength={200}
             className="flex-1 bg-transparent font-display text-base outline-none px-2"
           />
@@ -1084,8 +1084,8 @@ function WinScreen({ match, profile, achievementToasts, onHome, onReplay }) {
             )}
           </>
         )}
-        <button onClick={onReplay} className="btn-ghost"><RotateCcw size={14} aria-hidden="true" /> Watch Replay</button>
-        <button onClick={onHome} className="btn-primary"><Home size={14} aria-hidden="true" /> Home</button>
+        <button onClick={onReplay} className="btn-ghost"><RotateCcw size={14} /> Watch Replay</button>
+        <button onClick={onHome} className="btn-primary"><Home size={14} /> Home</button>
       </div>
     </div>
   );
