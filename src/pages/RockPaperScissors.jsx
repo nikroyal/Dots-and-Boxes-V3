@@ -112,11 +112,19 @@ export default function RockPaperScissors() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [gameState, resultMessage]); // Depend on resultMessage so resetGame works properly when re-evaluating the lose condition
 
+  const getRating = (s) => {
+    if (s >= 15) return "🏆 Unstoppable";
+    if (s >= 10) return "🔥 On Fire";
+    if (s >= 5) return "😎 Good";
+    return "🐢 Beginner";
+  };
+
   const [copied, setCopied] = useState(false);
   const handleShare = (e) => {
     e.stopPropagation();
     e.preventDefault();
-    const text = `I reached a streak of ${streak} in Axiom Rock Paper Scissors! ✊✋✌️`;
+    const rating = getRating(streak);
+    const text = `I reached a streak of ${streak} in Axiom Rock Paper Scissors! ✊✋✌️ ${rating}`;
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(text).then(() => {
         sfx.notify();
@@ -164,8 +172,11 @@ export default function RockPaperScissors() {
 
         {gameState === 'result' ? (
           <div className="flex flex-col items-center fade-in">
-             <div className={`font-display text-3xl mb-6 ${resultMessage === 'You win!' ? 'text-[var(--forest)]' : resultMessage === 'You lose!' ? 'text-[var(--crimson)]' : ''}`}>
+             <div className={`font-display text-3xl mb-2 ${resultMessage === 'You win!' ? 'text-[var(--forest)]' : resultMessage === 'You lose!' ? 'text-[var(--crimson)]' : ''}`}>
                 {resultMessage}
+             </div>
+             <div className="font-display text-xl mb-6 opacity-90 text-[var(--ink)]">
+                {getRating(streak)}
              </div>
              <div className="flex gap-4">
                <button onClick={resetGame} className="btn-primary">

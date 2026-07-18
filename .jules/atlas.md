@@ -68,3 +68,7 @@
 ## 2026-07-17 - Safe Fast Keyboard Shortcuts in React
 **Learning:** Implementing window-level `keydown` event listeners in React for fast core loops requires updating a mutable `ref` containing the execution callback (e.g., `startGame`) triggered within a `useEffect` with no dependency array (or specific dependency) so the listener always invokes the absolute latest function closure, preventing stale state errors and buggy behavior during fast restarts.
 **Action:** When adding global keyboard shortcuts to React games for quick restarting, use a `useRef` to store the target callback and update it during every render cycle or `useEffect`, rather than binding it directly into the listener.
+
+## 2024-05-18 - Shareable Qualitative Ratings
+**Learning:** Adding performance-based qualitative tiers (like "On Fire" or "Calculator") and including them in the clipboard share text significantly boosts the fun factor and replayability of arcade games.
+**Action:** When adding sharing to games, map numerical scores/times to qualitative rating strings and display them on the result screen and in the copy-paste string.

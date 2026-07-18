@@ -148,10 +148,18 @@ export default function SpeedMath() {
     }
   };
 
+  const getRating = (s) => {
+    if (s >= 40) return "🧮 Calculator";
+    if (s >= 30) return "🚀 Fast";
+    if (s >= 20) return "🏃 Good";
+    return "🐢 Keep practicing";
+  };
+
   const handleShare = (e) => {
     e.stopPropagation();
     e.preventDefault();
-    const text = `I solved ${score} math problems in 60s in Axiom Speed Math! 🧮`;
+    const rating = getRating(score);
+    const text = `I solved ${score} math problems in 60s in Axiom Speed Math! 🧮 ${rating}`;
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(text).then(() => {
         sfx.notify();
@@ -192,7 +200,10 @@ export default function SpeedMath() {
         {gameState === 'result' && (
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-[var(--paper-tint)]/90 z-10 backdrop-blur-sm">
              <div className="font-display text-4xl mb-2 text-[var(--crimson)]">Time's Up!</div>
-             <div className="font-display text-3xl mb-6 opacity-90 text-[var(--forest)]">{score} Solved</div>
+             <div className="font-display text-3xl mb-2 opacity-90 text-[var(--forest)]">{score} Solved</div>
+             <div className="font-display text-xl mb-6 opacity-90 text-[var(--ink)]">
+                {getRating(score)}
+             </div>
              <div className="flex gap-4">
                <button onClick={startGame} className="btn-primary">
                   Try Again (Enter)
