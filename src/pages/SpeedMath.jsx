@@ -29,6 +29,13 @@ export default function SpeedMath() {
     }
   });
 
+  useEffect(() => {
+    const profileBest = profile?.arcadeBests?.['speed-math']?.scoreValue;
+    if (profileBest !== undefined && profileBest > bestScore) {
+      setBestScore(profileBest);
+    }
+  }, [profile, bestScore]);
+
   const generateProblem = useCallback((currentScore = score) => {
     const ops = ['+', '-', '*'];
     // Weight towards + and - for speed, but include some *
@@ -111,16 +118,17 @@ export default function SpeedMath() {
     };
   }, []);
 
-  useEffect(() => {
-    const handleGlobalKeyDown = (e) => {
-      if (e.key === 'Enter' && (gameState === 'waiting' || gameState === 'result' || gameState === 'gameover')) {
-        e.preventDefault();
-        startGame();
-      }
-    };
-    window.addEventListener('keydown', handleGlobalKeyDown);
-    return () => window.removeEventListener('keydown', handleGlobalKeyDown);
+  const handleKeyDown = useCallback((e) => {
+    if (e.key === 'Enter' && (gameState === 'waiting' || gameState === 'result' || gameState === 'gameover')) {
+      e.preventDefault();
+      startGame();
+    }
   }, [gameState, startGame]);
+
+  useEffect(() => {
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [handleKeyDown]);
 
   const handleSubmit = (e) => {
     if (e) e.preventDefault();

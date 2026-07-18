@@ -39,13 +39,13 @@ import WordScramble from './pages/WordScramble';
 import QuickMath from './pages/QuickMath';
 import RockPaperScissors from './pages/RockPaperScissors';
 import GuessTheNumber from './pages/GuessTheNumber';
+import SpeedMath from './pages/SpeedMath';
 import ClickTheTarget from './pages/ClickTheTarget';
 import SequenceMemory from './pages/SequenceMemory';
 import ColorMatch from './pages/ColorMatch';
 import SpeedGrid from './pages/SpeedGrid';
 import TypingSpeed from './pages/TypingSpeed';
 import MathFlash from './pages/MathFlash';
-import SpeedMath from './pages/SpeedMath';
 
 import LocalDistrictExchange from './pages/LocalDistrictExchange';
 import DistrictExchangeHub from './pages/DistrictExchangeHub';
