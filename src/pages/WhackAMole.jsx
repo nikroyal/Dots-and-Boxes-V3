@@ -35,7 +35,7 @@ export default function WhackAMole() {
 
   useEffect(() => {
     startGameRef.current = startGame;
-  });
+  }, []);
 
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -47,13 +47,6 @@ export default function WhackAMole() {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [gameState]);
-
-  useEffect(() => {
-    return () => {
-      if (timerRef.current) clearInterval(timerRef.current);
-      if (moleTimerRef.current) clearTimeout(moleTimerRef.current);
-    };
-  }, []);
 
   useEffect(() => {
     scoreRef.current = score;
@@ -84,8 +77,6 @@ export default function WhackAMole() {
 
     if (moleTimerRef.current) clearTimeout(moleTimerRef.current);
     moleTimerRef.current = setTimeout(() => {
-      // Use ref to check game state to avoid stale closure if spawnMole is not rebuilt perfectly
-      // Actually spawnMole depends on gameState, but let's be safe.
       spawnMole();
     }, stayDuration);
   }, []);
@@ -198,12 +189,13 @@ export default function WhackAMole() {
 
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if (e.key === 'Enter' && (gameState === 'waiting' || gameState === 'gameover')) {
-        e.preventDefault();
-        startGame();
+      if (gameState !== 'playing') {
+        if (e.key === 'Enter' && (gameState === 'waiting' || gameState === 'gameover')) {
+          e.preventDefault();
+          if (startGameRef.current) startGameRef.current();
+        }
         return;
       }
-      if (gameState !== 'playing') return;
       const keyMap = {
         '1': 0, '2': 1, '3': 2,
         '4': 3, '5': 4, '6': 5,

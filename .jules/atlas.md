@@ -57,6 +57,9 @@
 ## 2026-06-28 - Fast Input Responsiveness
 **Learning:** In fast-paced or reaction-based arcade games (like Click The Target), using standard `onClick` handlers introduces an inherent 100-300ms touch delay on mobile devices, which makes the game feel sluggish and unresponsive.
 **Action:** Always use `onPointerDown` instead of `onClick` for interactive game elements to eliminate touch delay. Ensure you use `e.stopPropagation()` to prevent misclicks on background elements.
+## 2024-05-19 - Keyboard Shortcuts for Fast Core Loops & Closing Learning Loops
+**Learning:** Explicitly surfacing keyboard shortcuts (like Enter) directly on primary buttons reduces friction and speeds up the replay loop. Revealing missed states (like the word in Word Scramble) immediately satisfies curiosity and closes the learning loop.
+**Action:** Always ensure arcade games use explicit keyboard shortcuts to start/restart, and always reveal the final "answer" or missed objective upon failure to encourage another try.
 
 ## 2024-07-16 - Shareable Qualitative Ratings
 **Learning:** Adding performance-based qualitative tiers (like "Aimbot" or "Hacker") and including them in the clipboard share text significantly boosts the fun factor and replayability of arcade games.

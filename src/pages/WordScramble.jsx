@@ -201,7 +201,8 @@ export default function WordScramble() {
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/10 z-10 backdrop-blur-[2px]">
             <p className="font-display text-3xl mb-2 text-[var(--crimson)]">Time's Up!</p>
             <p className="font-mono text-lg mb-1">Final Score: {score}</p>
-            <p className="font-display text-xl mb-6 text-[var(--ink)] opacity-90">{getRatingMessage(score)}</p>
+            <p className="font-display text-xl mb-2 text-[var(--ink)] opacity-90">{getRatingMessage(score)}</p>
+            <p className="font-mono text-sm opacity-80 mb-6">The word was: {currentWord}</p>
             <div className="flex gap-4">
               <button onClick={startGame} className="btn-primary">
                 Play Again <span className="hidden sm:inline opacity-50 font-mono text-xs ml-2">(Enter)</span>

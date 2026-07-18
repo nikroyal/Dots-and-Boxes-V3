@@ -54,7 +54,7 @@ export default function TypingSpeed() {
 
   useEffect(() => {
     startGameRef.current = startGame;
-  });
+  }, []);
 
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -89,8 +89,6 @@ export default function TypingSpeed() {
     if (w >= 40) return "🏃 Average";
     return "🐢 Beginner";
   };
-
-
 
   useEffect(() => {
     if (gameState === 'playing' && inputRef.current) {
