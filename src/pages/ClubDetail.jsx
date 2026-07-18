@@ -439,16 +439,16 @@ function SettingsModal({ club, members, channels, requests, onClose, currentUser
             <div className="max-w-md space-y-6">
               <h2 className="font-display text-2xl mb-6">General Settings</h2>
               <div>
-                <label htmlFor="club-name" className="font-mono block mb-2 text-[0.65rem] tracking-widest uppercase opacity-55">Club Name</label>
-                <input id="club-name" className="input-field" value={name} onChange={e => setName(e.target.value)} />
+                <label htmlFor={"club-name-" + club.id} className="font-mono block mb-2 text-[0.65rem] tracking-widest uppercase opacity-55">Club Name</label>
+                <input id={"club-name-" + club.id} className="input-field" value={name} onChange={e => setName(e.target.value)} />
               </div>
               <div>
-                <label htmlFor="club-desc" className="font-mono block mb-2 text-[0.65rem] tracking-widest uppercase opacity-55">Description</label>
-                <textarea id="club-desc" className="input-field" value={desc} onChange={e => setDesc(e.target.value)} style={{ minHeight: 80 }} />
+                <label htmlFor={"club-desc-" + club.id} className="font-mono block mb-2 text-[0.65rem] tracking-widest uppercase opacity-55">Description</label>
+                <textarea id={"club-desc-" + club.id} className="input-field" value={desc} onChange={e => setDesc(e.target.value)} style={{ minHeight: 80 }} />
               </div>
               <div className="flex items-center gap-3">
-                <input type="checkbox" id="isPublic" checked={isPublic} onChange={e => setIsPublic(e.target.checked)} className="accent-[var(--ink)]" />
-                <label htmlFor="isPublic" className="font-display text-sm cursor-pointer">Public Club (Visible to everyone)</label>
+                <input type="checkbox" id={`isPublic-${club.id}`} checked={isPublic} onChange={e => setIsPublic(e.target.checked)} className="accent-[var(--ink)]" />
+                <label htmlFor={`isPublic-${club.id}`} className="font-display text-sm cursor-pointer">Public Club (Visible to everyone)</label>
               </div>
               <button onClick={handleUpdateGeneral} disabled={busy} className="btn-primary w-full">Save Changes</button>
             </div>

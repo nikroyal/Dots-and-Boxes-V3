@@ -28,3 +28,11 @@
 ## 2026-06-29 - Missing id and htmlFor in Settings Forms
 **Learning:** General settings forms in modal views (e.g., in `ClubDetail.jsx`) often rely on visual layout to associate `<label>` and `<input>`/`<textarea>` elements instead of explicit programmatic links.
 **Action:** Always ensure that form fields within settings components explicitly link labels and inputs using `id` and `htmlFor`, and provide `aria-label`s for inline inputs without visible labels.
+
+## 2026-07-10 - ARIA Labels on Inline Form Fields
+**Learning:** Text inputs that visually lack explicit label tags (like the chat inputs in Match components) or rely on placeholder text are inaccessible to screen readers and need explicit aria-labels to be correctly interpreted. Similarly, icon-only buttons (like Quit or Rematch buttons with just a lucide-react icon) need aria-labels and aria-hidden="true" on the icon itself for accessibility.
+**Action:** Always ensure that inline inputs include descriptive aria-label attributes, and add aria-label to buttons without visible text.
+
+## 2026-06-29 - Dynamic ARIA labels on repeated generic actions
+**Learning:** In lists of items (like friend requests) where every row contains the exact same visible action buttons ("Accept", "Decline", "Buy"), screen readers will read identical button text continuously without clarifying which item the action applies to.
+**Action:** Always attach dynamic `aria-label`s to generic action buttons inside mapped lists. Ensure the label clearly states the action AND the specific item or user it affects (e.g., ``aria-label={`Accept friend request from ${req.fromUsername}`}``).

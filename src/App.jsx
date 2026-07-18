@@ -36,11 +36,16 @@ import Snake from './pages/Snake';
 import Battleships from './pages/battleships/Battleships';
 import WhackAMole from './pages/WhackAMole';
 import WordScramble from './pages/WordScramble';
+import QuickMath from './pages/QuickMath';
 import RockPaperScissors from './pages/RockPaperScissors';
 import GuessTheNumber from './pages/GuessTheNumber';
 import ClickTheTarget from './pages/ClickTheTarget';
 import SequenceMemory from './pages/SequenceMemory';
+import ColorMatch from './pages/ColorMatch';
+import SpeedGrid from './pages/SpeedGrid';
 import TypingSpeed from './pages/TypingSpeed';
+import MathFlash from './pages/MathFlash';
+import SpeedMath from './pages/SpeedMath';
 
 import LocalDistrictExchange from './pages/LocalDistrictExchange';
 import DistrictExchangeHub from './pages/DistrictExchangeHub';
@@ -113,15 +118,19 @@ function Shell() {
         <Route path="/memory-match" element={<MemoryMatch />} />
         <Route path="/reaction-timer" element={<ReactionTimer />} />
         <Route path="/word-scramble" element={<WordScramble />} />
+        <Route path="/quick-math" element={<QuickMath />} />
         <Route path="/whack-a-mole" element={<WhackAMole />} />
         <Route path="/rock-paper-scissors" element={<RockPaperScissors />} />
         <Route path="/guess-the-number" element={<GuessTheNumber />} />
         <Route path="/click-the-target" element={<ClickTheTarget />} />
         <Route path="/sequence-memory" element={<SequenceMemory />} />
+        <Route path="/color-match" element={<ColorMatch />} />
+        <Route path="/speed-grid" element={<SpeedGrid />} />
         <Route path="/typing-speed" element={<TypingSpeed />} />
+        <Route path="/math-flash" element={<MathFlash />} />
+        <Route path="/speed-math" element={<SpeedMath />} />
         <Route path="/district-exchange/local" element={<LocalDistrictExchange />} />
         <Route path="/snake" element={<Snake />} />
-        <Route path="/guess-the-number" element={<GuessTheNumber />} />
         <Route path="/battleships" element={<Battleships />} />
         <Route path="/paper-io" element={<PaperIo />} />
         <Route path="*" element={<Navigate to="/login" />} />
@@ -166,14 +175,18 @@ function Shell() {
               <Route path="/memory-match" element={<MemoryMatch />} />
               <Route path="/reaction-timer" element={<ReactionTimer />} />
               <Route path="/word-scramble" element={<WordScramble />} />
+              <Route path="/quick-math" element={<QuickMath />} />
               <Route path="/whack-a-mole" element={<WhackAMole />} />
               <Route path="/rock-paper-scissors" element={<RockPaperScissors />} />
               <Route path="/guess-the-number" element={<GuessTheNumber />} />
               <Route path="/sequence-memory" element={<SequenceMemory />} />
+              <Route path="/color-match" element={<ColorMatch />} />
+              <Route path="/speed-grid" element={<SpeedGrid />} />
               <Route path="/click-the-target" element={<ClickTheTarget />} />
               <Route path="/typing-speed" element={<TypingSpeed />} />
+              <Route path="/math-flash" element={<MathFlash />} />
+              <Route path="/speed-math" element={<SpeedMath />} />
               <Route path="/snake" element={<Snake />} />
-              <Route path="/guess-the-number" element={<GuessTheNumber />} />
               <Route path="/battleships" element={<Battleships />} />
               <Route path="/lobby" element={<Lobby />} />
               <Route path="/match/:id" element={<Match />} />
