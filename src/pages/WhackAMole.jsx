@@ -31,22 +31,7 @@ export default function WhackAMole() {
   const moleTimerRef = useRef(null);
   const hitTimeoutsRef = useRef([]);
   const scoreRef = useRef(score);
-  const startGameRef = useRef(null);
 
-  useEffect(() => {
-    startGameRef.current = startGame;
-  }, []);
-
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if ((gameState === 'waiting' || gameState === 'gameover') && e.key === 'Enter' && e.target.tagName !== 'BUTTON') {
-        e.preventDefault();
-        startGameRef.current?.();
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [gameState]);
 
   useEffect(() => {
     scoreRef.current = score;
@@ -187,10 +172,19 @@ export default function WhackAMole() {
     }
   };
 
+  const startGameRef = useRef(null);
+  useEffect(() => {
+    startGameRef.current = startGame;
+  }, [startGame]);
+
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (gameState !== 'playing') {
         if (e.key === 'Enter' && (gameState === 'waiting' || gameState === 'gameover')) {
+          const tagName = e.target?.tagName;
+          if (tagName === 'BUTTON' || tagName === 'INPUT' || tagName === 'TEXTAREA' || tagName === 'A') {
+            return;
+          }
           e.preventDefault();
           if (startGameRef.current) startGameRef.current();
         }

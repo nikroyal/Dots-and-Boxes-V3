@@ -46,7 +46,11 @@ export default function SequenceMemory() {
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.repeat) return;
-      if ((gameState === 'waiting' || gameState === 'gameover') && e.key === 'Enter' && e.target.tagName !== 'BUTTON') {
+      if ((gameState === 'waiting' || gameState === 'gameover') && e.key === 'Enter') {
+        const tagName = e.target?.tagName;
+        if (tagName === 'BUTTON' || tagName === 'INPUT' || tagName === 'TEXTAREA' || tagName === 'A') {
+          return;
+        }
         e.preventDefault();
         if (startGameRef.current) startGameRef.current();
       } else if (gameState === 'playing' && !isPlayingSequence) {
@@ -196,6 +200,7 @@ export default function SequenceMemory() {
     if (s >= 5) return "🧠 Good Memory";
     return "🧠 Needs Practice";
   };
+
 
   const handleShare = (e) => {
     e.stopPropagation();

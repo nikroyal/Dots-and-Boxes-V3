@@ -250,8 +250,14 @@ export default function WordScramble() {
                 }
               }}
               onKeyDown={(e) => {
-                if (e.key === 'Enter' && !userInput.trim()) {
+                if (e.key === 'Enter') {
                   e.preventDefault();
+                  if (!userInput.trim()) {
+                    loadNewWord();
+                  } else {
+                    sfx.click();
+                    setUserInput('');
+                  }
                 }
               }}
               className="w-full text-center text-2xl font-display uppercase tracking-widest p-4 border hairline bg-[var(--bg-soft)] focus:outline-none focus:ring-2 focus:ring-[var(--forest)]"

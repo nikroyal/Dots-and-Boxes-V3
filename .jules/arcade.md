@@ -27,6 +27,10 @@
 **Learning:** Using `<input type="number">` adds browser spin buttons that distract from fast gameplay and make exact matching harder, and `min`/`max` are ignored if we change it.
 **Action:** Use `<input type="text" inputMode="numeric">` for rapid numeric input and handle bounds checks manually.
 
+## 2024-07-06 - Rapid Numeric Input
+**Learning:** Using <input type="text" inputMode="numeric"> instead of type="number" prevents unwanted spin buttons and simplifies matching validation for fast games.
+**Action:** Use text input with numeric inputMode for arcade-style math games.
+
 ## 2024-11-21 - Autofocus on State Change
 **Learning:** For fast-paced games where an input field transitions from `disabled` to enabled based on a state change (e.g., clicking "Start Test"), React's `autoFocus` prop will not trigger because the element is already mounted.
 **Action:** When enabling inputs that require immediate focus, manually call `inputRef.current.focus()` inside the state-transition handler (often wrapped in a short `setTimeout` to ensure React has completed the render cycle).

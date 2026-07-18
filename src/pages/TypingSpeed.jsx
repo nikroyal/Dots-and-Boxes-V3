@@ -146,7 +146,6 @@ export default function TypingSpeed() {
     }
   }, [timeLeft, gameState, endGame]);
 
-
   const getRatingMessage = (w) => {
     if (w >= 100) return "⚡ Superhuman!";
     if (w >= 80) return "🐆 Excellent!";
