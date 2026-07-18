@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useAuth } from '../lib/AuthContext';
 import { recordActivity, ACTIVITY_TYPES } from '../lib/activity';
 import { updateArcadeBest } from '../lib/actions';
@@ -26,14 +26,8 @@ export default function GuessTheNumber() {
   });
 
   const inputRef = useRef(null);
-  const initGameRef = useRef(null);
-  const gameStateRef = useRef(gameState);
 
-  useEffect(() => {
-    gameStateRef.current = gameState;
-  }, [gameState]);
-
-  const initGame = () => {
+  const initGame = useCallback(() => {
     setTargetNumber(Math.floor(Math.random() * 100) + 1);
     setCurrentGuess('');
     setAttempts(0);
@@ -45,31 +39,26 @@ export default function GuessTheNumber() {
     setTimeout(() => {
       if (inputRef.current) inputRef.current.focus();
     }, 100);
-  };
-
-  useEffect(() => {
-    initGameRef.current = initGame;
-  }, [initGame]);
+  }, []);
 
   useEffect(() => {
     initGame();
-  }, []);
+  }, [initGame]);
 
   useEffect(() => {
     const handleGlobalKeyDown = (e) => {
       if (e.key === 'Enter') {
-        if (gameStateRef.current === 'won') {
+        if (e.target.tagName === 'BUTTON') return;
+        if (gameState === 'won') {
           e.preventDefault();
-          if (initGameRef.current) {
-            sfx.click();
-            initGameRef.current();
-          }
+          sfx.click();
+          initGame();
         }
       }
     };
     window.addEventListener('keydown', handleGlobalKeyDown);
     return () => window.removeEventListener('keydown', handleGlobalKeyDown);
-  }, []);
+  }, [gameState, initGame]);
 
   const handleGuess = (e) => {
     e.preventDefault();

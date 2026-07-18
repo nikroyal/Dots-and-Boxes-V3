@@ -50,12 +50,6 @@ export default function TypingSpeed() {
   const timerRef = useRef(null);
   const inputRef = useRef(null);
   const totalCharactersRef = useRef(0);
-  const startGameRef = useRef(null);
-  const gameStateRef = useRef(gameState);
-
-  useEffect(() => {
-    gameStateRef.current = gameState;
-  }, [gameState]);
 
   useEffect(() => {
     return () => {
@@ -89,23 +83,18 @@ export default function TypingSpeed() {
   }, [loadNewQuote]);
 
   useEffect(() => {
-    startGameRef.current = startGame;
-  }, [startGame]);
-
-  useEffect(() => {
     const handleGlobalKeyDown = (e) => {
       if (e.key === 'Enter') {
-        if (gameStateRef.current === 'waiting' || gameStateRef.current === 'result') {
+        if (e.target.tagName === 'BUTTON') return;
+        if (gameState === 'waiting' || gameState === 'result') {
           e.preventDefault();
-          if (startGameRef.current) {
-            startGameRef.current();
-          }
+          startGame();
         }
       }
     };
     window.addEventListener('keydown', handleGlobalKeyDown);
     return () => window.removeEventListener('keydown', handleGlobalKeyDown);
-  }, []);
+  }, [gameState, startGame]);
 
 
   const endGame = useCallback(() => {
