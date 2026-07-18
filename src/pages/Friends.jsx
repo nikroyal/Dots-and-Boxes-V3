@@ -150,9 +150,9 @@ export default function Friends() {
                 <span className="font-display text-base">{r.fromUsername}</span>
               </div>
               <div className="flex gap-2">
-                <button onClick={() => acceptFriendRequest(profile, r.fromId).then(() => toast('Accepted', 'success'))}
+                <button aria-label={`Accept friend request from ${r.fromUsername}`} onClick={() => acceptFriendRequest(profile, r.fromId).then(() => toast('Accepted', 'success'))}
                         className="btn-primary">Accept</button>
-                <button onClick={() => declineFriendRequest(profile, r.fromId)} className="btn-ghost">Decline</button>
+                <button aria-label={`Decline friend request from ${r.fromUsername}`} onClick={() => declineFriendRequest(profile, r.fromId)} className="btn-ghost">Decline</button>
               </div>
             </div>
           ))}

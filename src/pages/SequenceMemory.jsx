@@ -34,6 +34,39 @@ export default function SequenceMemory() {
 
   const timeoutsRef = useRef([]);
   const clickTimeoutRef = useRef(null);
+  const startGameRef = useRef(null);
+
+  const handlePadClickRef = useRef(null);
+
+  useEffect(() => {
+    startGameRef.current = startGame;
+    handlePadClickRef.current = handlePadClick;
+  });
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.repeat) return;
+      if ((gameState === 'waiting' || gameState === 'gameover') && e.key === 'Enter' && e.target.tagName !== 'BUTTON') {
+        e.preventDefault();
+        if (startGameRef.current) startGameRef.current();
+      } else if (gameState === 'playing' && !isPlayingSequence) {
+        const keyMap = {
+          '1': 0, 'q': 0, 'Q': 0,
+          '2': 1, 'w': 1, 'W': 1,
+          '3': 2, 'a': 2, 'A': 2,
+          '4': 3, 's': 3, 'S': 3,
+          'ArrowUp': 0, 'ArrowRight': 1, 'ArrowLeft': 2, 'ArrowDown': 3
+        };
+        const padId = keyMap[e.key];
+        if (padId !== undefined) {
+          e.preventDefault();
+          if (handlePadClickRef.current) handlePadClickRef.current(padId);
+        }
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [gameState, isPlayingSequence]);
 
   const clearAllTimeouts = () => {
     timeoutsRef.current.forEach(clearTimeout);
@@ -155,6 +188,8 @@ export default function SequenceMemory() {
     }
   };
 
+
+
   const getRatingMessage = (s) => {
     if (s >= 15) return "🧠 Mastermind";
     if (s >= 10) return "🧠 Genius";
@@ -218,7 +253,7 @@ export default function SequenceMemory() {
         {gameState === 'waiting' && (
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/5 z-10 backdrop-blur-[1px]">
             <button onClick={startGame} className="btn-primary">
-              Start Game <span className="opacity-50 font-mono text-xs ml-1">(Enter)</span>
+              Start Game <span className="hidden sm:inline opacity-50 font-mono text-xs ml-2">(Enter)</span>
             </button>
           </div>
         )}
@@ -230,7 +265,7 @@ export default function SequenceMemory() {
             <p className="font-display text-xl mb-6 text-[var(--ink)] opacity-90">{getRatingMessage(Math.max(0, level - 1))}</p>
             <div className="flex gap-4">
               <button onClick={startGame} className="btn-primary">
-                Play Again <span className="opacity-50 font-mono text-xs ml-1">(Enter)</span>
+                Play Again <span className="hidden sm:inline opacity-50 font-mono text-xs ml-2">(Enter)</span>
               </button>
               <button onClick={handleShare} className="btn-ghost">
                 {copied ? 'Copied!' : 'Share Result'}
@@ -239,16 +274,29 @@ export default function SequenceMemory() {
           </div>
         )}
 
-        <div className="grid grid-cols-2 gap-4 w-full h-full">
+        {gameState === 'playing' && (
+          <div className="absolute top-2 left-0 right-0 text-center z-10 fade-in pointer-events-none">
+            <span className={`font-mono text-xs tracking-widest uppercase px-3 py-1 rounded bg-[var(--paper)]/80 backdrop-blur-sm ${isPlayingSequence ? 'text-[var(--crimson)]' : 'text-[var(--forest)]'}`}>
+              {isPlayingSequence ? 'Watch...' : 'Your Turn!'}
+            </span>
+          </div>
+        )}
+
+        <div className="grid grid-cols-2 gap-4 w-full h-full pt-6">
           {PADS.map((pad) => (
             <button
               key={pad.id}
-              onClick={() => handlePadClick(pad.id)}
+              onPointerDown={(e) => {
+                e.stopPropagation();
+                handlePadClick(pad.id);
+              }}
               disabled={gameState !== 'playing' || isPlayingSequence}
-              className={`w-full h-full rounded-2xl transition-all duration-150 flex items-center justify-center ${activePad === pad.id ? 'opacity-100 scale-95 shadow-inner' : 'opacity-40 hover:opacity-60'} border border-black/10`}
+              className={`relative w-full h-full rounded-2xl transition-all duration-150 flex items-center justify-center ${activePad === pad.id ? 'opacity-100 scale-95 shadow-inner' : 'opacity-40 hover:opacity-60'} border border-black/10`}
               style={{ backgroundColor: pad.color }}
               aria-label={`Memory pad ${pad.id + 1}`}
-            />
+            >
+              <div className="hidden sm:block absolute top-2 left-3 font-mono text-xs opacity-50 pointer-events-none text-white/50">{pad.id + 1}</div>
+            </button>
           ))}
         </div>
       </div>

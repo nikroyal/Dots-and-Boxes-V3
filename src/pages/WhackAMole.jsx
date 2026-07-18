@@ -31,13 +31,22 @@ export default function WhackAMole() {
   const moleTimerRef = useRef(null);
   const hitTimeoutsRef = useRef([]);
   const scoreRef = useRef(score);
+  const startGameRef = useRef(null);
 
   useEffect(() => {
-    return () => {
-      if (timerRef.current) clearInterval(timerRef.current);
-      if (moleTimerRef.current) clearTimeout(moleTimerRef.current);
-    };
+    startGameRef.current = startGame;
   }, []);
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if ((gameState === 'waiting' || gameState === 'gameover') && e.key === 'Enter' && e.target.tagName !== 'BUTTON') {
+        e.preventDefault();
+        startGameRef.current?.();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [gameState]);
 
   useEffect(() => {
     scoreRef.current = score;
@@ -68,8 +77,6 @@ export default function WhackAMole() {
 
     if (moleTimerRef.current) clearTimeout(moleTimerRef.current);
     moleTimerRef.current = setTimeout(() => {
-      // Use ref to check game state to avoid stale closure if spawnMole is not rebuilt perfectly
-      // Actually spawnMole depends on gameState, but let's be safe.
       spawnMole();
     }, stayDuration);
   }, []);
@@ -85,7 +92,7 @@ export default function WhackAMole() {
     }
   }, [gameState, spawnMole]);
 
-  const startGame = () => {
+  const startGame = useCallback(() => {
     sfx.click();
     setGameState('playing');
     setScore(0);
@@ -100,7 +107,7 @@ export default function WhackAMole() {
     timerRef.current = setInterval(() => {
       setTimeLeft((prev) => Math.max(0, prev - 1));
     }, 1000);
-  };
+  }, []);
 
   const endGame = useCallback(() => {
     if (timerRef.current) clearInterval(timerRef.current);
@@ -187,8 +194,7 @@ export default function WhackAMole() {
 
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if (gameState !== 'playing') {
-        if (e.key === 'Enter') {
+        if (e.key === 'Enter' && (gameState === 'waiting' || gameState === 'gameover')) {
           const tagName = e.target?.tagName;
           if (tagName === 'BUTTON' || tagName === 'INPUT' || tagName === 'TEXTAREA' || tagName === 'A') {
             return;
@@ -198,7 +204,6 @@ export default function WhackAMole() {
         }
         return;
       }
-
       const keyMap = {
         '1': 0, '2': 1, '3': 2,
         '4': 3, '5': 4, '6': 5,
@@ -211,7 +216,7 @@ export default function WhackAMole() {
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [gameState, activeMole]);
+  }, [gameState, activeMole, startGame]);
 
   return (
     <div className="fade-in max-w-2xl mx-auto flex flex-col items-center justify-center min-h-[60vh]">
@@ -230,8 +235,11 @@ export default function WhackAMole() {
       <div className="relative border hairline card bg-[var(--paper-tint)] p-4 sm:p-6 w-full max-w-md">
         {gameState === 'waiting' && (
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/5 z-10 backdrop-blur-[1px]">
+            <p className="mb-4 text-center font-mono text-sm uppercase tracking-widest opacity-80">
+              Target: ≥ 300 for 🔨 Master
+            </p>
             <button onClick={startGame} className="btn-primary">
-              Start Game <span className="opacity-50 font-mono text-xs ml-1">(Enter)</span>
+              Start Game <span className="hidden sm:inline opacity-50 font-mono text-xs ml-2">(Enter)</span>
             </button>
           </div>
         )}
@@ -243,7 +251,7 @@ export default function WhackAMole() {
             <p className="font-display text-xl mb-6 text-[var(--ink)] opacity-90">{getRatingMessage(score)}</p>
             <div className="flex gap-4">
               <button onClick={startGame} className="btn-primary">
-                Play Again <span className="opacity-50 font-mono text-xs ml-1">(Enter)</span>
+                Play Again <span className="hidden sm:inline opacity-50 font-mono text-xs ml-2">(Enter)</span>
               </button>
               <button onClick={handleShare} className="btn-secondary">
                 {copied ? 'Copied!' : 'Share Result'}
