@@ -57,6 +57,14 @@
 ## 2026-06-28 - Fast Input Responsiveness
 **Learning:** In fast-paced or reaction-based arcade games (like Click The Target), using standard `onClick` handlers introduces an inherent 100-300ms touch delay on mobile devices, which makes the game feel sluggish and unresponsive.
 **Action:** Always use `onPointerDown` instead of `onClick` for interactive game elements to eliminate touch delay. Ensure you use `e.stopPropagation()` to prevent misclicks on background elements.
+## 2024-05-19 - Immediate UI Error States
+**Learning:** In typing or input-heavy games, allowing the user to blindly type incorrect characters without immediate visual feedback leads to wasted time and frustration.
+**Action:** Always provide instant visual styling (like a red border or background) the moment the input diverges from the target.
+
+## 2024-05-19 - Input Attributes for Numeric Games
+**Learning:** Using `<input type="number">` adds unwanted browser UI elements (spinners) and allows non-numeric characters like "e" to be typed, causing friction in fast-paced arcade games.
+**Action:** Replace `type="number"` with `<input type="text" inputMode="numeric">` and manually strip non-numeric characters in the `onChange` handler to ensure a clean, native-feeling mobile and desktop experience.
+
 ## 2024-11-21 - Visual Hints for Shortcuts
 **Learning:** Players may not discover keyboard shortcuts unless they are explicitly indicated in the UI.
 **Action:** Always append the corresponding shortcut key to the primary action button's text (e.g., "Start Game (Enter)").

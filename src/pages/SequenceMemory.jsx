@@ -198,6 +198,34 @@ export default function SequenceMemory() {
     }
   };
 
+  const handlePadClickRef = useRef(handlePadClick);
+  useEffect(() => {
+    handlePadClickRef.current = handlePadClick;
+  });
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (gameState !== 'playing' || isPlayingSequence) return;
+
+      const keyMap = {
+        '1': 0, 'q': 0, 'Q': 0,
+        '2': 1, 'w': 1, 'W': 1,
+        '3': 2, 'a': 2, 'A': 2,
+        '4': 3, 's': 3, 'S': 3,
+        'ArrowUp': 0, 'ArrowRight': 1, 'ArrowLeft': 2, 'ArrowDown': 3
+      };
+
+      const padId = keyMap[e.key];
+      if (padId !== undefined) {
+        e.preventDefault();
+        handlePadClickRef.current(padId);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [gameState, isPlayingSequence]);
+
   const getRatingMessage = (s) => {
     if (s >= 15) return "🧠 Mastermind";
     if (s >= 10) return "🧠 Genius";
@@ -262,7 +290,15 @@ export default function SequenceMemory() {
           </div>
         )}
 
-        <div className="grid grid-cols-2 gap-4 w-full h-full">
+        {gameState === 'playing' && (
+          <div className="absolute top-2 left-0 right-0 text-center z-10 fade-in pointer-events-none">
+            <span className={`font-mono text-xs tracking-widest uppercase px-3 py-1 rounded bg-[var(--paper)]/80 backdrop-blur-sm ${isPlayingSequence ? 'text-[var(--crimson)]' : 'text-[var(--forest)]'}`}>
+              {isPlayingSequence ? 'Watch...' : 'Your Turn!'}
+            </span>
+          </div>
+        )}
+
+        <div className="grid grid-cols-2 gap-4 w-full h-full pt-6">
           {PADS.map((pad) => (
             <button
               key={pad.id}

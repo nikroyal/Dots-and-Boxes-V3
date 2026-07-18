@@ -208,6 +208,8 @@ export default function TypingSpeed() {
   const elapsed = GAME_DURATION - timeLeft;
   const liveWpm = elapsed > 0 ? Math.floor(((totalCharactersTyped + (userInput === currentQuote.substring(0, userInput.length) ? userInput.length : 0)) / 5) / (elapsed / 60)) : 0;
 
+  const isError = userInput.length > 0 && !currentQuote.startsWith(userInput);
+
   return (
     <div className="fade-in max-w-4xl mx-auto flex flex-col items-center justify-center min-h-[60vh] px-4 py-8">
       <section className="text-center mb-8">
@@ -263,7 +265,11 @@ export default function TypingSpeed() {
             value={userInput}
             onChange={handleChange}
             aria-label="Type the quote"
-            className="w-full max-w-lg text-center text-xl font-display p-4 border hairline bg-[var(--bg-soft)] focus:outline-none focus:ring-2 focus:ring-[var(--forest)]"
+            className={`w-full max-w-lg text-center text-xl font-display p-4 border hairline focus:outline-none focus:ring-2 transition-colors duration-150 ${
+              isError
+                ? 'bg-red-50 dark:bg-red-900/20 border-red-500 focus:ring-red-500 text-red-700 dark:text-red-300'
+                : 'bg-[var(--bg-soft)] focus:ring-[var(--forest)]'
+            }`}
             placeholder="Start typing..."
             disabled={gameState !== 'playing'}
             autoFocus
