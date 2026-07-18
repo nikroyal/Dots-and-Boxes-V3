@@ -25,6 +25,9 @@
 ## 2026-06-28 - ARIA labels on text inputs lacking explicit labels
 **Learning:** Text inputs that visually lack explicit `<label>` tags (such as compact inline search bars) are not accessible to screen readers and need an explicit `aria-label` to be correctly interpreted.
 **Action:** Always ensure that inline inputs, like search bars or generic prompt fields, include descriptive `aria-label` attributes.
+## 2026-06-29 - Missing id and htmlFor in Settings Forms
+**Learning:** General settings forms in modal views (e.g., in `ClubDetail.jsx`) often rely on visual layout to associate `<label>` and `<input>`/`<textarea>` elements instead of explicit programmatic links.
+**Action:** Always ensure that form fields within settings components explicitly link labels and inputs using `id` and `htmlFor`, and provide `aria-label`s for inline inputs without visible labels.
 
 ## 2026-07-10 - ARIA Labels on Inline Form Fields
 **Learning:** Text inputs that visually lack explicit label tags (like the chat inputs in Match components) or rely on placeholder text are inaccessible to screen readers and need explicit aria-labels to be correctly interpreted. Similarly, icon-only buttons (like Quit or Rematch buttons with just a lucide-react icon) need aria-labels and aria-hidden="true" on the icon itself for accessibility.

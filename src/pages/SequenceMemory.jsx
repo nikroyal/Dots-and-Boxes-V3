@@ -36,41 +36,31 @@ export default function SequenceMemory() {
   const clickTimeoutRef = useRef(null);
   const startGameRef = useRef(null);
 
+  const handlePadClickRef = useRef(null);
+
   useEffect(() => {
     startGameRef.current = startGame;
-  });
-
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if ((gameState === 'waiting' || gameState === 'gameover') && e.key === 'Enter' && e.target.tagName !== 'BUTTON') {
-        e.preventDefault();
-        if (startGameRef.current) startGameRef.current();
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [gameState]);
-
-
-  const handlePadClickRef = useRef(null);
-  useEffect(() => {
     handlePadClickRef.current = handlePadClick;
   });
 
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.repeat) return;
-      if (gameState === 'waiting' || gameState === 'gameover') {
-        if (e.key === 'Enter') {
-          e.preventDefault();
-          startGame();
-        }
+      if ((gameState === 'waiting' || gameState === 'gameover') && e.key === 'Enter' && e.target.tagName !== 'BUTTON') {
+        e.preventDefault();
+        if (startGameRef.current) startGameRef.current();
       } else if (gameState === 'playing' && !isPlayingSequence) {
-        if (['1', '2', '3', '4'].includes(e.key)) {
+        const keyMap = {
+          '1': 0, 'q': 0, 'Q': 0,
+          '2': 1, 'w': 1, 'W': 1,
+          '3': 2, 'a': 2, 'A': 2,
+          '4': 3, 's': 3, 'S': 3,
+          'ArrowUp': 0, 'ArrowRight': 1, 'ArrowLeft': 2, 'ArrowDown': 3
+        };
+        const padId = keyMap[e.key];
+        if (padId !== undefined) {
           e.preventDefault();
-          if (handlePadClickRef.current) {
-            handlePadClickRef.current(parseInt(e.key, 10) - 1);
-          }
+          if (handlePadClickRef.current) handlePadClickRef.current(padId);
         }
       }
     };
@@ -198,33 +188,7 @@ export default function SequenceMemory() {
     }
   };
 
-  const handlePadClickRef = useRef(handlePadClick);
-  useEffect(() => {
-    handlePadClickRef.current = handlePadClick;
-  });
 
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (gameState !== 'playing' || isPlayingSequence) return;
-
-      const keyMap = {
-        '1': 0, 'q': 0, 'Q': 0,
-        '2': 1, 'w': 1, 'W': 1,
-        '3': 2, 'a': 2, 'A': 2,
-        '4': 3, 's': 3, 'S': 3,
-        'ArrowUp': 0, 'ArrowRight': 1, 'ArrowLeft': 2, 'ArrowDown': 3
-      };
-
-      const padId = keyMap[e.key];
-      if (padId !== undefined) {
-        e.preventDefault();
-        handlePadClickRef.current(padId);
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [gameState, isPlayingSequence]);
 
   const getRatingMessage = (s) => {
     if (s >= 15) return "🧠 Mastermind";
