@@ -94,9 +94,7 @@ export default function WordScramble() {
     setUserInput('');
   }, []);
 
-
-
-  const startGame = () => {
+  const startGame = useCallback(() => {
     sfx.click();
     setGameState('playing');
     setScore(0);
@@ -112,7 +110,7 @@ export default function WordScramble() {
     setTimeout(() => {
       if (inputRef.current) inputRef.current.focus();
     }, 10);
-  };
+  }, [loadNewWord]);
 
   const endGame = useCallback(() => {
     if (timerRef.current) clearInterval(timerRef.current);
@@ -137,6 +135,13 @@ export default function WordScramble() {
     }
   }, [timeLeft, gameState, endGame]);
 
+  const getNextTierMessage = (s) => {
+    if (s >= 200) return "You're at the top tier!";
+    if (s >= 100) return `${200 - s} points to Wordsmith tier`;
+    if (s >= 50) return `${100 - s} points to Smart tier`;
+    return `${50 - s} points to Good tier`;
+  };
+
   const getRatingMessage = (s) => {
     if (s >= 200) return "🧠 Wordsmith";
     if (s >= 100) return "🧠 Smart";
@@ -159,6 +164,20 @@ export default function WordScramble() {
       console.warn("Clipboard API not supported");
     }
   };
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+        return;
+      }
+      if (e.key === 'Enter' && (gameState === 'waiting' || gameState === 'gameover')) {
+        e.preventDefault();
+        startGame();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [gameState, startGame]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -201,8 +220,9 @@ export default function WordScramble() {
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/10 z-10 backdrop-blur-[2px]">
             <p className="font-display text-3xl mb-2 text-[var(--crimson)]">Time's Up!</p>
             <p className="font-mono text-lg mb-1">Final Score: {score}</p>
-            <p className="font-display text-xl mb-2 text-[var(--ink)] opacity-90">{getRatingMessage(score)}</p>
-            <p className="font-mono text-sm opacity-80 mb-6">The word was: {currentWord}</p>
+            <p className="font-display text-xl mb-1 text-[var(--ink)] opacity-90">{getRatingMessage(score)}</p>
+            <p className="font-mono text-xs opacity-60 tracking-widest uppercase mb-4">{getNextTierMessage(score)}</p>
+            <p className="font-mono text-sm opacity-80 mb-6 text-[var(--crimson)]">Missed word: {currentWord}</p>
             <div className="flex gap-4">
               <button onClick={startGame} className="btn-primary">
                 Play Again <span className="hidden sm:inline opacity-50 font-mono text-xs ml-2">(Enter)</span>
