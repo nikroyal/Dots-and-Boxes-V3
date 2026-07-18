@@ -155,6 +155,11 @@ export default function SequenceMemory() {
     }
   };
 
+  const handlePadClickRef = useRef(handlePadClick);
+  useEffect(() => {
+    handlePadClickRef.current = handlePadClick;
+  });
+
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (gameState !== 'playing' || isPlayingSequence) return;
@@ -170,13 +175,13 @@ export default function SequenceMemory() {
       const padId = keyMap[e.key];
       if (padId !== undefined) {
         e.preventDefault();
-        handlePadClick(padId);
+        handlePadClickRef.current(padId);
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [gameState, isPlayingSequence, playerSequence, sequence]);
+  }, [gameState, isPlayingSequence]);
 
   const getRatingMessage = (s) => {
     if (s >= 15) return "🧠 Mastermind";
