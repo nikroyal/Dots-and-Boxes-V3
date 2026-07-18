@@ -42,6 +42,21 @@ export default function Snake() {
   const lastMoveDirectionRef = useRef(direction);
   const speedRef = useRef(INITIAL_SPEED);
   const frameRef = useRef(null);
+  const startGameRef = useRef(null);
+
+  useEffect(() => {
+    startGameRef.current = startGame;
+  });
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if ((gameStateRef.current === 'waiting' || gameStateRef.current === 'gameover') && e.key === 'Enter' && e.target.tagName !== 'BUTTON') {
+        e.preventDefault();
+        if (startGameRef.current) startGameRef.current();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   // Sync refs
   useEffect(() => {
@@ -331,7 +346,7 @@ export default function Snake() {
           onPointerDown={(e) => { e.preventDefault(); handleMobileControl(0, -1); }}
           aria-label="Move Up"
         >
-          ↑
+          <span aria-hidden="true">↑</span>
         </button>
         <div />
         <button
@@ -339,21 +354,21 @@ export default function Snake() {
           onPointerDown={(e) => { e.preventDefault(); handleMobileControl(-1, 0); }}
           aria-label="Move Left"
         >
-          ←
+          <span aria-hidden="true">←</span>
         </button>
         <button
           className="btn-secondary h-12 flex items-center justify-center text-xl"
           onPointerDown={(e) => { e.preventDefault(); handleMobileControl(0, 1); }}
           aria-label="Move Down"
         >
-          ↓
+          <span aria-hidden="true">↓</span>
         </button>
         <button
           className="btn-secondary h-12 flex items-center justify-center text-xl"
           onPointerDown={(e) => { e.preventDefault(); handleMobileControl(1, 0); }}
           aria-label="Move Right"
         >
-          →
+          <span aria-hidden="true">→</span>
         </button>
       </div>
 

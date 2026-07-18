@@ -51,6 +51,26 @@ export default function WordScramble() {
   const timerRef = useRef(null);
   const scoreRef = useRef(score);
   const inputRef = useRef(null);
+  const startGameRef = useRef(null);
+  const loadNewWordRef = useRef(null);
+  useEffect(() => {
+    startGameRef.current = startGame;
+    loadNewWordRef.current = loadNewWord;
+  });
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Enter' && (gameState === 'waiting' || gameState === 'gameover') && e.target.tagName !== 'BUTTON') {
+        e.preventDefault();
+        startGameRef.current?.();
+      } else if (e.key === 'Escape' && gameState === 'playing') {
+        e.preventDefault();
+        loadNewWordRef.current?.();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [gameState]);
 
   useEffect(() => {
     return () => {
@@ -74,20 +94,7 @@ export default function WordScramble() {
     setUserInput('');
   }, []);
 
-  const startGameRef = useRef(null);
-  useEffect(() => {
-    startGameRef.current = startGame;
-  }, []);
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (e.key === 'Enter' && (gameState === 'waiting' || gameState === 'gameover')) {
-        e.preventDefault();
-        if (startGameRef.current) startGameRef.current();
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [gameState]);
+
 
   const startGame = () => {
     sfx.click();
@@ -101,6 +108,10 @@ export default function WordScramble() {
     timerRef.current = setInterval(() => {
       setTimeLeft((prev) => Math.max(0, prev - 1));
     }, 1000);
+
+    setTimeout(() => {
+      if (inputRef.current) inputRef.current.focus();
+    }, 10);
   };
 
   const endGame = useCallback(() => {
@@ -245,7 +256,7 @@ export default function WordScramble() {
               disabled={gameState !== 'playing'}
               className="btn-ghost text-xs"
             >
-              Skip
+              Skip <span className="hidden sm:inline opacity-50 font-mono text-xs ml-2">(Esc)</span>
             </button>
           </div>
         </div>

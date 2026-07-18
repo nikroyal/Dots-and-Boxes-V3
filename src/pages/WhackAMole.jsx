@@ -31,6 +31,22 @@ export default function WhackAMole() {
   const moleTimerRef = useRef(null);
   const hitTimeoutsRef = useRef([]);
   const scoreRef = useRef(score);
+  const startGameRef = useRef(null);
+
+  useEffect(() => {
+    startGameRef.current = startGame;
+  });
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if ((gameState === 'waiting' || gameState === 'gameover') && e.key === 'Enter' && e.target.tagName !== 'BUTTON') {
+        e.preventDefault();
+        startGameRef.current?.();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [gameState]);
 
   useEffect(() => {
     return () => {
@@ -90,7 +106,7 @@ export default function WhackAMole() {
     startGameRef.current = startGame;
   }, []);
 
-  const startGame = () => {
+  const startGame = useCallback(() => {
     sfx.click();
     setGameState('playing');
     setScore(0);
@@ -105,7 +121,7 @@ export default function WhackAMole() {
     timerRef.current = setInterval(() => {
       setTimeLeft((prev) => Math.max(0, prev - 1));
     }, 1000);
-  };
+  }, []);
 
   const endGame = useCallback(() => {
     if (timerRef.current) clearInterval(timerRef.current);
@@ -206,7 +222,7 @@ export default function WhackAMole() {
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [gameState, activeMole]);
+  }, [gameState, activeMole, startGame]);
 
   return (
     <div className="fade-in max-w-2xl mx-auto flex flex-col items-center justify-center min-h-[60vh]">
@@ -225,6 +241,9 @@ export default function WhackAMole() {
       <div className="relative border hairline card bg-[var(--paper-tint)] p-4 sm:p-6 w-full max-w-md">
         {gameState === 'waiting' && (
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/5 z-10 backdrop-blur-[1px]">
+            <p className="mb-4 text-center font-mono text-sm uppercase tracking-widest opacity-80">
+              Target: ≥ 300 for 🔨 Master
+            </p>
             <button onClick={startGame} className="btn-primary">
               Start Game <span className="hidden sm:inline opacity-50 font-mono text-xs ml-2">(Enter)</span>
             </button>
