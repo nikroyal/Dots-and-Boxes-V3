@@ -51,6 +51,26 @@ export default function WordScramble() {
   const timerRef = useRef(null);
   const scoreRef = useRef(score);
   const inputRef = useRef(null);
+  const startGameRef = useRef(null);
+  const loadNewWordRef = useRef(null);
+  useEffect(() => {
+    startGameRef.current = startGame;
+    loadNewWordRef.current = loadNewWord;
+  });
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Enter' && (gameState === 'waiting' || gameState === 'gameover') && e.target.tagName !== 'BUTTON') {
+        e.preventDefault();
+        startGameRef.current?.();
+      } else if (e.key === 'Escape' && gameState === 'playing') {
+        e.preventDefault();
+        loadNewWordRef.current?.();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [gameState]);
 
   useEffect(() => {
     return () => {
@@ -86,6 +106,10 @@ export default function WordScramble() {
     timerRef.current = setInterval(() => {
       setTimeLeft((prev) => Math.max(0, prev - 1));
     }, 1000);
+
+    setTimeout(() => {
+      if (inputRef.current) inputRef.current.focus();
+    }, 10);
   }, [loadNewWord]);
 
   const endGame = useCallback(() => {
@@ -187,7 +211,7 @@ export default function WordScramble() {
         {gameState === 'waiting' && (
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/5 z-10 backdrop-blur-[1px]">
             <button onClick={startGame} className="btn-primary">
-              Start Game (Enter)
+              Start Game <span className="hidden sm:inline opacity-50 font-mono text-xs ml-2">(Enter)</span>
             </button>
           </div>
         )}
@@ -201,7 +225,7 @@ export default function WordScramble() {
             <p className="font-mono text-sm opacity-80 mb-6 text-[var(--crimson)]">Missed word: {currentWord}</p>
             <div className="flex gap-4">
               <button onClick={startGame} className="btn-primary">
-                Play Again (Enter)
+                Play Again <span className="hidden sm:inline opacity-50 font-mono text-xs ml-2">(Enter)</span>
               </button>
               <button onClick={handleShare} className="btn-ghost">
                 {copied ? 'Copied!' : 'Share Result'}
@@ -252,7 +276,7 @@ export default function WordScramble() {
               disabled={gameState !== 'playing'}
               className="btn-ghost text-xs"
             >
-              Skip
+              Skip <span className="hidden sm:inline opacity-50 font-mono text-xs ml-2">(Esc)</span>
             </button>
           </div>
         </div>
