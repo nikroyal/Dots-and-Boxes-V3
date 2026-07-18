@@ -1,10 +1,12 @@
 import { useState, useMemo, useEffect, useRef, useCallback, memo } from 'react';
+import { useAuth } from '../lib/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { createEmptyGame, applyMove } from '../lib/chessLogic.js';
 import { sfx } from '../lib/sound';
 import { X, Trophy, RefreshCcw, Clock } from 'lucide-react';
 import Confetti from '../components/Confetti';
 import { useConfirm } from '../components/ConfirmDialog';
+import PostMatchGoals from '../components/PostMatchGoals';
 import { Chessboard } from 'react-chessboard';
 import { Chess } from 'chess.js';
 
@@ -28,6 +30,7 @@ export default function LocalChess() {
   const [optionSquares, setOptionSquares] = useState({});
   const [pendingGame, setPendingGame] = useState(null);
   const pendingTimeoutRef = useRef(null);
+  const { profile } = useAuth();
   const { confirm, dialog: confirmDialogEl } = useConfirm();
 
   const [turnTimerMs, setTurnTimerMs] = useState(0);
@@ -281,6 +284,7 @@ export default function LocalChess() {
             <h2 className="font-display text-3xl mb-1">{isDraw ? 'Draw!' : `${winnerName} Wins!`}</h2>
             <p className="font-mono text-[0.65rem] tracking-widest uppercase opacity-60">Match Over</p>
           </div>
+          <PostMatchGoals profile={profile} />
           <div className="flex gap-3 justify-center">
              <button onClick={() => setGame(createEmptyGame(['p1', 'p2']))} className="btn-primary">
                Rematch

@@ -1,13 +1,16 @@
 import { useState } from 'react';
+import { useAuth } from '../lib/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { createEmptyGame, applyMove } from '../lib/tictactoeLogic';
 import { sfx } from '../lib/sound';
 import { X, Trophy } from 'lucide-react';
 import Confetti from '../components/Confetti';
 import { useConfirm } from '../components/ConfirmDialog';
+import PostMatchGoals from '../components/PostMatchGoals';
 
 export default function LocalTicTacToe() {
   const navigate = useNavigate();
+  const { profile } = useAuth();
   const [setup, setSetup] = useState(true);
   const [p1Name, setP1Name] = useState('Player 1');
   const [p2Name, setP2Name] = useState('Player 2');
@@ -178,6 +181,7 @@ export default function LocalTicTacToe() {
             <h2 className="font-display text-3xl mb-1">{isDraw ? 'Draw!' : `${winnerName} Wins!`}</h2>
             <p className="font-mono text-[0.65rem] tracking-widest uppercase opacity-60">Match Over</p>
           </div>
+          <PostMatchGoals profile={profile} />
           <div className="flex gap-3 justify-center">
              <button onClick={() => setGame(createEmptyGame(3, 3, ['p1', 'p2']))} className="btn-primary">
                Rematch

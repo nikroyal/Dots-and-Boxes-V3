@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useAuth } from '../lib/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { createEmptyGame, applyMove, PLAYER_COLORS } from '../lib/gameLogic';
 import { sfx } from '../lib/sound';
@@ -6,9 +7,11 @@ import { X, Trophy, RotateCcw } from 'lucide-react';
 import Confetti from '../components/Confetti';
 import BoxParticles from '../components/BoxParticles';
 import { useConfirm } from '../components/ConfirmDialog';
+import PostMatchGoals from '../components/PostMatchGoals';
 
 export default function LocalMatch() {
   const navigate = useNavigate();
+  const { profile } = useAuth();
   const [setup, setSetup] = useState(true);
   const [rows, setRows] = useState(5);
   const [cols, setCols] = useState(5);
@@ -263,6 +266,7 @@ export default function LocalMatch() {
             <h2 className="font-display text-3xl mb-1">{isDraw ? 'Draw!' : `${winnerName} Wins!`}</h2>
             <p className="font-mono text-[0.65rem] tracking-widest uppercase opacity-60">Match Over</p>
           </div>
+          <PostMatchGoals profile={profile} />
           <div className="flex gap-3 justify-center">
              <button onClick={() => { setGame(createEmptyGame(rows, cols, ['p1', 'p2'])); }} className="btn-primary">
                <RotateCcw size={14} /> Play Again
