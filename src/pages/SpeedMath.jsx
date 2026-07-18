@@ -28,10 +28,10 @@ export default function SpeedMath() {
     }
   });
 
-  const generateProblem = useCallback(() => {
+  const generateProblem = useCallback((currentScore) => {
     const ops = ['+', '-', '*'];
     // Weight towards + and - for speed, but include some *
-    const op = ops[Math.floor(Math.random() * (score > 10 ? 3 : 2))];
+    const op = ops[Math.floor(Math.random() * (currentScore > 10 ? 3 : 2))];
 
     let a, b, answer;
     if (op === '+') {
@@ -50,14 +50,14 @@ export default function SpeedMath() {
 
     setProblem({ text: `${a} ${op} ${b}`, answer });
     setUserInput('');
-  }, [score]);
+  }, []);
 
   const startGame = useCallback(() => {
     sfx.click();
     setScore(0);
     setTimeLeft(GAME_DURATION);
     setGameState('playing');
-    generateProblem();
+    generateProblem(0);
 
     if (timerRef.current) clearInterval(timerRef.current);
     timerRef.current = setInterval(() => {
@@ -122,8 +122,9 @@ export default function SpeedMath() {
     // Auto-submit on exact match
     if (parseInt(value, 10) === problem.answer) {
       sfx.piece();
-      setScore((s) => s + 1);
-      generateProblem();
+      const nextScore = score + 1;
+      setScore(nextScore);
+      generateProblem(nextScore);
     }
   };
 
