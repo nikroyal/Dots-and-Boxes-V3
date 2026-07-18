@@ -54,11 +54,20 @@ export default function TypingSpeed() {
 
   useEffect(() => {
     startGameRef.current = startGame;
-  }, []);
+  }, [startGame]);
+
+  useEffect(() => {
+    if (gameState === 'playing' && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [gameState]);
 
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if ((gameState === 'waiting' || gameState === 'result') && e.key === 'Enter' && e.target.tagName !== 'BUTTON') {
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+        return;
+      }
+      if (e.key === 'Enter' && (gameState === 'waiting' || gameState === 'result')) {
         e.preventDefault();
         startGameRef.current?.();
       }
@@ -109,10 +118,6 @@ export default function TypingSpeed() {
     timerRef.current = setInterval(() => {
       setTimeLeft((prev) => Math.max(0, prev - 1));
     }, 1000);
-
-    setTimeout(() => {
-      if (inputRef.current) inputRef.current.focus();
-    }, 10);
   }, [loadNewQuote]);
 
   const endGame = useCallback(() => {
@@ -140,6 +145,7 @@ export default function TypingSpeed() {
       endGame();
     }
   }, [timeLeft, gameState, endGame]);
+
 
   const getRatingMessage = (w) => {
     if (w >= 100) return "⚡ Superhuman!";
@@ -177,40 +183,12 @@ export default function TypingSpeed() {
     const value = e.target.value;
     setUserInput(value);
 
-    // Check if the current typed word is correct so far
-    let isCorrectSoFar = true;
-    for (let i = 0; i < value.length; i++) {
-        if (value[i] !== currentQuote[i]) {
-            isCorrectSoFar = false;
-            break;
-        }
-    }
-
-    if (!isCorrectSoFar) {
-        // Maybe play error sound if we want, but let's keep it quiet or add visual indicator
-        // sfx.error() isn't standard, click is fine or no sound
-    }
-
     if (value === currentQuote) {
         sfx.piece();
         setTotalCharactersTyped(prev => prev + value.length);
         loadNewQuote();
     }
   };
-
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
-        return;
-      }
-      if (e.key === 'Enter' && (gameState === 'waiting' || gameState === 'result')) {
-        e.preventDefault();
-        startGame();
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [gameState, startGame]);
 
   const renderQuote = () => {
     return currentQuote.split('').map((char, index) => {
@@ -231,11 +209,11 @@ export default function TypingSpeed() {
   const liveWpm = elapsed > 0 ? Math.floor(((totalCharactersTyped + (userInput === currentQuote.substring(0, userInput.length) ? userInput.length : 0)) / 5) / (elapsed / 60)) : 0;
 
   return (
-    <div className="fade-in max-w-3xl mx-auto flex flex-col items-center justify-center min-h-[60vh] px-4">
+    <div className="fade-in max-w-4xl mx-auto flex flex-col items-center justify-center min-h-[60vh] px-4 py-8">
       <section className="text-center mb-8">
         <h1 className="font-display text-5xl font-medium tracking-tight mb-2">Typing Speed</h1>
         <p className="font-mono text-sm tracking-widest uppercase opacity-60 mb-2">
-          Time: {timeLeft}s | WPM: {gameState === 'playing' ? liveWpm : wpm}
+          Time: <span className="text-[var(--ink)] font-bold">{Math.max(0, timeLeft)}s</span> | WPM: <span className="score-display text-[var(--ink)] font-bold">{gameState === 'playing' ? liveWpm : wpm}</span>
         </p>
         {bestWpm > 0 && (
           <p className="font-mono text-xs tracking-widest uppercase opacity-80 mt-2 text-[var(--forest)]">
@@ -244,7 +222,7 @@ export default function TypingSpeed() {
         )}
       </section>
 
-      <div className="relative border hairline card bg-[var(--paper-tint)] p-6 sm:p-10 w-full">
+      <div className="w-full max-w-2xl border hairline card bg-[var(--paper-tint)] flex flex-col items-center relative overflow-hidden p-6 sm:p-10 min-h-[300px]">
         {gameState === 'waiting' && (
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-[var(--paper-tint)] z-10">
             <p className="mb-6 font-display text-xl opacity-80 text-center px-4">

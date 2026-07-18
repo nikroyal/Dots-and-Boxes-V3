@@ -56,11 +56,20 @@ export default function WordScramble() {
   useEffect(() => {
     startGameRef.current = startGame;
     loadNewWordRef.current = loadNewWord;
-  });
+  }, [startGame, loadNewWord]);
+
+  useEffect(() => {
+    if (gameState === 'playing' && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [gameState]);
 
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if (e.key === 'Enter' && (gameState === 'waiting' || gameState === 'gameover') && e.target.tagName !== 'BUTTON') {
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+        return;
+      }
+      if (e.key === 'Enter' && (gameState === 'waiting' || gameState === 'gameover')) {
         e.preventDefault();
         startGameRef.current?.();
       } else if (e.key === 'Escape' && gameState === 'playing') {
@@ -106,10 +115,6 @@ export default function WordScramble() {
     timerRef.current = setInterval(() => {
       setTimeLeft((prev) => Math.max(0, prev - 1));
     }, 1000);
-
-    setTimeout(() => {
-      if (inputRef.current) inputRef.current.focus();
-    }, 10);
   }, [loadNewWord]);
 
   const endGame = useCallback(() => {
@@ -134,6 +139,8 @@ export default function WordScramble() {
       endGame();
     }
   }, [timeLeft, gameState, endGame]);
+
+
 
   const getNextTierMessage = (s) => {
     if (s >= 200) return "You're at the top tier!";
@@ -165,19 +172,6 @@ export default function WordScramble() {
     }
   };
 
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
-        return;
-      }
-      if (e.key === 'Enter' && (gameState === 'waiting' || gameState === 'gameover')) {
-        e.preventDefault();
-        startGame();
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [gameState, startGame]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
