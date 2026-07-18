@@ -95,7 +95,7 @@ export default function LocalTicTacToe() {
       <div className="flex items-center justify-between border-b hairline pb-4">
         <div className="flex items-center gap-4">
           <button onClick={quit} className="btn-ghost" aria-label="Quit match">
-            <X size={16} />
+            <X size={16} aria-hidden="true" />
           </button>
         </div>
         {!finished && (

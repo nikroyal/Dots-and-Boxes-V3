@@ -290,10 +290,10 @@ function ConversationView({ convId, profile, conversations, onBack }) {
       </div>
       <form onSubmit={handleSend} className="border-t hairline p-3 flex gap-2 items-center">
         <input
+          aria-label="Direct message input"
           value={input}
           onChange={e => setInput(e.target.value.slice(0, 1000))}
           placeholder={canMessage ? 'Message…' : 'Chat opens after acceptance'}
-          aria-label="Direct message"
           maxLength={1000}
           className="flex-1 bg-transparent font-display text-base outline-none px-2"
           disabled={!canMessage}
