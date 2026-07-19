@@ -36,3 +36,6 @@
 ## 2026-06-29 - Dynamic ARIA labels on repeated generic actions
 **Learning:** In lists of items (like friend requests) where every row contains the exact same visible action buttons ("Accept", "Decline", "Buy"), screen readers will read identical button text continuously without clarifying which item the action applies to.
 **Action:** Always attach dynamic `aria-label`s to generic action buttons inside mapped lists. Ensure the label clearly states the action AND the specific item or user it affects (e.g., ``aria-label={`Accept friend request from ${req.fromUsername}`}``).
+## 2026-06-30 - Missing explicit IDs for dynamic mapping elements
+**Learning:** Checkboxes within dynamically generated lists (like `me.properties.map(...)` in `ActionDialogs.jsx`) often rely on the label wrapping the input, but this implicit connection isn't always robust enough for all assistive technologies.
+**Action:** Always provide dynamically generated `id`s (e.g. ``id={`offer-prop-${pid}`}``) for checkboxes mapped from an array, and explicitly link the parent `<label>` to them using `htmlFor`.

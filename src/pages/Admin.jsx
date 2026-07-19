@@ -201,7 +201,7 @@ function MatchesPanel({ admin, matches }) {
 
 function MatchButton({ match, active, onClick }) {
   return (
-    <button onClick={onClick} className="w-full text-left p-3 hover:bg-black/5" style={{ background: active ? 'var(--bg-soft)' : 'transparent' }}>
+    <button onClick={onClick} className="w-full text-left p-3 hover:bg-black/5" aria-label={`Select match ${match.id}`} style={{ background: active ? 'var(--bg-soft)' : 'transparent' }}>
       <TinyMatch match={match} />
     </button>
   );
@@ -360,11 +360,11 @@ function OwnerSettings({ admin }) {
         <h2 className="font-display text-2xl">Admin profile</h2>
       </div>
       <form onSubmit={save} className="space-y-3">
-        <label className="block">
+        <label htmlFor="admin-name" className="block">
           <span className="font-mono text-[0.65rem] tracking-widest uppercase opacity-60 block mb-2">Display name</span>
-          <input className="input-field" value={name} onChange={e => setName(e.target.value.slice(0, 40))} />
+          <input id="admin-name" className="input-field" value={name} onChange={e => setName(e.target.value.slice(0, 40))} />
         </label>
-        <button type="submit" disabled={saving || !name.trim()} className="btn-primary"><Save size={13} /> {saving ? 'Saving…' : 'Save'}</button>
+        <button type="submit" disabled={saving || !name.trim()} className="btn-primary" ><Save size={13} aria-hidden="true" /> {saving ? 'Saving…' : 'Save'}</button>
       </form>
     </section>
   );

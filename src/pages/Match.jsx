@@ -1087,7 +1087,7 @@ function WinScreen({ match, profile, achievementToasts, onHome, onReplay }) {
         {isPlayer && (
           <>
             <button onClick={handleRematch} disabled={rematchState === 'sending' || rematchState === 'sent'}
-                    className="btn-ghost">
+                    className="btn-ghost" >
               <Repeat size={14} />{' '}
               {rematchState === 'sent' ? 'Rematch sent'
                 : rematchState === 'sending' ? 'Sending…'
@@ -1095,7 +1095,7 @@ function WinScreen({ match, profile, achievementToasts, onHome, onReplay }) {
             </button>
             {opponentInfo && !isFriend && !hasPendingRequest && !hasIncomingRequest && (
               <button onClick={handleAddFriend} disabled={friendRequestState === 'sending' || friendRequestState === 'sent'}
-                      className={friendRequestState === 'sent' ? 'btn-ghost opacity-50' : 'btn-ghost'}>
+                      className={friendRequestState === 'sent' ? 'btn-ghost opacity-50' : 'btn-ghost'} >
                 <UserPlus size={14} />{' '}
                 {friendRequestState === 'sent' ? 'Request sent'
                   : friendRequestState === 'sending' ? 'Sending…'

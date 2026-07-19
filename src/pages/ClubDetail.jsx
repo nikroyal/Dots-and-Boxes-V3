@@ -613,9 +613,9 @@ function MessageItem({
                 autoFocus
               />
               <div className="flex gap-2 mt-1 text-[0.65rem] font-mono">
-                <span>escape to <button onClick={onCancelEdit} className="text-[var(--crimson)] hover:underline">cancel</button></span>
+                <span>escape to <button onClick={onCancelEdit} className="text-[var(--crimson)] hover:underline" aria-label="Cancel edit">cancel</button></span>
                 <span>•</span>
-                <span>enter to <button onClick={() => onSaveEdit(editInput)} className="text-[var(--forest)] hover:underline">save</button></span>
+                <span>enter to <button onClick={() => onSaveEdit(editInput)} className="text-[var(--forest)] hover:underline" aria-label="Save edit">save</button></span>
               </div>
             </div>
           ) : (
