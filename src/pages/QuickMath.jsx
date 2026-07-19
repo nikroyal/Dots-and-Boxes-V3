@@ -122,8 +122,12 @@ export default function QuickMath() {
     if (e.key === 'Enter' && (gameState === 'waiting' || gameState === 'gameover')) {
       e.preventDefault();
       startGame();
+    } else if (e.key === 'Escape' && gameState === 'playing') {
+      e.preventDefault();
+      sfx.click();
+      loadNewQuestion();
     }
-  }, [gameState, startGame]);
+  }, [gameState, startGame, loadNewQuestion]);
 
   useEffect(() => {
     window.addEventListener('keydown', handleKeyDown);
@@ -192,6 +196,9 @@ export default function QuickMath() {
             <button onClick={startGame} className="btn-primary">
               Start Game (Enter)
             </button>
+            <span className="text-sm opacity-60 mt-2 block font-mono tracking-widest uppercase text-center">
+              Target: ≥ 40 for 🚀 Human Calculator
+            </span>
           </div>
         )}
 
@@ -241,7 +248,7 @@ export default function QuickMath() {
               disabled={gameState !== 'playing'}
               className="btn-ghost text-xs"
             >
-              Skip
+              Skip <span className="hidden sm:inline opacity-50 font-mono text-xs ml-2">(Esc)</span>
             </button>
           </div>
         </div>

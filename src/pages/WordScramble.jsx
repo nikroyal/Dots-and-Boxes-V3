@@ -220,7 +220,10 @@ export default function WordScramble() {
             <button onClick={startGame} className="btn-primary mb-2">
               Start Game <span className="hidden sm:inline opacity-50 font-mono text-xs ml-2">(Enter)</span>
             </button>
-            <p className="font-mono text-xs opacity-60">Press Enter</p>
+            <p className="font-mono text-xs opacity-60 mb-2">Press Enter</p>
+            <span className="text-sm opacity-60 block font-mono tracking-widest uppercase text-center">
+              Target: ≥ 200 for 🧠 Wordsmith
+            </span>
           </div>
         )}
 

@@ -199,6 +199,9 @@ export default function ColorMatch() {
               <p className="mb-6 opacity-80 max-w-[250px]">
                 Click 'Yes' if the meaning of the word matches its ink color. One mistake ends the game!
               </p>
+              <span className="text-sm opacity-60 mb-4 block font-mono tracking-widest uppercase text-center">
+                Target: ≥ 50 for 🦅 Eagle Eye
+              </span>
               <button onClick={startGame} className="btn-primary w-full text-lg py-3">
                 Start Game (Enter)
               </button>
