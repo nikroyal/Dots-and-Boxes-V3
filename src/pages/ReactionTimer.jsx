@@ -103,6 +103,14 @@ export default function ReactionTimer() {
     return "🐢 Keep practicing!";
   };
 
+  const getNextTierMessage = (time) => {
+    if (time < 200) return "You're at the top tier!";
+    if (time < 250) return `${(time - 199).toFixed(0)} ms to Superhuman`;
+    if (time < 300) return `${(time - 249).toFixed(0)} ms to Excellent`;
+    if (time < 400) return `${(time - 299).toFixed(0)} ms to Good`;
+    return `${(time - 399).toFixed(0)} ms to Average`;
+  };
+
   const handleKeyDown = (e) => {
     if (e.key === ' ' || e.key === 'Enter') {
       if (e.repeat) return;
@@ -179,6 +187,9 @@ export default function ReactionTimer() {
               )}
               <div className="font-display text-xl text-[var(--ink)] mb-1 opacity-90">
                 {getRating(reactionTime)}
+              </div>
+              <div className="font-mono text-xs opacity-60 tracking-widest uppercase mb-2">
+                {getNextTierMessage(reactionTime)}
               </div>
               {!isNewBest && bestTime && (
                 <div className="font-mono text-xs opacity-60 tracking-widest uppercase mb-2">

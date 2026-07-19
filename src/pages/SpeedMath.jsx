@@ -165,6 +165,22 @@ export default function SpeedMath() {
     }
   };
 
+  const getRatingMessage = (s) => {
+    if (s >= 50) return "⚡ Superhuman!";
+    if (s >= 35) return "🐆 Excellent!";
+    if (s >= 20) return "🏃 Good!";
+    if (s >= 10) return "🚶 Average!";
+    return "🐢 Keep practicing!";
+  };
+
+  const getNextTierMessage = (s) => {
+    if (s >= 50) return "You're at the top tier!";
+    if (s >= 35) return `${50 - s} more to Superhuman tier`;
+    if (s >= 20) return `${35 - s} more to Excellent tier`;
+    if (s >= 10) return `${20 - s} more to Good tier`;
+    return `${10 - s} more to Average tier`;
+  };
+
   const handleShare = (e) => {
     e.stopPropagation();
     e.preventDefault();
@@ -209,7 +225,14 @@ export default function SpeedMath() {
         {gameState === 'result' && (
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-[var(--paper-tint)]/90 z-10 backdrop-blur-sm">
              <div className="font-display text-4xl mb-2 text-[var(--crimson)]">Time's Up!</div>
-             <div className="font-display text-3xl mb-6 opacity-90 text-[var(--forest)]">{score} Solved</div>
+             <div className="font-display text-3xl mb-1 opacity-90 text-[var(--forest)]">{score} Solved</div>
+             <div className="font-display text-xl mb-1 text-[var(--ink)] opacity-90">{getRatingMessage(score)}</div>
+             <div className="font-mono text-xs opacity-60 tracking-widest uppercase mb-4">{getNextTierMessage(score)}</div>
+             {problem && problem.text && (
+               <div className="font-mono text-sm opacity-80 mb-6 text-[var(--crimson)]">
+                 Missed: {problem.text} = {problem.answer}
+               </div>
+             )}
              <div className="flex gap-4">
                <button onClick={startGame} className="btn-primary">
                   Try Again (Enter)

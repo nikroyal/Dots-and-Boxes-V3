@@ -130,6 +130,13 @@ export default function QuickMath() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [handleKeyDown]);
 
+  const getNextTierMessage = (s) => {
+    if (s >= 40) return "You're at the top tier!";
+    if (s >= 25) return `${40 - s} more to Human Calculator`;
+    if (s >= 15) return `${25 - s} more to Lightning Fast`;
+    return `${15 - s} more to Smart Cookie`;
+  };
+
   const getRatingMessage = (s) => {
     if (s >= 40) return "🚀 Human Calculator";
     if (s >= 25) return "⚡ Lightning Fast";
@@ -199,7 +206,13 @@ export default function QuickMath() {
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/10 z-10 backdrop-blur-[2px]">
             <p className="font-display text-3xl mb-2 text-[var(--crimson)]">Time's Up!</p>
             <p className="font-mono text-lg mb-1">Final Score: {score}</p>
-            <p className="font-display text-xl mb-6 text-[var(--ink)] opacity-90">{getRatingMessage(score)}</p>
+            <p className="font-display text-xl mb-1 text-[var(--ink)] opacity-90">{getRatingMessage(score)}</p>
+            <p className="font-mono text-xs opacity-60 tracking-widest uppercase mb-6">{getNextTierMessage(score)}</p>
+            {question && question.text && (
+              <p className="font-mono text-sm opacity-80 mb-4 text-[var(--crimson)]">
+                Missed: {question.text} = {question.answer}
+              </p>
+            )}
             <div className="flex gap-4">
               <button onClick={startGame} className="btn-primary">
                 Play Again (Enter)

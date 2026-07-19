@@ -96,3 +96,8 @@
 **Learning:** Highlighting goals that require only a binary, one-off action (like "play a game") inadvertently obscures goals that require sustained effort (like "play 100 games"). When a binary achievement completes, it hits 100% progress and dominates the immediate post-match screen, distracting the user from the actual incremental progress they are making.
 
 **Action:** When surfacing "closest" or "up next" goals/achievements, explicitly filter out binary or immediate-completion goals to ensure the user's attention is focused on targets that require ongoing engagement and repeated sessions.
+## 2024-07-28 - Up Next Achievement in Static Lists
+
+**Learning:** When players navigate to a dedicated progression page (like an Achievements page), presenting them with a massive, unfiltered list of all static milestones creates friction and overwhelm. Even if they intended to check their progress, they have to manually scan to figure out what to aim for next.
+
+**Action:** Whenever rendering a long list of static progression items (like the full Achievements list), explicitly calculate and highlight the most attainable "Up Next" micro-goal at the very top of the view. This immediately converts a static reference list into an actionable objective.
