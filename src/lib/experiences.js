@@ -379,6 +379,21 @@ export const EXPERIENCE_CATALOG = [
     routePrefixes: ['/circuit-maker'],
   },
   {
+    id: 'number-memory',
+    name: 'Number Memory',
+    shortName: 'Numbers',
+    path: '/number-memory',
+    kind: 'Arcade',
+    status: 'Live',
+    accent: 'var(--ochre)',
+    description: 'Remember the longest number you can.',
+    features: ['Local play', 'Best score'],
+    navItems: [
+      { to: '/number-memory', label: 'Play' },
+    ],
+    routePrefixes: ['/number-memory'],
+  },
+  {
     id: 'color-match',
     name: 'Color Match',
     shortName: 'Colors',

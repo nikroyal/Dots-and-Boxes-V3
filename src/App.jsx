@@ -42,6 +42,7 @@ import GuessTheNumber from './pages/GuessTheNumber';
 import SpeedMath from './pages/SpeedMath';
 import ClickTheTarget from './pages/ClickTheTarget';
 import SequenceMemory from './pages/SequenceMemory';
+import NumberMemory from './pages/NumberMemory';
 import ColorMatch from './pages/ColorMatch';
 import SpeedGrid from './pages/SpeedGrid';
 import TypingSpeed from './pages/TypingSpeed';
@@ -124,6 +125,7 @@ function Shell() {
         <Route path="/guess-the-number" element={<GuessTheNumber />} />
         <Route path="/click-the-target" element={<ClickTheTarget />} />
         <Route path="/sequence-memory" element={<SequenceMemory />} />
+        <Route path="/number-memory" element={<NumberMemory />} />
         <Route path="/color-match" element={<ColorMatch />} />
         <Route path="/speed-grid" element={<SpeedGrid />} />
         <Route path="/typing-speed" element={<TypingSpeed />} />
@@ -180,6 +182,7 @@ function Shell() {
               <Route path="/rock-paper-scissors" element={<RockPaperScissors />} />
               <Route path="/guess-the-number" element={<GuessTheNumber />} />
               <Route path="/sequence-memory" element={<SequenceMemory />} />
+              <Route path="/number-memory" element={<NumberMemory />} />
               <Route path="/color-match" element={<ColorMatch />} />
               <Route path="/speed-grid" element={<SpeedGrid />} />
               <Route path="/click-the-target" element={<ClickTheTarget />} />
