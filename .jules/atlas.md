@@ -93,3 +93,6 @@
 ## 2026-07-17 - Safe Fast Keyboard Shortcuts in React
 **Learning:** Implementing window-level `keydown` event listeners in React for fast core loops requires ensuring stable references or using refs so the listener invokes the latest function closure without stale state errors during fast restarts.
 **Action:** When adding global keyboard shortcuts to React games for quick restarting, ensure proper dependency arrays with useCallback or refs rather than binding stale functions directly into the listener.
+## 2024-07-20 - Fast UI Testing for Timed Games
+**Learning:** When using Playwright to verify end-game states for games with long timers (e.g., 30 or 60 seconds), tests can time out if they wait for the natural game loop.
+**Action:** Temporarily patch the game duration variable to 1 second (e.g., \`const GAME_DURATION = 1;\`) during test execution to bypass the wait, and strictly ensure you restore the original duration before committing.
