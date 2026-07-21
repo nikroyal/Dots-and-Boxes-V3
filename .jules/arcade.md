@@ -65,3 +65,7 @@
 ## 2024-11-20 - Fast Timer Rendering
 **Learning:** Rendering a timer down to milliseconds using `setInterval` that triggers a React state update ~60 times a second can cause performance overhead by constantly re-rendering the entire component.
 **Action:** For highly precise sub-second timers, prefer using `requestAnimationFrame` attached directly to a DOM ref to avoid frequent, expensive React render cycles.
+
+## 2024-05-18 - Safe Regex Replacing in Files with Duplicate Structures
+**Learning:** When patching files like `App.jsx` that contain identical structural blocks (e.g., authenticated and unauthenticated routing sections), using a global `.replace()` or assuming the first match is correct will often corrupt the file structure.
+**Action:** Isolate the specific blocks using `.indexOf()` and `.lastIndexOf()` to split the content and apply the replacement only to the targeted section, or split the string entirely and reassemble it cleanly, preventing duplicate or corrupted code.

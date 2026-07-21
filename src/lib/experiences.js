@@ -1,5 +1,20 @@
 export const EXPERIENCE_CATALOG = [
   {
+    id: 'hangman',
+    name: 'Hangman',
+    shortName: 'Hangman',
+    path: '/hangman',
+    kind: 'Arcade',
+    status: 'Live',
+    accent: 'var(--ochre)',
+    description: 'Guess the hidden word before it\'s too late!',
+    features: ['Local play', 'Best streak'],
+    navItems: [
+      { to: '/hangman', label: 'Play' },
+    ],
+    routePrefixes: ['/hangman'],
+  },
+  {
     id: 'quick-math',
     name: 'Quick Math',
     shortName: 'Math',
