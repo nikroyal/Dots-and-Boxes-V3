@@ -30,6 +30,39 @@ export default function SpeedGrid() {
     }
   });
 
+  const [copied, setCopied] = useState(false);
+  const shareTimeoutRef = useRef(null);
+
+  const getRating = (t) => {
+    if (t < 5000) return "⚡ Speed Demon";
+    if (t < 10000) return "🐆 Fast";
+    if (t < 15000) return "🏃 Good";
+    return "🐢 Keep practicing";
+  };
+
+  const handleShare = (e) => {
+    e.stopPropagation();
+    e.preventDefault();
+    const rating = getRating(time);
+    const text = `I cleared Axiom Speed Grid in ${(time / 1000).toFixed(3)}s! ${rating}`;
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(() => {
+        sfx.notify();
+        setCopied(true);
+        if (shareTimeoutRef.current) clearTimeout(shareTimeoutRef.current);
+        shareTimeoutRef.current = setTimeout(() => setCopied(false), 2000);
+      }).catch(err => console.warn("Clipboard copy failed", err));
+    } else {
+      console.warn("Clipboard API not supported");
+    }
+  };
+
+  useEffect(() => {
+    return () => {
+      if (shareTimeoutRef.current) clearTimeout(shareTimeoutRef.current);
+    };
+  }, []);
+
   const timerRef = useRef(null);
   const startTimeRef = useRef(null);
 
@@ -134,6 +167,7 @@ export default function SpeedGrid() {
               return (
                 <button
                   key={num}
+                  onPointerDown={(e) => { e.preventDefault(); e.stopPropagation(); handleCellClick(num); }}
                   onClick={() => handleCellClick(num)}
                   disabled={isClicked}
                   className={`aspect-square flex items-center justify-center font-display text-2xl ${isClicked ? 'opacity-0' : 'bg-[var(--bg-soft)] border hairline hover:bg-[var(--ink)] hover:text-[var(--paper)] transition-colors'}`}
@@ -151,9 +185,14 @@ export default function SpeedGrid() {
              <div className="font-display text-5xl text-[var(--forest)] mb-6 pulse-soft">
                {(time / 1000).toFixed(3)}s
              </div>
-             <button onClick={startGame} className="btn-primary w-full text-lg py-3 max-w-[200px]">
-               Play Again (Enter)
-             </button>
+             <div className="flex gap-4 w-full justify-center">
+               <button onClick={startGame} className="btn-primary flex-1 text-lg py-3 max-w-[200px]">
+                 Play Again (Enter)
+               </button>
+               <button onClick={handleShare} className="btn-secondary flex-1 text-lg py-3 max-w-[200px]">
+                 {copied ? 'Copied!' : 'Share Result'}
+               </button>
+             </div>
            </div>
         )}
       </div>

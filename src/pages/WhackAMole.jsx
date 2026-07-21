@@ -56,8 +56,9 @@ export default function WhackAMole() {
     });
 
     // Random duration for mole to stay
-    const minStay = 400;
-    const maxStay = 1000;
+    const scale = Math.max(0.4, 1 - ((scoreRef?.current || 0) / 400));
+    const minStay = 400 * scale;
+    const maxStay = 1000 * scale;
     const stayDuration = Math.random() * (maxStay - minStay) + minStay;
 
     if (moleTimerRef.current) clearTimeout(moleTimerRef.current);

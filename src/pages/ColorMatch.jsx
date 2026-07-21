@@ -236,6 +236,7 @@ export default function ColorMatch() {
         {gameState === 'playing' && (
           <div className="grid grid-cols-2 gap-4 w-full">
             <button
+              onPointerDown={(e) => { e.preventDefault(); e.stopPropagation(); handleAnswer(true); }}
               onClick={() => handleAnswer(true)}
               className="btn-secondary py-4 text-lg flex flex-col items-center justify-center gap-1"
             >
@@ -243,6 +244,7 @@ export default function ColorMatch() {
               <span className="text-[0.6rem] uppercase tracking-widest opacity-50">Left Arrow</span>
             </button>
             <button
+              onPointerDown={(e) => { e.preventDefault(); e.stopPropagation(); handleAnswer(false); }}
               onClick={() => handleAnswer(false)}
               className="btn-secondary py-4 text-lg flex flex-col items-center justify-center gap-1"
             >
