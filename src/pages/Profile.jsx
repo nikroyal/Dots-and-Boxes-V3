@@ -70,6 +70,11 @@ export default function Profile() {
   const isFriend = (Array.isArray(me.friends) ? me.friends : []).includes(target.id);
   const isBlocked = (me.blocked || []).includes(target.id);
 
+  const h2hMatches = !isMe ? (me.matchHistory || []).filter(m => m.opponent === target.username) : [];
+  const h2hWins = h2hMatches.filter(m => m.result === 'win').length;
+  const h2hLosses = h2hMatches.filter(m => m.result === 'loss').length;
+  const h2hDraws = h2hMatches.filter(m => m.result === 'draw').length;
+
   // Find the locked achievement with the highest progress percentage
   const upNextAchievement = (() => {
     let best = null;
@@ -267,6 +272,34 @@ export default function Profile() {
             </p>
             <DeleteAccountForm />
           </div>
+        </section>
+      )}
+
+      {/* Head to Head */}
+      {!isMe && h2hMatches.length > 0 && (
+        <section className="card mb-10" style={{ background: 'var(--bg-soft)', borderColor: h2hWins > h2hLosses ? 'var(--forest)' : h2hWins < h2hLosses ? 'var(--crimson)' : 'var(--hairline)' }}>
+          <div className="flex items-center justify-between mb-4">
+            <div className="font-mono text-[0.65rem] tracking-widest uppercase opacity-60">Head-to-Head Record</div>
+            <div className="font-mono text-[0.65rem] tracking-widest uppercase">
+              {h2hWins > h2hLosses ? 'Winning' : h2hWins < h2hLosses ? 'Losing' : 'Tied'}
+            </div>
+          </div>
+          <div className="flex items-center justify-center gap-6">
+            <div className="text-center">
+              <div className="font-display text-4xl font-medium" style={{ color: h2hWins > h2hLosses ? 'var(--forest)' : 'inherit' }}>{h2hWins}</div>
+              <div className="font-mono text-[0.6rem] tracking-widest uppercase opacity-50 mt-1">You</div>
+            </div>
+            <div className="font-display text-2xl opacity-30">-</div>
+            <div className="text-center">
+              <div className="font-display text-4xl font-medium" style={{ color: h2hLosses > h2hWins ? 'var(--crimson)' : 'inherit' }}>{h2hLosses}</div>
+              <div className="font-mono text-[0.6rem] tracking-widest uppercase opacity-50 mt-1">{target.username}</div>
+            </div>
+          </div>
+          {h2hDraws > 0 && (
+            <div className="text-center font-mono text-[0.6rem] tracking-widest uppercase opacity-40 mt-3">
+              {h2hDraws} draw{h2hDraws !== 1 ? 's' : ''}
+            </div>
+          )}
         </section>
       )}
 

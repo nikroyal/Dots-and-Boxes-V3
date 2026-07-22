@@ -96,3 +96,9 @@
 **Learning:** Highlighting goals that require only a binary, one-off action (like "play a game") inadvertently obscures goals that require sustained effort (like "play 100 games"). When a binary achievement completes, it hits 100% progress and dominates the immediate post-match screen, distracting the user from the actual incremental progress they are making.
 
 **Action:** When surfacing "closest" or "up next" goals/achievements, explicitly filter out binary or immediate-completion goals to ensure the user's attention is focused on targets that require ongoing engagement and repeated sessions.
+
+## 2024-05-25 - Head-to-Head Records
+
+**Learning:** Static statistics on a user's profile show capability, but they don't tell a personal story. By calculating and displaying a "Head-to-Head" win/loss record specifically between the viewing user and the profile owner, we create an immediate, personal rivalry that acts as a strong intrinsic motivator to challenge that specific player to another game (either to tie the score or take the lead).
+
+**Action:** Whenever a platform supports direct 1v1 interactions, prioritize surfacing personal comparative metrics (like Head-to-Head records) over global metrics on user profiles to drive direct engagement.
