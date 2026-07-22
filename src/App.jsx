@@ -46,6 +46,7 @@ import ColorMatch from './pages/ColorMatch';
 import SpeedGrid from './pages/SpeedGrid';
 import TypingSpeed from './pages/TypingSpeed';
 import MathFlash from './pages/MathFlash';
+import Minesweeper from './pages/Minesweeper';
 
 import LocalDistrictExchange from './pages/LocalDistrictExchange';
 import DistrictExchangeHub from './pages/DistrictExchangeHub';
@@ -133,7 +134,8 @@ function Shell() {
         <Route path="/snake" element={<Snake />} />
         <Route path="/battleships" element={<Battleships />} />
         <Route path="/paper-io" element={<PaperIo />} />
-        <Route path="*" element={<Navigate to="/login" />} />
+                <Route path="/minesweeper" element={<Minesweeper />} />
+<Route path="*" element={<Navigate to="/login" />} />
       </Routes>
     );
   }
@@ -211,7 +213,8 @@ function Shell() {
               <Route path="/chess/local" element={<LocalChess />} />
               <Route path="/district-exchange/local" element={<LocalDistrictExchange />} />
               {isAdmin && <Route path="/admin" element={<Admin />} />}
-              <Route path="*" element={<Navigate to="/" />} />
+                            <Route path="/minesweeper" element={<Minesweeper />} />
+<Route path="*" element={<Navigate to="/" />} />
             </Routes>
           </Suspense>
         </ErrorBoundary>

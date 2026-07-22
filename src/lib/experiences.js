@@ -408,6 +408,21 @@ export const EXPERIENCE_CATALOG = [
     ],
     routePrefixes: ['/speed-grid'],
   },
+  {
+    id: 'minesweeper',
+    name: 'Minesweeper',
+    shortName: 'Mines',
+    path: '/minesweeper',
+    kind: 'Puzzle',
+    status: 'Live',
+    accent: 'var(--crimson)',
+    description: 'Classic Minesweeper. Clear the board without detonating any mines.',
+    features: ['Local play', 'Best time'],
+    navItems: [
+      { to: '/minesweeper', label: 'Play' },
+    ],
+    routePrefixes: ['/minesweeper'],
+  },
 ];
 
 export const DEFAULT_EXPERIENCE = {
