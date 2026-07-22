@@ -21,6 +21,9 @@ export default function SpeedGrid() {
   const [grid, setGrid] = useState([]);
   const [nextNumber, setNextNumber] = useState(1);
   const [time, setTime] = useState(0);
+  const [copied, setCopied] = useState(false);
+  const [isNewBest, setIsNewBest] = useState(false);
+  const [prevBestTime, setPrevBestTime] = useState(null);
   const [bestTime, setBestTime] = useState(() => {
     try {
       const saved = localStorage.getItem('axiom-speedgrid-best');
@@ -41,6 +44,7 @@ export default function SpeedGrid() {
     setNextNumber(1);
     setTime(0);
     setGameState('playing');
+    setIsNewBest(false);
 
     startTimeRef.current = performance.now();
     const animate = () => {
@@ -57,6 +61,8 @@ export default function SpeedGrid() {
     setTime(finalTime);
 
     if (bestTime === null || finalTime < bestTime) {
+      setPrevBestTime(bestTime);
+      setIsNewBest(true);
       setBestTime(finalTime);
       try {
         localStorage.setItem('axiom-speedgrid-best', finalTime.toString());
@@ -65,6 +71,27 @@ export default function SpeedGrid() {
       updateArcadeBest(profile, 'speed-grid', 'Speed Grid', finalTime, (finalTime / 1000).toFixed(3) + 's');
     }
   }, [bestTime, profile]);
+
+  const getRating = (t) => {
+    if (t <= 12000) return "⚡ Lightning!";
+    if (t <= 16000) return "🐆 Fast!";
+    if (t <= 20000) return "🏃 Good!";
+    return "🐢 Keep practicing!";
+  };
+
+  const handleShare = (e) => {
+    e.stopPropagation();
+    e.preventDefault();
+    const rating = getRating(time);
+    const text = `I cleared the Axiom Speed Grid in ${(time / 1000).toFixed(3)}s! ${rating}`;
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(() => {
+        sfx.click();
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      });
+    }
+  };
 
   const handleCellClick = (num) => {
     if (gameState !== 'playing') return;
@@ -121,6 +148,7 @@ export default function SpeedGrid() {
 
         {gameState === 'start' && (
           <div className="flex flex-col items-center justify-center min-h-[300px] w-full mt-8 mb-8">
+             <div className="mb-6 opacity-80 text-center text-sm font-mono tracking-widest uppercase">Target: &le; 12.0s for ⚡ Lightning</div>
              <button onClick={startGame} className="btn-primary w-full text-lg py-3 max-w-[200px]">
                Start Game (Enter)
              </button>
@@ -135,6 +163,7 @@ export default function SpeedGrid() {
                 <button
                   key={num}
                   onClick={() => handleCellClick(num)}
+                  onPointerDown={(e) => { e.preventDefault(); handleCellClick(num); }}
                   disabled={isClicked}
                   className={`aspect-square flex items-center justify-center font-display text-2xl ${isClicked ? 'opacity-0' : 'bg-[var(--bg-soft)] border hairline hover:bg-[var(--ink)] hover:text-[var(--paper)] transition-colors'}`}
                 >
@@ -151,9 +180,32 @@ export default function SpeedGrid() {
              <div className="font-display text-5xl text-[var(--forest)] mb-6 pulse-soft">
                {(time / 1000).toFixed(3)}s
              </div>
-             <button onClick={startGame} className="btn-primary w-full text-lg py-3 max-w-[200px]">
-               Play Again (Enter)
-             </button>
+             {isNewBest && (
+               <div className="font-display text-2xl text-[var(--ochre)] pulse-soft mb-2">
+                 🎉 New Best!
+               </div>
+             )}
+             <div className="font-display text-xl text-[var(--ink)] mb-4 opacity-90">
+               {getRating(time)}
+             </div>
+             {!isNewBest && bestTime !== null && (
+               <div className="font-mono text-xs opacity-60 tracking-widest uppercase mb-6">
+                 +{ ((time - bestTime) / 1000).toFixed(3) }s slower than best
+               </div>
+             )}
+             {isNewBest && prevBestTime !== null && (
+               <div className="font-mono text-xs text-[var(--forest)] tracking-widest uppercase mb-6">
+                 -{ ((prevBestTime - time) / 1000).toFixed(3) }s faster!
+               </div>
+             )}
+             <div className="flex gap-4 w-full justify-center">
+               <button onClick={startGame} className="btn-primary flex-1 text-lg py-3 max-w-[200px]">
+                 Play Again (Enter)
+               </button>
+               <button onClick={handleShare} className="btn-secondary flex-1 text-lg py-3 max-w-[200px]">
+                 {copied ? 'Copied!' : 'Share Result'}
+               </button>
+             </div>
            </div>
         )}
       </div>

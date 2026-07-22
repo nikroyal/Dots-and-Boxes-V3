@@ -93,3 +93,6 @@
 ## 2026-07-17 - Safe Fast Keyboard Shortcuts in React
 **Learning:** Implementing window-level `keydown` event listeners in React for fast core loops requires ensuring stable references or using refs so the listener invokes the latest function closure without stale state errors during fast restarts.
 **Action:** When adding global keyboard shortcuts to React games for quick restarting, ensure proper dependency arrays with useCallback or refs rather than binding stale functions directly into the listener.
+## 2024-07-22 - Pointer Events for Touch Responsiveness
+**Learning:** React web games often suffer from a native ~100-300ms touch delay on mobile when relying solely on `onClick`.
+**Action:** Always add `onPointerDown={(e) => { e.preventDefault(); handleAction(); }}` alongside `onClick` for primary, fast-reaction interactive elements (like grid cells or "Yes/No" buttons) to immediately register the tap and make the game feel tight and responsive.

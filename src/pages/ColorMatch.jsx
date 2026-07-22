@@ -237,6 +237,7 @@ export default function ColorMatch() {
           <div className="grid grid-cols-2 gap-4 w-full">
             <button
               onClick={() => handleAnswer(true)}
+              onPointerDown={(e) => { e.preventDefault(); handleAnswer(true); }}
               className="btn-secondary py-4 text-lg flex flex-col items-center justify-center gap-1"
             >
               <span>Yes</span>
@@ -244,6 +245,7 @@ export default function ColorMatch() {
             </button>
             <button
               onClick={() => handleAnswer(false)}
+              onPointerDown={(e) => { e.preventDefault(); handleAnswer(false); }}
               className="btn-secondary py-4 text-lg flex flex-col items-center justify-center gap-1"
             >
               <span>No</span>
