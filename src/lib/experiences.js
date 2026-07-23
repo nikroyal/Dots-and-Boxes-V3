@@ -408,6 +408,21 @@ export const EXPERIENCE_CATALOG = [
     ],
     routePrefixes: ['/speed-grid'],
   },
+  {
+    id: 'lights-out',
+    name: 'Lights Out',
+    shortName: 'Lights Out',
+    path: '/lights-out',
+    kind: 'Puzzle',
+    status: 'Live',
+    accent: 'var(--ochre)',
+    description: 'Turn off all the lights! Clicking a light toggles it and its neighbors.',
+    features: ['Local play', 'Best moves'],
+    navItems: [
+      { to: '/lights-out', label: 'Play' },
+    ],
+    routePrefixes: ['/lights-out'],
+  },
 ];
 
 export const DEFAULT_EXPERIENCE = {
