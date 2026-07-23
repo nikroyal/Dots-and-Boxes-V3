@@ -47,7 +47,7 @@ export default function AxiomHub() {
       if (!unlocked.includes(a.id) && a.progress) {
         const [curr, max, min = 0] = a.progress(profile);
         const pct = max === min ? 0 : Math.min(100, Math.max(0, ((curr - min) / (max - min)) * 100));
-        if (pct > 0 && pct < 100 && max > 1 && pct > highestPct) {
+        if (pct < 100 && max > 1 && pct > highestPct) {
           highestPct = pct;
           best = { a, curr, max, pct };
         }
@@ -140,14 +140,29 @@ export default function AxiomHub() {
 
 
       {/* Active Objectives */}
-      {profile && (upNextAchievement || !dailyGoalCompleted) && (
+      {profile && (
         <section className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {!dailyGoalCompleted && (
-            <Link to="/dots-and-boxes" className="block border hairline p-4 bg-black/5 hover:bg-black/10 transition-colors" style={{ borderColor: 'var(--hairline)' }}>
-              <div className="font-mono text-[0.55rem] tracking-widest uppercase mb-1 flex items-center gap-2 opacity-60">
-                <Target size={12} /> Daily Goal
+          <Link to="/dots-and-boxes" className="block border hairline p-4 bg-black/5 hover:bg-black/10 transition-colors" style={{ borderColor: dailyGoalCompleted ? 'var(--forest)' : 'var(--hairline)' }}>
+            <div className="font-mono text-[0.55rem] tracking-widest uppercase mb-1 flex items-center gap-2">
+              <span className="opacity-60 flex items-center gap-1.5"><Target size={12} /> Daily Goal</span>
+              {(profile.dailyGoalStreak || 0) > 0 && (
+                <span className="px-1.5 py-0.5 rounded-sm flex items-center gap-1" style={{ background: 'var(--bg-soft)', color: 'var(--ochre)' }}>
+                  🔥 {profile.dailyGoalStreak} Day Streak
+                </span>
+              )}
+            </div>
+            <div className="font-display text-lg mb-3">{dailyGoal.text}</div>
+
+            {dailyGoalCompleted ? (
+              <div className="flex flex-col gap-1.5 mt-1">
+                <div className="flex items-center gap-2 font-mono text-[0.65rem] tracking-widest uppercase px-2 py-1 rounded-sm w-fit" style={{ background: 'var(--forest)', color: 'var(--paper)' }}>
+                  <Check size={12} /> Completed
+                </div>
+                <div className="font-mono text-[0.55rem] tracking-widest uppercase opacity-60">
+                  Come back tomorrow to keep your streak going
+                </div>
               </div>
-              <div className="font-display text-lg mb-3">{dailyGoal.text}</div>
+            ) : (
               <div>
                 <div className="flex justify-between font-mono text-[0.55rem] tracking-widest uppercase opacity-50 mb-1">
                   <span>Progress</span>
@@ -157,8 +172,8 @@ export default function AxiomHub() {
                   <div className="h-full transition-all duration-500 bg-current opacity-60" style={{ width: `${(dailyGoal.getProgress(dailyStats) / dailyGoal.max) * 100}%` }} />
                 </div>
               </div>
-            </Link>
-          )}
+            )}
+          </Link>
 
           {upNextAchievement && (
             <Link to="/achievements" className="block border hairline p-4 bg-black/5 hover:bg-black/10 transition-colors" style={{ borderColor: 'var(--ochre)' }}>
