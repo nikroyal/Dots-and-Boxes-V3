@@ -119,7 +119,8 @@ service cloud.firestore {
       allow create: if isSignedIn() && request.auth.uid in request.resource.data.players;
 
       function isPlayer() {
-        return isSignedIn() && request.auth.uid in resource.data.players;
+        return isSignedIn() && request.auth.uid in resource.data.players
+          && !changedKeys().hasAny(['players', 'gameType', 'rows', 'cols', 'adminClosed']);
       }
       function specJoin() {
         return changedKeys().hasOnly(['spectators'])
@@ -157,8 +158,11 @@ service cloud.firestore {
       function isHostJoining() {
         return isSignedIn()
           && resource.data.status == 'waiting'
-          && request.resource.data.status == 'active'
-          && request.auth.uid in request.resource.data.players;
+          && (request.resource.data.status == 'active' || request.resource.data.status == 'timer_negotiation')
+          && !changedKeys().hasAny(['gameType', 'rows', 'cols', 'adminClosed'])
+          && request.resource.data.players.size() == resource.data.players.size() + 1
+          && request.resource.data.players.hasAll(resource.data.players)
+          && request.resource.data.players[request.resource.data.players.size() - 1] == request.auth.uid;
       }
 
       allow update: if isAdmin() || isPlayer() || specJoin() || specLeave() || chatAppend() || isHostJoining();
