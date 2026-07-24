@@ -394,6 +394,21 @@ export const EXPERIENCE_CATALOG = [
     routePrefixes: ['/color-match'],
   },
   {
+    id: 'higher-or-lower',
+    name: 'Higher or Lower',
+    shortName: 'Higher',
+    path: '/higher-or-lower',
+    kind: 'Arcade',
+    status: 'Live',
+    accent: 'var(--ochre)',
+    description: 'Guess if the next number will be higher or lower. Build your streak.',
+    features: ['Local play', 'Best score'],
+    navItems: [
+      { to: '/higher-or-lower', label: 'Play' },
+    ],
+    routePrefixes: ['/higher-or-lower'],
+  },
+  {
     id: 'speed-grid',
     name: 'Speed Grid',
     shortName: 'Speed Grid',
