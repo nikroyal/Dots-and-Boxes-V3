@@ -65,3 +65,6 @@
 ## 2024-11-20 - Fast Timer Rendering
 **Learning:** Rendering a timer down to milliseconds using `setInterval` that triggers a React state update ~60 times a second can cause performance overhead by constantly re-rendering the entire component.
 **Action:** For highly precise sub-second timers, prefer using `requestAnimationFrame` attached directly to a DOM ref to avoid frequent, expensive React render cycles.
+## 2024-05-18 - Avoid State Closures in Game Over Logic
+**Learning:** When using React closures for game events (like keyboard handlers or delayed result callbacks), accessing state like `bestStreak` directly can cause stale reads, overwriting higher scores with lower ones if the callback was registered earlier in the game.
+**Action:** Use a dedicated `useEffect` that depends on `gameState` and scores to handle game-over updates (e.g. `updateArcadeBest`) rather than executing them inside the event handler itself.

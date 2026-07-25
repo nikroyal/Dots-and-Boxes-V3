@@ -113,6 +113,21 @@ export const EXPERIENCE_CATALOG = [
     ],
   },
   {
+    id: 'higher-or-lower',
+    name: 'Higher or Lower',
+    shortName: 'Higher/Lower',
+    path: '/higher-or-lower',
+    kind: 'Arcade',
+    status: 'Live',
+    accent: 'var(--ochre)',
+    description: 'Will the next number be higher or lower? Test your luck and build your streak.',
+    features: ['Local play', 'Best streak'],
+    navItems: [
+      { to: '/higher-or-lower', label: 'Play' },
+    ],
+    routePrefixes: ['/higher-or-lower'],
+  },
+  {
     id: 'paper-io',
     name: 'Paper.io',
     shortName: 'Paper.io',

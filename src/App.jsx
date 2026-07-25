@@ -45,6 +45,7 @@ import SequenceMemory from './pages/SequenceMemory';
 import ColorMatch from './pages/ColorMatch';
 import SpeedGrid from './pages/SpeedGrid';
 import TypingSpeed from './pages/TypingSpeed';
+import HigherOrLower from './pages/HigherOrLower';
 import MathFlash from './pages/MathFlash';
 
 import LocalDistrictExchange from './pages/LocalDistrictExchange';
@@ -126,6 +127,7 @@ function Shell() {
         <Route path="/sequence-memory" element={<SequenceMemory />} />
         <Route path="/color-match" element={<ColorMatch />} />
         <Route path="/speed-grid" element={<SpeedGrid />} />
+        <Route path="/higher-or-lower" element={<HigherOrLower />} />
         <Route path="/typing-speed" element={<TypingSpeed />} />
         <Route path="/math-flash" element={<MathFlash />} />
         <Route path="/speed-math" element={<SpeedMath />} />
@@ -183,6 +185,7 @@ function Shell() {
               <Route path="/color-match" element={<ColorMatch />} />
               <Route path="/speed-grid" element={<SpeedGrid />} />
               <Route path="/click-the-target" element={<ClickTheTarget />} />
+              <Route path="/higher-or-lower" element={<HigherOrLower />} />
               <Route path="/typing-speed" element={<TypingSpeed />} />
               <Route path="/math-flash" element={<MathFlash />} />
               <Route path="/speed-math" element={<SpeedMath />} />
