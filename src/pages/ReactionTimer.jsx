@@ -72,8 +72,8 @@ export default function ReactionTimer() {
 
     if (!bestTime || time < bestTime) {
       setPrevBestTime(bestTime);
-      recordActivity(profile, ACTIVITY_TYPES.ARCADE_BEST, { game: 'Reaction Timer', score: time.toFixed(0) + ' ms' });
-      updateArcadeBest(profile, 'reaction-timer', 'Reaction Timer', time, time.toFixed(0) + ' ms');
+      if (profile) recordActivity(profile, ACTIVITY_TYPES.ARCADE_BEST, { game: 'Reaction Timer', score: time.toFixed(0) + ' ms' });
+      if (profile) updateArcadeBest(profile, 'reaction-timer', 'Reaction Timer', time, time.toFixed(0) + ' ms');
       setIsNewBest(true);
       setBestTime(time);
       try {

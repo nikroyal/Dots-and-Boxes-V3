@@ -109,8 +109,8 @@ export default function ClickTheTarget() {
         try {
           localStorage.setItem('axiom-click-best', score.toString());
         } catch {}
-        recordActivity(profile, ACTIVITY_TYPES.ARCADE_BEST, { game: 'Click The Target', score: score + ' targets' });
-        updateArcadeBest(profile, 'click-the-target', 'Click The Target', score, score + ' targets');
+        if (profile) recordActivity(profile, ACTIVITY_TYPES.ARCADE_BEST, { game: 'Click The Target', score: score + ' targets' });
+        if (profile) updateArcadeBest(profile, 'click-the-target', 'Click The Target', score, score + ' targets');
       } else {
         sfx.notify();
       }

@@ -101,11 +101,11 @@ export default function LocalMatch() {
             <div className="flex gap-4">
                <div className="flex-1">
                  <label htmlFor="board-rows" className="font-mono text-[0.65rem] tracking-widest uppercase opacity-60 mb-1 block">Rows</label>
-                 <input id="board-rows" type="number" min="2" max="10" value={rows} onChange={e => setRows(Number(e.target.value))} className="w-full bg-black/5 dark:bg-white/5 border hairline px-3 py-2 font-display outline-none focus-ring" required />
+                 <input id="board-rows" type="text" inputMode="numeric" min="2" max="10" value={rows} onChange={e => { const val = e.target.value; if (val === '') setRows(''); else { const num = Number(val); if (!isNaN(num)) setRows(num); } }} onBlur={() => { setRows(prev => { const n = Number(prev); return isNaN(n) ? 2 : Math.min(10, Math.max(2, n)); }); }} className="w-full bg-black/5 dark:bg-white/5 border hairline px-3 py-2 font-display outline-none focus-ring" required />
                </div>
                <div className="flex-1">
                  <label htmlFor="board-cols" className="font-mono text-[0.65rem] tracking-widest uppercase opacity-60 mb-1 block">Cols</label>
-                 <input id="board-cols" type="number" min="2" max="10" value={cols} onChange={e => setCols(Number(e.target.value))} className="w-full bg-black/5 dark:bg-white/5 border hairline px-3 py-2 font-display outline-none focus-ring" required />
+                 <input id="board-cols" type="text" inputMode="numeric" min="2" max="10" value={cols} onChange={e => { const val = e.target.value; if (val === '') setCols(''); else { const num = Number(val); if (!isNaN(num)) setCols(num); } }} onBlur={() => { setCols(prev => { const n = Number(prev); return isNaN(n) ? 2 : Math.min(10, Math.max(2, n)); }); }} className="w-full bg-black/5 dark:bg-white/5 border hairline px-3 py-2 font-display outline-none focus-ring" required />
                </div>
             </div>
           </div>

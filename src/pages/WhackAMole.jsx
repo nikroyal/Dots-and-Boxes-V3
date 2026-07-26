@@ -107,8 +107,8 @@ export default function WhackAMole() {
       try {
         localStorage.setItem('axiom-whackamole-best', finalScore.toString());
       } catch {}
-      recordActivity(profile, ACTIVITY_TYPES.ARCADE_BEST, { game: 'Whack-A-Mole', score: finalScore });
-      updateArcadeBest(profile, 'whack-a-mole', 'Whack-A-Mole', finalScore, finalScore.toString());
+      if (profile) recordActivity(profile, ACTIVITY_TYPES.ARCADE_BEST, { game: 'Whack-A-Mole', score: finalScore });
+      if (profile) updateArcadeBest(profile, 'whack-a-mole', 'Whack-A-Mole', finalScore, finalScore.toString());
     }
   }, [bestScore, profile]);
 

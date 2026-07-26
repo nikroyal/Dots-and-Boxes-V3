@@ -37,3 +37,10 @@
 ## 2026-06-26 - Operator Precedence with Ternary Array Checks
 **Learning:** When using ternary inline checks like `Array.isArray(arr) ? arr.length : 0` to index into an array (e.g., to find the last item `arr[... - 1]`), failing to wrap the ternary in parentheses causes operator precedence bugs (`0 - 1` evaluates first).
 **Action:** Always wrap ternary expressions in parentheses when performing arithmetic on their result: `(Array.isArray(arr) ? arr.length : 0) - 1`.
+## 2024-11-20 - Unauthenticated Arcade Best Crashes
+**Learning:** Activities in Arcade games (like `recordActivity` and `updateArcadeBest`) are called during game over states but assume a valid user `profile` object, causing crashes for unauthenticated users accessing public games.
+**Action:** Always wrap `recordActivity` and `updateArcadeBest` calls in an `if (profile)` check for public arcade games.
+
+## 2024-11-20 - Numeric Input Validation Bypassed
+**Learning:** Changing `<input type="number">` to `<input type="text" inputMode="numeric">` breaks native HTML `min` and `max` validation. Trying to enforce bounds strictly inside `onChange` creates a frustrating UX because typing intermediate values (like "1" when min="2") clamps the input immediately.
+**Action:** Let users type freely in `onChange` (allowing intermediate states) and defer strict `min`/`max` validation to `onBlur` using JavaScript bounds checking, ensuring the value is only clamped when the user finishes interacting with the field.

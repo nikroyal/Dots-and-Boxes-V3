@@ -443,7 +443,7 @@ export default function MatchChess() {
               {useTimer && (
                 <div className="mb-4">
                   <label htmlFor="timer-mins" className="font-mono text-[0.65rem] tracking-widest uppercase opacity-60 mb-1 block">Minutes per turn</label>
-                  <input id="timer-mins" type="number" value={timerMins} onChange={e => setTimerMins(Math.max(1, parseInt(e.target.value, 10) || 1))} className="w-full bg-black/5 dark:bg-white/5 border hairline px-3 py-2 font-display outline-none focus-ring" min={1} required />
+                  <input id="timer-mins" type="text" inputMode="numeric" value={timerMins} onChange={e => { const val = e.target.value; if (val === '') setTimerMins(''); else { const num = parseInt(val, 10); if (!isNaN(num)) setTimerMins(num); } }} onBlur={() => { setTimerMins(prev => { const n = parseInt(prev, 10); return isNaN(n) ? 1 : Math.max(1, n); }); }} className="w-full bg-black/5 dark:bg-white/5 border hairline px-3 py-2 font-display outline-none focus-ring" min={1} required />
                 </div>
               )}
               <div className="font-mono text-[0.55rem] tracking-widest uppercase opacity-50 mb-4">Note: Both players should agree on the timer settings.</div>

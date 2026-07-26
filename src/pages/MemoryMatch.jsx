@@ -67,8 +67,8 @@ export default function MemoryMatch() {
 
   useEffect(() => {
     if (isGameWon && (bestMoves === null || moves < bestMoves)) {
-      recordActivity(profile, ACTIVITY_TYPES.ARCADE_BEST, { game: "Memory Match", score: moves + " moves" });
-      updateArcadeBest(profile, "memory-match", "Memory Match", moves, moves + " moves");
+      if (profile) recordActivity(profile, ACTIVITY_TYPES.ARCADE_BEST, { game: "Memory Match", score: moves + " moves" });
+      if (profile) updateArcadeBest(profile, "memory-match", "Memory Match", moves, moves + " moves");
       localStorage.setItem("memory-match-best", moves.toString());
     }
   }, [isGameWon, moves, bestMoves, profile]);

@@ -61,8 +61,8 @@ export default function SpeedGrid() {
       try {
         localStorage.setItem('axiom-speedgrid-best', finalTime.toString());
       } catch {}
-      recordActivity(profile, ACTIVITY_TYPES.ARCADE_BEST, { game: 'Speed Grid', score: (finalTime / 1000).toFixed(3) + 's' });
-      updateArcadeBest(profile, 'speed-grid', 'Speed Grid', finalTime, (finalTime / 1000).toFixed(3) + 's');
+      if (profile) recordActivity(profile, ACTIVITY_TYPES.ARCADE_BEST, { game: 'Speed Grid', score: (finalTime / 1000).toFixed(3) + 's' });
+      if (profile) updateArcadeBest(profile, 'speed-grid', 'Speed Grid', finalTime, (finalTime / 1000).toFixed(3) + 's');
     }
   }, [bestTime, profile]);
 
