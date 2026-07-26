@@ -153,7 +153,8 @@ export default function Dashboard() {
         const [curr, max, min = 0] = a.progress(profile);
         const pct = max === min ? 0 : Math.min(100, Math.max(0, ((curr - min) / (max - min)) * 100));
         // Only show if it has some progress (not 0/1 binary)
-        if (pct > 0 && max > 1 && pct > highestPct) {
+        // Magnet: Ignore 0/1 binary progress achievements for goals
+        if (pct > 0 && pct < 100 && max > 1 && pct > highestPct) {
           highestPct = pct;
           best = { a, curr, max, pct };
         }

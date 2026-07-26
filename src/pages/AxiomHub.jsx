@@ -47,6 +47,7 @@ export default function AxiomHub() {
       if (!unlocked.includes(a.id) && a.progress) {
         const [curr, max, min = 0] = a.progress(profile);
         const pct = max === min ? 0 : Math.min(100, Math.max(0, ((curr - min) / (max - min)) * 100));
+        // Magnet: Ignore 0/1 binary progress achievements for goals
         if (pct > 0 && pct < 100 && max > 1 && pct > highestPct) {
           highestPct = pct;
           best = { a, curr, max, pct };
