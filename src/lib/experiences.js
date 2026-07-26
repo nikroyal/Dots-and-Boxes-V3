@@ -408,6 +408,22 @@ export const EXPERIENCE_CATALOG = [
     ],
     routePrefixes: ['/speed-grid'],
   },
+
+  {
+    id: 'word-search',
+    name: 'Word Search',
+    shortName: 'Word Search',
+    path: '/word-search',
+    kind: 'Puzzle',
+    status: 'Live',
+    accent: 'var(--forest)',
+    description: 'Find all the hidden words as fast as you can.',
+    features: ['Local play', 'Best time'],
+    navItems: [
+      { to: '/word-search', label: 'Play' },
+    ],
+    routePrefixes: ['/word-search'],
+  },
 ];
 
 export const DEFAULT_EXPERIENCE = {
