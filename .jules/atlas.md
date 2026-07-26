@@ -93,3 +93,6 @@
 ## 2026-07-17 - Safe Fast Keyboard Shortcuts in React
 **Learning:** Implementing window-level `keydown` event listeners in React for fast core loops requires ensuring stable references or using refs so the listener invokes the latest function closure without stale state errors during fast restarts.
 **Action:** When adding global keyboard shortcuts to React games for quick restarting, ensure proper dependency arrays with useCallback or refs rather than binding stale functions directly into the listener.
+## 2024-07-26 - Adding progression context and clearer instructions
+**Learning:** Providing explicit "Next Tier" progress (e.g. "x more to reach Master") and explaining less obvious controls (like Spacebar or number keys 1-9) significantly improves immediate player comprehension and replay incentives. Using distinct colors for different directional feedback (e.g., Ochre for "Too low", Crimson for "Too high", Forest for correct) makes history logs much easier to parse quickly.
+**Action:** Always include Next Tier prompts on end screens for games with score thresholds. Ensure all valid keyboard shortcuts are explicitly mentioned on the start screen. Use semantically distinct colors for distinct types of failure/hints, not just red vs green.

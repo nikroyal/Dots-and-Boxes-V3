@@ -165,10 +165,28 @@ export default function SpeedMath() {
     }
   };
 
+
+  const getRatingMessage = (s) => {
+    if (s >= 50) return "🚀 Human Calculator";
+    if (s >= 40) return "🧮 Math Wizard";
+    if (s >= 30) return "📐 Mathematician";
+    if (s >= 20) return "🤓 Number Cruncher";
+    return "🐢 Beginner";
+  };
+
+  const getNextTierMessage = (s) => {
+    if (s >= 50) return "You're at the top tier!";
+    if (s >= 40) return `${50 - s} more to Human Calculator tier`;
+    if (s >= 30) return `${40 - s} more to Math Wizard tier`;
+    if (s >= 20) return `${30 - s} more to Mathematician tier`;
+    return `${20 - s} more to Number Cruncher tier`;
+  };
+
   const handleShare = (e) => {
     e.stopPropagation();
     e.preventDefault();
-    const text = `I solved ${score} math problems in 60s in Axiom Speed Math! 🧮`;
+    const rating = getRatingMessage(score);
+    const text = `I solved ${score} math problems in 60s in Axiom Speed Math! 🧮 ${rating}`;
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(text).then(() => {
         sfx.notify();
@@ -209,7 +227,9 @@ export default function SpeedMath() {
         {gameState === 'result' && (
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-[var(--paper-tint)]/90 z-10 backdrop-blur-sm">
              <div className="font-display text-4xl mb-2 text-[var(--crimson)]">Time's Up!</div>
-             <div className="font-display text-3xl mb-6 opacity-90 text-[var(--forest)]">{score} Solved</div>
+             <div className="font-display text-3xl mb-1 opacity-90 text-[var(--forest)]">{score} Solved</div>
+             <div className="font-display text-xl mb-1 text-[var(--ink)] opacity-90">{getRatingMessage(score)}</div>
+             <div className="font-mono text-xs opacity-60 tracking-widest uppercase mb-6">{getNextTierMessage(score)}</div>
              <div className="flex gap-4">
                <button onClick={startGame} className="btn-primary">
                   Try Again (Enter)

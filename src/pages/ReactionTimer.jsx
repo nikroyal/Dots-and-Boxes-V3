@@ -9,7 +9,7 @@ export default function ReactionTimer() {
   // states: 'waiting' | 'ready' | 'finished'
   const [gameState, setGameState] = useState('waiting');
   const [reactionTime, setReactionTime] = useState(null);
-  const [message, setMessage] = useState('Click to start');
+  const [message, setMessage] = useState('Click or Space to start');
   const [isNewBest, setIsNewBest] = useState(false);
   const [copied, setCopied] = useState(false);
   const [prevBestTime, setPrevBestTime] = useState(null);
@@ -57,7 +57,7 @@ export default function ReactionTimer() {
     sfx.loss();
     setGameState('finished');
     gameStateRef.current = 'finished';
-    setMessage('Too early! Click to try again.');
+    setMessage('Too early! Click or Space to try again.');
   };
 
   const handleValidClick = () => {
@@ -94,6 +94,15 @@ export default function ReactionTimer() {
     }
   };
 
+
+
+  const getNextTierMessage = (t) => {
+    if (t < 200) return "You're at the top tier!";
+    if (t < 250) return `${(t - 199).toFixed(0)} ms to Superhuman tier`;
+    if (t < 300) return `${(t - 249).toFixed(0)} ms to Excellent tier`;
+    if (t < 400) return `${(t - 299).toFixed(0)} ms to Good tier`;
+    return `${(t - 399).toFixed(0)} ms to Average tier`;
+  };
 
   const getRating = (time) => {
     if (time < 200) return "⚡ Superhuman!";
@@ -180,6 +189,9 @@ export default function ReactionTimer() {
               <div className="font-display text-xl text-[var(--ink)] mb-1 opacity-90">
                 {getRating(reactionTime)}
               </div>
+              <div className="font-mono text-xs opacity-60 tracking-widest uppercase mb-4">
+                {getNextTierMessage(reactionTime)}
+              </div>
               {!isNewBest && bestTime && (
                 <div className="font-mono text-xs opacity-60 tracking-widest uppercase mb-2">
                   +{ (reactionTime - bestTime).toFixed(0) } ms slower than best
@@ -191,7 +203,7 @@ export default function ReactionTimer() {
                 </div>
               )}
               <div className="font-mono text-sm opacity-80 tracking-widest uppercase mt-2">
-                Click to try again
+                Click or Space to try again
               </div>
             </div>
           )}

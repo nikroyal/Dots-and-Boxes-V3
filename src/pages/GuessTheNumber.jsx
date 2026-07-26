@@ -244,7 +244,7 @@ export default function GuessTheNumber() {
               {history.map((h, i) => (
                 <div key={i} className="flex justify-between items-center text-sm font-mono border hairline bg-[var(--bg-soft)] px-4 py-2 rounded opacity-80">
                   <span>{h.guess}</span>
-                  <span className={h.result === 'Too high!' ? 'text-[var(--crimson)]' : 'text-[var(--forest)]'}>
+                  <span className={h.result === 'Too high!' ? 'text-[var(--crimson)]' : h.result === 'Too low!' ? 'text-[var(--ochre)]' : 'text-[var(--forest)]'}>
                     {h.result}
                   </span>
                 </div>

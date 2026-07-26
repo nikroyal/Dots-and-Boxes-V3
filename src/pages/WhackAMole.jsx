@@ -223,6 +223,8 @@ export default function WhackAMole() {
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/5 z-10 backdrop-blur-[1px]">
             <p className="mb-4 text-center font-mono text-sm uppercase tracking-widest opacity-80">
               Target: ≥ 300 for 🔨 Master
+              <br/>
+              <span className="text-xs opacity-70 mt-2 block lowercase">tip: use number keys 1-9 or click</span>
             </p>
             <button onClick={startGame} className="btn-primary">
               Start Game <span className="hidden sm:inline opacity-50 font-mono text-xs ml-2">(Enter)</span>
