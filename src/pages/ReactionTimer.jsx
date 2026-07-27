@@ -152,6 +152,9 @@ export default function ReactionTimer() {
         <p className="font-mono text-sm tracking-widest uppercase opacity-60 mb-2">
           Test your reflexes
         </p>
+        <p className="font-mono text-xs tracking-widest uppercase opacity-80 mt-1 mb-2">
+          Target: &lt; 200ms for ⚡ Superhuman
+        </p>
         {bestTime && (
           <p className="font-mono text-xs tracking-widest uppercase opacity-80 mt-4 text-[var(--ochre)]">
             Best Time: {bestTime.toFixed(0)} ms

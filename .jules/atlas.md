@@ -93,3 +93,4 @@
 ## 2026-07-17 - Safe Fast Keyboard Shortcuts in React
 **Learning:** Implementing window-level `keydown` event listeners in React for fast core loops requires ensuring stable references or using refs so the listener invokes the latest function closure without stale state errors during fast restarts.
 **Action:** When adding global keyboard shortcuts to React games for quick restarting, ensure proper dependency arrays with useCallback or refs rather than binding stale functions directly into the listener.
+## 2025-02-14 - Add Up-Front Goals to Arcade Games   **Learning:** Arcade games with a single core loop benefit greatly from explicitly stating a target score before the game starts. It sets an immediate benchmark and expectation for the player.   **Action:** Always include a specific target or rank (e.g., "Target: ≥ 15 for 🧠 Mastermind") on the waiting screen of arcade games to drive instant engagement and give players a tangible goal.

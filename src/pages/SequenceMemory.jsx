@@ -237,6 +237,9 @@ export default function SequenceMemory() {
       <div className="relative border hairline card bg-[var(--paper-tint)] p-6 sm:p-8 w-full max-w-md aspect-square flex items-center justify-center">
         {gameState === 'waiting' && (
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/5 z-10 backdrop-blur-[1px]">
+            <p className="mb-4 text-center font-mono text-sm uppercase tracking-widest opacity-80">
+              Target: ≥ 15 for 🧠 Mastermind
+            </p>
             <button onClick={startGame} className="btn-primary">
               Start Game <span className="hidden sm:inline opacity-50 font-mono text-xs ml-2">(Enter)</span>
             </button>
@@ -287,7 +290,7 @@ export default function SequenceMemory() {
       </div>
 
       <p className="mt-8 font-mono text-xs opacity-50 hidden sm:block text-center max-w-xs">
-        Repeat the sequence. It gets longer every round!
+        Repeat the sequence. It gets longer every round!<br/>Use 1-4, Q-W-A-S, or Arrow Keys to play.
       </p>
     </div>
   );
