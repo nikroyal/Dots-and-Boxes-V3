@@ -49,6 +49,7 @@ import MathFlash from './pages/MathFlash';
 
 import LocalDistrictExchange from './pages/LocalDistrictExchange';
 import DistrictExchangeHub from './pages/DistrictExchangeHub';
+import HigherOrLower from './pages/HigherOrLower';
 const Admin = lazy(() => import('./pages/Admin'));
 
 export default function App() {
@@ -133,6 +134,7 @@ function Shell() {
         <Route path="/snake" element={<Snake />} />
         <Route path="/battleships" element={<Battleships />} />
         <Route path="/paper-io" element={<PaperIo />} />
+        <Route path="/higher-or-lower" element={<HigherOrLower />} />
         <Route path="*" element={<Navigate to="/login" />} />
       </Routes>
     );
@@ -211,6 +213,7 @@ function Shell() {
               <Route path="/chess/local" element={<LocalChess />} />
               <Route path="/district-exchange/local" element={<LocalDistrictExchange />} />
               {isAdmin && <Route path="/admin" element={<Admin />} />}
+              <Route path="/higher-or-lower" element={<HigherOrLower />} />
               <Route path="*" element={<Navigate to="/" />} />
             </Routes>
           </Suspense>

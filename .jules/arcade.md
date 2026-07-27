@@ -65,3 +65,6 @@
 ## 2024-11-20 - Fast Timer Rendering
 **Learning:** Rendering a timer down to milliseconds using `setInterval` that triggers a React state update ~60 times a second can cause performance overhead by constantly re-rendering the entire component.
 **Action:** For highly precise sub-second timers, prefer using `requestAnimationFrame` attached directly to a DOM ref to avoid frequent, expensive React render cycles.
+## 2024-05-25 - Arrow Key Event Defaults
+**Learning:** Attaching keyboard event listeners (like ArrowUp, ArrowDown) to the window in interactive React mini-games causes the entire browser window to scroll up and down during gameplay if `e.preventDefault()` is not consistently called or if the listener isn't correctly focused/scoped.
+**Action:** Always ensure `e.preventDefault()` is executed inside global `keydown` event listeners for arrow keys whenever the game state is actively 'playing'.

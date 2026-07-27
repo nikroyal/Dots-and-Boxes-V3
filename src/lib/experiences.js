@@ -408,6 +408,21 @@ export const EXPERIENCE_CATALOG = [
     ],
     routePrefixes: ['/speed-grid'],
   },
+  {
+    id: 'higher-or-lower',
+    name: 'Higher or Lower',
+    shortName: 'High/Low',
+    path: '/higher-or-lower',
+    kind: 'Arcade',
+    status: 'Live',
+    accent: 'var(--ochre)',
+    description: 'Will the next number be higher or lower? Build your winning streak.',
+    features: ['Local play', 'Best streak'],
+    navItems: [
+      { to: '/higher-or-lower', label: 'Play' },
+    ],
+    routePrefixes: ['/higher-or-lower'],
+  },
 ];
 
 export const DEFAULT_EXPERIENCE = {
