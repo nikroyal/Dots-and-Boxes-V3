@@ -96,3 +96,9 @@
 **Learning:** Highlighting goals that require only a binary, one-off action (like "play a game") inadvertently obscures goals that require sustained effort (like "play 100 games"). When a binary achievement completes, it hits 100% progress and dominates the immediate post-match screen, distracting the user from the actual incremental progress they are making.
 
 **Action:** When surfacing "closest" or "up next" goals/achievements, explicitly filter out binary or immediate-completion goals to ensure the user's attention is focused on targets that require ongoing engagement and repeated sessions.
+
+## 2024-07-28 - Up Next Achievement Filter
+
+**Learning:** Showing achievements that are at 100% progress but not yet officially "unlocked" (e.g. pending backend sync) as "Up Next" is confusing and removes the motivation to chase an actually attainable, future goal.
+
+**Action:** When calculating "closest" or "up next" achievements, always explicitly filter out those with >= 100% progress so the focus remains on future engagement.
