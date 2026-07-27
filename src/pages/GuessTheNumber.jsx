@@ -115,8 +115,10 @@ export default function GuessTheNumber() {
           localStorage.setItem('axiom-guess-best', newAttempts.toString());
         } catch {}
 
+        if (profile) {
         recordActivity(profile, ACTIVITY_TYPES.ARCADE_BEST, { game: 'Guess The Number', score: newAttempts + ' attempts' });
         updateArcadeBest(profile, 'guess-the-number', 'Guess The Number', newAttempts, newAttempts + ' attempts');
+        }
       }
     } else if (guess < targetNumber) {
       sfx.click();

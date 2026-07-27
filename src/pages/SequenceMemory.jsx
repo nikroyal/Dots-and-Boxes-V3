@@ -187,8 +187,10 @@ export default function SequenceMemory() {
       try {
         localStorage.setItem('axiom-sequence-best', finalScore.toString());
       } catch {}
+      if (profile) {
       recordActivity(profile, ACTIVITY_TYPES.ARCADE_BEST, { game: 'Sequence Memory', score: finalScore });
       updateArcadeBest(profile, 'sequence-memory', 'Sequence Memory', finalScore, finalScore.toString());
+      }
     }
   };
 

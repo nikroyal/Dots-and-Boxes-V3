@@ -140,8 +140,10 @@ export default function TypingSpeed() {
       try {
         localStorage.setItem('axiom-typingspeed-best', finalWpm.toString());
       } catch {}
+      if (profile) {
       recordActivity(profile, ACTIVITY_TYPES.ARCADE_BEST, { game: 'Typing Speed', score: finalWpm + ' WPM' });
       updateArcadeBest(profile, 'typing-speed', 'Typing Speed', finalWpm, finalWpm + ' WPM');
+      }
     }
   }, [bestWpm, profile]);
 

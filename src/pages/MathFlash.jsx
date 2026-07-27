@@ -98,8 +98,10 @@ export default function MathFlash() {
       try {
         localStorage.setItem('axiom-mathflash-best', finalScore.toString());
       } catch {}
+      if (profile) {
       recordActivity(profile, ACTIVITY_TYPES.ARCADE_BEST, { game: 'Math Flash', score: finalScore });
       updateArcadeBest(profile, 'math-flash', 'Math Flash', finalScore, finalScore.toString());
+      }
     }
   }, [bestScore, profile]);
 

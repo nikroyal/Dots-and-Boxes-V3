@@ -77,8 +77,10 @@ export default function RockPaperScissors() {
       try {
         localStorage.setItem('axiom-rps-best', streak.toString());
       } catch {}
+      if (profile) {
       recordActivity(profile, ACTIVITY_TYPES.ARCADE_BEST, { game: 'Rock Paper Scissors', score: streak + ' streak' });
       updateArcadeBest(profile, 'rock-paper-scissors', 'Rock Paper Scissors', streak, streak + ' streak');
+      }
     }
   }, [gameState, streak, bestStreak, profile]);
 

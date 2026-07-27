@@ -101,8 +101,10 @@ export default function QuickMath() {
       try {
         localStorage.setItem('axiom-quickmath-best', finalScore.toString());
       } catch {}
+      if (profile) {
       recordActivity(profile, ACTIVITY_TYPES.ARCADE_BEST, { game: 'Quick Math', score: finalScore });
       updateArcadeBest(profile, 'quick-math', 'Quick Math', finalScore, finalScore.toString());
+      }
     }
   }, [bestScore, profile]);
 

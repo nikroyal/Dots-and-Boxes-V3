@@ -77,8 +77,10 @@ export default function ColorMatch() {
       try {
         localStorage.setItem('axiom-colormatch-best', score.toString());
       } catch {}
+      if (profile) {
       recordActivity(profile, ACTIVITY_TYPES.ARCADE_BEST, { game: 'Color Match', score: score.toString() });
       updateArcadeBest(profile, 'color-match', 'Color Match', score, score.toString());
+      }
     }
   }, [score, bestScore, profile]);
 

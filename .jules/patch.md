@@ -37,3 +37,7 @@
 ## 2026-06-26 - Operator Precedence with Ternary Array Checks
 **Learning:** When using ternary inline checks like `Array.isArray(arr) ? arr.length : 0` to index into an array (e.g., to find the last item `arr[... - 1]`), failing to wrap the ternary in parentheses causes operator precedence bugs (`0 - 1` evaluates first).
 **Action:** Always wrap ternary expressions in parentheses when performing arithmetic on their result: `(Array.isArray(arr) ? arr.length : 0) - 1`.
+
+## 2024-08-16 - Wrap Arcade bests in profile check
+**Learning:** Arcade games record user activity on game over, but if accessed unauthenticated, missing `profile` checks cause crashes when logging scores.
+**Action:** Always wrap `recordActivity` and `updateArcadeBest` calls in `if (profile)` checks.

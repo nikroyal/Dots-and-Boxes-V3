@@ -101,8 +101,10 @@ export default function SpeedMath() {
       try {
         localStorage.setItem('axiom-speedmath-best', score.toString());
       } catch {}
+      if (profile) {
       recordActivity(profile, ACTIVITY_TYPES.ARCADE_BEST, { game: 'Speed Math', score: score });
       updateArcadeBest(profile, 'speed-math', 'Speed Math', score, score.toString());
+      }
     }
   }, [bestScore, profile, score]);
 

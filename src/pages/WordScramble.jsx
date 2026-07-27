@@ -142,8 +142,10 @@ export default function WordScramble() {
       try {
         localStorage.setItem('axiom-wordscramble-best', finalScore.toString());
       } catch {}
+      if (profile) {
       recordActivity(profile, ACTIVITY_TYPES.ARCADE_BEST, { game: 'Word Scramble', score: finalScore });
       updateArcadeBest(profile, 'word-scramble', 'Word Scramble', finalScore, finalScore.toString());
+      }
     }
   }, [bestScore, profile]);
 

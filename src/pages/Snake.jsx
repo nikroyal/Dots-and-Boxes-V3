@@ -109,8 +109,10 @@ export default function Snake() {
       try {
         localStorage.setItem('axiom-snake-best', scoreRef.current.toString());
       } catch {}
+      if (profile) {
       recordActivity(profile, ACTIVITY_TYPES.ARCADE_BEST, { game: 'Snake', score: scoreRef.current.toString() });
       updateArcadeBest(profile, 'snake', 'Snake', scoreRef.current, scoreRef.current.toString());
+      }
     }
   };
 
