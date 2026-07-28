@@ -55,3 +55,7 @@
 **Vulnerability:** In `firestore.rules`, the `match /conversations/{convId}` rule allowed any participant to update the conversation document without restricting which fields could be updated. This meant a legitimate participant could maliciously alter the `participants` array, the `requestedBy` field, or the `createdAt` timestamp.
 **Learning:** Even when restricting document updates to authorized users (participants), the allowed updates must be strictly bounded. Allowing unrestrained updates on a document lets attackers bypass application logic (like replacing the entire participants list) or alter metadata used for security decisions.
 **Prevention:** Always restrict update payloads using `changedKeys().hasAny()` or `changedKeys().hasOnly()` to ensure that immutable core structural fields (like owners, IDs, or participants lists) cannot be modified through regular update flows.
+## 2024-10-24 - Remove Hardcoded Firebase Credentials
+**Vulnerability:** Hardcoded Firebase configuration values, including the apiKey, were checked directly into `src/lib/firebase.js`.
+**Learning:** Developers sometimes temporarily hardcode credentials for quick local testing and accidentally commit them, bypassing environment variables.
+**Prevention:** Always use `import.meta.env` for environment configurations in Vite projects, and consider adding pre-commit hooks (like `trufflehog` or custom git-hooks) to detect hardcoded secrets like "AIzaSy..." before they are committed.
