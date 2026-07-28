@@ -29,16 +29,21 @@ export default function ClickTheTarget() {
     startGameRef.current = startGame;
   });
 
+  const gameStateRef = useRef(gameState);
+  useEffect(() => {
+    gameStateRef.current = gameState;
+  }, [gameState]);
+
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if ((gameState === 'waiting' || gameState === 'result') && e.key === 'Enter' && e.target.tagName !== 'BUTTON') {
+      if ((gameStateRef.current === 'waiting' || gameStateRef.current === 'result') && e.key === 'Enter' && e.target.tagName !== 'BUTTON') {
         e.preventDefault();
         startGameRef.current?.();
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [gameState]);
+  }, []);
 
 
   const getRating = (s) => {

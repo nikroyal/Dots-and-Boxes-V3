@@ -62,19 +62,24 @@ export default function TypingSpeed() {
     }
   }, [gameState]);
 
+  const gameStateRef = useRef(gameState);
+  useEffect(() => {
+    gameStateRef.current = gameState;
+  }, [gameState]);
+
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
         return;
       }
-      if (e.key === 'Enter' && (gameState === 'waiting' || gameState === 'result')) {
+      if (e.key === 'Enter' && (gameStateRef.current === 'waiting' || gameStateRef.current === 'result')) {
         e.preventDefault();
         startGameRef.current?.();
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [gameState]);
+  }, []);
 
   useEffect(() => {
     return () => {
@@ -111,19 +116,7 @@ export default function TypingSpeed() {
       setTimeLeft((prev) => Math.max(0, prev - 1));
     }, 1000);
   }, [loadNewQuote]);
-  useEffect(() => {
-    const handleGlobalKeyDown = (e) => {
-      if (e.key === 'Enter') {
-        if (e.target.tagName === 'BUTTON') return;
-        if (gameState === 'waiting' || gameState === 'result') {
-          e.preventDefault();
-          startGame();
-        }
-      }
-    };
-    window.addEventListener('keydown', handleGlobalKeyDown);
-    return () => window.removeEventListener('keydown', handleGlobalKeyDown);
-  }, [gameState, startGame]);
+
 
   const endGame = useCallback(() => {
     if (timerRef.current) clearInterval(timerRef.current);

@@ -29,9 +29,14 @@ export default function MemoryMatch() {
     initializeGameRef.current = initializeGame;
   });
 
+  const isGameWonRef = useRef(isGameWon);
+  useEffect(() => {
+    isGameWonRef.current = isGameWon;
+  }, [isGameWon]);
+
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if (isGameWon && e.key === 'Enter' && e.target.tagName !== 'BUTTON') {
+      if (isGameWonRef.current && e.key === 'Enter' && e.target.tagName !== 'BUTTON') {
         e.preventDefault();
         sfx.click();
         if (initializeGameRef.current) initializeGameRef.current();
@@ -39,7 +44,7 @@ export default function MemoryMatch() {
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isGameWon]);
+  }, []);
 
   // Cleanup timeout on unmount
   useEffect(() => {

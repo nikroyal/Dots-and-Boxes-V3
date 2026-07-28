@@ -177,10 +177,18 @@ export default function WhackAMole() {
     startGameRef.current = startGame;
   }, [startGame]);
 
+  const gameStateRef = useRef(gameState);
+  const handleHoleClickRef = useRef(handleHoleClick);
+
+  useEffect(() => {
+    gameStateRef.current = gameState;
+    handleHoleClickRef.current = handleHoleClick;
+  }, [gameState, handleHoleClick]);
+
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if (gameState !== 'playing') {
-        if (e.key === 'Enter' && (gameState === 'waiting' || gameState === 'gameover')) {
+      if (gameStateRef.current !== 'playing') {
+        if (e.key === 'Enter' && (gameStateRef.current === 'waiting' || gameStateRef.current === 'gameover')) {
           const tagName = e.target?.tagName;
           if (tagName === 'BUTTON' || tagName === 'INPUT' || tagName === 'TEXTAREA' || tagName === 'A') {
             return;
@@ -197,12 +205,12 @@ export default function WhackAMole() {
       };
       if (keyMap[e.key] !== undefined) {
         e.preventDefault();
-        handleHoleClick(keyMap[e.key]);
+        if (handleHoleClickRef.current) handleHoleClickRef.current(keyMap[e.key]);
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [gameState, activeMole, startGame]);
+  }, []);
 
   return (
     <div className="fade-in max-w-2xl mx-auto flex flex-col items-center justify-center min-h-[60vh]">

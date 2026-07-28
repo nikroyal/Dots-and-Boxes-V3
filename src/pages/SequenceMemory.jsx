@@ -43,17 +43,25 @@ export default function SequenceMemory() {
     handlePadClickRef.current = handlePadClick;
   });
 
+  const gameStateRef = useRef(gameState);
+  const isPlayingSequenceRef = useRef(isPlayingSequence);
+
+  useEffect(() => {
+    gameStateRef.current = gameState;
+    isPlayingSequenceRef.current = isPlayingSequence;
+  }, [gameState, isPlayingSequence]);
+
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.repeat) return;
-      if ((gameState === 'waiting' || gameState === 'gameover') && e.key === 'Enter') {
+      if ((gameStateRef.current === 'waiting' || gameStateRef.current === 'gameover') && e.key === 'Enter') {
         const tagName = e.target?.tagName;
         if (tagName === 'BUTTON' || tagName === 'INPUT' || tagName === 'TEXTAREA' || tagName === 'A') {
           return;
         }
         e.preventDefault();
         if (startGameRef.current) startGameRef.current();
-      } else if (gameState === 'playing' && !isPlayingSequence) {
+      } else if (gameStateRef.current === 'playing' && !isPlayingSequenceRef.current) {
         const keyMap = {
           '1': 0, 'q': 0, 'Q': 0,
           '2': 1, 'w': 1, 'W': 1,
@@ -70,7 +78,7 @@ export default function SequenceMemory() {
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [gameState, isPlayingSequence]);
+  }, []);
 
   const clearAllTimeouts = () => {
     timeoutsRef.current.forEach(clearTimeout);

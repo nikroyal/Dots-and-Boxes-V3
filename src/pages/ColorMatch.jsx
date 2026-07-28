@@ -135,10 +135,15 @@ export default function ColorMatch() {
   }, [gameState, colorText, colorFill, generateColors, endGame]);
 
   const handleKeyDownRef = useRef();
+  const gameStateRef = useRef(gameState);
+
+  useEffect(() => {
+    gameStateRef.current = gameState;
+  }, [gameState]);
 
   useEffect(() => {
     handleKeyDownRef.current = (e) => {
-      if (gameState === 'playing') {
+      if (gameStateRef.current === 'playing') {
         if (e.key === 'ArrowLeft') {
           e.preventDefault();
           handleAnswer(true);
@@ -146,14 +151,14 @@ export default function ColorMatch() {
           e.preventDefault();
           handleAnswer(false);
         }
-      } else if (gameState === 'start' || gameState === 'gameover') {
+      } else if (gameStateRef.current === 'start' || gameStateRef.current === 'gameover') {
         if (e.key === 'Enter') {
           e.preventDefault();
           startGame();
         }
       }
     };
-  }, [gameState, handleAnswer, startGame]);
+  }, [handleAnswer, startGame]);
 
   useEffect(() => {
     const handleKeyDown = (e) => {
