@@ -185,7 +185,7 @@ export default function LocalChess() {
               <div className="font-mono text-[0.55rem] tracking-widest uppercase opacity-50">Note: Both players should agree on the timer settings.</div>
             </div>
           </div>
-          <button type="submit" className="btn-primary w-full justify-center">Start Match</button>
+          <button type="submit" className="btn-primary w-full justify-center" aria-label="Start local match">Start Match</button>
         </form>
       </div>
     );

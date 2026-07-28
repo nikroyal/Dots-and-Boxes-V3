@@ -281,7 +281,7 @@ export default function LocalDistrictExchange() {
               + Add Player
             </button>
           )}
-          <button onClick={handleStart} className="btn-primary w-full justify-center">Start Match</button>
+          <button onClick={handleStart} className="btn-primary w-full justify-center" aria-label="Start local match">Start Match</button>
         </div>
       </div>
     );

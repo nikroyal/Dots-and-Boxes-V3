@@ -36,3 +36,6 @@
 ## 2026-06-29 - Dynamic ARIA labels on repeated generic actions
 **Learning:** In lists of items (like friend requests) where every row contains the exact same visible action buttons ("Accept", "Decline", "Buy"), screen readers will read identical button text continuously without clarifying which item the action applies to.
 **Action:** Always attach dynamic `aria-label`s to generic action buttons inside mapped lists. Ensure the label clearly states the action AND the specific item or user it affects (e.g., ``aria-label={`Accept friend request from ${req.fromUsername}`}``).
+## 2024-05-18 - Missing ARIA on Buttons with Loading States
+**Learning:** Found multiple instances where asynchronous buttons (e.g. login, send challenge, match finding) were missing appropriate `aria-busy` and `aria-label` attributes when in a loading state. This is crucial for screen readers to convey that the system is processing something.
+**Action:** Always ensure that buttons triggering async tasks receive an `aria-busy={loadingState}` attribute and a dynamic `aria-label` providing feedback about the processing status (e.g., 'Authenticating' instead of 'Sign In').

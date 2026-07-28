@@ -142,7 +142,7 @@ export default function Login() {
             </div>
           )}
 
-          <button type="submit" disabled={loading} className="btn-primary w-full">
+          <button type="submit" disabled={loading} aria-busy={loading} aria-label={loading ? "Authenticating" : (mode === 'login' ? 'Sign In' : mode === 'signup' ? 'Create Account' : 'Send Reset Email')} className="btn-primary w-full">
             {loading ? '...'
               : mode === 'login' ? 'Sign In'
               : mode === 'signup' ? 'Create Account'

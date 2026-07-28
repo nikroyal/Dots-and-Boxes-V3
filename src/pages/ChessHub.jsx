@@ -207,11 +207,11 @@ export default function ChessHub() {
             />
           </div>
           <div className="flex flex-wrap gap-3">
-            <button type="submit" disabled={sending} className="btn-primary">
-              <Send size={14} /> Send Challenge
+            <button type="submit" disabled={sending} aria-busy={sending} aria-label={sending ? "Sending challenge" : "Send Challenge"} className="btn-primary">
+              <Send size={14} aria-hidden="true" /> Send Challenge
             </button>
-            <button type="button" onClick={handleQuickMatch} disabled={findingMatch} className="btn-ghost">
-              <Zap size={14} /> {findingMatch ? 'Finding…' : 'Quick Match'}
+            <button type="button" onClick={handleQuickMatch} disabled={findingMatch} aria-busy={findingMatch} aria-label={findingMatch ? "Finding quick match" : "Quick Match"} className="btn-ghost">
+              <Zap size={14} aria-hidden="true" /> {findingMatch ? 'Finding…' : 'Quick Match'}
             </button>
           </div>
         </form>

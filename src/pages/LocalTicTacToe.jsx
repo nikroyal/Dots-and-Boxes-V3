@@ -76,7 +76,7 @@ export default function LocalTicTacToe() {
               <input id="p2-name" value={p2Name} onChange={e => setP2Name(e.target.value)} className="w-full bg-black/5 dark:bg-white/5 border hairline px-3 py-2 font-display outline-none focus-ring" required maxLength={15} />
             </div>
           </div>
-          <button type="submit" className="btn-primary w-full justify-center">Start Match</button>
+          <button type="submit" className="btn-primary w-full justify-center" aria-label="Start local match">Start Match</button>
         </form>
       </div>
     );

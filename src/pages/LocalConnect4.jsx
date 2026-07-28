@@ -84,7 +84,7 @@ export default function LocalConnect4() {
               </div>
             </div>
           </div>
-          <button type="submit" className="btn-primary w-full justify-center">Start Match</button>
+          <button type="submit" className="btn-primary w-full justify-center" aria-label="Start local match">Start Match</button>
         </form>
       </div>
     );
