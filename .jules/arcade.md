@@ -65,3 +65,6 @@
 ## 2024-11-20 - Fast Timer Rendering
 **Learning:** Rendering a timer down to milliseconds using `setInterval` that triggers a React state update ~60 times a second can cause performance overhead by constantly re-rendering the entire component.
 **Action:** For highly precise sub-second timers, prefer using `requestAnimationFrame` attached directly to a DOM ref to avoid frequent, expensive React render cycles.
+## 2026-07-28 - Deep copying nested React state objects
+**Learning:** When updating 2D arrays of objects in React state (like game grids), performing a shallow clone (e.g., `[...grid.map(row => [...row])]`) leaves the inner object references intact. If you then mutate a property on one of those objects before setting state, you are mutating the previous state directly. This violates React's immutability principles, which can lead to tricky bugs or components not re-rendering correctly if references are compared downstream.
+**Action:** When updating a grid of objects, always perform a deep copy of the objects (e.g., `grid.map(row => row.map(cell => ({...cell})))`) before applying mutations to specific cells.

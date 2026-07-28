@@ -49,6 +49,7 @@ import MathFlash from './pages/MathFlash';
 
 import LocalDistrictExchange from './pages/LocalDistrictExchange';
 import DistrictExchangeHub from './pages/DistrictExchangeHub';
+import MineSweeper from './pages/MineSweeper';
 const Admin = lazy(() => import('./pages/Admin'));
 
 export default function App() {
@@ -121,6 +122,7 @@ function Shell() {
         <Route path="/quick-math" element={<QuickMath />} />
         <Route path="/whack-a-mole" element={<WhackAMole />} />
         <Route path="/rock-paper-scissors" element={<RockPaperScissors />} />
+        <Route path="/mine-sweeper" element={<MineSweeper />} />
         <Route path="/guess-the-number" element={<GuessTheNumber />} />
         <Route path="/click-the-target" element={<ClickTheTarget />} />
         <Route path="/sequence-memory" element={<SequenceMemory />} />
@@ -178,6 +180,7 @@ function Shell() {
               <Route path="/quick-math" element={<QuickMath />} />
               <Route path="/whack-a-mole" element={<WhackAMole />} />
               <Route path="/rock-paper-scissors" element={<RockPaperScissors />} />
+              <Route path="/mine-sweeper" element={<MineSweeper />} />
               <Route path="/guess-the-number" element={<GuessTheNumber />} />
               <Route path="/sequence-memory" element={<SequenceMemory />} />
               <Route path="/color-match" element={<ColorMatch />} />
