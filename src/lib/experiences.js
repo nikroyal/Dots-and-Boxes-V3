@@ -267,6 +267,21 @@ export const EXPERIENCE_CATALOG = [
     routePrefixes: ['/math-flash'],
   },
   {
+    id: 'codebreaker',
+    name: 'Codebreaker',
+    shortName: 'Codebreaker',
+    path: '/codebreaker',
+    kind: 'Puzzle',
+    status: 'Live',
+    accent: 'var(--forest)',
+    description: 'Crack the secret 4-color code in 10 attempts or less using logical deduction.',
+    features: ['Local play', 'Best attempts'],
+    navItems: [
+      { to: '/codebreaker', label: 'Play' },
+    ],
+    routePrefixes: ['/codebreaker'],
+  },
+  {
     id: 'reaction-timer',
     name: 'Reaction Timer',
     shortName: 'Reaction',

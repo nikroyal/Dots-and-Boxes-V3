@@ -65,3 +65,14 @@
 ## 2024-11-20 - Fast Timer Rendering
 **Learning:** Rendering a timer down to milliseconds using `setInterval` that triggers a React state update ~60 times a second can cause performance overhead by constantly re-rendering the entire component.
 **Action:** For highly precise sub-second timers, prefer using `requestAnimationFrame` attached directly to a DOM ref to avoid frequent, expensive React render cycles.
+## 2024-05-19 - Bash Escaping vs. Node Replace Logic
+
+**Learning:** When generating a JavaScript file (like a React component) using `cat << 'EOF'` that contains template literals with variables (`${var}`), special characters, and escaped newlines (`\n`), bash and Node string manipulation tools interact poorly. Regex replacements to fix syntax errors caused by double-escaping strings are brittle and prone to flag errors or missed cases.
+
+**Action:** When dynamically patching files containing template strings, avoid regex if possible. Use simple `.split(searchString).join(replaceString)` with explicit literal strings, or even better, construct the initial string block without complex escaping requirements by avoiding multiline bash commands when writing pure code.
+
+## 2024-05-19 - CSS Variable Fallbacks
+
+**Learning:** When using custom CSS variables (like `var(--cerulean)`) inline for styling in new games, if the variable isn't universally defined across the app's global stylesheet, the element might render transparent or incorrectly.
+
+**Action:** Always provide a robust fallback hex code in the inline style mapping (e.g., `var(--cerulean, #2980b9)`) to ensure the game remains visually intact regardless of the global CSS configuration.
