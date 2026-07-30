@@ -1,5 +1,20 @@
 export const EXPERIENCE_CATALOG = [
   {
+    id: 'higher-or-lower',
+    name: 'Higher or Lower',
+    shortName: 'Higher/Lower',
+    path: '/higher-or-lower',
+    kind: 'Arcade',
+    status: 'Live',
+    accent: 'var(--ochre)',
+    description: 'Guess if the next number will be higher or lower.',
+    features: ['Local play', 'Best streak'],
+    navItems: [
+      { to: '/higher-or-lower', label: 'Play' },
+    ],
+    routePrefixes: ['/higher-or-lower'],
+  },
+  {
     id: 'quick-math',
     name: 'Quick Math',
     shortName: 'Math',

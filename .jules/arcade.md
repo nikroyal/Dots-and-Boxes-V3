@@ -65,3 +65,6 @@
 ## 2024-11-20 - Fast Timer Rendering
 **Learning:** Rendering a timer down to milliseconds using `setInterval` that triggers a React state update ~60 times a second can cause performance overhead by constantly re-rendering the entire component.
 **Action:** For highly precise sub-second timers, prefer using `requestAnimationFrame` attached directly to a DOM ref to avoid frequent, expensive React render cycles.
+## 2024-05-23 - Higher or Lower Game
+   **Learning:** Created a new game called "Higher or Lower". Learned to manage game-over side effects in a dedicated useEffect to prevent stale state reads.
+   **Action:** When implementing Arcade games, always manage game-ending side effects in a useEffect hooked to the game state rather than inside the event closure directly.

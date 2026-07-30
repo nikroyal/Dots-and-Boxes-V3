@@ -46,6 +46,7 @@ import ColorMatch from './pages/ColorMatch';
 import SpeedGrid from './pages/SpeedGrid';
 import TypingSpeed from './pages/TypingSpeed';
 import MathFlash from './pages/MathFlash';
+import HigherOrLower from './pages/HigherOrLower';
 
 import LocalDistrictExchange from './pages/LocalDistrictExchange';
 import DistrictExchangeHub from './pages/DistrictExchangeHub';
@@ -128,6 +129,7 @@ function Shell() {
         <Route path="/speed-grid" element={<SpeedGrid />} />
         <Route path="/typing-speed" element={<TypingSpeed />} />
         <Route path="/math-flash" element={<MathFlash />} />
+        <Route path="/higher-or-lower" element={<HigherOrLower />} />
         <Route path="/speed-math" element={<SpeedMath />} />
         <Route path="/district-exchange/local" element={<LocalDistrictExchange />} />
         <Route path="/snake" element={<Snake />} />
@@ -185,6 +187,7 @@ function Shell() {
               <Route path="/click-the-target" element={<ClickTheTarget />} />
               <Route path="/typing-speed" element={<TypingSpeed />} />
               <Route path="/math-flash" element={<MathFlash />} />
+              <Route path="/higher-or-lower" element={<HigherOrLower />} />
               <Route path="/speed-math" element={<SpeedMath />} />
               <Route path="/snake" element={<Snake />} />
               <Route path="/battleships" element={<Battleships />} />
