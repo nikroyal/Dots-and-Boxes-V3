@@ -140,14 +140,19 @@ export default function AxiomHub() {
 
 
       {/* Active Objectives */}
-      {profile && (upNextAchievement || !dailyGoalCompleted) && (
+      {profile && (upNextAchievement || dailyGoal) && (
         <section className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {!dailyGoalCompleted && (
-            <Link to="/dots-and-boxes" className="block border hairline p-4 bg-black/5 hover:bg-black/10 transition-colors" style={{ borderColor: 'var(--hairline)' }}>
-              <div className="font-mono text-[0.55rem] tracking-widest uppercase mb-1 flex items-center gap-2 opacity-60">
-                <Target size={12} /> Daily Goal
-              </div>
-              <div className="font-display text-lg mb-3">{dailyGoal.text}</div>
+          <Link to="/dots-and-boxes" className="block border hairline p-4 bg-black/5 hover:bg-black/10 transition-colors" style={{ borderColor: dailyGoalCompleted ? 'var(--forest)' : 'var(--hairline)' }}>
+            <div className="font-mono text-[0.55rem] tracking-widest uppercase mb-1 flex items-center justify-between opacity-60">
+              <span className="flex items-center gap-2" style={{ color: dailyGoalCompleted ? 'var(--forest)' : 'currentColor', opacity: dailyGoalCompleted ? 1 : 0.6 }}>
+                <Target size={12} /> {dailyGoalCompleted ? 'Goal Completed' : 'Daily Goal'}
+              </span>
+              {dailyGoalCompleted && <Check size={12} style={{ color: 'var(--forest)' }} />}
+            </div>
+            <div className="font-display text-lg mb-3" style={{ opacity: dailyGoalCompleted ? 0.6 : 1 }}>
+              {dailyGoalCompleted ? 'Come back tomorrow for a new goal.' : dailyGoal.text}
+            </div>
+            {!dailyGoalCompleted && (
               <div>
                 <div className="flex justify-between font-mono text-[0.55rem] tracking-widest uppercase opacity-50 mb-1">
                   <span>Progress</span>
@@ -157,8 +162,8 @@ export default function AxiomHub() {
                   <div className="h-full transition-all duration-500 bg-current opacity-60" style={{ width: `${(dailyGoal.getProgress(dailyStats) / dailyGoal.max) * 100}%` }} />
                 </div>
               </div>
-            </Link>
-          )}
+            )}
+          </Link>
 
           {upNextAchievement && (
             <Link to="/achievements" className="block border hairline p-4 bg-black/5 hover:bg-black/10 transition-colors" style={{ borderColor: 'var(--ochre)' }}>

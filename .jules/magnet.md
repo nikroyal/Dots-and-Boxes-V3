@@ -96,3 +96,8 @@
 **Learning:** Highlighting goals that require only a binary, one-off action (like "play a game") inadvertently obscures goals that require sustained effort (like "play 100 games"). When a binary achievement completes, it hits 100% progress and dominates the immediate post-match screen, distracting the user from the actual incremental progress they are making.
 
 **Action:** When surfacing "closest" or "up next" goals/achievements, explicitly filter out binary or immediate-completion goals to ensure the user's attention is focused on targets that require ongoing engagement and repeated sessions.
+## 2024-05-14 - Exposing Hidden Progression
+
+**Learning:** Hidden progression systems (like unlockable avatars and titles accessible only through the profile edit screen) fail to drive engagement because users are unaware of the goals they can strive for.
+
+**Action:** Always surface locked cosmetics, titles, and achievements as a visible catalog of goals to create a continuous sense of progression and motivation.

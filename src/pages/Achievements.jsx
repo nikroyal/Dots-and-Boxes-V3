@@ -1,10 +1,12 @@
 import { useAuth } from '../lib/AuthContext';
-import { ACHIEVEMENTS } from '../lib/achievements';
+import { ACHIEVEMENTS, UNLOCKABLE_AVATARS, UNLOCKABLE_TITLES } from '../lib/achievements';
 
 export default function Achievements() {
   const { profile } = useAuth();
   if (!profile) return null;
   const unlocked = profile.unlockedAchievements || [];
+  const unlockedAvatars = UNLOCKABLE_AVATARS.filter(a => a.free || a.check(profile));
+  const unlockedTitles = UNLOCKABLE_TITLES.filter(a => a.free || a.check(profile));
   const progress = Math.round((unlocked.length / ACHIEVEMENTS.length) * 100);
 
   return (
@@ -54,6 +56,51 @@ export default function Achievements() {
             </div>
           );
         })}
+      </section>
+
+
+      <section>
+        <div className="font-mono text-[0.65rem] tracking-widest uppercase opacity-50 mb-2">
+          {unlockedAvatars.length} of {UNLOCKABLE_AVATARS.length} unlocked
+        </div>
+        <h2 className="font-display text-2xl font-medium tracking-tight mb-4">Avatars</h2>
+        <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-3">
+          {UNLOCKABLE_AVATARS.map(av => {
+            const got = av.free || av.check(profile);
+            return (
+              <div key={av.val} className="border hairline flex flex-col items-center justify-center p-3 relative transition-all group"
+                   style={{ opacity: got ? 1 : 0.4, background: got ? 'var(--paper-tint)' : 'transparent' }}>
+                <div className="font-display text-4xl mb-2">{av.val}</div>
+                {!got && <span className="absolute top-1 right-1 text-[0.5rem]">🔒</span>}
+                {!got && (
+                  <div className="absolute inset-0 bg-black/90 text-white p-2 text-center text-[0.55rem] font-mono tracking-widest uppercase leading-tight opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center z-10 pointer-events-none">
+                    {av.req}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </section>
+
+      <section>
+        <div className="font-mono text-[0.65rem] tracking-widest uppercase opacity-50 mb-2">
+          {unlockedTitles.length} of {UNLOCKABLE_TITLES.length} unlocked
+        </div>
+        <h2 className="font-display text-2xl font-medium tracking-tight mb-4">Titles</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          {UNLOCKABLE_TITLES.map(t => {
+            const got = t.free || t.check(profile);
+            return (
+              <div key={t.val} className="border hairline p-3 transition-all relative group"
+                   style={{ opacity: got ? 1 : 0.5, background: got ? 'var(--paper-tint)' : 'transparent' }}>
+                <div className="font-display text-lg">{t.val}</div>
+                {!got && <div className="font-mono text-[0.6rem] tracking-widest uppercase opacity-70 mt-1">🔒 {t.req}</div>}
+                {got && !t.free && <div className="font-mono text-[0.6rem] tracking-widest uppercase opacity-70 mt-1" style={{ color: 'var(--forest)' }}>✓ {t.req}</div>}
+              </div>
+            );
+          })}
+        </div>
       </section>
     </div>
   );
