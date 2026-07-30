@@ -75,6 +75,12 @@ export default function MemoryMatch() {
 
 
 
+  const getNextTierMessage = (moveCount) => {
+    if (moveCount <= 10) return "Target: ≤ 10 moves for ⭐⭐⭐";
+    if (moveCount <= 14) return "Target: ≤ 14 moves for ⭐⭐";
+    return "Target: ≤ 100 moves for ⭐";
+  };
+
   const getStars = (moveCount) => {
     if (moveCount <= 10) return "⭐⭐⭐";
     if (moveCount <= 14) return "⭐⭐";
@@ -168,7 +174,7 @@ export default function MemoryMatch() {
         </p>
         {!isGameWon && (
           <p className="font-mono text-xs tracking-widest uppercase opacity-50 mt-1">
-            Target: ≤ 10 moves for ⭐⭐⭐
+            {getNextTierMessage(moves)}
           </p>
         )}
         {isGameWon && (

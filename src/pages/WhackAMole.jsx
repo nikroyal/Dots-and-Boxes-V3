@@ -125,6 +125,13 @@ export default function WhackAMole() {
     return "🔨 Novice";
   };
 
+  const getNextTierMessage = (s) => {
+    if (s >= 300) return "You're at the top tier!";
+    if (s >= 200) return `${300 - s} points to Master tier`;
+    if (s >= 100) return `${200 - s} points to Pro tier`;
+    return `${100 - s} points to Good tier`;
+  };
+
   const handleShare = (e) => {
     e.stopPropagation();
     e.preventDefault();
@@ -234,7 +241,8 @@ export default function WhackAMole() {
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/10 z-10 backdrop-blur-[2px]">
             <p className="font-display text-3xl mb-2 text-[var(--crimson)]">Time's Up!</p>
             <p className="font-mono text-lg mb-1">Final Score: {score}</p>
-            <p className="font-display text-xl mb-6 text-[var(--ink)] opacity-90">{getRatingMessage(score)}</p>
+            <p className="font-display text-xl mb-1 text-[var(--ink)] opacity-90">{getRatingMessage(score)}</p>
+            <p className="font-mono text-xs opacity-60 tracking-widest uppercase mb-6">{getNextTierMessage(score)}</p>
             <div className="flex gap-4">
               <button onClick={startGame} className="btn-primary">
                 Play Again <span className="hidden sm:inline opacity-50 font-mono text-xs ml-2">(Enter)</span>
