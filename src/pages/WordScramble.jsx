@@ -217,6 +217,9 @@ export default function WordScramble() {
       <div className="relative border hairline card bg-[var(--paper-tint)] p-6 sm:p-8 w-full max-w-md">
         {gameState === 'waiting' && (
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/5 z-10 backdrop-blur-[1px]">
+            <p className="mb-4 text-center font-mono text-sm uppercase tracking-widest opacity-80">
+              Target: ≥ 200 for 🧠 Wordsmith
+            </p>
             <button onClick={startGame} className="btn-primary mb-2">
               Start Game <span className="hidden sm:inline opacity-50 font-mono text-xs ml-2">(Enter)</span>
             </button>

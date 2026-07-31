@@ -233,7 +233,7 @@ export default function TypingSpeed() {
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-[var(--paper-tint)] z-10">
             <p className="mb-6 font-display text-xl opacity-80 text-center px-4">
               Type the phrases as fast and accurately as possible in 60 seconds!<br/>
-              <span className="text-sm opacity-60 mt-2 block font-mono tracking-widest uppercase">Target: ≥ 60 WPM for 🚀</span>
+              <span className="text-sm opacity-60 mt-2 block font-mono tracking-widest uppercase">Target: ≥ 100 WPM for ⚡</span>
             </p>
             <button onClick={startGame} className="btn-primary mb-2">
               Start Test <span className="hidden sm:inline opacity-50 font-mono text-xs ml-2">(Enter)</span>

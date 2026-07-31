@@ -48,6 +48,13 @@ export default function ClickTheTarget() {
     return "🐢 Keep practicing";
   };
 
+  const getNextTierMessage = (s) => {
+    if (s >= 40) return "You're at the top tier!";
+    if (s >= 30) return `${40 - s} targets to Aimbot tier`;
+    if (s >= 20) return `${30 - s} targets to Sharpshooter tier`;
+    return `${20 - s} targets to Good tier`;
+  };
+
   const startGame = () => {
     sfx.click();
     setScore(0);
@@ -203,7 +210,8 @@ export default function ClickTheTarget() {
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-[var(--paper-tint)] fade-in">
              <div className="font-display text-4xl mb-2">Time's Up!</div>
              <div className="font-display text-2xl mb-2 opacity-80 text-[var(--forest)]">Score: {score}</div>
-             <div className="font-display text-xl mb-6 opacity-90">{getRating(score)}</div>
+             <div className="font-display text-xl mb-1 opacity-90">{getRating(score)}</div>
+             <div className="font-mono text-xs opacity-60 tracking-widest uppercase mb-6">{getNextTierMessage(score)}</div>
              <div className="flex gap-4">
                <button onClick={startGame} className="btn-primary">
                   Play Again <span className="hidden sm:inline opacity-50 font-mono text-xs ml-2">(Enter)</span>

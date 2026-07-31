@@ -165,10 +165,25 @@ export default function SpeedMath() {
     }
   };
 
+  const getRatingMessage = (s) => {
+    if (s >= 40) return "🚀 Human Calculator";
+    if (s >= 25) return "⚡ Lightning Fast";
+    if (s >= 15) return "🧠 Smart Cookie";
+    return "🐢 Beginner";
+  };
+
+  const getNextTierMessage = (s) => {
+    if (s >= 40) return "You're at the top tier!";
+    if (s >= 25) return `${40 - s} points to Human Calculator tier`;
+    if (s >= 15) return `${25 - s} points to Lightning Fast tier`;
+    return `${15 - s} points to Smart Cookie tier`;
+  };
+
   const handleShare = (e) => {
     e.stopPropagation();
     e.preventDefault();
-    const text = `I solved ${score} math problems in 60s in Axiom Speed Math! 🧮`;
+    const rating = getRatingMessage(score);
+    const text = `I solved ${score} math problems in 60s in Axiom Speed Math! ${rating}`;
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(text).then(() => {
         sfx.notify();
@@ -198,7 +213,8 @@ export default function SpeedMath() {
         {gameState === 'waiting' && (
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-[var(--paper-tint)] z-10">
             <p className="mb-6 font-display text-xl opacity-80 text-center px-4">
-              Solve as many basic math problems as you can in 60 seconds!
+              Solve as many basic math problems as you can in 60 seconds!<br/>
+              <span className="text-sm opacity-60 mt-2 block font-mono tracking-widest uppercase">Target: ≥ 40 for 🚀 Human Calculator</span>
             </p>
             <button onClick={startGame} className="btn-primary">
               Start Game (Enter)
@@ -209,7 +225,9 @@ export default function SpeedMath() {
         {gameState === 'result' && (
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-[var(--paper-tint)]/90 z-10 backdrop-blur-sm">
              <div className="font-display text-4xl mb-2 text-[var(--crimson)]">Time's Up!</div>
-             <div className="font-display text-3xl mb-6 opacity-90 text-[var(--forest)]">{score} Solved</div>
+             <div className="font-display text-3xl mb-1 opacity-90 text-[var(--forest)]">{score} Solved</div>
+             <div className="font-display text-xl mb-1 text-[var(--ink)] opacity-90">{getRatingMessage(score)}</div>
+             <div className="font-mono text-xs opacity-60 tracking-widest uppercase mb-6">{getNextTierMessage(score)}</div>
              <div className="flex gap-4">
                <button onClick={startGame} className="btn-primary">
                   Try Again (Enter)

@@ -93,3 +93,7 @@
 ## 2026-07-17 - Safe Fast Keyboard Shortcuts in React
 **Learning:** Implementing window-level `keydown` event listeners in React for fast core loops requires ensuring stable references or using refs so the listener invokes the latest function closure without stale state errors during fast restarts.
 **Action:** When adding global keyboard shortcuts to React games for quick restarting, ensure proper dependency arrays with useCallback or refs rather than binding stale functions directly into the listener.
+
+## 2024-05-18 - Explicit Target Context
+**Learning:** Games with star ratings based on move counts or time often lack context for new players. By explicitly stating the target required for the top rating upfront (e.g., "Target: ≤ 10 moves"), players instantly understand the goal and have a reason to replay.
+**Action:** Expose rating thresholds or "par" scores directly in the UI before or during the game, rather than only revealing them upon completion.

@@ -189,6 +189,9 @@ export default function QuickMath() {
       <div className="relative border hairline card bg-[var(--paper-tint)] p-6 sm:p-8 w-full max-w-md">
         {gameState === 'waiting' && (
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/5 z-10 backdrop-blur-[1px]">
+            <p className="mb-4 text-center font-mono text-sm uppercase tracking-widest opacity-80 px-4">
+              Target: ≥ 40 for 🚀 Human Calculator
+            </p>
             <button onClick={startGame} className="btn-primary">
               Start Game (Enter)
             </button>
