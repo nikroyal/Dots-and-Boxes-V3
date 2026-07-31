@@ -96,3 +96,8 @@
 **Learning:** Highlighting goals that require only a binary, one-off action (like "play a game") inadvertently obscures goals that require sustained effort (like "play 100 games"). When a binary achievement completes, it hits 100% progress and dominates the immediate post-match screen, distracting the user from the actual incremental progress they are making.
 
 **Action:** When surfacing "closest" or "up next" goals/achievements, explicitly filter out binary or immediate-completion goals to ensure the user's attention is focused on targets that require ongoing engagement and repeated sessions.
+## 2024-07-31 - Unlocking Hidden Value: Exposing Avatars and Titles
+
+**Learning:** Users lack motivation because they don't know what they can unlock. The avatars and titles existed but were hidden inside edit menus on the Profile page without any clear indication of progress. Users need explicitly visible short-to-medium-term goals to stay engaged.
+
+**Action:** Elevated Avatars and Titles to be first-class unlockables with progress tracking alongside Achievements on a new "Awards & Unlocks" page.

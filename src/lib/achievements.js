@@ -77,16 +77,16 @@ export const UNLOCKABLE_AVATARS = [
   { val: '◆', free: true }, { val: '◇', free: true }, { val: '●', free: true }, { val: '○', free: true },
   { val: '■', free: true }, { val: '□', free: true }, { val: '▲', free: true }, { val: '△', free: true },
   { val: '▼', free: true }, { val: '▽', free: true },
-  { val: '★', req: 'Reach 1200 ELO', check: s => (s.elo || 1000) >= 1200 },
-  { val: '☆', req: 'Reach 1500 ELO', check: s => (s.elo || 1000) >= 1500 },
-  { val: '♠', req: 'Win 50 games', check: s => (s.wins || 0) >= 50 },
-  { val: '♣', req: 'Win 100 games', check: s => (s.wins || 0) >= 100 },
-  { val: '♥', req: 'Have 5+ friends', check: s => (Array.isArray(s.friends) ? s.friends.length : 0) >= 5 },
-  { val: '♦', req: 'Win 10 in a row', check: s => (s.bestWinStreak || 0) >= 10 },
-  { val: '✦', req: 'Reach 1800 ELO', check: s => (s.elo || 1000) >= 1800 },
-  { val: '✧', req: 'Reach 2000 ELO', check: s => (s.elo || 1000) >= 2000 },
-  { val: '◉', req: 'Claim 1000 boxes', check: s => (s.totalBoxes || 0) >= 1000 },
-  { val: '⬢', req: 'Complete 10 Daily Goals', check: s => (s.dailyGoalsCompleted || 0) >= 10 },
+  { val: '★', req: 'Reach 1200 ELO', check: s => (s.elo || 1000) >= 1200, progress: s => [Math.max(1000, s.elo || 1000), 1200, 1000] },
+  { val: '☆', req: 'Reach 1500 ELO', check: s => (s.elo || 1000) >= 1500, progress: s => [Math.max(1000, s.elo || 1000), 1500, 1000] },
+  { val: '♠', req: 'Win 50 games', check: s => (s.wins || 0) >= 50, progress: s => [s.wins || 0, 50] },
+  { val: '♣', req: 'Win 100 games', check: s => (s.wins || 0) >= 100, progress: s => [s.wins || 0, 100] },
+  { val: '♥', req: 'Have 5+ friends', check: s => (Array.isArray(s.friends) ? s.friends.length : 0) >= 5, progress: s => [Array.isArray(s.friends) ? s.friends.length : 0, 5] },
+  { val: '♦', req: 'Win 10 in a row', check: s => (s.bestWinStreak || 0) >= 10, progress: s => [s.bestWinStreak || 0, 10] },
+  { val: '✦', req: 'Reach 1800 ELO', check: s => (s.elo || 1000) >= 1800, progress: s => [Math.max(1000, s.elo || 1000), 1800, 1000] },
+  { val: '✧', req: 'Reach 2000 ELO', check: s => (s.elo || 1000) >= 2000, progress: s => [Math.max(1000, s.elo || 1000), 2000, 1000] },
+  { val: '◉', req: 'Claim 1000 boxes', check: s => (s.totalBoxes || 0) >= 1000, progress: s => [s.totalBoxes || 0, 1000] },
+  { val: '⬢', req: 'Complete 10 Daily Goals', check: s => (s.dailyGoalsCompleted || 0) >= 10, progress: s => [s.dailyGoalsCompleted || 0, 10] },
 ];
 
 export const AVATAR_OPTIONS = UNLOCKABLE_AVATARS.map(a => a.val);
@@ -94,15 +94,15 @@ AVATAR_OPTIONS.freeCount = UNLOCKABLE_AVATARS.filter(a => a.free).length;
 
 export const UNLOCKABLE_TITLES = [
   { val: 'Novice', free: true },
-  { val: 'Apprentice', req: 'Play 10 games', check: s => (s.gamesPlayed || 0) >= 10 },
-  { val: 'Player', req: 'Reach 1200 ELO', check: s => (s.elo || 1000) >= 1200 },
-  { val: 'Strategist', req: 'Win 50 games', check: s => (s.wins || 0) >= 50 },
-  { val: 'Tactician', req: 'Reach 1500 ELO', check: s => (s.elo || 1000) >= 1500 },
-  { val: 'Master', req: 'Reach 2000 ELO', check: s => (s.elo || 1000) >= 2000 },
-  { val: 'Grandmaster', req: 'Reach 2500 ELO', check: s => (s.elo || 1000) >= 2500 },
-  { val: 'Legend', req: 'Reach 3000 ELO', check: s => (s.elo || 1000) >= 3000 },
-  { val: 'The Patient', req: 'Lose 25 games', check: s => (s.losses || 0) >= 25 },
-  { val: 'The Bold', req: 'Win in under 2 minutes', check: s => (s.fastestWin ?? Infinity) < 120000 },
+  { val: 'Apprentice', req: 'Play 10 games', check: s => (s.gamesPlayed || 0) >= 10, progress: s => [s.gamesPlayed || 0, 10] },
+  { val: 'Player', req: 'Reach 1200 ELO', check: s => (s.elo || 1000) >= 1200, progress: s => [Math.max(1000, s.elo || 1000), 1200, 1000] },
+  { val: 'Strategist', req: 'Win 50 games', check: s => (s.wins || 0) >= 50, progress: s => [s.wins || 0, 50] },
+  { val: 'Tactician', req: 'Reach 1500 ELO', check: s => (s.elo || 1000) >= 1500, progress: s => [Math.max(1000, s.elo || 1000), 1500, 1000] },
+  { val: 'Master', req: 'Reach 2000 ELO', check: s => (s.elo || 1000) >= 2000, progress: s => [Math.max(1000, s.elo || 1000), 2000, 1000] },
+  { val: 'Grandmaster', req: 'Reach 2500 ELO', check: s => (s.elo || 1000) >= 2500, progress: s => [Math.max(1000, s.elo || 1000), 2500, 1000] },
+  { val: 'Legend', req: 'Reach 3000 ELO', check: s => (s.elo || 1000) >= 3000, progress: s => [Math.max(1000, s.elo || 1000), 3000, 1000] },
+  { val: 'The Patient', req: 'Lose 25 games', check: s => (s.losses || 0) >= 25, progress: s => [s.losses || 0, 25] },
+  { val: 'The Bold', req: 'Win in under 2 minutes', check: s => (s.fastestWin ?? Infinity) < 120000, progress: s => [(s.fastestWin && s.fastestWin < 120000) ? 1 : 0, 1] },
 ];
 
 export const TITLE_OPTIONS = UNLOCKABLE_TITLES.map(t => t.val);
