@@ -36,3 +36,6 @@
 ## 2026-06-29 - Dynamic ARIA labels on repeated generic actions
 **Learning:** In lists of items (like friend requests) where every row contains the exact same visible action buttons ("Accept", "Decline", "Buy"), screen readers will read identical button text continuously without clarifying which item the action applies to.
 **Action:** Always attach dynamic `aria-label`s to generic action buttons inside mapped lists. Ensure the label clearly states the action AND the specific item or user it affects (e.g., ``aria-label={`Accept friend request from ${req.fromUsername}`}``).
+## 2026-06-29 - Missing id and htmlFor on React mapping loops
+**Learning:** Form labels and inputs inside \`.map()\` loops often rely on visual layout to associate them instead of explicit programmatic links, or use only \`aria-label\` without explicitly linking the \`<label>\` wrapper.
+**Action:** Ensure all \`<label>\` tags explicitly target their respective \`<input>\` elements using dynamically generated \`htmlFor\` and \`id\` attributes matched to the map index or item ID.

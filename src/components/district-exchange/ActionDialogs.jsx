@@ -494,8 +494,8 @@ function ProposeTradeDialog({ gameState, currentPlayerId, onClose, onAction, pla
                 {me.properties.length === 0 ? <div className="text-sm opacity-50">None</div> : (
                   <div className="space-y-1">
                     {me.properties.map(pid => (
-                      <label key={pid} className="flex items-center gap-2 text-sm cursor-pointer hover:bg-black/5 p-1 rounded">
-                        <input type="checkbox" checked={offerProps.includes(pid)} onChange={() => toggleProp(pid, true)} />
+                      <label key={pid} htmlFor={"offer-prop-" + pid} className="flex items-center gap-2 text-sm cursor-pointer hover:bg-black/5 p-1 rounded">
+                        <input id={"offer-prop-" + pid} type="checkbox" checked={offerProps.includes(pid)} onChange={() => toggleProp(pid, true)} />
                         {gameState.boardSpaces[pid].name}
                       </label>
                     ))}
@@ -541,8 +541,8 @@ function ProposeTradeDialog({ gameState, currentPlayerId, onClose, onAction, pla
                 {target.properties.length === 0 ? <div className="text-sm opacity-50">None</div> : (
                   <div className="space-y-1">
                     {target.properties.map(pid => (
-                      <label key={pid} className="flex items-center gap-2 text-sm cursor-pointer hover:bg-black/5 p-1 rounded">
-                        <input type="checkbox" checked={reqProps.includes(pid)} onChange={() => toggleProp(pid, false)} />
+                      <label key={pid} htmlFor={"req-prop-" + pid} className="flex items-center gap-2 text-sm cursor-pointer hover:bg-black/5 p-1 rounded">
+                        <input id={"req-prop-" + pid} type="checkbox" checked={reqProps.includes(pid)} onChange={() => toggleProp(pid, false)} />
                         {gameState.boardSpaces[pid].name}
                       </label>
                     ))}

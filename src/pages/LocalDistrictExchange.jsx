@@ -232,14 +232,18 @@ export default function LocalDistrictExchange() {
           <div className="space-y-4">
             {players.map((p, i) => (
               <div key={i} className="flex items-center gap-2">
+                <label htmlFor={"p" + i + "-color"} className="sr-only">Player {i + 1} Color</label>
                 <input
+                  id={"p" + i + "-color"}
                   type="color"
                   value={p.color}
                   onChange={e => handleUpdatePlayer(i, 'color', e.target.value)}
                   className="w-10 h-10 p-0 border-0 cursor-pointer"
                   aria-label={`Player ${i + 1} Color`}
                 />
+                <label htmlFor={"p" + i + "-name"} className="sr-only">Player {i + 1} Name</label>
                 <input
+                  id={"p" + i + "-name"}
                   value={p.name}
                   onChange={e => handleUpdatePlayer(i, 'name', e.target.value)}
                   className="flex-1 bg-black/5 dark:bg-white/5 border hairline px-3 py-2 font-display outline-none focus-ring"

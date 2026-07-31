@@ -165,9 +165,9 @@ export default function Header() {
                     </div>
                   </div>
                   <div className="pt-1 border-t hairline" />
-                  <label className="flex items-center justify-between gap-2 cursor-pointer">
+                  <label htmlFor="reduce-motion-checkbox" className="flex items-center justify-between gap-2 cursor-pointer">
                     <span className="font-mono text-[0.65rem] tracking-widest uppercase opacity-80">Reduced motion</span>
-                    <input type="checkbox" checked={motionState} onChange={toggleMotion}
+                    <input id="reduce-motion-checkbox" type="checkbox" checked={motionState} onChange={toggleMotion}
                            aria-label="Reduce animations"
                            style={{ accentColor: 'var(--ink)' }} />
                   </label>
