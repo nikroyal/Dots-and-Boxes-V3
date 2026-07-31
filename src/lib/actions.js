@@ -30,6 +30,7 @@ const GAMES_LOWER_SCORE_IS_BETTER = new Set([
   'memory-match',
   'guess-the-number',
   'speed-grid',
+  'lights-out',
 ]);
 
 // ─── Guard ────────────────────────────────────────────────────────────────

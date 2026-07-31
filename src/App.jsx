@@ -44,6 +44,7 @@ import ClickTheTarget from './pages/ClickTheTarget';
 import SequenceMemory from './pages/SequenceMemory';
 import ColorMatch from './pages/ColorMatch';
 import SpeedGrid from './pages/SpeedGrid';
+import LightsOut from './pages/LightsOut';
 import TypingSpeed from './pages/TypingSpeed';
 import MathFlash from './pages/MathFlash';
 
@@ -111,6 +112,7 @@ function Shell() {
     return (
       <Routes>
         <Route path="/login" element={<Login />} />
+        <Route path="/lights-out" element={<LightsOut />} />
         <Route path="/local" element={<LocalMatch />} />
         <Route path="/connect4/local" element={<LocalConnect4 />} />
         <Route path="/tictactoe/local" element={<LocalTicTacToe />} />
@@ -165,6 +167,7 @@ function Shell() {
           <Suspense fallback={<LoadingScreen />}>
             <Routes>
               <Route path="/" element={<AxiomHub />} />
+              <Route path="/lights-out" element={<LightsOut />} />
               <Route path="/dots-and-boxes" element={<DotsHome />} />
               <Route path="/connect4" element={<Connect4Hub />} />
               <Route path="/tictactoe" element={<TicTacToeHub />} />

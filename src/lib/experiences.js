@@ -1,5 +1,20 @@
 export const EXPERIENCE_CATALOG = [
   {
+    id: 'lights-out',
+    name: 'Lights Out',
+    shortName: 'Lights',
+    path: '/lights-out',
+    kind: 'Puzzle',
+    status: 'Live',
+    accent: 'var(--ochre)',
+    description: 'Turn off all the lights. Clicking a light toggles it and its adjacent lights.',
+    features: ['Local play', 'Fewest moves'],
+    navItems: [
+      { to: '/lights-out', label: 'Play' },
+    ],
+    routePrefixes: ['/lights-out'],
+  },
+  {
     id: 'quick-math',
     name: 'Quick Math',
     shortName: 'Math',
