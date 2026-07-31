@@ -55,3 +55,7 @@
 **Vulnerability:** In `firestore.rules`, the `match /conversations/{convId}` rule allowed any participant to update the conversation document without restricting which fields could be updated. This meant a legitimate participant could maliciously alter the `participants` array, the `requestedBy` field, or the `createdAt` timestamp.
 **Learning:** Even when restricting document updates to authorized users (participants), the allowed updates must be strictly bounded. Allowing unrestrained updates on a document lets attackers bypass application logic (like replacing the entire participants list) or alter metadata used for security decisions.
 **Prevention:** Always restrict update payloads using `changedKeys().hasAny()` or `changedKeys().hasOnly()` to ensure that immutable core structural fields (like owners, IDs, or participants lists) cannot be modified through regular update flows.
+## 2025-02-20 - Removed Hardcoded Secrets in Firebase Config
+**Vulnerability:** Hardcoded API key and Firebase configuration details were present in `src/lib/firebase.js`.
+**Learning:** Storing secrets or configuration keys directly in the client-side source code exposes them to anyone viewing the application bundle, leading to potential unauthorized access or abuse of the backend services.
+**Prevention:** Always use environment variables (e.g., `import.meta.env`) for configuration that varies by environment or could be considered sensitive, and never commit API keys to version control.
