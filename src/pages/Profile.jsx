@@ -75,8 +75,9 @@ export default function Profile() {
     let best = null;
     let highestPct = -1;
     const unlocked = target.unlockedAchievements || [];
+    const unlockedSet = new Set(unlocked);
     for (const a of ACHIEVEMENTS) {
-      if (!unlocked.includes(a.id) && a.progress) {
+      if (!unlockedSet.has(a.id) && a.progress) {
         const [curr, max, min = 0] = a.progress(target);
         const pct = max === min ? 0 : Math.min(100, Math.max(0, ((curr - min) / (max - min)) * 100));
         // Only show if it has some progress (not 0/1 binary)
@@ -334,8 +335,10 @@ export default function Profile() {
               </div>
             </div>
           )}
-          {ACHIEVEMENTS.map(a => {
-            const unlocked = (target.unlockedAchievements || []).includes(a.id);
+          {(() => {
+            const unlockedSetMap = new Set(target.unlockedAchievements || []);
+            return ACHIEVEMENTS.map(a => {
+            const unlocked = unlockedSetMap.has(a.id);
             return (
               <div key={a.id} className="border hairline p-3" style={{ opacity: unlocked ? 1 : 0.5 }}>
                 <div className="font-display text-base">{a.name}</div>
@@ -352,7 +355,7 @@ export default function Profile() {
                 })()}
               </div>
             );
-          })}
+          })})()}
         </div>
       </section>
     </div>

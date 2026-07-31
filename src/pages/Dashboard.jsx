@@ -148,8 +148,9 @@ export default function Dashboard() {
     let best = null;
     let highestPct = -1;
     const unlocked = profile.unlockedAchievements || [];
+    const unlockedSet = new Set(unlocked);
     for (const a of ACHIEVEMENTS) {
-      if (!unlocked.includes(a.id) && a.progress) {
+      if (!unlockedSet.has(a.id) && a.progress) {
         const [curr, max, min = 0] = a.progress(profile);
         const pct = max === min ? 0 : Math.min(100, Math.max(0, ((curr - min) / (max - min)) * 100));
         // Only show if it has some progress (not 0/1 binary)

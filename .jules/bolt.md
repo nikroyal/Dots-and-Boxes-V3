@@ -84,3 +84,7 @@
 ## 2024-05-20 - Prevent 1-second re-renders on expensive Match components
 **Learning:** In the `Match` family of components (`Match.jsx`, `MatchConnect4.jsx`, `MatchTicTacToe.jsx`, `MatchChess.jsx`), a 1-second ticker state (`now`) drives the turn timer UI. Any expensive child component (like `Board` or `<Chessboard>`) rendered within these match pages that does not depend on `now` will unnecessarily re-render every single second, creating a severe performance bottleneck.
 **Action:** Always wrap expensive child components (like `Board` or `<Chessboard>`) inside match pages in `React.memo()`. Crucially, ensure all object/array props passed to it are either hoisted statically outside the component or explicitly memoized using `useMemo()` to guarantee referential stability across the ticker's render cycles.
+
+## 2024-05-24 - O(1) Set lookups in render loops
+**Learning:** Using `Array.includes()` inside a `.map()` render loop over a static configuration array (like `ACHIEVEMENTS`) creates an O(N²) time complexity bottleneck. While N might be relatively small initially, it scales poorly and blocks the main thread during React renders.
+**Action:** When computing unlocked items or flags inside a component, convert the underlying array (`profile.unlockedAchievements`) to a `Set` via `const unlockedSet = new Set(unlocked);` outside the mapping iteration. Then use `unlockedSet.has(a.id)` for O(1) lookup performance inside the render loop, completely bypassing the nested loop overhead.

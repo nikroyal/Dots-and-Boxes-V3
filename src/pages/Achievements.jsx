@@ -5,6 +5,7 @@ export default function Achievements() {
   const { profile } = useAuth();
   if (!profile) return null;
   const unlocked = profile.unlockedAchievements || [];
+  const unlockedSet = new Set(unlocked);
   const progress = Math.round((unlocked.length / ACHIEVEMENTS.length) * 100);
 
   return (
@@ -21,7 +22,7 @@ export default function Achievements() {
 
       <section className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         {ACHIEVEMENTS.map(a => {
-          const got = unlocked.includes(a.id);
+          const got = unlockedSet.has(a.id);
           return (
             <div key={a.id} className="border hairline p-4 transition-all" style={{ opacity: got ? 1 : 0.6 }}>
               <div className="flex items-start justify-between gap-3">
