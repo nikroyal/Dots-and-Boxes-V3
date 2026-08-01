@@ -89,7 +89,7 @@ export default function SpeedGrid() {
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (gameState === 'start' || gameState === 'gameover') {
-        if (e.key === 'Enter') {
+        if (e.key === 'Enter' && e.target.tagName !== 'BUTTON' && e.target.tagName !== 'A' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
           e.preventDefault();
           startGame();
         }

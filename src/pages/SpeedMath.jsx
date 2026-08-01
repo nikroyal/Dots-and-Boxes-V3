@@ -119,7 +119,7 @@ export default function SpeedMath() {
   }, []);
 
   const handleKeyDown = useCallback((e) => {
-    if (e.key === 'Enter' && (gameState === 'waiting' || gameState === 'result' || gameState === 'gameover')) {
+    if (e.key === 'Enter' && (gameState === 'waiting' || gameState === 'result' || gameState === 'gameover') && e.target.tagName !== 'BUTTON' && e.target.tagName !== 'A' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
       e.preventDefault();
       startGame();
     }

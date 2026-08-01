@@ -66,7 +66,7 @@ export default function WordScramble() {
 
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'BUTTON' || e.target.tagName === 'A') {
         return;
       }
       if (e.key === 'Enter' && (gameState === 'waiting' || gameState === 'gameover')) {
@@ -119,7 +119,7 @@ export default function WordScramble() {
   useEffect(() => {
     const handleGlobalKeyDown = (e) => {
       if (e.key === 'Enter') {
-        if (e.target.tagName === 'BUTTON') return;
+        if (e.target.tagName === 'BUTTON' || e.target.tagName === 'A' || e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
         if (gameState === 'waiting' || gameState === 'gameover') {
           e.preventDefault();
           startGame();

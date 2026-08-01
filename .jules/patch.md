@@ -37,3 +37,6 @@
 ## 2026-06-26 - Operator Precedence with Ternary Array Checks
 **Learning:** When using ternary inline checks like `Array.isArray(arr) ? arr.length : 0` to index into an array (e.g., to find the last item `arr[... - 1]`), failing to wrap the ternary in parentheses causes operator precedence bugs (`0 - 1` evaluates first).
 **Action:** Always wrap ternary expressions in parentheses when performing arithmetic on their result: `(Array.isArray(arr) ? arr.length : 0) - 1`.
+## 2024-10-25 - Global Keydown Event Handlers Intercepting Input Focus
+**Learning:** In interactive React games, adding a global `keydown` event listener to handle `Enter` for game restarts can accidentally intercept key presses when users are focused on interactive elements like `BUTTON`, `A`, `INPUT`, or `TEXTAREA`. Previously only `BUTTON` was ignored.
+**Action:** When implementing global keydown handlers, explicitly check `e.target.tagName` and ignore the event if it originates from any standard interactive element (`BUTTON`, `A`, `INPUT`, `TEXTAREA`) to prevent breaking default browser behavior.

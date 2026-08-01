@@ -50,7 +50,7 @@ export default function Snake() {
 
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if ((gameStateRef.current === 'waiting' || gameStateRef.current === 'gameover') && e.key === 'Enter' && e.target.tagName !== 'BUTTON') {
+      if ((gameStateRef.current === 'waiting' || gameStateRef.current === 'gameover') && e.key === 'Enter' && e.target.tagName !== 'BUTTON' && e.target.tagName !== 'A' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
         e.preventDefault();
         if (startGameRef.current) startGameRef.current();
       }

@@ -119,7 +119,7 @@ export default function QuickMath() {
   }, [gameState]);
 
   const handleKeyDown = useCallback((e) => {
-    if (e.key === 'Enter' && (gameState === 'waiting' || gameState === 'gameover')) {
+    if (e.key === 'Enter' && (gameState === 'waiting' || gameState === 'gameover') && e.target.tagName !== 'BUTTON' && e.target.tagName !== 'A' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
       e.preventDefault();
       startGame();
     }

@@ -147,7 +147,7 @@ export default function ColorMatch() {
           handleAnswer(false);
         }
       } else if (gameState === 'start' || gameState === 'gameover') {
-        if (e.key === 'Enter') {
+        if (e.key === 'Enter' && e.target.tagName !== 'BUTTON' && e.target.tagName !== 'A' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
           e.preventDefault();
           startGame();
         }
