@@ -4,7 +4,7 @@ import { Play, Star, Target, Trophy, Users, Zap, LayoutGrid, Check } from 'lucid
 import { EXPERIENCE_CATALOG } from '../lib/experiences';
 import { useAuth } from '../lib/AuthContext';
 import { sfx } from '../lib/sound';
-import { getRankInfo, ACHIEVEMENTS } from '../lib/achievements';
+import { getRankInfo, ACHIEVEMENTS, getUpNextAchievement } from '../lib/achievements';
 import { getDailyGoal, getLocalYYYYMMDD } from '../lib/daily';
 
 const FAVORITES_KEY = 'axiom-favorite-experiences';
@@ -38,30 +38,8 @@ export default function AxiomHub() {
   const nextRank = rankInfo?.nextRank;
   const rankProgress = rankInfo?.progress;
 
-  const upNextAchievement = useMemo(() => {
-    if (!profile) return null;
-    let best = null;
-    let highestPct = -1;
-    const unlocked = profile.unlockedAchievements || [];
-    for (const a of ACHIEVEMENTS) {
-      if (!unlocked.includes(a.id) && a.progress) {
-        const [curr, max, min = 0] = a.progress(profile);
-        const pct = max === min ? 0 : Math.min(100, Math.max(0, ((curr - min) / (max - min)) * 100));
-        if (pct > 0 && pct < 100 && max > 1 && pct > highestPct) {
-          highestPct = pct;
-          best = { a, curr, max, pct };
-        }
-      }
-    }
-    if (!best) {
-      const firstLocked = ACHIEVEMENTS.find(a => !unlocked.includes(a.id));
-      if (firstLocked && firstLocked.progress) {
-        const [curr, max, min = 0] = firstLocked.progress(profile);
-        const pct = max === min ? 0 : Math.min(100, Math.max(0, ((curr - min) / (max - min)) * 100));
-        best = { a: firstLocked, curr, max, pct };
-      }
-    }
-    return best;
+    const upNextAchievement = useMemo(() => {
+    return getUpNextAchievement(profile);
   }, [profile]);
 
   useEffect(() => {
