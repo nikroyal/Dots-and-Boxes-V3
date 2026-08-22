@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { collection, query, where, onSnapshot } from 'firebase/firestore';
 import { db } from '../lib/firebase';
@@ -143,8 +143,10 @@ export default function Dashboard() {
   const dailyStats = profile.dailyStats?.date === today ? profile.dailyStats : { wins: 0, gamesPlayed: 0, totalBoxes: 0, biggestChain: 0 };
   const dailyGoalCompleted = profile.dailyGoalDate === today || dailyGoal.check(dailyStats);
 
-  // Find the locked achievement with the highest progress percentage
-  const upNextAchievement = (() => {
+  // Optimization (Bolt): Memoize the O(N) achievement progress calculation.
+  // Previously, this complex loop over all ACHIEVEMENTS ran on every Dashboard render
+  // (which happens every 20s due to presence heartbeats or whenever local state changes).
+  const upNextAchievement = useMemo(() => {
     let best = null;
     let highestPct = -1;
     const unlocked = profile.unlockedAchievements || [];
@@ -160,7 +162,7 @@ export default function Dashboard() {
       }
     }
     return best;
-  })();
+  }, [profile]);
 
   const handleInvite = async (e) => {
     e.preventDefault();
