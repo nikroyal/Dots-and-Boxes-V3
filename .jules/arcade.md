@@ -65,3 +65,6 @@
 ## 2024-11-20 - Fast Timer Rendering
 **Learning:** Rendering a timer down to milliseconds using `setInterval` that triggers a React state update ~60 times a second can cause performance overhead by constantly re-rendering the entire component.
 **Action:** For highly precise sub-second timers, prefer using `requestAnimationFrame` attached directly to a DOM ref to avoid frequent, expensive React render cycles.
+## 2024-08-22 - Avoid Duplicate API Calls on Game Over
+**Learning:** When recording end-of-game activities in React, using a `useEffect` triggered by `gameState === 'gameover'` without a strict one-time guard flag (like a `hasRecorded` ref) can cause duplicate API calls on re-renders, especially if variables like `bestScore` are updated and included in the dependency array.
+**Action:** To safely record scores, either implement a strict guard flag inside the `useEffect`, or ideally place the logging logic directly inside the game-ending event handler (e.g., `handleGuess`) while carefully managing state to avoid reading stale variables.

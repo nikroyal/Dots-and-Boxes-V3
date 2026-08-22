@@ -40,6 +40,7 @@ import QuickMath from './pages/QuickMath';
 import RockPaperScissors from './pages/RockPaperScissors';
 import GuessTheNumber from './pages/GuessTheNumber';
 import SpeedMath from './pages/SpeedMath';
+import HigherLower from './pages/HigherLower';
 import ClickTheTarget from './pages/ClickTheTarget';
 import SequenceMemory from './pages/SequenceMemory';
 import ColorMatch from './pages/ColorMatch';
@@ -129,6 +130,7 @@ function Shell() {
         <Route path="/typing-speed" element={<TypingSpeed />} />
         <Route path="/math-flash" element={<MathFlash />} />
         <Route path="/speed-math" element={<SpeedMath />} />
+        <Route path="/higher-lower" element={<HigherLower />} />
         <Route path="/district-exchange/local" element={<LocalDistrictExchange />} />
         <Route path="/snake" element={<Snake />} />
         <Route path="/battleships" element={<Battleships />} />
@@ -186,6 +188,7 @@ function Shell() {
               <Route path="/typing-speed" element={<TypingSpeed />} />
               <Route path="/math-flash" element={<MathFlash />} />
               <Route path="/speed-math" element={<SpeedMath />} />
+              <Route path="/higher-lower" element={<HigherLower />} />
               <Route path="/snake" element={<Snake />} />
               <Route path="/battleships" element={<Battleships />} />
               <Route path="/lobby" element={<Lobby />} />
