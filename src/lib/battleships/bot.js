@@ -177,7 +177,7 @@ export function getBotMove(shotGrid, difficulty = 3, targetGrid, targetShips) {
       if (isHorizontal) {
         targetCluster.sort((a, b) => a.c - b.c);
         const minC = targetCluster[0].c;
-        const maxC = targetCluster[targetCluster.length - 1].c;
+        const maxC = Array.isArray(targetCluster) && targetCluster.length > 0 ? targetCluster[targetCluster.length - 1].c : minC;
         const r = targetCluster[0].r;
 
         // Any missing pieces in the middle? (rare but possible with weird overlap)
@@ -193,7 +193,7 @@ export function getBotMove(shotGrid, difficulty = 3, targetGrid, targetShips) {
       } else if (isVertical) {
         targetCluster.sort((a, b) => a.r - b.r);
         const minR = targetCluster[0].r;
-        const maxR = targetCluster[targetCluster.length - 1].r;
+        const maxR = Array.isArray(targetCluster) && targetCluster.length > 0 ? targetCluster[targetCluster.length - 1].r : minR;
         const c = targetCluster[0].c;
 
         for (let r = minR + 1; r < maxR; r++) {

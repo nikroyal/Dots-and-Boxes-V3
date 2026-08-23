@@ -186,7 +186,7 @@ export default function LocalMatch() {
               const owner = game.boxes[`${r},${c}`];
               if (!owner) return null;
               const color = owner === 'p1' ? PLAYER_COLORS[0] : PLAYER_COLORS[1];
-              const lastMove = game.moves[game.moves.length - 1];
+              const lastMove = Array.isArray(game.moves) && game.moves.length > 0 ? game.moves[game.moves.length - 1] : undefined;
               const isJustClaimed = !!lastMove && lastMove.claimedBoxes?.some(b => b.r === r && b.c === c);
               return (
                 <g key={`b-${r}-${c}`} className="box-filled">

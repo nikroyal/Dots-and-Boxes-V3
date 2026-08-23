@@ -36,7 +36,8 @@ export default function GuessTheNumber() {
 
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if (e.key === 'Enter' && gameStateRef.current === 'won' && e.target.tagName !== 'BUTTON') {
+      if (e.key === 'Enter' && gameStateRef.current === 'won') {
+        if (e.target.tagName === 'BUTTON' || e.target.tagName === 'A' || e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
         e.preventDefault();
         sfx.click();
         initGameRef.current?.();
@@ -67,7 +68,7 @@ export default function GuessTheNumber() {
   useEffect(() => {
     const handleGlobalKeyDown = (e) => {
       if (e.key === 'Enter') {
-        if (e.target.tagName === 'BUTTON') return;
+        if (e.target.tagName === 'BUTTON' || e.target.tagName === 'A' || e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
         if (gameState === 'won') {
           e.preventDefault();
           sfx.click();

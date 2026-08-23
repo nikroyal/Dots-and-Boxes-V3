@@ -70,6 +70,7 @@ export default function WordScramble() {
         return;
       }
       if (e.key === 'Enter' && (gameState === 'waiting' || gameState === 'gameover')) {
+        if (e.target.tagName === 'BUTTON' || e.target.tagName === 'A' || e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
         e.preventDefault();
         startGameRef.current?.();
       } else if (e.key === 'Escape' && gameState === 'playing') {
@@ -119,7 +120,7 @@ export default function WordScramble() {
   useEffect(() => {
     const handleGlobalKeyDown = (e) => {
       if (e.key === 'Enter') {
-        if (e.target.tagName === 'BUTTON') return;
+        if (e.target.tagName === 'BUTTON' || e.target.tagName === 'A' || e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
         if (gameState === 'waiting' || gameState === 'gameover') {
           e.preventDefault();
           startGame();

@@ -70,7 +70,7 @@ export default function MatchTicTacToe() {
       // match?" — set after the first callback fires.
       const newMoveCount = m.game?.moveCount || 0;
       if (hasSubscribed.current && newMoveCount > prevMoveCount.current) {
-        const lastMove = Array.isArray(m.game.moves) ? m.game.moves[m.game.moves.length - 1] : undefined;
+        const lastMove = Array.isArray(m.game.moves) && m.game.moves.length > 0 ? m.game.moves[m.game.moves.length - 1] : undefined;
         if (lastMove?.claimed > 0) sfx.claim();
         else sfx.line();
       }
@@ -634,9 +634,9 @@ const Board = memo(function Board({ game, players, playerInfo, isMyTurn, onPlay,
 
   // Compute strike-through line if won
   let strikeLine = null;
-  if (winLine && winLine.length > 0) {
+  if (Array.isArray(winLine) && winLine.length > 0) {
     const first = winLine[0];
-    const last = winLine[winLine.length - 1];
+    const last = Array.isArray(winLine) && winLine.length > 0 ? winLine[winLine.length - 1] : undefined;
 
     // Convert to relative coordinates inside the grid (0 to 1)
     const x1 = (first.c + 0.5) / cols;

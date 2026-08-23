@@ -31,7 +31,8 @@ export default function ClickTheTarget() {
 
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if ((gameState === 'waiting' || gameState === 'result') && e.key === 'Enter' && e.target.tagName !== 'BUTTON') {
+      if ((gameState === 'waiting' || gameState === 'result') && e.key === 'Enter') {
+        if (e.target.tagName === 'BUTTON' || e.target.tagName === 'A' || e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
         e.preventDefault();
         startGameRef.current?.();
       }

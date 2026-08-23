@@ -148,6 +148,7 @@ export default function ColorMatch() {
         }
       } else if (gameState === 'start' || gameState === 'gameover') {
         if (e.key === 'Enter') {
+          if (e.target.tagName === 'BUTTON' || e.target.tagName === 'A' || e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
           e.preventDefault();
           startGame();
         }

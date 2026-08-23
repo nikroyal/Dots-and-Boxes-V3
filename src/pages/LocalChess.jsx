@@ -199,7 +199,7 @@ export default function LocalChess() {
 
   const boardOrientation = flipBoard ? (p1Turn ? 'white' : 'black') : 'white';
 
-  const lastMove = displayGame.moves && displayGame.moves.length > 0 ? displayGame.moves[displayGame.moves.length - 1] : null;
+  const lastMove = Array.isArray(displayGame.moves) && displayGame.moves.length > 0 ? displayGame.moves[displayGame.moves.length - 1] : null;
 
   // Optimization (Bolt): Memoized derived object props using useMemo to maintain a stable reference across the 1Hz ticker updates.
   const customSquareStyles = useMemo(() => ({
