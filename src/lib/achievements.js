@@ -140,3 +140,35 @@ export function getRankInfo(elo) {
 export function getRankFromElo(elo) {
   return getRankInfo(elo).rank;
 }
+
+export function getUpNextAchievement(profile) {
+  if (!profile) return null;
+  let best = null;
+  let highestPct = -1;
+  const unlocked = profile.unlockedAchievements || [];
+
+  for (const a of ACHIEVEMENTS) {
+    if (!unlocked.includes(a.id) && a.progress) {
+      const [curr, max, min = 0] = a.progress(profile);
+      const pct = max === min ? 0 : Math.min(100, Math.max(0, ((curr - min) / (max - min)) * 100));
+
+      // Explicitly filter out binary or immediate-completion goals (max <= 1)
+      if (max > 1 && pct > highestPct && pct < 100) {
+        highestPct = pct;
+        best = { a, curr, max, pct };
+      }
+    }
+  }
+
+  // If no partially completed non-binary achievements exist, find the first available non-binary one
+  if (!best) {
+    const firstLocked = ACHIEVEMENTS.find(a => !unlocked.includes(a.id) && a.progress && a.progress(profile)[1] > 1);
+    if (firstLocked) {
+      const [curr, max, min = 0] = firstLocked.progress(profile);
+      const pct = max === min ? 0 : Math.min(100, Math.max(0, ((curr - min) / (max - min)) * 100));
+      best = { a: firstLocked, curr, max, pct };
+    }
+  }
+
+  return best;
+}
