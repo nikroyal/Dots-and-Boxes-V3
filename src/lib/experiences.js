@@ -408,6 +408,21 @@ export const EXPERIENCE_CATALOG = [
     ],
     routePrefixes: ['/speed-grid'],
   },
+  {
+    id: 'cps-test',
+    name: 'CPS Test',
+    shortName: 'CPS',
+    path: '/cps-test',
+    kind: 'Arcade',
+    status: 'Live',
+    accent: 'var(--ochre)',
+    description: 'How many times can you click in 10 seconds?',
+    features: ['Local play', 'Best score'],
+    navItems: [
+      { to: '/cps-test', label: 'Play' },
+    ],
+    routePrefixes: ['/cps-test'],
+  },
 ];
 
 export const DEFAULT_EXPERIENCE = {

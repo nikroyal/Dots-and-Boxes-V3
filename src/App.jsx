@@ -48,6 +48,7 @@ import TypingSpeed from './pages/TypingSpeed';
 import MathFlash from './pages/MathFlash';
 
 import LocalDistrictExchange from './pages/LocalDistrictExchange';
+import CPSTest from './pages/CPSTest';
 import DistrictExchangeHub from './pages/DistrictExchangeHub';
 const Admin = lazy(() => import('./pages/Admin'));
 
@@ -129,6 +130,7 @@ function Shell() {
         <Route path="/typing-speed" element={<TypingSpeed />} />
         <Route path="/math-flash" element={<MathFlash />} />
         <Route path="/speed-math" element={<SpeedMath />} />
+        <Route path="/cps-test" element={<CPSTest />} />
         <Route path="/district-exchange/local" element={<LocalDistrictExchange />} />
         <Route path="/snake" element={<Snake />} />
         <Route path="/battleships" element={<Battleships />} />
@@ -209,7 +211,8 @@ function Shell() {
               <Route path="/connect4/local" element={<LocalConnect4 />} />
               <Route path="/tictactoe/local" element={<LocalTicTacToe />} />
               <Route path="/chess/local" element={<LocalChess />} />
-              <Route path="/district-exchange/local" element={<LocalDistrictExchange />} />
+              <Route path="/cps-test" element={<CPSTest />} />
+        <Route path="/district-exchange/local" element={<LocalDistrictExchange />} />
               {isAdmin && <Route path="/admin" element={<Admin />} />}
               <Route path="*" element={<Navigate to="/" />} />
             </Routes>
