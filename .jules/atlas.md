@@ -93,3 +93,7 @@
 ## 2026-07-17 - Safe Fast Keyboard Shortcuts in React
 **Learning:** Implementing window-level `keydown` event listeners in React for fast core loops requires ensuring stable references or using refs so the listener invokes the latest function closure without stale state errors during fast restarts.
 **Action:** When adding global keyboard shortcuts to React games for quick restarting, ensure proper dependency arrays with useCallback or refs rather than binding stale functions directly into the listener.
+
+## 2024-12-02 - Shareable Milestones in Speed Grid
+**Learning:** Even simple numerical grid games benefit immensely from qualitative ratings (e.g. "⚡ Speed Demon", "🐆 Fast"). Adding these ratings directly to a share string drastically improves virality over raw numerical scores alone.
+**Action:** Always include a tier-based rating along with the raw time or score when adding "Share Result" features to fast-paced timing games.

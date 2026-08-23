@@ -21,6 +21,7 @@ export default function SpeedGrid() {
   const [grid, setGrid] = useState([]);
   const [nextNumber, setNextNumber] = useState(1);
   const [time, setTime] = useState(0);
+  const [copied, setCopied] = useState(false);
   const [bestTime, setBestTime] = useState(() => {
     try {
       const saved = localStorage.getItem('axiom-speedgrid-best');
@@ -31,6 +32,7 @@ export default function SpeedGrid() {
   });
 
   const timerRef = useRef(null);
+  const shareTimeoutRef = useRef(null);
   const startTimeRef = useRef(null);
 
   const startGame = useCallback(() => {
@@ -83,8 +85,33 @@ export default function SpeedGrid() {
   useEffect(() => {
     return () => {
       if (timerRef.current) cancelAnimationFrame(timerRef.current);
+      if (shareTimeoutRef.current) clearTimeout(shareTimeoutRef.current);
     };
   }, []);
+
+  const getRating = (time) => {
+    if (time <= 15000) return "⚡ Speed Demon";
+    if (time <= 25000) return "🐆 Fast";
+    if (time <= 35000) return "🏃 Good";
+    return "🐢 Made it!";
+  };
+
+  const handleShare = (e) => {
+    e.stopPropagation();
+    e.preventDefault();
+    const rating = getRating(time);
+    const text = `I solved Axiom Speed Grid in ${(time / 1000).toFixed(3)}s! ${rating}`;
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(() => {
+        sfx.notify();
+        setCopied(true);
+        if (shareTimeoutRef.current) clearTimeout(shareTimeoutRef.current);
+        shareTimeoutRef.current = setTimeout(() => setCopied(false), 2000);
+      }).catch(err => console.warn("Clipboard copy failed", err));
+    } else {
+      console.warn("Clipboard API not supported");
+    }
+  };
 
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -148,12 +175,18 @@ export default function SpeedGrid() {
         {gameState === 'gameover' && (
            <div className="flex flex-col items-center justify-center min-h-[300px] w-full mt-8 mb-8 text-center fade-in">
              <div className="font-display text-3xl mb-2">Done!</div>
-             <div className="font-display text-5xl text-[var(--forest)] mb-6 pulse-soft">
+             <div className="font-display text-5xl text-[var(--forest)] mb-2 pulse-soft">
                {(time / 1000).toFixed(3)}s
              </div>
-             <button onClick={startGame} className="btn-primary w-full text-lg py-3 max-w-[200px]">
-               Play Again (Enter)
-             </button>
+             <div className="font-display text-xl mb-6 opacity-90">{getRating(time)}</div>
+             <div className="flex gap-4 w-full">
+               <button onClick={startGame} className="btn-primary flex-1 text-lg py-3">
+                 Play Again (Enter)
+               </button>
+               <button onClick={handleShare} className="btn-secondary flex-1 text-lg py-3">
+                 {copied ? 'Copied!' : 'Share Result'}
+               </button>
+             </div>
            </div>
         )}
       </div>
