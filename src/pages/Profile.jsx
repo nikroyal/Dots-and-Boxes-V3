@@ -4,7 +4,7 @@ import { doc, onSnapshot, getDoc } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { useAuth } from '../lib/AuthContext';
 import { updateProfile, sendFriendRequest, removeFriend, blockUser } from '../lib/actions';
-import { ACHIEVEMENTS, AVATAR_OPTIONS, TITLE_OPTIONS, UNLOCKABLE_AVATARS, UNLOCKABLE_TITLES, getRankInfo } from '../lib/achievements';
+import { ACHIEVEMENTS, AVATAR_OPTIONS, TITLE_OPTIONS, UNLOCKABLE_AVATARS, UNLOCKABLE_TITLES, getRankInfo, getUpNextAchievement } from '../lib/achievements';
 import { toast } from '../components/Notifications';
 import { useConfirm } from '../components/ConfirmDialog';
 import { Edit2, UserPlus, Ban, Check } from 'lucide-react';
@@ -71,23 +71,7 @@ export default function Profile() {
   const isBlocked = (me.blocked || []).includes(target.id);
 
   // Find the locked achievement with the highest progress percentage
-  const upNextAchievement = (() => {
-    let best = null;
-    let highestPct = -1;
-    const unlocked = target.unlockedAchievements || [];
-    for (const a of ACHIEVEMENTS) {
-      if (!unlocked.includes(a.id) && a.progress) {
-        const [curr, max, min = 0] = a.progress(target);
-        const pct = max === min ? 0 : Math.min(100, Math.max(0, ((curr - min) / (max - min)) * 100));
-        // Only show if it has some progress (not 0/1 binary)
-        if (pct > 0 && max > 1 && pct > highestPct) {
-          highestPct = pct;
-          best = { a, curr, max, pct };
-        }
-      }
-    }
-    return best;
-  })();
+  const upNextAchievement = getUpNextAchievement(target);
 
   const saveProfile = async () => {
     try {
