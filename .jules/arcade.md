@@ -65,3 +65,14 @@
 ## 2024-11-20 - Fast Timer Rendering
 **Learning:** Rendering a timer down to milliseconds using `setInterval` that triggers a React state update ~60 times a second can cause performance overhead by constantly re-rendering the entire component.
 **Action:** For highly precise sub-second timers, prefer using `requestAnimationFrame` attached directly to a DOM ref to avoid frequent, expensive React render cycles.
+## 2024-11-23 - Resilient Playwright Locators
+**Learning:** When writing Playwright tests for elements with complex or dynamic text (like icons mixed with text), avoid overly strict `get_by_role` matching (which may time out or fail). Prefer resilient substring matching like `page.locator("button:has-text('Text')")`.
+**Action:** Use `locator("button:has-text(...)")` instead of `get_by_role("button", name=...)` for buttons with icons or dynamic content.
+
+## 2024-11-23 - PNPM Non-Interactive Installs
+**Learning:** If `pnpm install` hangs in an automated environment due to a prompt to 'Choose which packages to build', run `pnpm config set ignore-scripts false && pnpm install` to bypass the interactive prompt and successfully complete the installation.
+**Action:** Use `pnpm config set ignore-scripts false && pnpm install` when dependencies require building native addons.
+
+## 2024-11-23 - Grounded Plan Occurrences
+**Learning:** When applying string replacements to multiple occurrences of a pattern (like adding a route to both authenticated and unauthenticated blocks), do not assume the number of occurrences based on intuition. Always verify the exact count (e.g., using `grep -c`) to comply with the Groundedness Rule.
+**Action:** Always verify the exact number of occurrences of a string before planning global replacements.
