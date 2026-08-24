@@ -70,6 +70,7 @@ export default function PaperIo() {
 
   return (
     <iframe
+      sandbox="allow-scripts"
       title="Paper.io"
       srcDoc={srcDoc}
       style={{ position: 'fixed', inset: 0, width: '100vw', height: '100vh', border: 0, background: '#0e0f13', zIndex: 2147483647 }}
