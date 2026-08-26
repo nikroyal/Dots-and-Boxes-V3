@@ -55,6 +55,10 @@
 **Vulnerability:** In `firestore.rules`, the `match /conversations/{convId}` rule allowed any participant to update the conversation document without restricting which fields could be updated. This meant a legitimate participant could maliciously alter the `participants` array, the `requestedBy` field, or the `createdAt` timestamp.
 **Learning:** Even when restricting document updates to authorized users (participants), the allowed updates must be strictly bounded. Allowing unrestrained updates on a document lets attackers bypass application logic (like replacing the entire participants list) or alter metadata used for security decisions.
 **Prevention:** Always restrict update payloads using `changedKeys().hasAny()` or `changedKeys().hasOnly()` to ensure that immutable core structural fields (like owners, IDs, or participants lists) cannot be modified through regular update flows.
+## 2024-05-18 - XSS Risk with sandbox="allow-scripts allow-same-origin"
+**Vulnerability:** The iframe for Paper.io had an XSS vulnerability due to lack of a sandbox. My initial fix added `allow-scripts allow-same-origin`, but this allows a dedicated malicious script to remove the sandbox entirely or freely access the parent document.
+**Learning:** When securing iframes, avoid combining `allow-scripts` and `allow-same-origin` in the `sandbox` attribute for same-origin or `srcDoc` iframes.
+**Prevention:** Only use `sandbox="allow-scripts"` for iframes that need scripts but shouldn't access the parent document.
 ## 2024-10-24 - Client-Authoritative Stats (Architecture Flaw)
 **Vulnerability:** Users can arbitrarily modify their own `elo`, `wins`, `losses`, and other stats directly via Firestore client writes.
 **Learning:** The app's architecture uses client-side transactions to compute and update game results (`finalizeStats`). Securing these fields in Firestore rules (`protectedUserKeysChanged`) would break the app's core functionality since there is no backend game server to securely handle these writes.
