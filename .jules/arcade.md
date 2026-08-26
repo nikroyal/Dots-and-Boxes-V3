@@ -72,3 +72,6 @@
 ## 2024-08-25 - Node.js patch scripts and ES modules
 **Learning:** When writing temporary Node.js patch scripts that use `require()` in a repository with `"type": "module"` defined in its `package.json`, it throws a runtime error.
 **Action:** Use the `.cjs` file extension (e.g., `patch.cjs`) instead of `.js` to ensure it runs correctly as a CommonJS script.
+## 2026-08-26 - Slide Puzzle
+**Learning:** Generating solvable sliding puzzle states is best done by simulating random backward moves from the solved state to avoid mathematically unsolvable boards.
+**Action:** Use simulated reverse moves for puzzle state generation in future grid games.

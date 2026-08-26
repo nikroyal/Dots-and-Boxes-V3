@@ -28,6 +28,7 @@ const TURN_TIMEOUT_MS = 60 * 1000;
 const GAMES_LOWER_SCORE_IS_BETTER = new Set([
   'reaction-timer',
   'memory-match',
+  'slide-puzzle',
   'guess-the-number',
   'speed-grid',
   'minesweeper',
