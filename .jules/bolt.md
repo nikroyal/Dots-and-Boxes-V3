@@ -84,3 +84,7 @@
 ## 2024-05-20 - Prevent 1-second re-renders on expensive Match components
 **Learning:** In the `Match` family of components (`Match.jsx`, `MatchConnect4.jsx`, `MatchTicTacToe.jsx`, `MatchChess.jsx`), a 1-second ticker state (`now`) drives the turn timer UI. Any expensive child component (like `Board` or `<Chessboard>`) rendered within these match pages that does not depend on `now` will unnecessarily re-render every single second, creating a severe performance bottleneck.
 **Action:** Always wrap expensive child components (like `Board` or `<Chessboard>`) inside match pages in `React.memo()`. Crucially, ensure all object/array props passed to it are either hoisted statically outside the component or explicitly memoized using `useMemo()` to guarantee referential stability across the ticker's render cycles.
+
+## 2024-05-19 - Fast Sets for Grid Iteration
+**Learning:** In rapid-action games like Whack-A-Mole, doing nested N*M loops during grid render (like using `Array.some` inside a grid mapping loop) can be a source of re-render slowness. Using `useMemo` to convert array checks into O(1) Set lookups prevents unnecessary performance hits.
+**Action:** Always pre-compute Hash Maps or Sets when mapping over grids that require checking inclusion inside an array state for every cell.

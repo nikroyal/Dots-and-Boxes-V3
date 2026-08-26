@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useAuth } from '../lib/AuthContext';
 import { recordActivity, ACTIVITY_TYPES } from '../lib/activity';
 import { updateArcadeBest } from '../lib/actions';
@@ -204,6 +204,12 @@ export default function WhackAMole() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [gameState, activeMole, startGame]);
 
+
+  // Optimization (Bolt): Pre-computed hit and miss sets to eliminate O(N) array lookups (hits.some/misses.some)
+  // during the render loop of the 9-cell grid. This speeds up render times when rapidly clicking.
+  const hitSet = React.useMemo(() => new Set(hits.map(h => h.index)), [hits]);
+  const missSet = React.useMemo(() => new Set(misses.map(m => m.index)), [misses]);
+
   return (
     <div className="fade-in max-w-2xl mx-auto flex flex-col items-center justify-center min-h-[60vh]">
       <section className="text-center mb-8">
@@ -248,8 +254,8 @@ export default function WhackAMole() {
 
         <div className="grid grid-cols-3 gap-4 sm:gap-6">
           {Array.from({ length: GRID_SIZE }).map((_, i) => {
-            const isHit = hits.some(h => h.index === i);
-            const isMiss = misses.some(m => m.index === i);
+            const isHit = hitSet.has(i);
+            const isMiss = missSet.has(i);
             return (
               <div key={i} className="relative aspect-square">
                 <button
