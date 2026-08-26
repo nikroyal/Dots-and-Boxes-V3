@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useParams } from 'react-router-dom';
 import { doc, onSnapshot, getDoc } from 'firebase/firestore';
 import { db } from '../lib/firebase';
@@ -71,7 +71,9 @@ export default function Profile() {
   const isBlocked = (me.blocked || []).includes(target.id);
 
   // Find the locked achievement with the highest progress percentage
-  const upNextAchievement = (() => {
+  // Optimization (Bolt): Memoized the expensive upNextAchievement calculation with useMemo.
+  // Impact: Prevents O(N) recalculations on every render (e.g., during profile editing keystrokes).
+  const upNextAchievement = useMemo(() => {
     let best = null;
     let highestPct = -1;
     const unlocked = target.unlockedAchievements || [];
@@ -87,7 +89,7 @@ export default function Profile() {
       }
     }
     return best;
-  })();
+  }, [target]);
 
   const saveProfile = async () => {
     try {
