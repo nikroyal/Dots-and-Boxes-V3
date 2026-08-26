@@ -46,6 +46,7 @@ import ColorMatch from './pages/ColorMatch';
 import SpeedGrid from './pages/SpeedGrid';
 import TypingSpeed from './pages/TypingSpeed';
 import MathFlash from './pages/MathFlash';
+import MineSweeper from './pages/MineSweeper';
 
 import LocalDistrictExchange from './pages/LocalDistrictExchange';
 import CPSTest from './pages/CPSTest';
@@ -129,6 +130,7 @@ function Shell() {
         <Route path="/speed-grid" element={<SpeedGrid />} />
         <Route path="/typing-speed" element={<TypingSpeed />} />
         <Route path="/math-flash" element={<MathFlash />} />
+        <Route path="/minesweeper" element={<MineSweeper />} />
         <Route path="/speed-math" element={<SpeedMath />} />
         <Route path="/cps-test" element={<CPSTest />} />
         <Route path="/district-exchange/local" element={<LocalDistrictExchange />} />
@@ -187,6 +189,7 @@ function Shell() {
               <Route path="/click-the-target" element={<ClickTheTarget />} />
               <Route path="/typing-speed" element={<TypingSpeed />} />
               <Route path="/math-flash" element={<MathFlash />} />
+              <Route path="/minesweeper" element={<MineSweeper />} />
               <Route path="/speed-math" element={<SpeedMath />} />
               <Route path="/snake" element={<Snake />} />
               <Route path="/battleships" element={<Battleships />} />

@@ -39,7 +39,14 @@ export default function PostMatchGoals({ profile }) {
     <div className={`grid gap-3 mb-8 text-left max-w-sm mx-auto ${upNextAchievement ? 'grid-cols-1 sm:grid-cols-3 sm:max-w-none' : 'grid-cols-1 sm:grid-cols-2 sm:max-w-none'}`}>
       {/* Daily Goal */}
       <div className="border hairline p-3 bg-black/5" style={{ borderColor: dailyGoalCompleted ? 'var(--forest)' : 'var(--hairline)' }}>
-        <div className="font-mono text-[0.55rem] tracking-widest uppercase mb-1 opacity-60">Daily Goal</div>
+        <div className="font-mono text-[0.55rem] tracking-widest uppercase mb-1 flex items-center justify-between opacity-60">
+          <div>Daily Goal</div>
+          {(profile.dailyGoalStreak || 0) > 0 && (
+            <span className="px-1.5 py-0.5 rounded-sm flex items-center gap-1" style={{ background: 'var(--bg-soft)', color: 'var(--ochre)', opacity: 1 }}>
+              🔥 {profile.dailyGoalStreak} Day Streak
+            </span>
+          )}
+        </div>
         <div className="font-display text-base mb-2">{dailyGoal.text}</div>
         {dailyGoalCompleted ? (
           <div className="flex flex-col gap-1.5">

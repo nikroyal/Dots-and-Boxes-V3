@@ -409,19 +409,19 @@ export const EXPERIENCE_CATALOG = [
     routePrefixes: ['/speed-grid'],
   },
   {
-    id: 'cps-test',
-    name: 'CPS Test',
-    shortName: 'CPS',
-    path: '/cps-test',
+    id: 'minesweeper',
+    name: 'Minesweeper',
+    shortName: 'Minesweeper',
+    path: '/minesweeper',
     kind: 'Arcade',
     status: 'Live',
-    accent: 'var(--ochre)',
-    description: 'How many times can you click in 10 seconds?',
-    features: ['Local play', 'Best score'],
+    accent: 'var(--crimson)',
+    description: 'Clear the board without detonating any mines. Use logic and deduction to flag the danger zones.',
+    features: ['Local play', 'Best time'],
     navItems: [
-      { to: '/cps-test', label: 'Play' },
+      { to: '/minesweeper', label: 'Play' },
     ],
-    routePrefixes: ['/cps-test'],
+    routePrefixes: ['/minesweeper'],
   },
 ];
 
