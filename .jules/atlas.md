@@ -93,3 +93,6 @@
 ## 2026-07-17 - Safe Fast Keyboard Shortcuts in React
 **Learning:** Implementing window-level `keydown` event listeners in React for fast core loops requires ensuring stable references or using refs so the listener invokes the latest function closure without stale state errors during fast restarts.
 **Action:** When adding global keyboard shortcuts to React games for quick restarting, ensure proper dependency arrays with useCallback or refs rather than binding stale functions directly into the listener.
+## 2024-05-20 - Adding explicit target context to Share Strings
+**Learning:** Adding explicit targets or qualitative rank messages to the clipboard share string in a game like Memory Match or Sequence Memory helps players immediately understand if a score is good, making them more likely to replay the game to reach a higher rank or challenge their friends.
+**Action:** When evaluating games with share buttons, verify that the shared text includes both the numerical score and the qualitative rank (like "Mastermind") or explicit target context to encourage the replay loop.
