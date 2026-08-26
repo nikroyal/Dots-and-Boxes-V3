@@ -59,8 +59,8 @@ export default function EloChart({ matchHistory = [], currentElo = 1000 }) {
     .map((p, i) => `${i === 0 ? 'M' : 'L'} ${xAt(i).toFixed(1)} ${yAt(p.elo).toFixed(1)}`)
     .join(' ');
 
-  const last = sampled[sampled.length - 1];
-  const first = sampled[0];
+  const last = Array.isArray(sampled) && sampled.length > 0 ? sampled[sampled.length - 1] : {elo: 1000};
+  const first = Array.isArray(sampled) && sampled.length > 0 ? sampled[0] : {elo: 1000};
   const trend = last.elo - first.elo;
 
   return (

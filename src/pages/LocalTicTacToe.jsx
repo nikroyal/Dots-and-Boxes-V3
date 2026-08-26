@@ -139,7 +139,7 @@ export default function LocalTicTacToe() {
           </div>
           {finished && game.winLine && (() => {
             const first = game.winLine[0];
-            const last = game.winLine[game.winLine.length - 1];
+            const last = Array.isArray(game.winLine) && game.winLine.length > 0 ? game.winLine[game.winLine.length - 1] : undefined;
             const x1 = (first.c + 0.5) / game.cols;
             const y1 = (first.r + 0.5) / game.rows;
             const x2 = (last.c + 0.5) / game.cols;

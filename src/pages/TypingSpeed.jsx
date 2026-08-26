@@ -68,6 +68,7 @@ export default function TypingSpeed() {
         return;
       }
       if (e.key === 'Enter' && (gameState === 'waiting' || gameState === 'result')) {
+        if (e.target.tagName === 'BUTTON' || e.target.tagName === 'A' || e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
         e.preventDefault();
         startGameRef.current?.();
       }
@@ -114,7 +115,7 @@ export default function TypingSpeed() {
   useEffect(() => {
     const handleGlobalKeyDown = (e) => {
       if (e.key === 'Enter') {
-        if (e.target.tagName === 'BUTTON') return;
+        if (e.target.tagName === 'BUTTON' || e.target.tagName === 'A' || e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
         if (gameState === 'waiting' || gameState === 'result') {
           e.preventDefault();
           startGame();

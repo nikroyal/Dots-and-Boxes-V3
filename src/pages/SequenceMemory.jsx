@@ -47,10 +47,7 @@ export default function SequenceMemory() {
     const handleKeyDown = (e) => {
       if (e.repeat) return;
       if ((gameState === 'waiting' || gameState === 'gameover') && e.key === 'Enter') {
-        const tagName = e.target?.tagName;
-        if (tagName === 'BUTTON' || tagName === 'INPUT' || tagName === 'TEXTAREA' || tagName === 'A') {
-          return;
-        }
+        if (e.target.tagName === 'BUTTON' || e.target.tagName === 'A' || e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
         e.preventDefault();
         if (startGameRef.current) startGameRef.current();
       } else if (gameState === 'playing' && !isPlayingSequence) {

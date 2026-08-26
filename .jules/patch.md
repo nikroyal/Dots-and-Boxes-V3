@@ -37,3 +37,10 @@
 ## 2026-06-26 - Operator Precedence with Ternary Array Checks
 **Learning:** When using ternary inline checks like `Array.isArray(arr) ? arr.length : 0` to index into an array (e.g., to find the last item `arr[... - 1]`), failing to wrap the ternary in parentheses causes operator precedence bugs (`0 - 1` evaluates first).
 **Action:** Always wrap ternary expressions in parentheses when performing arithmetic on their result: `(Array.isArray(arr) ? arr.length : 0) - 1`.
+## 2024-11-20 - Global Keydown Handler Tag Name Filtering
+**Learning:** Global `keydown` handlers (e.g., listening for 'Enter') without filtering by `e.target.tagName` trigger unintended interactions when users are focused inside `BUTTON`, `A`, `INPUT`, or `TEXTAREA` elements.
+**Action:** Always filter global `keydown` events: `if (e.target.tagName === 'BUTTON' || e.target.tagName === 'A' || e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;`.
+
+## 2024-11-20 - Array Length Safe Checks on Nullable Game State
+**Learning:** Attempting to access the last element of an array using `arr[arr.length - 1]` without first confirming `Array.isArray(arr)` and `arr.length > 0` causes crashes when game state is uninitialized, missing, or empty.
+**Action:** Always wrap `.length` indexing in safe array checks: `Array.isArray(arr) && arr.length > 0 ? arr[arr.length - 1] : undefined`.
