@@ -85,7 +85,7 @@ export default function MemoryMatch() {
     e.stopPropagation();
     e.preventDefault();
     const stars = getStars(moves);
-    const text = `I won Axiom Memory Match in ${moves} moves! 🧠 ${stars}`;
+    const text = `I won Axiom Memory Match in ${moves} moves! 🧠 ${stars}\nTarget: ≤ 10 moves for ⭐⭐⭐`;
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(text).then(() => {
         sfx.notify();

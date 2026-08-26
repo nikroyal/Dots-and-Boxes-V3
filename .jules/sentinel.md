@@ -59,3 +59,11 @@
 **Vulnerability:** The iframe for Paper.io had an XSS vulnerability due to lack of a sandbox. My initial fix added `allow-scripts allow-same-origin`, but this allows a dedicated malicious script to remove the sandbox entirely or freely access the parent document.
 **Learning:** When securing iframes, avoid combining `allow-scripts` and `allow-same-origin` in the `sandbox` attribute for same-origin or `srcDoc` iframes.
 **Prevention:** Only use `sandbox="allow-scripts"` for iframes that need scripts but shouldn't access the parent document.
+## 2024-10-24 - Client-Authoritative Stats (Architecture Flaw)
+**Vulnerability:** Users can arbitrarily modify their own `elo`, `wins`, `losses`, and other stats directly via Firestore client writes.
+**Learning:** The app's architecture uses client-side transactions to compute and update game results (`finalizeStats`). Securing these fields in Firestore rules (`protectedUserKeysChanged`) would break the app's core functionality since there is no backend game server to securely handle these writes.
+**Prevention:** Game logic and state resolution must be moved to a trusted backend environment (e.g., Firebase Cloud Functions or a dedicated Node server) before enforcing strict field-level restrictions on player stats in Firestore rules.
+## 2024-10-24 - Over-permissive match updates (Insecure Direct Object Reference)
+**Vulnerability:** The Firestore rule for `matches` allows any player involved in the match (`isPlayer()`) to perform arbitrary updates to the match document without restriction on `changedKeys()`. A malicious player can manipulate the game state, scores, or mark themselves as the winner.
+**Learning:** `allow update: if isAdmin() || isPlayer() ...` lacks field-level constraints for `isPlayer()`. A player should only be able to update specific fields related to gameplay (like `game`, `status`, `winner`, `chat`, etc) and not arbitrarily modify other players' data or game settings in ways that break the game rules. Wait, since game logic is evaluated client-side, the client has to be able to write the entire `game` object. However, players shouldn't be able to alter `players`, `createdAt`, `playerInfo`, etc.
+**Prevention:** Add field-specific restrictions or a check like `!changedKeys().hasAny(['players', 'createdAt'])` within the `isPlayer()` rule or `update` block for matches.
