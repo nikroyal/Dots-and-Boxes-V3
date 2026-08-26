@@ -379,6 +379,21 @@ export const EXPERIENCE_CATALOG = [
     routePrefixes: ['/circuit-maker'],
   },
   {
+    id: 'slide-puzzle',
+    name: 'Slide Puzzle',
+    shortName: 'Slide',
+    path: '/slide-puzzle',
+    kind: 'Puzzle',
+    status: 'Live',
+    accent: 'var(--ochre)',
+    description: 'Classic 4x4 sliding number puzzle. Solve it in the fewest moves!',
+    features: ['Local play', 'Best moves'],
+    navItems: [
+      { to: '/slide-puzzle', label: 'Play' },
+    ],
+    routePrefixes: ['/slide-puzzle'],
+  },
+  {
     id: 'color-match',
     name: 'Color Match',
     shortName: 'Colors',

@@ -47,6 +47,7 @@ import SpeedGrid from './pages/SpeedGrid';
 import TypingSpeed from './pages/TypingSpeed';
 import MathFlash from './pages/MathFlash';
 import MineSweeper from './pages/MineSweeper';
+import SlidePuzzle from './pages/SlidePuzzle';
 
 import LocalDistrictExchange from './pages/LocalDistrictExchange';
 import CPSTest from './pages/CPSTest';
@@ -137,6 +138,7 @@ function Shell() {
         <Route path="/snake" element={<Snake />} />
         <Route path="/battleships" element={<Battleships />} />
         <Route path="/paper-io" element={<PaperIo />} />
+        <Route path="/slide-puzzle" element={<SlidePuzzle />} />
         <Route path="*" element={<Navigate to="/login" />} />
       </Routes>
     );
@@ -216,6 +218,7 @@ function Shell() {
               <Route path="/chess/local" element={<LocalChess />} />
               <Route path="/cps-test" element={<CPSTest />} />
         <Route path="/district-exchange/local" element={<LocalDistrictExchange />} />
+              <Route path="/slide-puzzle" element={<SlidePuzzle />} />
               {isAdmin && <Route path="/admin" element={<Admin />} />}
               <Route path="*" element={<Navigate to="/" />} />
             </Routes>
