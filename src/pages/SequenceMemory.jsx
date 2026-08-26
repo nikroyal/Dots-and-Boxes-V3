@@ -207,7 +207,7 @@ export default function SequenceMemory() {
     e.preventDefault();
     const finalScore = Math.max(0, level - 1);
     const rating = getRatingMessage(finalScore);
-    const text = `I reached level ${finalScore} in Axiom Sequence Memory! ${rating}`;
+    let text = `I reached level ${finalScore} in Axiom Sequence Memory! ${rating}`;
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(text).then(() => {
         sfx.notify();
