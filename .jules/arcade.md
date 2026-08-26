@@ -65,6 +65,9 @@
 ## 2024-11-20 - Fast Timer Rendering
 **Learning:** Rendering a timer down to milliseconds using `setInterval` that triggers a React state update ~60 times a second can cause performance overhead by constantly re-rendering the entire component.
 **Action:** For highly precise sub-second timers, prefer using `requestAnimationFrame` attached directly to a DOM ref to avoid frequent, expensive React render cycles.
+## 2024-05-01 - [CPS Test Pointer Events]
+**Learning:** When building rapid-click games, using `onPointerDown` instead of `onClick` avoids mobile touch delay and prevents double-firing on hybrid devices if `e.preventDefault()` is used.
+**Action:** Use `onPointerDown={(e) => { e.preventDefault(); handleAction(); }}` for primary interactions in future arcade games requiring high input frequency.
 
 ## 2024-08-25 - Node.js patch scripts and ES modules
 **Learning:** When writing temporary Node.js patch scripts that use `require()` in a repository with `"type": "module"` defined in its `package.json`, it throws a runtime error.
