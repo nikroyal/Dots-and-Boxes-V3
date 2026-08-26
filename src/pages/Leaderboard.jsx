@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { getLeaderboard } from '../lib/actions';
 import { useAuth } from '../lib/AuthContext';
@@ -33,13 +33,16 @@ export default function Leaderboard() {
 
   // Hide users I've blocked, and users who have blocked me. The
   // leaderboard isn't a place I want to bump into people I'm avoiding.
-  const visibleUsers = profile
-    ? users.filter(u => {
-        const myBlocked = profile.blocked || [];
-        const theirBlocked = u.blocked || [];
-        return !myBlocked.includes(u.id) && !theirBlocked.includes(profile.id);
-      })
-    : users;
+  // Optimization (Bolt): Memoized the visibleUsers filter calculation.
+  // Impact: Prevents O(N) array filtering when un-related state changes occur.
+  const visibleUsers = useMemo(() => {
+    if (!profile) return users;
+    return users.filter(u => {
+      const myBlocked = profile.blocked || [];
+      const theirBlocked = u.blocked || [];
+      return !myBlocked.includes(u.id) && !theirBlocked.includes(profile.id);
+    });
+  }, [profile, users]);
 
   return (
     <div className="fade-in space-y-8">
