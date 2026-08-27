@@ -267,6 +267,21 @@ export const EXPERIENCE_CATALOG = [
     routePrefixes: ['/math-flash'],
   },
   {
+    id: 'number-memory',
+    name: 'Number Memory',
+    shortName: 'Numbers',
+    path: '/number-memory',
+    kind: 'Arcade',
+    status: 'Live',
+    accent: 'var(--ochre)',
+    description: 'Memorize the number shown on screen. It gets longer each level.',
+    features: ['Local play', 'Best level'],
+    navItems: [
+      { to: '/number-memory', label: 'Play' },
+    ],
+    routePrefixes: ['/number-memory'],
+  },
+  {
     id: 'reaction-timer',
     name: 'Reaction Timer',
     shortName: 'Reaction',
