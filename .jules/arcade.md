@@ -72,3 +72,6 @@
 ## 2024-08-25 - Node.js patch scripts and ES modules
 **Learning:** When writing temporary Node.js patch scripts that use `require()` in a repository with `"type": "module"` defined in its `package.json`, it throws a runtime error.
 **Action:** Use the `.cjs` file extension (e.g., `patch.cjs`) instead of `.js` to ensure it runs correctly as a CommonJS script.
+## 2024-05-19 - Number Memory Shrink-0
+**Learning:** In flex containers that may overflow and scroll (like the game over screen in Number Memory), using `shrink-0` on critical UI elements (like headers, stats, and buttons) ensures they are not squished if the viewport height is very small. Additionally, using `overflow-y-auto` with appropriate padding provides a robust layout for long content on mobile devices.
+**Action:** Always consider flex shrinking behavior for vertically stacked result screens on smaller screens and apply `shrink-0` along with scrollable containers where appropriate.
