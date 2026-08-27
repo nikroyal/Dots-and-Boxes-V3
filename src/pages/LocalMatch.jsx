@@ -181,14 +181,18 @@ export default function LocalMatch() {
           </defs>
 
           {/* Boxes */}
-          {Array.from({ length: rows }).map((_, r) =>
-            Array.from({ length: cols }).map((_, c) => {
-              const owner = game.boxes[`${r},${c}`];
-              if (!owner) return null;
-              const color = owner === 'p1' ? PLAYER_COLORS[0] : PLAYER_COLORS[1];
-              const lastMove = Array.isArray(game.moves) && game.moves.length > 0 ? game.moves[game.moves.length - 1] : undefined;
-              const isJustClaimed = !!lastMove && lastMove.claimedBoxes?.some(b => b.r === r && b.c === c);
-              return (
+          {(() => {
+            // Optimization (Bolt): Hoist lastMove resolution and precompute O(1) Set for claimed boxes outside the O(R*C) map loops
+            const lastMove = Array.isArray(game.moves) && game.moves.length > 0 ? game.moves[game.moves.length - 1] : undefined;
+            const claimedBoxesSet = new Set(lastMove?.claimedBoxes?.map(b => `${b.r},${b.c}`) || []);
+
+            return Array.from({ length: rows }).map((_, r) =>
+              Array.from({ length: cols }).map((_, c) => {
+                const owner = game.boxes[`${r},${c}`];
+                if (!owner) return null;
+                const color = owner === 'p1' ? PLAYER_COLORS[0] : PLAYER_COLORS[1];
+                const isJustClaimed = claimedBoxesSet.has(`${r},${c}`);
+                return (
                 <g key={`b-${r}-${c}`} className="box-filled">
                   <rect
                     x={c * 60 + 10} y={r * 60 + 10}
@@ -203,7 +207,8 @@ export default function LocalMatch() {
                 </g>
               );
             })
-          )}
+          )
+          })()}
 
           {/* Dots */}
           {Array.from({ length: rows + 1 }).map((_, r) =>
