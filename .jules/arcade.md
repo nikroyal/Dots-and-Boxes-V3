@@ -72,3 +72,10 @@
 ## 2024-08-25 - Node.js patch scripts and ES modules
 **Learning:** When writing temporary Node.js patch scripts that use `require()` in a repository with `"type": "module"` defined in its `package.json`, it throws a runtime error.
 **Action:** Use the `.cjs` file extension (e.g., `patch.cjs`) instead of `.js` to ensure it runs correctly as a CommonJS script.
+## 2024-11-21 - Reverting File Modifications
+**Learning:** When reverting file modifications during development, avoid using `git reset --hard && git clean -fd` if you have created new, untracked files that you want to keep, as `git clean -fd` will permanently delete them.
+**Action:** Use `git restore <file>` to revert specific tracked files or `git restore --staged <file>` to unstage them.
+
+## 2024-11-21 - Inserting code with duplicates
+**Learning:** When a Node.js patch script needs to insert code near a target string that appears multiple identical times in a file (like duplicated `<Route>` components), avoid `String.prototype.replace()`.
+**Action:** Use `code.split('\n')` to iterate through the lines and maintain state flags (e.g., `let foundFirst = false;`) to ensure the new code is inserted at the exact intended occurrences.

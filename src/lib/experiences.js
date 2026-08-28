@@ -1,5 +1,21 @@
 export const EXPERIENCE_CATALOG = [
   {
+    id: 'memory-matrix',
+    name: 'Memory Matrix',
+    shortName: 'Matrix',
+    path: '/memory-matrix',
+    kind: 'Puzzle',
+    status: 'Live',
+    accent: 'var(--forest)',
+    description: 'Watch the pattern closely and repeat it to advance to higher levels.',
+    features: ['Local play', 'Best level'],
+    navItems: [
+      { to: '/memory-matrix', label: 'Play' },
+    ],
+    routePrefixes: ['/memory-matrix'],
+  },
+
+  {
     id: 'quick-math',
     name: 'Quick Math',
     shortName: 'Math',
