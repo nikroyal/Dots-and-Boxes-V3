@@ -423,6 +423,22 @@ export const EXPERIENCE_CATALOG = [
     ],
     routePrefixes: ['/minesweeper'],
   },
+
+  {
+    id: 'twenty-forty-eight',
+    name: '2048',
+    shortName: '2048',
+    path: '/twenty-forty-eight',
+    kind: 'Arcade',
+    status: 'Live',
+    accent: 'var(--ochre)',
+    description: 'Join the numbers and get to the 2048 tile! Use arrow keys or swipe to move.',
+    features: ['Local play', 'High score'],
+    navItems: [
+      { to: '/twenty-forty-eight', label: 'Play' },
+    ],
+    routePrefixes: ['/twenty-forty-eight'],
+  },
 ];
 
 export const DEFAULT_EXPERIENCE = {
