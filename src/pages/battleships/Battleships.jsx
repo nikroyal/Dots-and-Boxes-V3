@@ -32,6 +32,10 @@ export default function Battleships() {
   const [playerShots, setPlayerShots] = useState(createEmptyGrid()); // Where player shot (rendered on right board)
   const [botShots, setBotShots] = useState(createEmptyGrid()); // Where bot shot (rendered on left board)
 
+  // Optimization (Bolt): Convert array of hovered cells to Set for O(1) lookups inside double render loop
+  // Reduces complexity from O(N^3) to O(N^2) during high-frequency mouse events
+  const hoveredCellsSet = useMemo(() => new Set(hoveredCells.map(hc => `${hc.r},${hc.c}`)), [hoveredCells]);
+
   const [winner, setWinner] = useState(null); // 'player' | 'bot'
   const [isPlayerTurn, setIsPlayerTurn] = useState(true);
 
@@ -220,7 +224,7 @@ export default function Battleships() {
             >
               {playerGrid.map((row, r) =>
                 row.map((cell, c) => {
-                  const isHovered = hoveredCells.some(hc => hc.r === r && hc.c === c);
+                  const isHovered = hoveredCellsSet.has(`${r},${c}`);
                   let bgColor = 'bg-white dark:bg-neutral-900';
 
                   if (cell !== null) {

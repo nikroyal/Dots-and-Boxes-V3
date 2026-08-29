@@ -121,6 +121,13 @@ export default function LocalMatch() {
 
   const p1Turn = game.currentPlayerIdx === 0;
 
+  // Optimization (Bolt): Pre-compute claimed boxes Set outside O(N^2) render loop
+  // Converts Array.some O(N) into Set.has O(1), preventing UI freezes on large boards
+  const claimedBoxesSet = useMemo(() => {
+    const lastMove = Array.isArray(game.moves) && game.moves.length > 0 ? game.moves[game.moves.length - 1] : undefined;
+    return new Set(lastMove?.claimedBoxes?.map(b => `${b.r},${b.c}`) || []);
+  }, [game.moves]);
+
   return (
     <div className="fade-in max-w-4xl mx-auto space-y-6">
       {confirmDialogEl}
@@ -186,8 +193,7 @@ export default function LocalMatch() {
               const owner = game.boxes[`${r},${c}`];
               if (!owner) return null;
               const color = owner === 'p1' ? PLAYER_COLORS[0] : PLAYER_COLORS[1];
-              const lastMove = Array.isArray(game.moves) && game.moves.length > 0 ? game.moves[game.moves.length - 1] : undefined;
-              const isJustClaimed = !!lastMove && lastMove.claimedBoxes?.some(b => b.r === r && b.c === c);
+              const isJustClaimed = claimedBoxesSet.has(`${r},${c}`);
               return (
                 <g key={`b-${r}-${c}`} className="box-filled">
                   <rect
