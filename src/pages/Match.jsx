@@ -638,6 +638,11 @@ const PLAYER_STROKE_PATTERNS = [
 // Optimization (Bolt): React.memo prevents the heavy SVG board from re-rendering
 // every single second when the parent's `now` ticker updates the timer banner.
 const Board = memo(function Board({ game, players, playerInfo, isMyTurn, onPlay, lastMove }) {
+  // Optimization (Bolt): Precompute claimed boxes to avoid O(N) Array.some inside O(R*C) grid loops.
+  // Reduces time complexity to O(R*C), speeding up frame rates during box drawing.
+  const claimedBoxesSet = useMemo(() => {
+    return new Set(lastMove?.claimedBoxes?.map(b => `${b.r},${b.c}`) || []);
+  }, [lastMove]);
   const { rows, cols, hLines, vLines, boxes } = game;
   // Larger minimum tap target on small cells (D41). The hit area below the
   // visible line is at least max(44, cell*0.4) — iOS HIG's 44pt minimum.
@@ -759,7 +764,7 @@ const Board = memo(function Board({ game, players, playerInfo, isMyTurn, onPlay,
           if (!owner) return null;
           const x = padding + c * cell;
           const y = padding + r * cell;
-          const isJustClaimed = !!lastMove && lastMove.claimedBoxes?.some(b => b.r === r && b.c === c);
+          const isJustClaimed = claimedBoxesSet.has(`${r},${c}`);
           return (
             <g key={`b-${r}-${c}`} className="box-filled">
               <rect x={x + 2} y={y + 2} width={cell - 4} height={cell - 4} fill={playerSoft(owner)} />

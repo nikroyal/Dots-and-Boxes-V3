@@ -88,3 +88,6 @@
 ## 2024-05-19 - Fast Sets for Grid Iteration
 **Learning:** In rapid-action games like Whack-A-Mole, doing nested N*M loops during grid render (like using `Array.some` inside a grid mapping loop) can be a source of re-render slowness. Using `useMemo` to convert array checks into O(1) Set lookups prevents unnecessary performance hits.
 **Action:** Always pre-compute Hash Maps or Sets when mapping over grids that require checking inclusion inside an array state for every cell.
+## 2024-05-24 - Pre-computing Sets for Grid Maps
+**Learning:** Reconstructing a Set inside a React render loop using an IIFE (e.g. `(() => { const s = new Set(...) })()`) during a JSX return creates memory churn on every render cycle, degrading performance. It negates the O(1) Set lookup optimization because creating the Set costs O(N) each render.
+**Action:** When replacing `Array.some` with a Set to optimize grid lookups, always create the Set using `useMemo` at the top level of the component.
