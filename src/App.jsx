@@ -51,6 +51,7 @@ import MineSweeper from './pages/MineSweeper';
 import LocalDistrictExchange from './pages/LocalDistrictExchange';
 import CPSTest from './pages/CPSTest';
 import DistrictExchangeHub from './pages/DistrictExchangeHub';
+import TwentyFortyEight from './pages/TwentyFortyEight';
 const Admin = lazy(() => import('./pages/Admin'));
 
 export default function App() {
@@ -135,6 +136,7 @@ function Shell() {
         <Route path="/cps-test" element={<CPSTest />} />
         <Route path="/district-exchange/local" element={<LocalDistrictExchange />} />
         <Route path="/snake" element={<Snake />} />
+        <Route path="/twenty-forty-eight" element={<TwentyFortyEight />} />
         <Route path="/battleships" element={<Battleships />} />
         <Route path="/paper-io" element={<PaperIo />} />
         <Route path="*" element={<Navigate to="/login" />} />
@@ -192,6 +194,7 @@ function Shell() {
               <Route path="/minesweeper" element={<MineSweeper />} />
               <Route path="/speed-math" element={<SpeedMath />} />
               <Route path="/snake" element={<Snake />} />
+              <Route path="/twenty-forty-eight" element={<TwentyFortyEight />} />
               <Route path="/battleships" element={<Battleships />} />
               <Route path="/lobby" element={<Lobby />} />
               <Route path="/match/:id" element={<Match />} />

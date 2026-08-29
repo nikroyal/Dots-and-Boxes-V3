@@ -72,3 +72,6 @@
 ## 2024-08-25 - Node.js patch scripts and ES modules
 **Learning:** When writing temporary Node.js patch scripts that use `require()` in a repository with `"type": "module"` defined in its `package.json`, it throws a runtime error.
 **Action:** Use the `.cjs` file extension (e.g., `patch.cjs`) instead of `.js` to ensure it runs correctly as a CommonJS script.
+## 2024-10-27 - 2048 Game Styling and Stale Closures
+**Learning:** For React games relying on complex layout grids and fast sequential keystrokes (like 2048), `e.preventDefault()` must be explicitly tied to specific keys (`ArrowUp`, etc.) inside the `keydown` listener to prevent browser scroll interference without breaking normal accessibility. Furthermore, relying entirely on React state for the `keydown` handler can drop rapidly queued keystrokes if the state hasn't committed yet.
+**Action:** While acceptable for casual mini-games, consider using a queue or ref-based state accumulator if high-frequency keyboard inputs (like speedrunning 2048) are a core requirement.
