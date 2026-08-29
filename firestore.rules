@@ -42,7 +42,9 @@ service cloud.firestore {
       allow create: if isSelf(userId)
                     && request.resource.data.username is string
                     && request.resource.data.get('role', 'player') == 'player'
-                    && request.resource.data.get('status', 'active') == 'active';
+                    && request.resource.data.get('status', 'active') == 'active'
+                    && request.resource.data.get('elo', 1000) <= 1000
+                    && request.resource.data.get('wins', 0) == 0;
 
       allow update: if isSignedIn() && (
         isAdmin()
@@ -50,6 +52,9 @@ service cloud.firestore {
           request.auth.uid == userId
           && request.resource.data.username == resource.data.username
           && !protectedUserKeysChanged()
+          && (request.resource.data.get('bio', '') is string && request.resource.data.get('bio', '').size() <= 500)
+          && (request.resource.data.get('displayName', '') is string && request.resource.data.get('displayName', '').size() <= 100)
+          && (request.resource.data.get('title', '') is string && request.resource.data.get('title', '').size() <= 100)
         )
         || (
           changedKeys().hasOnly(['friends', 'outgoingFriendRequests'])
@@ -201,7 +206,9 @@ service cloud.firestore {
                     && request.auth.uid in get(/databases/$(database)/documents/conversations/$(convId)).data.participants);
         allow create: if isSignedIn()
                       && request.resource.data.fromId == request.auth.uid
-                      && request.auth.uid in get(/databases/$(database)/documents/conversations/$(convId)).data.participants;
+                      && request.auth.uid in get(/databases/$(database)/documents/conversations/$(convId)).data.participants
+                      && request.resource.data.text is string
+                      && request.resource.data.text.size() <= 1000;
         allow update, delete: if isAdmin();
       }
     }
@@ -339,8 +346,14 @@ service cloud.firestore {
 
         match /messages/{msgId} {
           allow read: if isAdmin() || canReadClubMessages();
-          allow create: if isSignedIn() && exists(/databases/$(database)/documents/clubs/$(clubId)/members/$(request.auth.uid));
-          allow update, delete: if isAdmin() || (isSignedIn() && (
+          allow create: if isSignedIn() && exists(/databases/$(database)/documents/clubs/$(clubId)/members/$(request.auth.uid))
+                         && request.resource.data.text is string
+                         && request.resource.data.text.size() <= 1000;
+          allow update: if isAdmin() || (isSignedIn() && (
+            request.auth.uid == resource.data.userId
+            || get(/databases/$(database)/documents/clubs/$(clubId)/members/$(request.auth.uid)).data.role in ['owner', 'admin', 'moderator']
+          ) && (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['text']) || (request.resource.data.text is string && request.resource.data.text.size() <= 1000)));
+          allow delete: if isAdmin() || (isSignedIn() && (
             request.auth.uid == resource.data.userId
             || get(/databases/$(database)/documents/clubs/$(clubId)/members/$(request.auth.uid)).data.role in ['owner', 'admin', 'moderator']
           ));
