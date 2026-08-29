@@ -30,6 +30,14 @@ export default function PostMatchGoals({ profile }) {
         }
       }
     }
+    if (!best) {
+      const firstLocked = ACHIEVEMENTS.find(a => !unlocked.includes(a.id) && a.progress && a.progress(profile)[1] > 1);
+      if (firstLocked) {
+        const [curr, max, min = 0] = firstLocked.progress(profile);
+        const pct = max === min ? 0 : Math.min(100, Math.max(0, ((curr - min) / (max - min)) * 100));
+        best = { a: firstLocked, curr, max, pct };
+      }
+    }
     return best;
   })();
 
