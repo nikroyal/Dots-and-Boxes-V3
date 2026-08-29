@@ -104,9 +104,12 @@ service cloud.firestore {
         && request.resource.data.matchId is string
         && request.resource.data.game is string
         && request.resource.data.ts is number;
+      function validInviteUpdate() {
+        return !changedKeys().hasAny(['fromId', 'toId', 'game', 'ts']);
+      }
       allow update: if isSignedIn() && (
         request.auth.uid == resource.data.toId || request.auth.uid == resource.data.fromId
-      );
+      ) && validInviteUpdate();
       allow delete: if isSignedIn() && (
         request.auth.uid == resource.data.fromId || request.auth.uid == resource.data.toId || isAdmin()
       );
@@ -122,7 +125,7 @@ service cloud.firestore {
         return isSignedIn() && request.auth.uid in resource.data.players;
       }
       function validPlayerUpdate() {
-        return isPlayer() && !changedKeys().hasAny(['players', 'createdAt', 'playerInfo', 'gameType', 'rows', 'cols', 'adminClosed']);
+        return isPlayer() && !changedKeys().hasAny(['players', 'createdAt', 'playerInfo', 'gameType', 'rows', 'cols', 'adminClosed', 'spectators', 'chat']);
       }
       function specJoin() {
         return changedKeys().hasOnly(['spectators'])
