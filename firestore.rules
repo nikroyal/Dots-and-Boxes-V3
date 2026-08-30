@@ -106,7 +106,7 @@ service cloud.firestore {
         && request.resource.data.ts is number;
       allow update: if isSignedIn() && (
         request.auth.uid == resource.data.toId || request.auth.uid == resource.data.fromId
-      );
+      ) && !changedKeys().hasAny(['fromId', 'toId', 'matchId', 'game', 'ts']);
       allow delete: if isSignedIn() && (
         request.auth.uid == resource.data.fromId || request.auth.uid == resource.data.toId || isAdmin()
       );
@@ -340,7 +340,11 @@ service cloud.firestore {
         match /messages/{msgId} {
           allow read: if isAdmin() || canReadClubMessages();
           allow create: if isSignedIn() && exists(/databases/$(database)/documents/clubs/$(clubId)/members/$(request.auth.uid));
-          allow update, delete: if isAdmin() || (isSignedIn() && (
+          allow update: if isAdmin() || (isSignedIn() && (
+            request.auth.uid == resource.data.userId
+            || get(/databases/$(database)/documents/clubs/$(clubId)/members/$(request.auth.uid)).data.role in ['owner', 'admin', 'moderator']
+          ) && !changedKeys().hasAny(['userId']));
+          allow delete: if isAdmin() || (isSignedIn() && (
             request.auth.uid == resource.data.userId
             || get(/databases/$(database)/documents/clubs/$(clubId)/members/$(request.auth.uid)).data.role in ['owner', 'admin', 'moderator']
           ));
