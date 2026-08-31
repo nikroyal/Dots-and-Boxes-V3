@@ -72,3 +72,6 @@
 ## 2024-08-25 - Node.js patch scripts and ES modules
 **Learning:** When writing temporary Node.js patch scripts that use `require()` in a repository with `"type": "module"` defined in its `package.json`, it throws a runtime error.
 **Action:** Use the `.cjs` file extension (e.g., `patch.cjs`) instead of `.js` to ensure it runs correctly as a CommonJS script.
+## 2026-08-31 - Added Sliding Puzzle Game
+**Learning:** For a sliding 15-puzzle game, checking solvability randomly shuffling elements can result in unsolvable states.
+**Action:** When implementing a sliding 15-puzzle, always shuffle by repeatedly applying valid sliding moves from a solved state to ensure the resulting grid is always solvable.
