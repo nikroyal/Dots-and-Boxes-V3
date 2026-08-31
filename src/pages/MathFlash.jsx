@@ -114,10 +114,18 @@ export default function MathFlash() {
 
   const inputRef = useRef(null);
 
+  const getRatingMessage = (s) => {
+    if (s >= 30) return "⚡ Lightning!";
+    if (s >= 20) return "🔥 Quick!";
+    if (s >= 10) return "🧠 Thinker!";
+    return "🐢 Keep practicing!";
+  };
+
   const handleShare = (e) => {
     e.stopPropagation();
     e.preventDefault();
-    const text = `I scored ${score} in Axiom Math Flash! ⚡`;
+    const rating = getRatingMessage(score);
+    const text = `I scored ${score} in Axiom Math Flash! ⚡ ${rating}`;
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(text).then(() => {
         sfx.notify();
@@ -179,7 +187,8 @@ export default function MathFlash() {
         {gameState === 'result' && (
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-[var(--paper-tint)]/90 z-10 backdrop-blur-sm rounded-xl">
             <div className="font-display text-4xl mb-2 text-[var(--crimson)]">Time's Up!</div>
-            <div className="font-display text-3xl mb-6 opacity-90 text-[var(--forest)]">Score: {score}</div>
+            <div className="font-display text-3xl mb-1 opacity-90 text-[var(--forest)]">Score: {score}</div>
+            <div className="font-display text-xl mb-6 opacity-90">{getRatingMessage(score)}</div>
             <div className="flex gap-4">
               <button onClick={startGame} className="btn-primary">
                 Try Again
