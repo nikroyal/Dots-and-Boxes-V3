@@ -165,14 +165,14 @@ export default function Clubs() {
               </div>
               <div className="flex items-center gap-4 py-2">
                 <label htmlFor="create-club-public" className="flex items-center gap-2 cursor-pointer">
-                  <input id="create-club-public" type="checkbox" checked={isPublic} onChange={e => setIsPublic(e.target.checked)} className="accent-[var(--ink)]" />
+                  <input id="create-club-public" type="checkbox" checked={isPublic} onChange={e => setIsPublic(e.target.checked)} className="accent-[var(--ink)]" aria-describedby="public-desc" />
                   <span className="font-display text-sm">Public Club</span>
                 </label>
-                <span className="font-mono text-[0.6rem] opacity-40">— Anyone can find and join</span>
+                <span id="public-desc" className="font-mono text-[0.6rem] opacity-40">— Anyone can find and join</span>
               </div>
               <div className="pt-4 flex gap-3">
                 <button type="button" onClick={() => setShowCreate(false)} className="btn-ghost flex-1">Cancel</button>
-                <button type="submit" disabled={creating || name.length < 3} className="btn-primary flex-1">
+                <button type="submit" disabled={creating || name.length < 3} className="btn-primary flex-1" aria-busy={creating}>
                   {creating ? 'Creating…' : 'Create Club'}
                 </button>
               </div>
