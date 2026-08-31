@@ -423,6 +423,22 @@ export const EXPERIENCE_CATALOG = [
     ],
     routePrefixes: ['/minesweeper'],
   },
+  {
+    id: 'sliding-puzzle',
+    name: 'Sliding Puzzle',
+    shortName: 'Sliding',
+    path: '/sliding-puzzle',
+    kind: 'Puzzle',
+    status: 'Live',
+    accent: 'var(--ochre)',
+    description: 'Rearrange the tiles into numerical order by sliding them into the empty space.',
+    features: ['Local play', 'Fewest moves'],
+    navItems: [
+      { to: '/sliding-puzzle', label: 'Play' },
+    ],
+    routePrefixes: ['/sliding-puzzle'],
+  },
+
 ];
 
 export const DEFAULT_EXPERIENCE = {
