@@ -364,7 +364,7 @@ function OwnerSettings({ admin }) {
           <span className="font-mono text-[0.65rem] tracking-widest uppercase opacity-60 block mb-2">Display name</span>
           <input className="input-field" value={name} onChange={e => setName(e.target.value.slice(0, 40))} />
         </label>
-        <button type="submit" disabled={saving || !name.trim()} className="btn-primary"><Save size={13} /> {saving ? 'Saving…' : 'Save'}</button>
+        <button type="submit" disabled={saving || !name.trim()} className="btn-primary" aria-busy={saving}><Save size={13} /> {saving ? 'Saving…' : 'Save'}</button>
       </form>
     </section>
   );

@@ -422,7 +422,7 @@ function DeleteAccountForm() {
       <div className="flex gap-2">
         <button type="button" onClick={() => { setOpen(false); setPassword(''); setTypedUsername(''); }}
                 className="btn-ghost">Cancel</button>
-        <button type="submit" disabled={!canConfirm || busy} className="btn-danger">
+        <button type="submit" disabled={!canConfirm || busy} className="btn-danger" aria-busy={busy}>
           {busy ? 'Deleting…' : 'Permanently delete account'}
         </button>
       </div>

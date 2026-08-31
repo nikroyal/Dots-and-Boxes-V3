@@ -36,3 +36,10 @@
 ## 2026-06-29 - Dynamic ARIA labels on repeated generic actions
 **Learning:** In lists of items (like friend requests) where every row contains the exact same visible action buttons ("Accept", "Decline", "Buy"), screen readers will read identical button text continuously without clarifying which item the action applies to.
 **Action:** Always attach dynamic `aria-label`s to generic action buttons inside mapped lists. Ensure the label clearly states the action AND the specific item or user it affects (e.g., ``aria-label={`Accept friend request from ${req.fromUsername}`}``).
+## 2024-05-18 - Missing ARIA on State-Driven Async Buttons
+**Learning:** Found multiple instances where critical actions (like "Create Club", "Save Settings", or "Permanently delete account") disable themselves while loading but do not indicate their busy state to screen readers.
+**Action:** Always add `aria-busy={state}` whenever a button disables itself pending an asynchronous operation.
+
+## 2024-05-18 - Input Helper Text Unlinked
+**Learning:** In the clubs creation page, helper text describing the consequence of a checkbox ("— Anyone can find and join") was visually placed near the input but not programmatically linked.
+**Action:** When adding helper text directly beneath or beside an input, link it using `aria-describedby` and an `id` on the text container.
