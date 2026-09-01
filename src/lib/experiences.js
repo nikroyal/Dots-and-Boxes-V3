@@ -1,5 +1,20 @@
 export const EXPERIENCE_CATALOG = [
   {
+    id: 'tic-tac-toe-simple',
+    name: 'Tic-Tac-Toe Simple',
+    shortName: 'Tic-Tac-Toe',
+    path: '/tic-tac-toe-simple',
+    kind: 'Arcade',
+    status: 'Live',
+    accent: 'var(--ochre)',
+    description: 'Classic local 2-player match of Tic-Tac-Toe.',
+    features: ['Local play'],
+    navItems: [
+      { to: '/tic-tac-toe-simple', label: 'Play' },
+    ],
+    routePrefixes: ['/tic-tac-toe-simple'],
+  },
+  {
     id: 'quick-math',
     name: 'Quick Math',
     shortName: 'Math',

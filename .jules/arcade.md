@@ -72,3 +72,6 @@
 ## 2024-08-25 - Node.js patch scripts and ES modules
 **Learning:** When writing temporary Node.js patch scripts that use `require()` in a repository with `"type": "module"` defined in its `package.json`, it throws a runtime error.
 **Action:** Use the `.cjs` file extension (e.g., `patch.cjs`) instead of `.js` to ensure it runs correctly as a CommonJS script.
+## 2024-05-02 - Arcade Games UI Guidelines
+**Learning:** For small mini-games, buttons often use `.btn-primary` and `.btn-secondary` or `.btn-ghost` classes for standard styling.
+**Action:** Use these standard button classes when building arcade games to maintain visual consistency.
