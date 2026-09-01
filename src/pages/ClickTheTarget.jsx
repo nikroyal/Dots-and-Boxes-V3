@@ -3,6 +3,7 @@ import { useAuth } from '../lib/AuthContext';
 import { recordActivity, ACTIVITY_TYPES } from '../lib/activity';
 import { updateArcadeBest } from '../lib/actions';
 import { sfx } from '../lib/sound';
+import PostMatchGoals from '../components/PostMatchGoals';
 
 export default function ClickTheTarget() {
   const { profile } = useAuth();
@@ -205,6 +206,7 @@ export default function ClickTheTarget() {
              <div className="font-display text-4xl mb-2">Time's Up!</div>
              <div className="font-display text-2xl mb-2 opacity-80 text-[var(--forest)]">Score: {score}</div>
              <div className="font-display text-xl mb-6 opacity-90">{getRating(score)}</div>
+             {profile && <div className="mb-6 w-full max-w-md mx-auto"><PostMatchGoals profile={profile} /></div>}
              <div className="flex gap-4">
                <button onClick={startGame} className="btn-primary">
                   Play Again <span className="hidden sm:inline opacity-50 font-mono text-xs ml-2">(Enter)</span>

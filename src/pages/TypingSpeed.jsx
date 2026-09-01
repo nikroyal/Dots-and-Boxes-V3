@@ -3,6 +3,7 @@ import { useAuth } from '../lib/AuthContext';
 import { recordActivity, ACTIVITY_TYPES } from '../lib/activity';
 import { updateArcadeBest } from '../lib/actions';
 import { sfx } from '../lib/sound';
+import PostMatchGoals from '../components/PostMatchGoals';
 
 const GAME_DURATION = 60; // 60 seconds
 
@@ -249,6 +250,7 @@ export default function TypingSpeed() {
              <div className="font-display text-3xl mb-1 opacity-90 text-[var(--forest)]">{wpm} WPM</div>
              <div className="font-display text-xl mb-1 text-[var(--ink)] opacity-90">{getRatingMessage(wpm)}</div>
              <div className="font-mono text-xs opacity-60 tracking-widest uppercase mb-6">{getNextTierMessage(wpm)}</div>
+             {profile && <div className="mb-6 w-full max-w-md mx-auto"><PostMatchGoals profile={profile} /></div>}
              <div className="flex gap-4 mb-2">
                <button onClick={startGame} className="btn-primary">
                   Try Again <span className="hidden sm:inline opacity-50 font-mono text-xs ml-2">(Enter)</span>

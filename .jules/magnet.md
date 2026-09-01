@@ -101,3 +101,9 @@
 **Learning:** When short-term goals (like a Daily Goal) are completed, removing them from high-traffic pages (like the Hub) eliminates immediate explicit motivation and creates a "Done" state that reduces post-match engagement.
 
 **Action:** When short-term goals are completed, explicitly celebrate them with a completed state and a call-to-action (e.g., "Come back tomorrow!") on the Hub to create a returning habit, and ensure they remain visible rather than being hidden.
+
+## 2024-07-29 - Arcade End-Screen Progression
+
+**Learning:** When players finish a single-player arcade game, presenting them with a static "Play Again" screen without any contextual progression metrics creates a high-friction exit point. By injecting dynamic short-term goals (like Daily Goals, Up Next Achievements, and Rank Progress) directly into the result screen, we give them an explicit, immediate reason to play again to reach the next milestone, significantly increasing repeat plays.
+
+**Action:** Whenever a player completes a core gameplay loop (like an arcade match), always inject dynamic, personalized short-term goals into the post-match resolution screen to convert the momentum of a finished session into motivation for the next one.
