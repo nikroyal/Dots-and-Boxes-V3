@@ -28,7 +28,7 @@ service cloud.firestore {
 
     // Username lookups --------------------------------------------------------
     match /usernames/{username} {
-      allow read: if true;
+      allow get: if true;
       allow create: if isSignedIn()
                     && request.resource.data.uid == request.auth.uid;
       allow update: if false;
@@ -106,7 +106,7 @@ service cloud.firestore {
         && request.resource.data.ts is number;
       allow update: if isSignedIn() && (
         request.auth.uid == resource.data.toId || request.auth.uid == resource.data.fromId
-      );
+      ) && !changedKeys().hasAny(['fromId', 'toId']);
       allow delete: if isSignedIn() && (
         request.auth.uid == resource.data.fromId || request.auth.uid == resource.data.toId || isAdmin()
       );
