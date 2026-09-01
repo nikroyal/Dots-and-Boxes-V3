@@ -3,6 +3,7 @@ import { useAuth } from '../lib/AuthContext';
 import { recordActivity, ACTIVITY_TYPES } from '../lib/activity';
 import { updateArcadeBest } from '../lib/actions';
 import { sfx } from '../lib/sound';
+import PostMatchGoals from '../components/PostMatchGoals';
 
 export default function GuessTheNumber() {
   const { profile } = useAuth();
@@ -228,6 +229,7 @@ export default function GuessTheNumber() {
           </form>
         ) : (
           <div className="flex flex-col gap-4 w-full fade-in items-center">
+            {profile && <div className="w-full max-w-md mx-auto"><PostMatchGoals profile={profile} /></div>}
             <button onClick={() => { sfx.click(); initGame(); }} className="btn-primary w-full">
               Play Again <span className="hidden sm:inline opacity-50 font-mono text-xs ml-2">(Enter)</span>
             </button>
