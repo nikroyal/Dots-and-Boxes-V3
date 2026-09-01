@@ -67,3 +67,7 @@
 **Vulnerability:** The Firestore rule for `matches` allows any player involved in the match (`isPlayer()`) to perform arbitrary updates to the match document without restriction on `changedKeys()`. A malicious player can manipulate the game state, scores, or mark themselves as the winner.
 **Learning:** `allow update: if isAdmin() || isPlayer() ...` lacks field-level constraints for `isPlayer()`. A player should only be able to update specific fields related to gameplay (like `game`, `status`, `winner`, `chat`, etc) and not arbitrarily modify other players' data or game settings in ways that break the game rules. Wait, since game logic is evaluated client-side, the client has to be able to write the entire `game` object. However, players shouldn't be able to alter `players`, `createdAt`, `playerInfo`, etc.
 **Prevention:** Add field-specific restrictions or a check like `!changedKeys().hasAny(['players', 'createdAt'])` within the `isPlayer()` rule or `update` block for matches.
+## 2026-09-01 - Fix Insecure Direct Object Reference in Invites
+**Vulnerability:** Invites allowed users to update core immutable fields like toId and game, potentially escalating privileges or modifying other users' invites.
+**Learning:** In Firebase Security Rules, checking for update authorization (like matching user IDs) is insufficient to prevent IDOR or unmodifiable field tampering.
+**Prevention:** Always explicitly restrict modifications to immutable core fields (e.g., fromId, toId) using `!changedKeys().hasAny(['...'])`.
