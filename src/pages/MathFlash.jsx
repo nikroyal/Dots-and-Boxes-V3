@@ -28,8 +28,11 @@ export default function MathFlash() {
     }
   });
 
+
   const timerRef = useRef(null);
   const scoreRef = useRef(0);
+  const startGameRef = useRef(null);
+
 
   useEffect(() => {
     return () => {
@@ -64,7 +67,8 @@ export default function MathFlash() {
     setCorrectAnswer(answer);
   }, []);
 
-  const startGame = () => {
+
+  const startGame = useCallback(() => {
     sfx.click();
     setGameState('playing');
     setTimeLeft(GAME_DURATION);
@@ -76,14 +80,13 @@ export default function MathFlash() {
     timerRef.current = setInterval(() => {
       setTimeLeft((prev) => Math.max(0, prev - 1));
     }, 1000);
+  }, [generateEquation]);
 
-    // Focus input after a short delay to ensure React has rendered the enabled state
-    setTimeout(() => {
-      if (inputRef.current) {
-        inputRef.current.focus();
-      }
-    }, 50);
-  };
+  useEffect(() => {
+    startGameRef.current = startGame;
+  }, [startGame]);
+
+
 
   const endGame = useCallback(() => {
     if (timerRef.current) clearInterval(timerRef.current);
@@ -109,15 +112,53 @@ export default function MathFlash() {
     }
   }, [timeLeft, gameState, endGame]);
 
+
+  useEffect(() => {
+    if (gameState === 'playing' && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [gameState]);
+
+  useEffect(() => {
+    const handleGlobalKeyDown = (e) => {
+      if (e.key === 'Enter') {
+        if (e.target.tagName === 'BUTTON' || e.target.tagName === 'A' || e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+        if (gameState === 'waiting' || gameState === 'result') {
+          e.preventDefault();
+          startGameRef.current?.();
+        }
+      }
+    };
+    window.addEventListener('keydown', handleGlobalKeyDown);
+    return () => window.removeEventListener('keydown', handleGlobalKeyDown);
+  }, [gameState]);
+
   const [userInput, setUserInput] = useState('');
   const [copied, setCopied] = useState(false);
 
   const inputRef = useRef(null);
 
+
+  const getRatingMessage = (s) => {
+    if (s >= 40) return "🚀 Human Calculator";
+    if (s >= 25) return "⚡ Lightning Fast";
+    if (s >= 15) return "🧠 Smart Cookie";
+    return "🐢 Beginner";
+  };
+
+  const getNextTierMessage = (s) => {
+    if (s >= 40) return "You're at the top tier!";
+    if (s >= 25) return `${40 - s} points to Human Calculator`;
+    if (s >= 15) return `${25 - s} points to Lightning Fast`;
+    return `${15 - s} points to Smart Cookie`;
+  };
+
   const handleShare = (e) => {
     e.stopPropagation();
     e.preventDefault();
-    const text = `I scored ${score} in Axiom Math Flash! ⚡`;
+    const rating = getRatingMessage(score);
+    const text = `I scored ${score} in Axiom Math Flash! ${rating}`;
+
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(text).then(() => {
         sfx.notify();
@@ -165,31 +206,40 @@ export default function MathFlash() {
       </section>
 
       <div className="relative border hairline card bg-[var(--paper-tint)] p-6 sm:p-10 w-full max-w-lg">
+
         {gameState === 'waiting' && (
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-[var(--paper-tint)] z-10 rounded-xl">
             <p className="mb-6 font-display text-xl opacity-80 text-center px-4">
-              Solve as many math equations as you can in 30 seconds!
+              Solve as many math equations as you can in 30 seconds!<br/>
+              <span className="text-sm opacity-60 mt-2 block font-mono tracking-widest uppercase">Target: ≥ 40 for 🚀</span>
             </p>
-            <button onClick={startGame} className="btn-primary">
-              Start Test
+            <button onClick={startGame} className="btn-primary mb-2">
+              Start Test <span className="hidden sm:inline opacity-50 font-mono text-xs ml-2">(Enter)</span>
             </button>
+            <p className="font-mono text-xs opacity-60">Press Enter</p>
           </div>
         )}
+
+
 
         {gameState === 'result' && (
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-[var(--paper-tint)]/90 z-10 backdrop-blur-sm rounded-xl">
             <div className="font-display text-4xl mb-2 text-[var(--crimson)]">Time's Up!</div>
-            <div className="font-display text-3xl mb-6 opacity-90 text-[var(--forest)]">Score: {score}</div>
-            <div className="flex gap-4">
+            <div className="font-display text-3xl mb-1 opacity-90 text-[var(--forest)]">Score: {score}</div>
+            <div className="font-display text-xl mb-1 text-[var(--ink)] opacity-90">{getRatingMessage(score)}</div>
+            <div className="font-mono text-xs opacity-60 tracking-widest uppercase mb-6">{getNextTierMessage(score)}</div>
+            <div className="flex gap-4 mb-2">
               <button onClick={startGame} className="btn-primary">
-                Try Again
+                Try Again <span className="hidden sm:inline opacity-50 font-mono text-xs ml-2">(Enter)</span>
               </button>
               <button onClick={handleShare} className="btn-ghost">
                 {copied ? 'Copied!' : 'Share Result'}
               </button>
             </div>
+            <p className="font-mono text-xs opacity-60">Press Enter to try again</p>
           </div>
         )}
+
 
         <div className="flex flex-col items-center justify-center space-y-8 min-h-[200px]">
           <div className="text-4xl sm:text-5xl font-display leading-relaxed text-center" style={{ minHeight: '80px' }}>
