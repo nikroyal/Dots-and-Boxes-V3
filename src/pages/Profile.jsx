@@ -283,6 +283,7 @@ export default function Profile() {
           <Stat label="Biggest Chain" value={target.biggestChain || 0} />
           <Stat label="Perfect Wins" value={target.perfectWins || 0} />
           <Stat label="Goal Streak" value={target.dailyGoalStreak || 0} />
+          <Stat label="Best Goal Streak" value={target.bestDailyGoalStreak || 0} />
           <Stat label="Daily Goals" value={target.dailyGoalsCompleted || 0} />
         </div>
       </section>

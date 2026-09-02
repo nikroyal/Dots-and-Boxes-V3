@@ -771,6 +771,8 @@ function computeUpdatedUserStats(u, m, matchId, derivedStats) {
      }
   }
 
+  const bestDailyGoalStreak = Math.max(u.bestDailyGoalStreak || 0, newDailyGoalStreak);
+
   const newStats = {
     elo: clampedElo,
     gamesPlayed: (u.gamesPlayed || 0) + 1,
@@ -790,6 +792,7 @@ function computeUpdatedUserStats(u, m, matchId, derivedStats) {
     dailyGoalDate: completedDailyGoal ? today : (u.dailyGoalDate || null),
     dailyGoalsCompleted: (u.dailyGoalsCompleted || 0) + (completedDailyGoal ? 1 : 0),
     dailyGoalStreak: newDailyGoalStreak,
+    bestDailyGoalStreak,
   };
 
   // Bounded rolloff for matchHistory and finalizedMatches. Firestore docs
