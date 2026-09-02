@@ -407,7 +407,22 @@ export const EXPERIENCE_CATALOG = [
       { to: '/speed-grid', label: 'Play' },
     ],
     routePrefixes: ['/speed-grid'],
+  },  {
+    id: 'slide-puzzle',
+    name: 'Slide Puzzle',
+    shortName: 'Slide Puzzle',
+    path: '/slide-puzzle',
+    kind: 'Puzzle',
+    status: 'Live',
+    accent: 'var(--forest)',
+    description: 'Classic 15-puzzle. Arrange the numbers in order with the fewest moves.',
+    features: ['Local play', 'Best score'],
+    navItems: [
+      { to: '/slide-puzzle', label: 'Play' },
+    ],
+    routePrefixes: ['/slide-puzzle'],
   },
+
   {
     id: 'minesweeper',
     name: 'Minesweeper',
