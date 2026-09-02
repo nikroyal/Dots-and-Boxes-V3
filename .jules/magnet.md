@@ -101,3 +101,9 @@
 **Learning:** When short-term goals (like a Daily Goal) are completed, removing them from high-traffic pages (like the Hub) eliminates immediate explicit motivation and creates a "Done" state that reduces post-match engagement.
 
 **Action:** When short-term goals are completed, explicitly celebrate them with a completed state and a call-to-action (e.g., "Come back tomorrow!") on the Hub to create a returning habit, and ensure they remain visible rather than being hidden.
+
+## 2024-05-30 - Long-Term Daily Goals
+
+**Learning:** While Daily Goals provide short-term (daily) motivation, players lack a reason to consistently complete them over weeks or months. Once they complete the goal for the day, there's no visible "larger" progression tied specifically to that daily habit, causing the feature to feel disconnected from their long-term identity in the game.
+
+**Action:** Tie short-term repetitive tasks (like Daily Goals) into long-term cumulative and streak-based achievements (e.g., 7-day streak, 30 total goals) and explicitly display best streaks on profiles. This bridges the gap between a daily task and a long-term progression system, making every daily completion feel like a step toward a much larger reward.
