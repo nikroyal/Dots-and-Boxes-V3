@@ -72,3 +72,6 @@
 ## 2024-08-25 - Node.js patch scripts and ES modules
 **Learning:** When writing temporary Node.js patch scripts that use `require()` in a repository with `"type": "module"` defined in its `package.json`, it throws a runtime error.
 **Action:** Use the `.cjs` file extension (e.g., `patch.cjs`) instead of `.js` to ensure it runs correctly as a CommonJS script.
+## 2026-09-02 - Slide Puzzle vs 2048
+**Learning:** Chose to build a 15-puzzle over 2048 to avoid buggy single-pass implementation of complex game state machines like grid merging.
+**Action:** Opt for games with simple move mechanics in Arcade.

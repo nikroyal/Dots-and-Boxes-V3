@@ -31,6 +31,7 @@ const GAMES_LOWER_SCORE_IS_BETTER = new Set([
   'guess-the-number',
   'speed-grid',
   'minesweeper',
+  'slide-puzzle',
 ]);
 
 // ─── Guard ────────────────────────────────────────────────────────────────
