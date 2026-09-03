@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { sfx } from '../../lib/sound';
 import {
   BOARD_SIZE, SHIPS, createEmptyGrid, canPlaceShip, placeShip,
@@ -34,6 +34,31 @@ export default function Battleships() {
 
   const [winner, setWinner] = useState(null); // 'player' | 'bot'
   const [isPlayerTurn, setIsPlayerTurn] = useState(true);
+  const [copied, setCopied] = useState(false);
+
+  const getRatingMessage = () => {
+    if (winner === 'player') {
+      if (difficulty === 5) return "🏆 Unbeatable Admiral";
+      if (difficulty === 4) return "⭐ Master Tactician";
+      if (difficulty === 3) return "⚔️ Hardened Captain";
+      if (difficulty === 2) return "🌊 Sea Commander";
+      return "⛵ Lucky Sailor";
+    }
+    return "💀 Sunk";
+  };
+
+  const handleShare = (e) => {
+    e.stopPropagation();
+    e.preventDefault();
+    const result = winner === 'player' ? 'won' : 'lost';
+    const text = `I ${result} in Axiom Battleships against a difficulty ${difficulty} bot! ${getRatingMessage()}`;
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(() => {
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      });
+    }
+  };
 
   const currentShip = shipsToPlace[0];
 
@@ -141,7 +166,8 @@ export default function Battleships() {
     }
   }, [gameState, isPlayerTurn, botShots, playerGrid, playerShips, difficulty]);
 
-  const resetGame = () => {
+  const resetGameRef = useRef();
+  resetGameRef.current = () => {
     setGameState(GAME_STATES.PLACEMENT);
     setPlayerGrid(createEmptyGrid());
     setShipsToPlace([...SHIPS]);
@@ -153,7 +179,23 @@ export default function Battleships() {
     setBotShots(createEmptyGrid());
     setWinner(null);
     setIsPlayerTurn(true);
+    setCopied(false);
     sfx.click();
+  };
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Enter' && gameState === GAME_STATES.GAME_OVER) {
+        e.preventDefault();
+        if (resetGameRef.current) resetGameRef.current();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [gameState]);
+
+  const resetGame = () => {
+    if (resetGameRef.current) resetGameRef.current();
   };
 
   const renderCellState = (val, shipId = null, shipState = null) => {
@@ -313,10 +355,16 @@ export default function Battleships() {
       </div>
 
       {gameState === GAME_STATES.GAME_OVER && (
-        <div className="mt-12 text-center fade-in">
-          <button className="btn-primary" onClick={resetGame}>
-            Play Again
-          </button>
+        <div className="mt-12 flex flex-col items-center text-center fade-in">
+          <div className="flex gap-4 mb-2">
+            <button className="btn-primary" onClick={resetGame}>
+              Play Again <span className="hidden sm:inline opacity-50 font-mono text-xs ml-2">(Enter)</span>
+            </button>
+            <button className="btn-ghost" onClick={handleShare}>
+              {copied ? 'Copied!' : 'Share Result'}
+            </button>
+          </div>
+          <p className="font-mono text-xs opacity-60">Press Enter to try again</p>
         </div>
       )}
     </div>

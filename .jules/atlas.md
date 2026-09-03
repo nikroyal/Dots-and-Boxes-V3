@@ -96,3 +96,4 @@
 ## 2024-05-20 - Adding explicit target context to Share Strings
 **Learning:** Adding explicit targets or qualitative rank messages to the clipboard share string in a game like Memory Match or Sequence Memory helps players immediately understand if a score is good, making them more likely to replay the game to reach a higher rank or challenge their friends.
 **Action:** When evaluating games with share buttons, verify that the shared text includes both the numerical score and the qualitative rank (like "Mastermind") or explicit target context to encourage the replay loop.
+## 2024-09-03 - Share Results Context in Battleships\n**Learning:** Battleships game lacked a 'Share Result' button, reducing word-of-mouth loops. Adding qualitative ranks based on bot difficulty, and an Enter-to-restart fast loop makes it more replayable and shareable.\n**Action:** Applied 'Share Result' text generation and 'Enter' shortcut binding.
