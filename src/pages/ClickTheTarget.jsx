@@ -12,6 +12,7 @@ export default function ClickTheTarget() {
   const [timeLeft, setTimeLeft] = useState(30);
   const [targetPos, setTargetPos] = useState({ top: '50%', left: '50%' });
   const [missFeedback, setMissFeedback] = useState(null);
+  const [hitFeedback, setHitFeedback] = useState(null);
   const [bestScore, setBestScore] = useState(() => {
     try {
       const saved = localStorage.getItem('axiom-click-best');
@@ -67,6 +68,18 @@ export default function ClickTheTarget() {
   const handleTargetClick = (e) => {
     e.stopPropagation();
     if (gameState !== 'playing') return;
+
+    if (containerRef.current) {
+      const rect = containerRef.current.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      const id = Date.now();
+      setHitFeedback({ id, x, y });
+      setTimeout(() => {
+        setHitFeedback((prev) => (prev?.id === id ? null : prev));
+      }, 300);
+    }
+
     sfx.piece();
     setScore((s) => s + 1);
     moveTarget();
@@ -167,6 +180,21 @@ export default function ClickTheTarget() {
             }}
           >
             -1
+          </div>
+        )}
+
+        {hitFeedback && (
+          <div
+            key={hitFeedback.id}
+            className="absolute text-[var(--forest)] font-display text-2xl fade-up pointer-events-none select-none"
+            style={{
+              left: hitFeedback.x,
+              top: hitFeedback.y,
+              transform: 'translate(-50%, -50%)',
+              animationDuration: '0.3s'
+            }}
+          >
+            +1
           </div>
         )}
 

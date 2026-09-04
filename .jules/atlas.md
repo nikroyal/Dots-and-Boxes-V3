@@ -96,3 +96,7 @@
 ## 2024-05-20 - Adding explicit target context to Share Strings
 **Learning:** Adding explicit targets or qualitative rank messages to the clipboard share string in a game like Memory Match or Sequence Memory helps players immediately understand if a score is good, making them more likely to replay the game to reach a higher rank or challenge their friends.
 **Action:** When evaluating games with share buttons, verify that the shared text includes both the numerical score and the qualitative rank (like "Mastermind") or explicit target context to encourage the replay loop.
+
+## 2026-09-04 - Progressive Feedback
+**Learning:** In rapid-fire arcade or logic games, providing immediate and progressive feedback (like 'Hot/Cold' or '+1' visual popups) significantly improves the core loop's immediate fun and understandability.
+**Action:** Add intermediate feedback mechanics when a player makes a move but doesn't immediately win or lose.
