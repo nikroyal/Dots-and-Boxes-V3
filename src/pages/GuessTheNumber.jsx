@@ -119,14 +119,21 @@ export default function GuessTheNumber() {
         recordActivity(profile, ACTIVITY_TYPES.ARCADE_BEST, { game: 'Guess The Number', score: newAttempts + ' attempts' });
         updateArcadeBest(profile, 'guess-the-number', 'Guess The Number', newAttempts, newAttempts + ' attempts');
       }
-    } else if (guess < targetNumber) {
-      sfx.click();
-      resultMessage = 'Too low!';
-      setMinBound(prev => Math.max(prev, guess + 1));
     } else {
+      const diff = Math.abs(guess - targetNumber);
+      let hint = '';
+      if (diff <= 5) hint = ' (🔥 Hot!)';
+      else if (diff <= 15) hint = ' (Warm)';
+      else if (diff >= 40) hint = ' (🧊 Cold)';
+
       sfx.click();
-      resultMessage = 'Too high!';
-      setMaxBound(prev => Math.min(prev, guess - 1));
+      if (guess < targetNumber) {
+        resultMessage = 'Too low!' + hint;
+        setMinBound(prev => Math.max(prev, guess + 1));
+      } else {
+        resultMessage = 'Too high!' + hint;
+        setMaxBound(prev => Math.min(prev, guess - 1));
+      }
     }
 
     setMessage(resultMessage);

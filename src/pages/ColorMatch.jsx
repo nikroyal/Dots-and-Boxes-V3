@@ -126,7 +126,7 @@ export default function ColorMatch() {
     const actualMatch = colorText.value === colorFill.value;
 
     if (isMatchClaim === actualMatch) {
-      sfx.win();
+      sfx.piece();
       setScore(s => s + 1);
       generateColors();
     } else {

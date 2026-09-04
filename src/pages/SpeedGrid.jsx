@@ -116,7 +116,7 @@ export default function SpeedGrid() {
 
       <div className="w-full max-w-md border hairline card bg-[var(--paper-tint)] p-6 sm:p-10 flex flex-col items-center relative">
         <div className="flex justify-between w-full mb-6 font-mono text-xl tracking-widest px-2">
-           <div>Next: {gameState === 'playing' ? nextNumber : '-'}</div>
+           <div>Next: <span className="bg-[var(--ink)] text-[var(--paper)] px-2 py-0.5 rounded shadow-sm">{gameState === 'playing' ? nextNumber : '-'}</span></div>
            <div>{(time / 1000).toFixed(3)}s</div>
         </div>
 
