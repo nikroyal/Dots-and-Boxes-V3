@@ -140,3 +140,33 @@ export function getRankInfo(elo) {
 export function getRankFromElo(elo) {
   return getRankInfo(elo).rank;
 }
+
+export function getUpNextAchievement(profile, strictPct = false, allowFallback = false) {
+  if (!profile) return null;
+  let best = null;
+  let highestPct = -1;
+  const unlocked = profile.unlockedAchievements || [];
+  for (const a of ACHIEVEMENTS) {
+    if (!unlocked.includes(a.id) && a.progress) {
+      const [curr, max, min = 0] = a.progress(profile);
+      const pct = max === min ? 0 : Math.min(100, Math.max(0, ((curr - min) / (max - min)) * 100));
+
+      const meetsPctCriteria = strictPct ? (pct > 0 && pct < 100) : (pct > 0);
+      if (meetsPctCriteria && max > 1 && pct > highestPct) {
+        highestPct = pct;
+        best = { a, curr, max, pct };
+      }
+    }
+  }
+
+  // AxiomHub fallback
+  if (!best && strictPct && allowFallback) {
+    const firstLocked = ACHIEVEMENTS.find(a => !unlocked.includes(a.id));
+    if (firstLocked && firstLocked.progress) {
+      const [curr, max, min = 0] = firstLocked.progress(profile);
+      const pct = max === min ? 0 : Math.min(100, Math.max(0, ((curr - min) / (max - min)) * 100));
+      best = { a: firstLocked, curr, max, pct };
+    }
+  }
+  return best;
+}

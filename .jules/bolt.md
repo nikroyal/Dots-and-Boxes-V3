@@ -62,9 +62,9 @@
 ## 2024-11-20 - O(1) Map lookups in render loops
 **Learning:** Using `Array.find()` inside a `.map()` render loop creates an O(N²) time complexity bottleneck which blocks the main thread during renders, especially for large arrays like chat history. While replacing it with a Map lookup (`Map.get()`) makes it O(1), recreating the Map from the array on every render cycle introduces unnecessary O(N) computational overhead and memory allocation churn, which can degrade performance rather than improve it.
 **Action:** Always memoize the Map creation (e.g., using `useMemo`) so the O(N) map generation cost is only paid when the underlying array changes, ensuring true O(1) lookup performance in the render loop.
-## 2024-06-25 - Replace Array.find for Static Configuration Lookups
-**Learning:** Calling `Array.find()` repeatedly within render functions to look up metadata from static configuration arrays (like `ACHIEVEMENTS`) introduces O(N) overhead in hot paths without memoization benefits.
-**Action:** Pre-compute a module-level `Map` for static configuration arrays (like `ACHIEVEMENTS`) and expose an O(1) getter function (like `getAchievementById`) to eliminate repetitive loop overhead in component renders.
+## 2024-06-25 - Extract and Memoize Complex Array Filters
+**Learning:** Performing complex O(N) array filtering/mapping operations (like finding the next achievement) repeatedly inside React render functions causes unnecessary re-computations on every render, especially when the underlying state hasn't changed.
+**Action:** Extract complex array reduction/filtering logic into a single shared helper function and wrap its invocation in `useMemo` at the component level to ensure O(N) operations only run when their dependencies update.
 ## 2025-02-23 - Pre-computing Maps for static lookups
 **Learning:** O(N) array scans (`Array.find()`) over static config data (like `EXPERIENCE_CATALOG`) during component renders can accumulate to unnecessary overhead.
 **Action:** When data structures like catalogs are statically defined, pre-compute a `Map` keyed by their ID at the module level. This exposes an O(1) getter to the rest of the application and completely bypasses the need to iterate or use `useMemo` at the component layer.

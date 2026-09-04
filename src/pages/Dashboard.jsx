@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef , useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { collection, query, where, onSnapshot } from 'firebase/firestore';
 import { db } from '../lib/firebase';
@@ -9,7 +9,7 @@ import {
 } from '../lib/actions';
 import { toast } from '../components/Notifications';
 import { sfx } from '../lib/sound';
-import { getRankInfo, ACHIEVEMENTS, getAchievementById } from '../lib/achievements';
+import {  getRankInfo, ACHIEVEMENTS, getAchievementById , getUpNextAchievement } from '../lib/achievements';
 import { getDailyGoal, getLocalYYYYMMDD } from '../lib/daily';
 import EloChart from '../components/EloChart';
 import ActivityFeed from '../components/ActivityFeed';
@@ -144,23 +144,7 @@ export default function Dashboard() {
   const dailyGoalCompleted = profile.dailyGoalDate === today || dailyGoal.check(dailyStats);
 
   // Find the locked achievement with the highest progress percentage
-  const upNextAchievement = (() => {
-    let best = null;
-    let highestPct = -1;
-    const unlocked = profile.unlockedAchievements || [];
-    for (const a of ACHIEVEMENTS) {
-      if (!unlocked.includes(a.id) && a.progress) {
-        const [curr, max, min = 0] = a.progress(profile);
-        const pct = max === min ? 0 : Math.min(100, Math.max(0, ((curr - min) / (max - min)) * 100));
-        // Only show if it has some progress (not 0/1 binary)
-        if (pct > 0 && max > 1 && pct > highestPct) {
-          highestPct = pct;
-          best = { a, curr, max, pct };
-        }
-      }
-    }
-    return best;
-  })();
+  const upNextAchievement = useMemo(() => getUpNextAchievement(profile, false), [profile]);
 
   const handleInvite = async (e) => {
     e.preventDefault();
