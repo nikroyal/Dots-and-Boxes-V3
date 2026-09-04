@@ -72,3 +72,4 @@
 ## 2024-08-25 - Node.js patch scripts and ES modules
 **Learning:** When writing temporary Node.js patch scripts that use `require()` in a repository with `"type": "module"` defined in its `package.json`, it throws a runtime error.
 **Action:** Use the `.cjs` file extension (e.g., `patch.cjs`) instead of `.js` to ensure it runs correctly as a CommonJS script.
+\n## 2026-09-04 - Never Commit Local Artifacts\n**Learning:** During testing, the environment can auto-generate configuration files like `pnpm-workspace.yaml` or logs like `dev_server.log`. Adding all files blindly using `git add .` or failing to review `git status` can lead to committing out-of-scope files and failing review.\n**Action:** Never commit local development log files or auto-generated configuration files. Always verify `git status` before requesting a code review, and prefer staging specific files with `git add <file>` rather than `git add .` to prevent accidental inclusions.
