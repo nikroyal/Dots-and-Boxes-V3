@@ -101,3 +101,9 @@
 **Learning:** When short-term goals (like a Daily Goal) are completed, removing them from high-traffic pages (like the Hub) eliminates immediate explicit motivation and creates a "Done" state that reduces post-match engagement.
 
 **Action:** When short-term goals are completed, explicitly celebrate them with a completed state and a call-to-action (e.g., "Come back tomorrow!") on the Hub to create a returning habit, and ensure they remain visible rather than being hidden.
+
+## 2024-05-22 - Goal Granularity Filtering
+
+**Learning:** Filtering goals based on their max value being greater than 1 avoids short binary (1 step) goals but fails to filter them out when they reach completion. When a goal hits 100%, displaying it can dominate the interface and distract the user from the actual incremental progress they are making.
+
+**Action:** When surfacing "closest" or "up next" goals/achievements, explicitly filter out goals with `pct < 100` alongside `max > 1` so that only currently unachieved, incremental targets are highlighted.
