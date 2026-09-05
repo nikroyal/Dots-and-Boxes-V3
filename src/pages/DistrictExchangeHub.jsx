@@ -16,7 +16,7 @@ export default function DistrictExchangeHub() {
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
         <Link to="/district-exchange/local" className="card interactive p-6 space-y-4 group">
           <div className="w-12 h-12 rounded-xl bg-primary/20 flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
-            <Users size={24} />
+            <Users size={24}  aria-hidden="true" />
           </div>
           <div>
             <h2 className="font-display text-2xl mb-1">Local Match</h2>
@@ -26,7 +26,7 @@ export default function DistrictExchangeHub() {
 
         <div className="card p-6 space-y-4 opacity-50 grayscale cursor-not-allowed">
           <div className="w-12 h-12 rounded-xl bg-blue-500/20 flex items-center justify-center text-blue-500">
-            <Play size={24} />
+            <Play size={24}  aria-hidden="true" />
           </div>
           <div>
             <h2 className="font-display text-2xl mb-1">Online Lobby</h2>
@@ -36,7 +36,7 @@ export default function DistrictExchangeHub() {
 
         <div className="card p-6 space-y-4 opacity-50 grayscale cursor-not-allowed md:col-span-2 lg:col-span-1">
           <div className="w-12 h-12 rounded-xl bg-yellow-500/20 flex items-center justify-center text-yellow-500">
-            <Trophy size={24} />
+            <Trophy size={24}  aria-hidden="true" />
           </div>
           <div>
             <h2 className="font-display text-2xl mb-1">Ranked</h2>

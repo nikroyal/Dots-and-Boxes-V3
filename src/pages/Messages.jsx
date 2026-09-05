@@ -123,7 +123,7 @@ export default function Messages() {
           ) : (
             <div className="flex-1 flex items-center justify-center py-20 opacity-50 font-display italic">
               <div className="text-center">
-                <MessageSquare size={32} style={{ margin: '0 auto', opacity: 0.4 }} />
+                <MessageSquare size={32} style={{ margin: '0 auto', opacity: 0.4 }}  aria-hidden="true" />
                 <div className="mt-3 font-mono text-[0.65rem] tracking-widest uppercase">Select a conversation</div>
               </div>
             </div>
@@ -219,7 +219,7 @@ function ConversationView({ convId, profile, conversations, onBack }) {
     <>
       <div className="px-4 py-3 border-b hairline flex items-center gap-3">
         <button onClick={onBack} className="md:hidden opacity-60 hover:opacity-100" aria-label="Back">
-          <ArrowLeft size={16} />
+          <ArrowLeft size={16}  aria-hidden="true" />
         </button>
         <Link to={`/profile/${other.username}`} className="flex items-center gap-3 hover:opacity-70 min-w-0">
           <span className="font-display text-2xl shrink-0">{other.avatar}</span>
@@ -248,10 +248,10 @@ function ConversationView({ convId, profile, conversations, onBack }) {
             {!isRequester && (
               <div className="flex justify-center gap-2">
                 <button onClick={handleAccept} disabled={busy} className="btn-primary">
-                  <Check size={12} /> Accept
+                  <Check size={12}  aria-hidden="true" /> Accept
                 </button>
                 <button onClick={handleDecline} disabled={busy} className="btn-ghost">
-                  <X size={12} /> Decline
+                  <X size={12} aria-hidden="true" /> Decline
                 </button>
               </div>
             )}
@@ -315,7 +315,7 @@ function ConversationFallback({ onBack, text }) {
     <>
       <div className="px-4 py-3 border-b hairline flex items-center gap-3">
         <button onClick={onBack} className="md:hidden opacity-60 hover:opacity-100" aria-label="Back">
-          <ArrowLeft size={16} />
+          <ArrowLeft size={16}  aria-hidden="true" />
         </button>
         <div className="font-mono text-[0.65rem] tracking-widest uppercase opacity-50">Messages</div>
       </div>

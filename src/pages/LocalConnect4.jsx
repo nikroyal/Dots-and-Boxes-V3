@@ -147,7 +147,7 @@ export default function LocalConnect4() {
       {finished && (
         <div className="card text-center max-w-sm mx-auto space-y-6 fade-up">
           <div>
-            <Trophy size={32} className="mx-auto mb-3" style={{ color: 'var(--ochre)' }} />
+            <Trophy size={32} className="mx-auto mb-3" style={{ color: 'var(--ochre)' }}  aria-hidden="true" />
             <h2 className="font-display text-3xl mb-1">{isDraw ? 'Draw!' : `${winnerName} Wins!`}</h2>
             <p className="font-mono text-[0.65rem] tracking-widest uppercase opacity-60">Match Over</p>
           </div>

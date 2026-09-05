@@ -53,7 +53,7 @@ export default function Admin() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between gap-4">
           <div className="min-w-0">
             <div className="font-mono text-[0.6rem] tracking-widest uppercase opacity-50 flex items-center gap-2">
-              <Shield size={13} /> Owner Console
+              <Shield size={13}  aria-hidden="true" /> Owner Console
             </div>
             <div className="font-display text-2xl leading-tight truncate">{profile.displayName || profile.username}</div>
           </div>
@@ -65,7 +65,7 @@ export default function Admin() {
               </button>
             ))}
           </nav>
-          <button onClick={logout} className="btn-ghost"><LogOut size={13} /> Log Out</button>
+          <button onClick={logout} className="btn-ghost"><LogOut size={13}  aria-hidden="true" /> Log Out</button>
         </div>
         <nav className="lg:hidden flex overflow-x-auto border-t hairline px-3 py-2">
           {TABS.map(([id, label, Icon]) => (
@@ -174,12 +174,12 @@ function UserRow({ admin, user, onViewAs }) {
         </div>
       </div>
       <div className="flex flex-wrap gap-2">
-        <button className="btn-primary" onClick={() => onViewAs(user)}><Eye size={12} /> View As</button>
+        <button className="btn-primary" onClick={() => onViewAs(user)}><Eye size={12}  aria-hidden="true" /> View As</button>
         <button className="btn-ghost" onClick={() => setPatch({ status: banned ? 'active' : 'banned' }, banned ? 'User unbanned' : 'User banned')}>
-          {banned ? <CheckCircle size={12} /> : <Ban size={12} />} {banned ? 'Unban' : 'Ban'}
+          {banned ? <CheckCircle size={12} /> : <Ban size={12}  aria-hidden="true" />} {banned ? 'Unban' : 'Ban'}
         </button>
         <button className="btn-ghost" onClick={() => setPatch({ chatMuted: !muted }, muted ? 'Chat unmuted' : 'Chat muted')}>
-          <MessageSquare size={12} /> {muted ? 'Unmute' : 'Mute'}
+          <MessageSquare size={12}  aria-hidden="true" /> {muted ? 'Unmute' : 'Mute'}
         </button>
       </div>
     </article>
@@ -201,7 +201,7 @@ function MatchesPanel({ admin, matches }) {
 
 function MatchButton({ match, active, onClick }) {
   return (
-    <button onClick={onClick} className="w-full text-left p-3 hover:bg-black/5" style={{ background: active ? 'var(--bg-soft)' : 'transparent' }}>
+    <button onClick={onClick} className="w-full text-left p-3 hover:bg-black/5" style={{ background: active ? 'var(--bg-soft)' : 'transparent' }} aria-label={`View match ${match.id}`}>
       <TinyMatch match={match} />
     </button>
   );
@@ -364,7 +364,7 @@ function OwnerSettings({ admin }) {
           <span className="font-mono text-[0.65rem] tracking-widest uppercase opacity-60 block mb-2">Display name</span>
           <input className="input-field" value={name} onChange={e => setName(e.target.value.slice(0, 40))} />
         </label>
-        <button type="submit" disabled={saving || !name.trim()} className="btn-primary"><Save size={13} /> {saving ? 'Saving…' : 'Save'}</button>
+        <button type="submit" disabled={saving || !name.trim()} className="btn-primary"><Save size={13}  aria-hidden="true" /> {saving ? 'Saving…' : 'Save'}</button>
       </form>
     </section>
   );

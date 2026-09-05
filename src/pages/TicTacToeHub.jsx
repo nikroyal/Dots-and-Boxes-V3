@@ -216,10 +216,10 @@ export default function TicTacToeHub() {
           </div>
           <div className="flex flex-wrap gap-3">
             <button type="submit" disabled={sending} className="btn-primary">
-              <Send size={14} /> Send Challenge
+              <Send size={14}  aria-hidden="true" /> Send Challenge
             </button>
             <button type="button" onClick={handleQuickMatch} disabled={findingMatch} className="btn-ghost">
-              <Zap size={14} /> {findingMatch ? 'Finding…' : 'Quick Match'}
+              <Zap size={14}  aria-hidden="true" /> {findingMatch ? 'Finding…' : 'Quick Match'}
             </button>
           </div>
         </form>

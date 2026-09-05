@@ -71,7 +71,7 @@ export default function Clubs() {
       <section className="relative overflow-hidden border hairline p-8 bg-black/[0.02] rounded-xl">
         <div className="relative z-10 max-w-2xl">
           <div className="font-mono text-[0.65rem] tracking-widest uppercase opacity-50 mb-3 flex items-center gap-2">
-            <Users size={12} /> Community Hub
+            <Users size={12}  aria-hidden="true" /> Community Hub
           </div>
           <h1 className="font-display text-5xl font-medium tracking-tight mb-4">Clubs</h1>
           <p className="font-display text-lg opacity-70 leading-relaxed mb-6">
@@ -79,10 +79,10 @@ export default function Clubs() {
           </p>
           <div className="flex flex-wrap gap-3">
             <button onClick={() => setShowCreate(true)} className="btn-primary">
-              <Plus size={14} /> Create Club
+              <Plus size={14}  aria-hidden="true" /> Create Club
             </button>
             <div className="relative flex-1 min-w-[200px]">
-              <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 opacity-30" />
+              <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 opacity-30"  aria-hidden="true" />
               <input 
                 value={search}
                 onChange={e => setSearch(e.target.value)}
@@ -93,7 +93,7 @@ export default function Clubs() {
             </div>
           </div>
         </div>
-        <Users size={200} className="absolute -right-10 -bottom-10 opacity-[0.03] pointer-events-none" />
+        <Users size={200} className="absolute -right-10 -bottom-10 opacity-[0.03] pointer-events-none"  aria-hidden="true" />
       </section>
 
       {/* Tabs */}
@@ -191,13 +191,13 @@ function ClubCard({ club, isMember }) {
         <div className="min-w-0">
           <h3 className="font-display text-2xl font-medium group-hover:underline underline-offset-4 decoration-1">{club.name}</h3>
           <div className="flex items-center gap-3 mt-1 font-mono text-[0.6rem] tracking-widest uppercase opacity-40">
-            <span className="flex items-center gap-1"><Users size={10} /> {club.memberCount || 1}</span>
+            <span className="flex items-center gap-1"><Users size={10}  aria-hidden="true" /> {club.memberCount || 1}</span>
             <span>•</span>
             <span>{club.isPublic ? 'Public' : 'Private'}</span>
           </div>
         </div>
         <div className="w-10 h-10 flex items-center justify-center bg-black/[0.03] rounded-full group-hover:bg-[var(--ink)] group-hover:text-[var(--paper)] transition-colors shrink-0">
-          <ChevronRight size={20} />
+          <ChevronRight size={20}  aria-hidden="true" />
         </div>
       </div>
       

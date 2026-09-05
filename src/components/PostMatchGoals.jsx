@@ -51,7 +51,7 @@ export default function PostMatchGoals({ profile }) {
         {dailyGoalCompleted ? (
           <div className="flex flex-col gap-1.5">
             <div className="flex items-center gap-2 font-mono text-[0.7rem] tracking-widest uppercase px-2 py-1 rounded-sm w-fit" style={{ background: 'var(--forest)', color: 'var(--paper)' }}>
-              <Check size={12} /> Completed
+              <Check size={12}  aria-hidden="true" /> Completed
             </div>
             <div className="font-mono text-[0.55rem] tracking-widest uppercase opacity-60">
               Come back tomorrow to keep your streak going
