@@ -88,3 +88,6 @@
 ## 2024-05-19 - Fast Sets for Grid Iteration
 **Learning:** In rapid-action games like Whack-A-Mole, doing nested N*M loops during grid render (like using `Array.some` inside a grid mapping loop) can be a source of re-render slowness. Using `useMemo` to convert array checks into O(1) Set lookups prevents unnecessary performance hits.
 **Action:** Always pre-compute Hash Maps or Sets when mapping over grids that require checking inclusion inside an array state for every cell.
+## 2025-03-08 - Optimize O(N^3) Rendering in Paper.io grids
+**Learning:** In React grid-based games with nested row/column \`.map()\` loops, evaluating array methods like \`.some()\` on every cell causes an O(N^3) rendering bottleneck. For example, \`lastMove.claimedBoxes?.some(...)\` checked inside every grid square during render created significant memory churn and slow frames.
+**Action:** Precompute a \`Set\` of stringified coordinate keys (e.g., \`${r},${c}\`) outside the loops (and wrap it in \`useMemo\` if in a functional component). Then use \`Set.has()\` inside the loops to achieve O(1) lookups and significantly reduce O(N) memory churn.

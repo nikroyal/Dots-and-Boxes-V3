@@ -181,13 +181,16 @@ export default function LocalMatch() {
           </defs>
 
           {/* Boxes */}
-          {Array.from({ length: rows }).map((_, r) =>
-            Array.from({ length: cols }).map((_, c) => {
-              const owner = game.boxes[`${r},${c}`];
+          {/* Optimization (Bolt): Pre-compute Set of claimed box keys to avoid O(N^3) array lookups in the render loop */}
+          {(() => {
+            const lastMove = Array.isArray(game.moves) && game.moves.length > 0 ? game.moves[game.moves.length - 1] : undefined;
+            const claimedSet = new Set((lastMove?.claimedBoxes || []).map(b => `${b.r},${b.c}`));
+            return Array.from({ length: rows }).map((_, r) =>
+              Array.from({ length: cols }).map((_, c) => {
+                const owner = game.boxes[`${r},${c}`];
               if (!owner) return null;
               const color = owner === 'p1' ? PLAYER_COLORS[0] : PLAYER_COLORS[1];
-              const lastMove = Array.isArray(game.moves) && game.moves.length > 0 ? game.moves[game.moves.length - 1] : undefined;
-              const isJustClaimed = !!lastMove && lastMove.claimedBoxes?.some(b => b.r === r && b.c === c);
+              const isJustClaimed = claimedSet.has(`${r},${c}`);
               return (
                 <g key={`b-${r}-${c}`} className="box-filled">
                   <rect
@@ -200,10 +203,11 @@ export default function LocalMatch() {
                     {owner === 'p1' ? p1Avatar || p1Name[0].toUpperCase() : p2Avatar || p2Name[0].toUpperCase()}
                   </text>
                   {isJustClaimed && <BoxParticles x={c * 60 + 40} y={r * 60 + 40} color={color.hex} />}
-                </g>
-              );
-            })
-          )}
+                  </g>
+                );
+              })
+            );
+          })()}
 
           {/* Dots */}
           {Array.from({ length: rows + 1 }).map((_, r) =>
