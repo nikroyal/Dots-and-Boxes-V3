@@ -113,11 +113,23 @@ export default function MathFlash() {
   const [copied, setCopied] = useState(false);
 
   const inputRef = useRef(null);
+  const startGameRef = useRef(null);
+
+  useEffect(() => {
+    startGameRef.current = startGame;
+  }, [startGame]);
+
+  const getRatingMessage = (s) => {
+    if (s >= 40) return "⚡ Lightning Fast!";
+    if (s >= 30) return "🚀 Human Calculator!";
+    if (s >= 20) return "🧠 Smart Cookie!";
+    return "🐢 Beginner!";
+  };
 
   const handleShare = (e) => {
     e.stopPropagation();
     e.preventDefault();
-    const text = `I scored ${score} in Axiom Math Flash! ⚡`;
+    const text = `I scored ${score} in Axiom Math Flash! ${getRatingMessage(score)}`;
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(text).then(() => {
         sfx.notify();
@@ -150,6 +162,18 @@ export default function MathFlash() {
     }
   };
 
+    useEffect(() => {
+    const handleKeyDown = (e) => {
+      if ((gameState === 'waiting' || gameState === 'result') && e.key === 'Enter') {
+        if (e.target.tagName === 'BUTTON' || e.target.tagName === 'A' || e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+        e.preventDefault();
+        startGameRef.current?.();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [gameState]);
+
   return (
     <div className="fade-in max-w-3xl mx-auto flex flex-col items-center justify-center min-h-[60vh] px-4">
       <section className="text-center mb-8">
@@ -168,10 +192,11 @@ export default function MathFlash() {
         {gameState === 'waiting' && (
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-[var(--paper-tint)] z-10 rounded-xl">
             <p className="mb-6 font-display text-xl opacity-80 text-center px-4">
-              Solve as many math equations as you can in 30 seconds!
+              Solve as many math equations as you can in 30 seconds!<br/>
+              <span className="text-sm opacity-60 mt-2 block font-mono tracking-widest uppercase">Target: ≥ 40 for ⚡</span>
             </p>
             <button onClick={startGame} className="btn-primary">
-              Start Test
+              Start Test <span className="hidden sm:inline opacity-50 font-mono text-xs ml-2">(Enter)</span>
             </button>
           </div>
         )}
@@ -182,7 +207,7 @@ export default function MathFlash() {
             <div className="font-display text-3xl mb-6 opacity-90 text-[var(--forest)]">Score: {score}</div>
             <div className="flex gap-4">
               <button onClick={startGame} className="btn-primary">
-                Try Again
+                Try Again <span className="hidden sm:inline opacity-50 font-mono text-xs ml-2">(Enter)</span>
               </button>
               <button onClick={handleShare} className="btn-ghost">
                 {copied ? 'Copied!' : 'Share Result'}

@@ -100,12 +100,38 @@ export default function SpeedGrid() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [gameState, startGame]);
 
+  const getRatingMessage = (timeMs) => {
+    const s = timeMs / 1000;
+    if (s <= 10) return "⚡ Speed Demon";
+    if (s <= 15) return "🐆 Excellent";
+    if (s <= 20) return "🏃 Good";
+    return "🐢 Keep Practicing";
+  };
+
+  const [copied, setCopied] = useState(false);
+  const handleShare = (e) => {
+    e.stopPropagation();
+    e.preventDefault();
+    const rating = getRatingMessage(time);
+    const text = `I completed Axiom Speed Grid in ${(time / 1000).toFixed(3)}s! ${rating}`;
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(() => {
+        sfx.notify();
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      }).catch(err => console.warn("Clipboard copy failed", err));
+    } else {
+      console.warn("Clipboard API not supported");
+    }
+  };
+
   return (
     <div className="fade-in max-w-2xl mx-auto flex flex-col items-center justify-center min-h-[60vh] px-4">
       <section className="text-center mb-8">
         <h1 className="font-display text-5xl font-medium tracking-tight mb-2">Speed Grid</h1>
         <p className="font-mono text-sm tracking-widest uppercase opacity-60 mb-2">
-          Click 1 to 25 as fast as you can.
+          Click 1 to 25 as fast as you can.<br/>
+          <span className="text-xs opacity-60 mt-1 block">Target: ≤ 15s for 🐆</span>
         </p>
         {bestTime !== null && (
           <p className="font-mono text-xs tracking-widest uppercase opacity-80 mt-2 text-[var(--ochre)]">
@@ -149,12 +175,20 @@ export default function SpeedGrid() {
         {gameState === 'gameover' && (
            <div className="flex flex-col items-center justify-center min-h-[300px] w-full mt-8 mb-8 text-center fade-in">
              <div className="font-display text-3xl mb-2">Done!</div>
-             <div className="font-display text-5xl text-[var(--forest)] mb-6 pulse-soft">
+             <div className="font-display text-5xl text-[var(--forest)] mb-2 pulse-soft">
                {(time / 1000).toFixed(3)}s
              </div>
-             <button onClick={startGame} className="btn-primary w-full text-lg py-3 max-w-[200px]">
-               Play Again (Enter)
-             </button>
+             <div className="font-display text-xl mb-6 opacity-90 text-[var(--ink)]">
+               {getRatingMessage(time)}
+             </div>
+             <div className="flex gap-4 w-full max-w-[300px]">
+               <button onClick={startGame} className="btn-primary flex-1">
+                 Play Again <span className="hidden sm:inline opacity-50 font-mono text-xs ml-2">(Enter)</span>
+               </button>
+               <button onClick={handleShare} className="btn-secondary flex-1">
+                 {copied ? 'Copied!' : 'Share Result'}
+               </button>
+             </div>
            </div>
         )}
       </div>
