@@ -50,6 +50,10 @@ export const ACHIEVEMENTS = [
     check: s => (s.losses || 0) >= 25, progress: s => [s.losses || 0, 25] },
   { id: 'tied_one_on',    name: 'Tied One On',    desc: 'Finish a game in a draw',
     check: s => (s.draws || 0) >= 1, progress: s => [s.draws || 0, 1] },
+  { id: 'habitual',       name: 'Habitual',       desc: 'Complete 3 daily goals in a row',
+    check: s => (s.dailyGoalStreak || 0) >= 3, progress: s => [s.dailyGoalStreak || 0, 3] },
+  { id: 'dedicated',      name: 'Dedicated',      desc: 'Complete 7 daily goals in a row',
+    check: s => (s.dailyGoalStreak || 0) >= 7, progress: s => [s.dailyGoalStreak || 0, 7] },
   { id: 'night_owl',      name: 'Night Owl',      desc: 'Finish a game between midnight and 4 AM',
     check: s => !!s.playedAtMidnight, progress: s => [s.playedAtMidnight ? 1 : 0, 1] },
 ];
@@ -87,6 +91,8 @@ export const UNLOCKABLE_AVATARS = [
   { val: '✧', req: 'Reach 2000 ELO', check: s => (s.elo || 1000) >= 2000 },
   { val: '◉', req: 'Claim 1000 boxes', check: s => (s.totalBoxes || 0) >= 1000 },
   { val: '⬢', req: 'Complete 10 Daily Goals', check: s => (s.dailyGoalsCompleted || 0) >= 10 },
+  { val: '🔥', req: '3-Day Goal Streak', check: s => (s.dailyGoalStreak || 0) >= 3 },
+  { val: '⚡', req: '7-Day Goal Streak', check: s => (s.dailyGoalStreak || 0) >= 7 },
 ];
 
 export const AVATAR_OPTIONS = UNLOCKABLE_AVATARS.map(a => a.val);
@@ -101,6 +107,8 @@ export const UNLOCKABLE_TITLES = [
   { val: 'Master', req: 'Reach 2000 ELO', check: s => (s.elo || 1000) >= 2000 },
   { val: 'Grandmaster', req: 'Reach 2500 ELO', check: s => (s.elo || 1000) >= 2500 },
   { val: 'Legend', req: 'Reach 3000 ELO', check: s => (s.elo || 1000) >= 3000 },
+  { val: 'Dedicated', req: '3-Day Goal Streak', check: s => (s.dailyGoalStreak || 0) >= 3 },
+  { val: 'Relentless', req: '7-Day Goal Streak', check: s => (s.dailyGoalStreak || 0) >= 7 },
   { val: 'The Patient', req: 'Lose 25 games', check: s => (s.losses || 0) >= 25 },
   { val: 'The Bold', req: 'Win in under 2 minutes', check: s => (s.fastestWin ?? Infinity) < 120000 },
 ];
