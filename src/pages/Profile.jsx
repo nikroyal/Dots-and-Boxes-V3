@@ -178,16 +178,16 @@ export default function Profile() {
             <>
               {isFriend ? (
                 <button onClick={handleRemoveFriend} className="btn-ghost">
-                  <Check size={12} /> Friends
+                  <Check size={12}  aria-hidden="true" /> Friends
                 </button>
               ) : (
                 <button onClick={handleAddFriend} className="btn-primary">
-                  <UserPlus size={12} /> Add Friend
+                  <UserPlus size={12}  aria-hidden="true" /> Add Friend
                 </button>
               )}
               {!isBlocked && (
                 <button onClick={handleBlock} className="btn-danger">
-                  <Ban size={12} /> Block
+                  <Ban size={12}  aria-hidden="true" /> Block
                 </button>
               )}
             </>

@@ -94,7 +94,7 @@ const MatchCard = memo(function MatchCard({ match, youAreIn }) {
           {isPaused ? (
             <span style={{ color: 'var(--ochre)' }}>● PAUSED</span>
           ) : (
-            <><Eye size={10} /> {specCount}</>
+            <><Eye size={10}  aria-hidden="true" /> {specCount}</>
           )}
         </div>
       </div>

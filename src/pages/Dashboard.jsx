@@ -230,7 +230,7 @@ export default function Dashboard() {
         <div className="flex items-center justify-between gap-4 flex-wrap">
           <div>
             <div className="font-mono text-[0.65rem] tracking-widest uppercase mb-1 flex items-center gap-2">
-              <span className="opacity-50 flex items-center gap-1.5"><Target size={12} /> Daily Goal</span>
+              <span className="opacity-50 flex items-center gap-1.5"><Target size={12}  aria-hidden="true" /> Daily Goal</span>
               {(profile.dailyGoalStreak || 0) > 0 && (
                 <span className="px-1.5 py-0.5 rounded-sm flex items-center gap-1" style={{ background: 'var(--bg-soft)', color: 'var(--ochre)' }}>
                   🔥 {profile.dailyGoalStreak} Day Streak
@@ -242,7 +242,7 @@ export default function Dashboard() {
           {dailyGoalCompleted ? (
             <div className="flex flex-col items-end gap-1.5 mt-1 sm:mt-0">
               <div className="flex items-center gap-2 font-mono text-[0.7rem] tracking-widest uppercase px-3 py-1.5 rounded-full" style={{ background: 'var(--forest)', color: 'var(--paper)' }}>
-                <Check size={14} /> Completed
+                <Check size={14}  aria-hidden="true" /> Completed
               </div>
               <div className="font-mono text-[0.55rem] tracking-widest uppercase opacity-60">
                 Come back tomorrow to keep your streak going
@@ -297,10 +297,10 @@ export default function Dashboard() {
           </div>
           <div className="flex flex-wrap gap-3">
             <button type="submit" disabled={sending} className="btn-primary">
-              <Send size={14} /> Send Challenge
+              <Send size={14}  aria-hidden="true" /> Send Challenge
             </button>
             <button type="button" onClick={handleQuickMatch} disabled={findingMatch} className="btn-ghost">
-              <Zap size={14} /> {findingMatch ? 'Finding…' : 'Quick Match'}
+              <Zap size={14}  aria-hidden="true" /> {findingMatch ? 'Finding…' : 'Quick Match'}
             </button>
           </div>
         </form>

@@ -191,7 +191,7 @@ export default function ClubDetail() {
           <div className="flex items-center">
             {isAdmin && (
               <button onClick={() => setShowSettings(true)} className="p-2 opacity-40 hover:opacity-100 transition-opacity relative" aria-label="Settings">
-                <Settings size={18} />
+                <Settings size={18}  aria-hidden="true" />
                 {joinRequests.length > 0 && <span className="absolute top-1 right-1 w-2 h-2 bg-[var(--crimson)] rounded-full" />}
               </button>
             )}
@@ -212,7 +212,7 @@ export default function ClubDetail() {
                   aria-label={`Go to channel ${chan.name}`}
                   className={`w-full flex items-center gap-2 px-3 py-1.5 rounded transition-colors text-sm font-display ${activeChannelId === chan.id ? 'bg-black/10 font-medium' : 'hover:bg-black/5 opacity-70'}`}
                 >
-                  <Hash size={14} className="opacity-40" />
+                  <Hash size={14} className="opacity-40"  aria-hidden="true" />
                   {chan.name}
                 </button>
               ))}
@@ -223,7 +223,7 @@ export default function ClubDetail() {
         <div className="p-3 border-t hairline space-y-2">
           {!isMember ? (
             <button onClick={handleJoin} disabled={busy} className="btn-primary w-full text-[0.65rem] py-2">
-              <UserPlus size={12} /> Join Club
+              <UserPlus size={12}  aria-hidden="true" /> Join Club
             </button>
           ) : (
             <div className="flex items-center gap-2 px-2 py-1">
@@ -232,7 +232,7 @@ export default function ClubDetail() {
                 <div className="text-xs font-mono truncate">{profile.username}</div>
                 <div className="text-[0.55rem] font-mono opacity-50 uppercase tracking-tighter">{myRole}</div>
               </div>
-              <button onClick={() => navigate('/clubs')} title="Leave view" className="opacity-40 hover:opacity-100" aria-label="Leave view"><LogOut size={14}/></button>
+              <button onClick={() => navigate('/clubs')} title="Leave view" className="opacity-40 hover:opacity-100" aria-label="Leave view"><LogOut size={14} aria-hidden="true" /></button>
             </div>
           )}
         </div>
@@ -243,13 +243,13 @@ export default function ClubDetail() {
         {/* Header */}
         <div className="h-14 px-4 flex items-center justify-between border-b hairline shrink-0">
           <div className="flex items-center gap-2 font-display text-lg font-medium">
-            <button onClick={() => setShowMobileSidebar(true)} className="lg:hidden p-2 -ml-2 opacity-50" aria-label="Open sidebar"><MoreVertical size={18}/></button>
-            <Hash size={18} className="opacity-40" />
+            <button onClick={() => setShowMobileSidebar(true)} className="lg:hidden p-2 -ml-2 opacity-50" aria-label="Open sidebar"><MoreVertical size={18} aria-hidden="true" /></button>
+            <Hash size={18} className="opacity-40"  aria-hidden="true" />
             <span className="truncate">{channels.find(c => c.id === activeChannelId)?.name || 'general'}</span>
           </div>
           <div className="flex items-center gap-4">
-            <button className="opacity-40 hover:opacity-100" title="Pinned Messages" aria-label="Pinned Messages"><Pin size={16}/></button>
-            <button onClick={() => setShowMobileMembers(true)} className="opacity-40 hover:opacity-100 lg:hidden" title="Members List" aria-label="Members List"><Users size={16} /></button>
+            <button className="opacity-40 hover:opacity-100" title="Pinned Messages" aria-label="Pinned Messages"><Pin size={16} aria-hidden="true" /></button>
+            <button onClick={() => setShowMobileMembers(true)} className="opacity-40 hover:opacity-100 lg:hidden" title="Members List" aria-label="Members List"><Users size={16}  aria-hidden="true" /></button>
           </div>
         </div>
 
@@ -257,13 +257,13 @@ export default function ClubDetail() {
         <div className="flex-1 overflow-y-auto p-4 space-y-6 scrollbar-thin">
           {!canViewChat ? (
             <div className="h-full flex flex-col items-center justify-center opacity-40 text-center px-8">
-              <Shield size={48} className="mb-4 stroke-[1px]" />
+              <Shield size={48} className="mb-4 stroke-[1px]"  aria-hidden="true" />
               <div className="font-display text-lg mb-1">This Club is Private</div>
               <p className="font-display text-sm">You must be a member to view the conversation.</p>
             </div>
           ) : messages.length === 0 ? (
             <div className="h-full flex flex-col items-center justify-center opacity-30 italic font-display">
-              <MessageSquare size={48} className="mb-4 stroke-[1px]" />
+              <MessageSquare size={48} className="mb-4 stroke-[1px]"  aria-hidden="true" />
               No messages here yet.
             </div>
           ) : (
@@ -303,7 +303,7 @@ export default function ClubDetail() {
               {replyTo && (
                 <div className="px-3 py-1.5 border-b hairline flex items-center justify-between text-xs opacity-70 bg-black/5 rounded-t-lg">
                   <div className="flex items-center gap-2 truncate">
-                    <Reply size={12} /> Replying to <strong>{replyTo.username}</strong>
+                    <Reply size={12}  aria-hidden="true" /> Replying to <strong>{replyTo.username}</strong>
                   </div>
                   <button onClick={() => setReplyTo(null)} className="hover:opacity-100" aria-label="Cancel reply"><X size={12}/></button>
                 </div>
@@ -324,7 +324,7 @@ export default function ClubDetail() {
                   disabled={!activeChannelId}
                 />
                 <button type="submit" disabled={!activeChannelId || !chatInput.trim()} className="p-2 opacity-60 hover:opacity-100 disabled:opacity-20 transition-opacity" aria-label="Send message">
-                  <Send size={18} />
+                  <Send size={18}  aria-hidden="true" />
                 </button>
               </form>
             </div>
@@ -428,7 +428,7 @@ function SettingsModal({ club, members, channels, requests, onClose, currentUser
           ))}
           <div className="pt-4 mt-4 border-t hairline">
             <button onClick={onClose} className="w-full flex items-center gap-3 px-3 py-2 rounded font-display text-sm text-[var(--crimson)] hover:bg-[var(--crimson)]/5" aria-label="Close Settings">
-              <LogOut size={16} /> Close Settings
+              <LogOut size={16}  aria-hidden="true" /> Close Settings
             </button>
           </div>
         </div>
@@ -466,14 +466,14 @@ function SettingsModal({ club, members, channels, requests, onClose, currentUser
                     className="bg-black/5 border hairline rounded px-3 py-1.5 text-sm outline-none focus:border-[var(--ink)]"
                     aria-label="New channel name"
                   />
-                  <button type="submit" disabled={busy || !newChanName.trim()} className="btn-primary text-xs py-1.5 px-3" aria-label="Create channel"><Plus size={14}/></button>
+                  <button type="submit" disabled={busy || !newChanName.trim()} className="btn-primary text-xs py-1.5 px-3" aria-label="Create channel"><Plus size={14} aria-hidden="true" /></button>
                 </form>
               </div>
               <div className="border hairline rounded-xl overflow-hidden divide-y divide-hairline">
                 {channels.map(c => (
                   <div key={c.id} className="flex items-center justify-between p-4 bg-[var(--paper-tint)]">
                     <div className="flex items-center gap-3">
-                      <Hash size={16} className="opacity-40" />
+                      <Hash size={16} className="opacity-40"  aria-hidden="true" />
                       <span className="font-display font-medium">#{c.name}</span>
                     </div>
                     {c.name !== 'general' && (
@@ -512,7 +512,7 @@ function SettingsModal({ club, members, channels, requests, onClose, currentUser
                           <option value={ROLES.MEMBER}>Member</option>
                         </select>
                         <button onClick={() => kickMember(club.id, m.userId, currentUser)} className="p-2 text-[var(--crimson)] hover:bg-[var(--crimson)]/5 rounded transition-colors" title="Kick" aria-label={`Kick ${m.username}`}>
-                          <UserMinus size={16} />
+                          <UserMinus size={16}  aria-hidden="true" />
                         </button>
                       </div>
                     )}
@@ -540,7 +540,7 @@ function SettingsModal({ club, members, channels, requests, onClose, currentUser
                       </div>
                       <div className="flex gap-2">
                         <button onClick={() => acceptJoinRequest(club.id, r, currentUser)} className="p-2 bg-[var(--forest)]/10 text-[var(--forest)] hover:bg-[var(--forest)]/20 rounded transition-colors" aria-label={`Accept join request from ${r.username}`}>
-                          <Check size={18} />
+                          <Check size={18}  aria-hidden="true" />
                         </button>
                         <button onClick={() => rejectJoinRequest(club.id, r.userId, currentUser)} className="p-2 bg-[var(--crimson)]/10 text-[var(--crimson)] hover:bg-[var(--crimson)]/20 rounded transition-colors" aria-label={`Reject join request from ${r.username}`}>
                           <X size={18} />
@@ -628,11 +628,11 @@ function MessageItem({
         {/* Message Actions */}
         {!editing && (
           <div className="absolute top-[-10px] right-4 opacity-0 group-hover:opacity-100 transition-opacity flex bg-[var(--paper-tint)] border hairline rounded shadow-sm overflow-hidden z-10">
-            <button onClick={onReply} className="p-1.5 hover:bg-black/5" title="Reply" aria-label="Reply"><Reply size={14}/></button>
-            <button onClick={onForward} className="p-1.5 hover:bg-black/5" title="Forward" aria-label="Forward"><ChevronRight size={14}/></button>
+            <button onClick={onReply} className="p-1.5 hover:bg-black/5" title="Reply" aria-label="Reply"><Reply size={14} aria-hidden="true" /></button>
+            <button onClick={onForward} className="p-1.5 hover:bg-black/5" title="Forward" aria-label="Forward"><ChevronRight size={14} aria-hidden="true" /></button>
             {isOwn && <button onClick={onEdit} className="p-1.5 hover:bg-black/5" title="Edit" aria-label="Edit"><Edit3 size={14}/></button>}
             {(isOwn || isAdmin) && <button onClick={onDelete} className="p-1.5 hover:bg-black/5 text-[var(--crimson)]" title="Delete" aria-label="Delete"><Trash2 size={14}/></button>}
-            <button className="p-1.5 hover:bg-black/5" title="More" aria-label="More actions"><MoreVertical size={14}/></button>
+            <button className="p-1.5 hover:bg-black/5" title="More" aria-label="More actions"><MoreVertical size={14} aria-hidden="true" /></button>
           </div>
         )}
       </div>
@@ -662,7 +662,7 @@ function MemberGroup({ title, members }) {
 
 function RoleBadge({ role }) {
   if (role === ROLES.OWNER) return <Crown size={12} className="text-[var(--ochre)] ml-auto" />;
-  if (role === ROLES.ADMIN) return <Shield size={12} className="text-[var(--crimson)] ml-auto" />;
-  if (role === ROLES.MODERATOR) return <Shield size={12} className="text-[var(--forest)] ml-auto" />;
+  if (role === ROLES.ADMIN) return <Shield size={12} className="text-[var(--crimson)] ml-auto"  aria-hidden="true" />;
+  if (role === ROLES.MODERATOR) return <Shield size={12} className="text-[var(--forest)] ml-auto"  aria-hidden="true" />;
   return null;
 }

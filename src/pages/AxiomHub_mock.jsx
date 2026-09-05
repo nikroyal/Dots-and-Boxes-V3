@@ -159,7 +159,7 @@ export default function AxiomHub() {
           <Link to={dailyGoalCompleted ? "/profile" : "/dots-and-boxes"} className="block border hairline p-4 bg-black/5 hover:bg-black/10 transition-colors" style={{ borderColor: dailyGoalCompleted ? 'var(--forest)' : 'var(--hairline)' }}>
             <div className="font-mono text-[0.55rem] tracking-widest uppercase mb-1 flex items-center justify-between opacity-60">
               <div className="flex items-center gap-2">
-                <Target size={12} /> Daily Goal
+                <Target size={12}  aria-hidden="true" /> Daily Goal
               </div>
               {(profile.dailyGoalStreak || 0) > 0 && (
                 <span className="px-1.5 py-0.5 rounded-sm flex items-center gap-1" style={{ background: 'var(--bg-soft)', color: 'var(--ochre)' }}>
@@ -172,7 +172,7 @@ export default function AxiomHub() {
             {dailyGoalCompleted ? (
               <div className="flex flex-col gap-1.5">
                 <div className="flex items-center gap-2 font-mono text-[0.7rem] tracking-widest uppercase px-2 py-1 rounded-sm w-fit" style={{ background: 'var(--forest)', color: 'var(--paper)' }}>
-                  <Check size={12} /> Completed
+                  <Check size={12}  aria-hidden="true" /> Completed
                 </div>
                 <div className="font-mono text-[0.55rem] tracking-widest uppercase opacity-60">
                   Come back tomorrow to keep your streak going
@@ -194,7 +194,7 @@ export default function AxiomHub() {
           {upNextAchievement && (
             <Link to="/achievements" className="block border hairline p-4 bg-black/5 hover:bg-black/10 transition-colors" style={{ borderColor: 'var(--ochre)' }}>
               <div className="font-mono text-[0.55rem] tracking-widest uppercase mb-1 flex items-center gap-2" style={{ color: 'var(--ochre)' }}>
-                <Trophy size={12} /> Up Next
+                <Trophy size={12}  aria-hidden="true" /> Up Next
               </div>
               <div className="font-display text-lg truncate">{upNextAchievement.a.name}</div>
               <div className="font-mono text-[0.6rem] tracking-wide opacity-60 mt-1 mb-2 truncate">{upNextAchievement.a.desc}</div>

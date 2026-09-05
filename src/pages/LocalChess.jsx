@@ -223,7 +223,7 @@ export default function LocalChess() {
           </button>
           {!flipBoard && (
             <button onClick={() => setFlipBoard(true)} className="btn-ghost" title="Enable auto-flip" aria-label="Enable auto-flip">
-              <RefreshCcw size={16} />
+              <RefreshCcw size={16}  aria-hidden="true" />
             </button>
           )}
         </div>
@@ -231,7 +231,7 @@ export default function LocalChess() {
           <div className="flex items-center gap-4">
             {useTimer && (
               <div className="flex items-center gap-2 font-mono text-sm tabular-nums" style={{ color: 'var(--ochre)' }}>
-                <Clock size={14} />
+                <Clock size={14}  aria-hidden="true" />
                 {(() => {
                   const remainingMs = Math.max(0, timerMins * 60 * 1000 - (now - turnStartedAtMs));
                   const secs = Math.ceil(remainingMs / 1000);
@@ -277,7 +277,7 @@ export default function LocalChess() {
       {finished && !pendingGame && (
         <div className="card text-center max-w-sm mx-auto space-y-6 fade-up">
           <div>
-            <Trophy size={32} className="mx-auto mb-3" style={{ color: 'var(--ochre)' }} />
+            <Trophy size={32} className="mx-auto mb-3" style={{ color: 'var(--ochre)' }}  aria-hidden="true" />
             <h2 className="font-display text-3xl mb-1">{isDraw ? 'Draw!' : `${winnerName} Wins!`}</h2>
             <p className="font-mono text-[0.65rem] tracking-widest uppercase opacity-60">Match Over</p>
           </div>

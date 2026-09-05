@@ -259,13 +259,13 @@ export default function LocalMatch() {
       {finished && (
         <div className="card text-center max-w-sm mx-auto space-y-6 fade-up">
           <div>
-            <Trophy size={32} className="mx-auto mb-3" style={{ color: 'var(--ochre)' }} />
+            <Trophy size={32} className="mx-auto mb-3" style={{ color: 'var(--ochre)' }}  aria-hidden="true" />
             <h2 className="font-display text-3xl mb-1">{isDraw ? 'Draw!' : `${winnerName} Wins!`}</h2>
             <p className="font-mono text-[0.65rem] tracking-widest uppercase opacity-60">Match Over</p>
           </div>
           <div className="flex gap-3 justify-center">
              <button onClick={() => { setGame(createEmptyGame(rows, cols, ['p1', 'p2'])); }} className="btn-primary">
-               <RotateCcw size={14} /> Play Again
+               <RotateCcw size={14}  aria-hidden="true" /> Play Again
              </button>
              <button onClick={() => setSetup(true)} className="btn-ghost">
                Setup

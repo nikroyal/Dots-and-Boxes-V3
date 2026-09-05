@@ -191,7 +191,7 @@ export default function Replay() {
             <ChevronLeft size={16} aria-hidden="true" />
           </button>
           <button onClick={() => setPlaying(!playing)} className="btn-primary flex-1" aria-label={playing ? "Pause" : "Play"}>
-            {playing ? <Pause size={14} /> : <Play size={14} />} {playing ? 'Pause' : 'Play'}
+            {playing ? <Pause size={14}  aria-hidden="true" /> : <Play size={14}  aria-hidden="true" />} {playing ? 'Pause' : 'Play'}
           </button>
           <button onClick={() => setStep(s => Math.min(totalSteps, s + 1))} className="p-2 hover:bg-black/5" aria-label="Step forward">
             <ChevronRight size={16} aria-hidden="true" />
@@ -205,7 +205,7 @@ export default function Replay() {
                className="w-full" />
         <div className="flex justify-between font-mono text-[0.6rem] tracking-widest uppercase opacity-60">
           <span>Move {step} / {totalSteps}</span>
-          <button onClick={() => navigate('/history')} className="hover:opacity-100"><Home size={12} className="inline" /> Back</button>
+          <button onClick={() => navigate('/history')} className="hover:opacity-100"><Home size={12} className="inline"  aria-hidden="true" /> Back</button>
         </div>
       </div>
     </div>

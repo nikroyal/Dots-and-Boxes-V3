@@ -55,7 +55,7 @@ const ActivityRow = memo(function ActivityRow({ item, isMe }) {
   let icon, text, color;
   switch (item.type) {
     case ACTIVITY_TYPES.WIN: {
-      icon = <Trophy size={14} />;
+      icon = <Trophy size={14}  aria-hidden="true" />;
       color = 'var(--forest)';
       text = <>{subject} beat <strong>{item.data?.opponent || '?'}</strong> {item.data?.myScore}–{item.data?.oppScore} ({fmtElo(item.data?.eloDelta)} ELO)</>;
       break;
@@ -67,44 +67,44 @@ const ActivityRow = memo(function ActivityRow({ item, isMe }) {
       break;
     }
     case ACTIVITY_TYPES.DRAW: {
-      icon = <Equal size={14} />;
+      icon = <Equal size={14}  aria-hidden="true" />;
       color = 'var(--ochre)';
       text = <>{subject} drew with <strong>{item.data?.opponent || '?'}</strong> {item.data?.myScore}–{item.data?.oppScore}</>;
       break;
     }
     case ACTIVITY_TYPES.ACHIEVEMENT: {
       const a = getAchievementById(item.data?.achievementId);
-      icon = <Trophy size={14} />;
+      icon = <Trophy size={14}  aria-hidden="true" />;
       color = 'var(--ochre)';
       text = <>{subject} unlocked <strong>{a?.name || 'an achievement'}</strong></>;
       break;
     }
     case ACTIVITY_TYPES.FRIEND_ADDED: {
-      icon = <UserPlus size={14} />;
+      icon = <UserPlus size={14}  aria-hidden="true" />;
       color = 'var(--ink)';
       text = <>{subject} became friends with <strong>{item.data?.friendUsername || '?'}</strong></>;
       break;
     }
     case ACTIVITY_TYPES.CLUB_JOINED: {
-      icon = <Users size={14} />;
+      icon = <Users size={14}  aria-hidden="true" />;
       color = 'var(--ink)';
       text = <>{subject} joined club <strong>{item.data?.clubName || '?'}</strong></>;
       break;
     }
     case ACTIVITY_TYPES.CLUB_CREATED: {
-      icon = <Users size={14} />;
+      icon = <Users size={14}  aria-hidden="true" />;
       color = 'var(--ink)';
       text = <>{subject} founded club <strong>{item.data?.clubName || '?'}</strong></>;
       break;
     }
     case ACTIVITY_TYPES.ARCADE_BEST: {
-      icon = <Zap size={14} />;
+      icon = <Zap size={14}  aria-hidden="true" />;
       color = 'var(--crimson)';
       text = <>{subject} set a new personal best in <strong>{item.data?.game || 'an arcade game'}</strong> ({item.data?.score})</>;
       break;
     }
     case ACTIVITY_TYPES.DAILY_GOAL: {
-      icon = <Target size={14} />;
+      icon = <Target size={14}  aria-hidden="true" />;
       color = 'var(--forest)';
       text = <>{subject} completed their <strong>Daily Goal</strong></>;
       break;

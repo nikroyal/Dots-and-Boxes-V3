@@ -409,23 +409,23 @@ export default function CircuitMaker() {
             <div className="grid grid-cols-2 gap-2">
               {GATE_TYPES.map(([type, label]) => (
                 <button key={type} onClick={() => addComponent(type)} className="btn-ghost justify-start px-3 py-2">
-                  <Plus size={12} /> {label}
+                  <Plus size={12}  aria-hidden="true" /> {label}
                 </button>
               ))}
             </div>
           </div>
 
           <div className="card space-y-2">
-            <button onClick={connectSelected} disabled={selected.length !== 2} className="btn-primary w-full"><Zap size={14} /> Connect</button>
+            <button onClick={connectSelected} disabled={selected.length !== 2} className="btn-primary w-full"><Zap size={14}  aria-hidden="true" /> Connect</button>
             <div className="grid grid-cols-2 gap-2">
               <button onClick={undo} disabled={historyIndex <= 0} className="btn-ghost"><Undo2 size={13} /> Undo</button>
-              <button onClick={redo} disabled={historyIndex >= history.length - 1} className="btn-ghost"><RotateCcw size={13} /> Redo</button>
-              <button id="sampleBtn" onClick={sample} className="btn-ghost"><Zap size={13} /> Sample</button>
+              <button onClick={redo} disabled={historyIndex >= history.length - 1} className="btn-ghost"><RotateCcw size={13}  aria-hidden="true" /> Redo</button>
+              <button id="sampleBtn" onClick={sample} className="btn-ghost"><Zap size={13}  aria-hidden="true" /> Sample</button>
               <button onClick={removeSelected} disabled={!selected.length} className="btn-ghost"><Trash2 size={13} /> Delete</button>
-              <button onClick={saveProject} className="btn-ghost"><Save size={13} /> Save</button>
-              <button onClick={() => setProjectOpen(true)} className="btn-ghost"><FolderOpen size={13} /> Open</button>
-              <button onClick={exportJson} className="btn-ghost"><Download size={13} /> JSON</button>
-              <button id="exportPng" onClick={exportPng} className="btn-ghost"><Download size={13} /> PNG</button>
+              <button onClick={saveProject} className="btn-ghost"><Save size={13}  aria-hidden="true" /> Save</button>
+              <button onClick={() => setProjectOpen(true)} className="btn-ghost"><FolderOpen size={13}  aria-hidden="true" /> Open</button>
+              <button onClick={exportJson} className="btn-ghost"><Download size={13}  aria-hidden="true" /> JSON</button>
+              <button id="exportPng" onClick={exportPng} className="btn-ghost"><Download size={13}  aria-hidden="true" /> PNG</button>
             </div>
             <button onClick={clear} className="btn-danger w-full"><Trash2 size={13} /> Clear</button>
           </div>

@@ -365,7 +365,7 @@ export default function MatchConnect4() {
         {match.status === 'paused' && (
           <div className="card flex items-center justify-between" style={{ background: 'rgba(183,121,31,0.05)', borderColor: 'rgba(183,121,31,0.3)' }}>
             <div className="flex items-center gap-3">
-              <Pause size={16} style={{ color: 'var(--ochre)' }} />
+              <Pause size={16} style={{ color: 'var(--ochre)' }}  aria-hidden="true" />
               <div>
                 <div className="font-display text-base">Match Paused</div>
                 <div className="font-mono text-[0.65rem] tracking-widest uppercase opacity-60">Board hidden to prevent strategizing</div>
@@ -373,7 +373,7 @@ export default function MatchConnect4() {
             </div>
             {isPlayer && (
               <button onClick={handleResume} className="btn-primary">
-                <Play size={14} /> Resume
+                <Play size={14}  aria-hidden="true" /> Resume
               </button>
             )}
           </div>
@@ -448,7 +448,7 @@ export default function MatchConnect4() {
         <div className="flex items-center justify-between flex-wrap gap-3">
           <div className="font-mono text-xs tracking-wide opacity-60">
             {isSpectator ? (
-              <><Eye size={12} className="inline mr-1" /> Spectating · {(Array.isArray(match.spectators) ? match.spectators.length : 0)} watching</>
+              <><Eye size={12} className="inline mr-1"  aria-hidden="true" /> Spectating · {(Array.isArray(match.spectators) ? match.spectators.length : 0)} watching</>
             ) : inCountdown ? (
               'Starting…'
             ) : isMyTurn ? (
@@ -499,7 +499,7 @@ export default function MatchConnect4() {
         <div className="px-4 py-3 border-b hairline flex items-center justify-between">
           <div className="font-mono text-[0.65rem] tracking-widest uppercase opacity-60">Chat</div>
           <div className="font-mono text-[0.6rem] tracking-widest uppercase opacity-50">
-            <Eye size={10} className="inline mr-1" /> {(Array.isArray(match.spectators) ? match.spectators.length : 0)}
+            <Eye size={10} className="inline mr-1"  aria-hidden="true" /> {(Array.isArray(match.spectators) ? match.spectators.length : 0)}
           </div>
         </div>
         <div className="flex-1 overflow-y-auto p-3 space-y-2 scrollbar-thin">
@@ -581,8 +581,8 @@ function TurnTimerBanner({ remainingMs, timeoutMs, isMyTurn, isPlayer, opponentD
            style={{ background: 'rgba(185,28,60,0.06)', borderColor: 'rgba(185,28,60,0.3)' }}>
         <div className="flex items-center gap-3">
           {opponentDisconnected
-            ? <WifiOff size={16} style={{ color: 'var(--crimson)' }} />
-            : <Clock size={16} style={{ color: 'var(--crimson)' }} />}
+            ? <WifiOff size={16} style={{ color: 'var(--crimson)' }}  aria-hidden="true" />
+            : <Clock size={16} style={{ color: 'var(--crimson)' }}  aria-hidden="true" />}
           <div>
             <div className="font-display text-base">
               {opponentDisconnected ? 'Opponent disconnected' : "Opponent's time is up"}
@@ -593,7 +593,7 @@ function TurnTimerBanner({ remainingMs, timeoutMs, isMyTurn, isPlayer, opponentD
           </div>
         </div>
         <button onClick={onClaimVictory} className="btn-primary">
-          <Trophy size={12} /> Claim Victory
+          <Trophy size={12}  aria-hidden="true" /> Claim Victory
         </button>
       </div>
     );
@@ -602,7 +602,7 @@ function TurnTimerBanner({ remainingMs, timeoutMs, isMyTurn, isPlayer, opponentD
   return (
     <div className="border hairline px-4 py-2 flex items-center justify-between gap-3">
       <div className="flex items-center gap-2 min-w-0">
-        <Clock size={14} style={{ color, opacity: 0.8 }} />
+        <Clock size={14} style={{ color, opacity: 0.8 }}  aria-hidden="true" />
         <span className="font-mono text-[0.65rem] tracking-widest uppercase opacity-70">
           {!isPlayer ? 'Spectating'
             : isMyTurn ? 'Your turn'
@@ -862,7 +862,7 @@ const ConcealedBoard = memo(function ConcealedBoard({ rows, cols }) {
         )}
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center">
-        <Pause size={36} style={{ opacity: 0.4 }} />
+        <Pause size={36} style={{ opacity: 0.4 }}  aria-hidden="true" />
         <div className="font-mono text-[0.7rem] tracking-widest uppercase opacity-50 mt-3">Board hidden</div>
       </div>
     </div>
@@ -1068,7 +1068,7 @@ function WinScreen({ match, profile, achievementToasts, onHome, onReplay }) {
           <>
             <button onClick={handleRematch} disabled={rematchState === 'sending' || rematchState === 'sent'}
                     className="btn-ghost">
-              <Repeat size={14} />{' '}
+              <Repeat size={14}  aria-hidden="true" />{' '}
               {rematchState === 'sent' ? 'Rematch sent'
                 : rematchState === 'sending' ? 'Sending…'
                 : 'Rematch'}
@@ -1076,7 +1076,7 @@ function WinScreen({ match, profile, achievementToasts, onHome, onReplay }) {
             {opponentInfo && !isFriend && !hasPendingRequest && !hasIncomingRequest && (
               <button onClick={handleAddFriend} disabled={friendRequestState === 'sending' || friendRequestState === 'sent'}
                       className={friendRequestState === 'sent' ? 'btn-ghost opacity-50' : 'btn-ghost'}>
-                <UserPlus size={14} />{' '}
+                <UserPlus size={14}  aria-hidden="true" />{' '}
                 {friendRequestState === 'sent' ? 'Request sent'
                   : friendRequestState === 'sending' ? 'Sending…'
                   : 'Add Friend'}

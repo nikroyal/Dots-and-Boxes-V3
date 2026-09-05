@@ -263,7 +263,7 @@ export default function Battleships() {
                   className="btn-ghost flex items-center gap-2"
                   onClick={() => setIsVertical(!isVertical)}
                 >
-                  <RotateCw size={16} /> Rotate ({isVertical ? 'Vertical' : 'Horizontal'})
+                  <RotateCw size={16}  aria-hidden="true" /> Rotate ({isVertical ? 'Vertical' : 'Horizontal'})
                 </button>
               </div>
             </div>
