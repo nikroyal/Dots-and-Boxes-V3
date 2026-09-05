@@ -95,6 +95,11 @@ export default function MineSweeper() {
 
   const timerRef = useRef(null);
   const timeElapsedRef = useRef(0);
+  const startGameRef = useRef(null);
+
+  useEffect(() => {
+    startGameRef.current = resetGame;
+  });
 
   useEffect(() => {
     timeElapsedRef.current = timeElapsed;
@@ -228,6 +233,43 @@ export default function MineSweeper() {
     setGrid(newGrid);
   };
 
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if ((gameState === 'won' || gameState === 'lost') && e.key === 'Enter') {
+        if (e.target.tagName === 'BUTTON' || e.target.tagName === 'A' || e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+        e.preventDefault();
+        startGameRef.current?.();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [gameState]);
+
+  const [copied, setCopied] = useState(false);
+
+  const getRatingMessage = (time) => {
+    if (time <= 30) return "🚀 Mine Master";
+    if (time <= 60) return "⚡ Speedy Sweeper";
+    if (time <= 120) return "🧠 Careful Clearer";
+    return "🐢 Slow & Steady";
+  };
+
+  const handleShare = (e) => {
+    e.stopPropagation();
+    e.preventDefault();
+    const rating = getRatingMessage(timeElapsed);
+    const text = `I cleared Axiom Minesweeper in ${timeElapsed}s! ${rating}`;
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(() => {
+        sfx.notify();
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      }).catch(err => console.warn("Clipboard copy failed", err));
+    } else {
+      console.warn("Clipboard API not supported");
+    }
+  };
+
   const getNumberColor = (num) => {
     switch (num) {
       case 1: return 'text-blue-500';
@@ -249,6 +291,11 @@ export default function MineSweeper() {
         <p className="font-mono text-sm tracking-widest uppercase opacity-60 mb-2">
           Time: <span className="text-[var(--ink)] font-bold">{timeElapsed}s</span> | Flags: <span className="text-[var(--crimson)] font-bold">{flagsCount}</span>
         </p>
+        {gameState === 'waiting' && (
+          <p className="font-mono text-xs tracking-widest uppercase opacity-60 mt-1">
+            Target: ≤ 60s for ⚡
+          </p>
+        )}
         {bestTime !== null && (
           <p className="font-mono text-xs tracking-widest uppercase opacity-80 mt-2 text-[var(--forest)]">
             Best Time: {bestTime}s
@@ -262,9 +309,15 @@ export default function MineSweeper() {
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-[var(--paper-tint)]/90 z-10 backdrop-blur-sm">
              <div className="font-display text-4xl mb-2 text-[var(--forest)]">You Won!</div>
              <div className="font-display text-3xl mb-1 opacity-90">{timeElapsed} Seconds</div>
-             <button onClick={resetGame} className="btn-primary mt-6">
-                Play Again
-             </button>
+             <div className="font-display text-xl mb-6 opacity-90 text-[var(--ink)]">{getRatingMessage(timeElapsed)}</div>
+             <div className="flex gap-4 mt-6">
+               <button onClick={resetGame} className="btn-primary">
+                 Play Again <span className="hidden sm:inline opacity-50 font-mono text-xs ml-2">(Enter)</span>
+               </button>
+               <button onClick={handleShare} className="btn-secondary">
+                 {copied ? 'Copied!' : 'Share Result'}
+               </button>
+             </div>
           </div>
         )}
 
@@ -272,7 +325,7 @@ export default function MineSweeper() {
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-[var(--paper-tint)]/90 z-10 backdrop-blur-sm">
              <div className="font-display text-4xl mb-2 text-[var(--crimson)]">Game Over</div>
              <button onClick={resetGame} className="btn-primary mt-6">
-                Try Again
+                Try Again <span className="hidden sm:inline opacity-50 font-mono text-xs ml-2">(Enter)</span>
              </button>
           </div>
         )}
