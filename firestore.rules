@@ -106,7 +106,7 @@ service cloud.firestore {
         && request.resource.data.ts is number;
       allow update: if isSignedIn() && (
         request.auth.uid == resource.data.toId || request.auth.uid == resource.data.fromId
-      );
+      ) && !changedKeys().hasAny(['fromId', 'toId', 'matchId', 'game', 'ts']);
       allow delete: if isSignedIn() && (
         request.auth.uid == resource.data.fromId || request.auth.uid == resource.data.toId || isAdmin()
       );
