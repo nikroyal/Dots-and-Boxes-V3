@@ -96,3 +96,6 @@
 ## 2024-05-20 - Adding explicit target context to Share Strings
 **Learning:** Adding explicit targets or qualitative rank messages to the clipboard share string in a game like Memory Match or Sequence Memory helps players immediately understand if a score is good, making them more likely to replay the game to reach a higher rank or challenge their friends.
 **Action:** When evaluating games with share buttons, verify that the shared text includes both the numerical score and the qualitative rank (like "Mastermind") or explicit target context to encourage the replay loop.
+## 2024-05-19 - Safe Global Keyboard Shortcuts with Refs
+**Learning:** Implementing window-level `keydown` event listeners in React for fast core loops requires ensuring stable references or using refs. Without this, the listener might use the initial render state and fail to trigger or trigger the wrong action.
+**Action:** When adding global keyboard shortcuts to React games for quick restarting, use a `useRef` to store the callback function and invoke it in the `keydown` handler to avoid stale closures.
