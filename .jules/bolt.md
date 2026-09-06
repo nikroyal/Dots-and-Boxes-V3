@@ -88,3 +88,6 @@
 ## 2024-05-19 - Fast Sets for Grid Iteration
 **Learning:** In rapid-action games like Whack-A-Mole, doing nested N*M loops during grid render (like using `Array.some` inside a grid mapping loop) can be a source of re-render slowness. Using `useMemo` to convert array checks into O(1) Set lookups prevents unnecessary performance hits.
 **Action:** Always pre-compute Hash Maps or Sets when mapping over grids that require checking inclusion inside an array state for every cell.
+## 2026-09-06 - Precompute Set to eliminate O(N^3) bottleneck
+**Learning:** In React grid games, evaluating array methods like `.some()` inside nested row/col `.map()` loops causes a silent O(N^3) render bottleneck (O(N^2) for the grid * O(N) for the inner check). If the condition array has length M, it becomes O(N^2 * M).
+**Action:** Always precompute a `Set` of stringified coordinate keys (e.g. `${r},${c}`) wrapped in a `useMemo` hook at the top level to turn the inner O(M) check into an O(1) lookup, effectively dropping the rendering cost to O(N^2 + M).

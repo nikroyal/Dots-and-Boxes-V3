@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { sfx } from '../../lib/sound';
 import {
   BOARD_SIZE, SHIPS, createEmptyGrid, canPlaceShip, placeShip,
@@ -36,6 +36,12 @@ export default function Battleships() {
   const [isPlayerTurn, setIsPlayerTurn] = useState(true);
 
   const currentShip = shipsToPlace[0];
+
+  // Optimization (Bolt): Precompute hoveredCells into a Set to prevent O(N^3) bottleneck
+  // when checking hover states inside the O(N^2) grid rendering loops.
+  const hoveredSet = useMemo(() => {
+    return new Set(hoveredCells.map(hc => `${hc.r},${hc.c}`));
+  }, [hoveredCells]);
 
   const handlePlayerGridMouseEnter = (row, col) => {
     if (gameState !== GAME_STATES.PLACEMENT || !currentShip) return;
@@ -220,7 +226,7 @@ export default function Battleships() {
             >
               {playerGrid.map((row, r) =>
                 row.map((cell, c) => {
-                  const isHovered = hoveredCells.some(hc => hc.r === r && hc.c === c);
+                  const isHovered = hoveredSet.has(`${r},${c}`);
                   let bgColor = 'bg-white dark:bg-neutral-900';
 
                   if (cell !== null) {
