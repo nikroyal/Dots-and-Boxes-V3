@@ -101,3 +101,8 @@
 **Learning:** When short-term goals (like a Daily Goal) are completed, removing them from high-traffic pages (like the Hub) eliminates immediate explicit motivation and creates a "Done" state that reduces post-match engagement.
 
 **Action:** When short-term goals are completed, explicitly celebrate them with a completed state and a call-to-action (e.g., "Come back tomorrow!") on the Hub to create a returning habit, and ensure they remain visible rather than being hidden.
+## 2026-09-06 - Surface Arcade Records in Hub
+
+**Learning:** Players engage more when they see their past accomplishments upon returning. While arcade personal bests were stored in their profile and visible on their dedicated profile page, surfacing them directly on the game selection cards in the Hub provides immediate motivation to beat their own scores right at the moment of game selection.
+
+**Action:** Whenever introducing scoring or personal best mechanics in mini-games, ensure that these accomplishments are surfaced at the discovery/hub level, not just hidden within the game or user profile screens.

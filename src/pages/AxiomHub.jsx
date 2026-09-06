@@ -143,9 +143,10 @@ export default function AxiomHub() {
                 </div>
               </div>
             </div>
-            <div className="grid grid-cols-3 gap-2 text-center">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center">
               <MiniStat label="Things" value={EXPERIENCE_CATALOG.length} />
               <MiniStat label="Favorites" value={favoriteIds.length} />
+              <MiniStat label="Records" value={profile.arcadeBests ? Object.keys(profile.arcadeBests).length : 0} />
               <MiniStat label="Friends" value={Array.isArray(profile.friends) ? profile.friends.length : 0} />
             </div>
           </Link>
@@ -217,6 +218,7 @@ export default function AxiomHub() {
         experiences={favorites}
         favoriteSet={favoriteSet}
         onToggleFavorite={toggleFavorite}
+        profile={profile}
       />
 
       <ExperienceSection
@@ -224,6 +226,7 @@ export default function AxiomHub() {
         experiences={favorites.length ? others : EXPERIENCE_CATALOG}
         favoriteSet={favoriteSet}
         onToggleFavorite={toggleFavorite}
+        profile={profile}
       />
     </div>
   );
@@ -238,7 +241,7 @@ function MiniStat({ label, value }) {
   );
 }
 
-function ExperienceSection({ title, experiences, favoriteSet, onToggleFavorite }) {
+function ExperienceSection({ title, experiences, favoriteSet, onToggleFavorite, profile }) {
   if (!experiences.length) return null;
 
   return (
@@ -256,6 +259,7 @@ function ExperienceSection({ title, experiences, favoriteSet, onToggleFavorite }
             experience={experience}
             isFavorite={favoriteSet.has(experience.id)}
             onToggleFavorite={() => onToggleFavorite(experience.id)}
+            profile={profile}
           />
         ))}
       </div>
@@ -263,7 +267,7 @@ function ExperienceSection({ title, experiences, favoriteSet, onToggleFavorite }
   );
 }
 
-function ExperienceCard({ experience, isFavorite, onToggleFavorite }) {
+function ExperienceCard({ experience, isFavorite, onToggleFavorite, profile }) {
   const Icon = iconByExperience[experience.id] || Play;
 
   return (
@@ -291,7 +295,20 @@ function ExperienceCard({ experience, isFavorite, onToggleFavorite }) {
         </button>
       </div>
 
+
       <p className="font-display text-lg leading-snug opacity-70 flex-1">{experience.description}</p>
+
+      {profile?.arcadeBests?.[experience.id] && (
+        <div className="mt-4 font-mono text-[0.65rem] tracking-widest uppercase flex items-center justify-between border hairline px-3 py-2 bg-black/5">
+          <span className="opacity-60 flex items-center gap-2">
+             <Trophy size={10} aria-hidden="true" />
+             Personal Best
+          </span>
+          <span style={{ color: experience.accent }} className="font-bold">
+             {profile.arcadeBests[experience.id].scoreDisplay}
+          </span>
+        </div>
+      )}
 
       <div className="flex flex-wrap gap-2 mt-5 mb-5">
         {experience.features.map(feature => (
