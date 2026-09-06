@@ -109,7 +109,32 @@ export default function MathFlash() {
     }
   }, [timeLeft, gameState, endGame]);
 
+
+  const startGameRef = useRef(startGame);
+  startGameRef.current = startGame;
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Enter' && (gameState === 'waiting' || gameState === 'result')) {
+        if (e.target.tagName === 'BUTTON' || e.target.tagName === 'A' || e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+        e.preventDefault();
+        startGameRef.current();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [gameState]);
+
   const [userInput, setUserInput] = useState('');
+
+  const getRating = (score) => {
+    if (score >= 40) return "⚡ Human Calculator!";
+    if (score >= 30) return "🧠 Math Genius!";
+    if (score >= 20) return "🏃 Quick Thinker!";
+    if (score >= 10) return "🚶 Not Bad!";
+    return "🐢 Keep practicing!";
+  };
+
   const [copied, setCopied] = useState(false);
 
   const inputRef = useRef(null);
@@ -117,7 +142,8 @@ export default function MathFlash() {
   const handleShare = (e) => {
     e.stopPropagation();
     e.preventDefault();
-    const text = `I scored ${score} in Axiom Math Flash! ⚡`;
+    const rating = getRating(score);
+    const text = `I scored ${score} in Axiom Math Flash! ${rating}`;
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(text).then(() => {
         sfx.notify();
@@ -171,7 +197,7 @@ export default function MathFlash() {
               Solve as many math equations as you can in 30 seconds!
             </p>
             <button onClick={startGame} className="btn-primary">
-              Start Test
+              Start Test <span className="hidden sm:inline opacity-50 font-mono text-xs ml-2">(Enter)</span>
             </button>
           </div>
         )}
@@ -179,10 +205,11 @@ export default function MathFlash() {
         {gameState === 'result' && (
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-[var(--paper-tint)]/90 z-10 backdrop-blur-sm rounded-xl">
             <div className="font-display text-4xl mb-2 text-[var(--crimson)]">Time's Up!</div>
-            <div className="font-display text-3xl mb-6 opacity-90 text-[var(--forest)]">Score: {score}</div>
+            <div className="font-display text-3xl mb-2 opacity-90 text-[var(--forest)]">Score: {score}</div>
+            <div className="font-display text-xl mb-6 opacity-80">{getRating(score)}</div>
             <div className="flex gap-4">
               <button onClick={startGame} className="btn-primary">
-                Try Again
+                Try Again <span className="hidden sm:inline opacity-50 font-mono text-xs ml-2">(Enter)</span>
               </button>
               <button onClick={handleShare} className="btn-ghost">
                 {copied ? 'Copied!' : 'Share Result'}

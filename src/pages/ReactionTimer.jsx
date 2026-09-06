@@ -9,7 +9,7 @@ export default function ReactionTimer() {
   // states: 'waiting' | 'ready' | 'finished'
   const [gameState, setGameState] = useState('waiting');
   const [reactionTime, setReactionTime] = useState(null);
-  const [message, setMessage] = useState('Click to start');
+  const [message, setMessage] = useState('Click or press Space to start');
   const [isNewBest, setIsNewBest] = useState(false);
   const [copied, setCopied] = useState(false);
   const [prevBestTime, setPrevBestTime] = useState(null);
@@ -57,7 +57,7 @@ export default function ReactionTimer() {
     sfx.loss();
     setGameState('finished');
     gameStateRef.current = 'finished';
-    setMessage('Too early! Click to try again.');
+    setMessage('Too early! Click or press Space to try again.');
   };
 
   const handleValidClick = () => {
@@ -103,14 +103,32 @@ export default function ReactionTimer() {
     return "🐢 Keep practicing!";
   };
 
+
+  const handleTriggerRef = useRef(handleTrigger);
+  handleTriggerRef.current = handleTrigger;
+
+  useEffect(() => {
+    const handleGlobalKeyDown = (e) => {
+      if (e.key === ' ' || e.key === 'Enter') {
+        if (e.target.tagName === 'BUTTON' || e.target.tagName === 'A' || e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+        if (e.repeat) return;
+        e.preventDefault();
+        handleTriggerRef.current();
+      }
+    };
+    window.addEventListener('keydown', handleGlobalKeyDown);
+    return () => window.removeEventListener('keydown', handleGlobalKeyDown);
+  }, []);
+
   const handleKeyDown = (e) => {
     if (e.key === ' ' || e.key === 'Enter') {
-      if (e.target.tagName === 'BUTTON' || e.target.tagName === 'A' || e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
       if (e.repeat) return;
+      e.stopPropagation();
       e.preventDefault();
       handleTrigger();
     }
   };
+
 
   const handlePointerDown = (e) => {
     e.preventDefault();
@@ -192,7 +210,7 @@ export default function ReactionTimer() {
                 </div>
               )}
               <div className="font-mono text-sm opacity-80 tracking-widest uppercase mt-2">
-                Click to try again
+                Click or press Space to try again
               </div>
             </div>
           )}
