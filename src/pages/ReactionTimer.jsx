@@ -57,7 +57,7 @@ export default function ReactionTimer() {
     sfx.loss();
     setGameState('finished');
     gameStateRef.current = 'finished';
-    setMessage('Too early! Click to try again.');
+    setMessage('Too early! Click or Press Space to try again.');
   };
 
   const handleValidClick = () => {
@@ -192,7 +192,7 @@ export default function ReactionTimer() {
                 </div>
               )}
               <div className="font-mono text-sm opacity-80 tracking-widest uppercase mt-2">
-                Click to try again
+                Click or Press Space to try again
               </div>
             </div>
           )}

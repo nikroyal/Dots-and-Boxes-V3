@@ -139,10 +139,10 @@ export default function ColorMatch() {
   useEffect(() => {
     handleKeyDownRef.current = (e) => {
       if (gameState === 'playing') {
-        if (e.key === 'ArrowLeft') {
+        if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') {
           e.preventDefault();
           handleAnswer(true);
-        } else if (e.key === 'ArrowRight') {
+        } else if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') {
           e.preventDefault();
           handleAnswer(false);
         }
@@ -241,14 +241,14 @@ export default function ColorMatch() {
               className="btn-secondary py-4 text-lg flex flex-col items-center justify-center gap-1"
             >
               <span>Yes</span>
-              <span className="text-[0.6rem] uppercase tracking-widest opacity-50">Left Arrow</span>
+              <span className="text-[0.6rem] uppercase tracking-widest opacity-50">Left Arrow / A</span>
             </button>
             <button
               onClick={() => handleAnswer(false)}
               className="btn-secondary py-4 text-lg flex flex-col items-center justify-center gap-1"
             >
               <span>No</span>
-              <span className="text-[0.6rem] uppercase tracking-widest opacity-50">Right Arrow</span>
+              <span className="text-[0.6rem] uppercase tracking-widest opacity-50">Right Arrow / D</span>
             </button>
           </div>
         )}
