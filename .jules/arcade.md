@@ -72,3 +72,9 @@
 ## 2024-08-25 - Node.js patch scripts and ES modules
 **Learning:** When writing temporary Node.js patch scripts that use `require()` in a repository with `"type": "module"` defined in its `package.json`, it throws a runtime error.
 **Action:** Use the `.cjs` file extension (e.g., `patch.cjs`) instead of `.js` to ensure it runs correctly as a CommonJS script.
+## 2024-09-07 - Game State Ref Checks
+**Learning:** When guarding game logic (e.g., processing a player's move) against inactive game states stored in a `useRef`, using a simple exclusion check (e.g., `gameStateRef.current !== 'playing'`) is much safer and more robust than explicitly enumerating multiple end states like 'gameover' or 'won', as it naturally covers all edge cases.
+**Action:** Use broad exclusion checks (e.g., `!== 'playing'`) instead of specific inclusion checks when evaluating game activity states.
+## 2024-09-07 - Transparent Theme Variables
+**Learning:** When styling game components, theme CSS variables like `var(--bg-soft)` contain transparency (`rgba(..., 0.04)`). If placed over dark containers, they will blend and appear dark.
+**Action:** For consistent, opaque colors (e.g., empty game tiles), use explicit hex/rgb values instead of these transparent variables if placed on a dark background.

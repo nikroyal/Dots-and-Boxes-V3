@@ -409,6 +409,21 @@ export const EXPERIENCE_CATALOG = [
     routePrefixes: ['/speed-grid'],
   },
   {
+    id: '2048',
+    name: '2048',
+    shortName: '2048',
+    path: '/2048',
+    kind: 'Puzzle',
+    status: 'Live',
+    accent: 'var(--ochre)',
+    description: 'Slide tiles and merge them to reach 2048.',
+    features: ['Local play', 'High score'],
+    navItems: [
+      { to: '/2048', label: 'Play' },
+    ],
+    routePrefixes: ['/2048'],
+  },
+  {
     id: 'minesweeper',
     name: 'Minesweeper',
     shortName: 'Minesweeper',
