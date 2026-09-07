@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { collection, query, where, onSnapshot } from 'firebase/firestore';
 import { db } from '../lib/firebase';
@@ -144,7 +144,7 @@ export default function Dashboard() {
   const dailyGoalCompleted = profile.dailyGoalDate === today || dailyGoal.check(dailyStats);
 
   // Find the locked achievement with the highest progress percentage
-  const upNextAchievement = (() => {
+  const upNextAchievement = useMemo(() => {
     let best = null;
     let highestPct = -1;
     const unlocked = profile.unlockedAchievements || [];
@@ -160,7 +160,7 @@ export default function Dashboard() {
       }
     }
     return best;
-  })();
+  }, [profile]);
 
   const handleInvite = async (e) => {
     e.preventDefault();
