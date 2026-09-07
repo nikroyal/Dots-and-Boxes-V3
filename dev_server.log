@@ -1,11 +1,14 @@
 
-> axiom@1.0.0 dev /app
+> axiom@1.0.0 dev
 > vite
 
+Port 5173 is in use, trying another one...
 
-  VITE v5.4.21  ready in 272 ms
+  VITE v5.4.21  ready in 300 ms
 
-  ➜  Local:   http://localhost:5173/
+  ➜  Local:   http://localhost:5174/
   ➜  Network: use --host to expose
-1:41:18 AM [vite] hmr update /src/pages/AxiomHub.jsx, /src/index.css
-1:42:01 AM [vite] hmr update /src/pages/AxiomHub.jsx, /src/index.css
+8:04:32 PM [vite] hmr update /src/pages/Game2048.jsx, /src/index.css
+8:05:15 PM [vite] hmr update /src/pages/Game2048.jsx, /src/index.css
+8:05:23 PM [vite] hmr update /src/pages/Game2048.jsx, /src/index.css
+8:08:03 PM [vite] hmr update /src/pages/Game2048.jsx, /src/index.css
