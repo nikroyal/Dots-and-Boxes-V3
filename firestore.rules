@@ -28,7 +28,7 @@ service cloud.firestore {
 
     // Username lookups --------------------------------------------------------
     match /usernames/{username} {
-      allow read: if true;
+      allow get: if true;
       allow create: if isSignedIn()
                     && request.resource.data.uid == request.auth.uid;
       allow update: if false;
