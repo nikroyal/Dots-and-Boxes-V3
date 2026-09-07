@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { useAuth } from '../lib/AuthContext';
 import { ACHIEVEMENTS } from '../lib/achievements';
 
@@ -6,6 +7,22 @@ export default function Achievements() {
   if (!profile) return null;
   const unlocked = profile.unlockedAchievements || [];
   const progress = Math.round((unlocked.length / ACHIEVEMENTS.length) * 100);
+
+  // Pre-calculate achievement states to avoid re-running a.progress(profile) on every render
+  const achievementCards = useMemo(() => {
+    return ACHIEVEMENTS.map(a => {
+      const got = unlocked.includes(a.id);
+      let pct = 0, curr = 0, max = 0, min = 0;
+      if (!got && a.progress) {
+        const progressRes = a.progress(profile);
+        curr = progressRes[0];
+        max = progressRes[1];
+        min = progressRes[2] || 0;
+        pct = max === min ? 0 : Math.min(100, Math.max(0, ((curr - min) / (max - min)) * 100));
+      }
+      return { a, got, curr, max, min, pct };
+    });
+  }, [profile]);
 
   return (
     <div className="fade-in space-y-8">
@@ -20,8 +37,7 @@ export default function Achievements() {
       </section>
 
       <section className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        {ACHIEVEMENTS.map(a => {
-          const got = unlocked.includes(a.id);
+        {achievementCards.map(({ a, got, curr, max, min, pct }) => {
           return (
             <div key={a.id} className="border hairline p-4 transition-all" style={{ opacity: got ? 1 : 0.6 }}>
               <div className="flex items-start justify-between gap-3">
@@ -29,8 +45,6 @@ export default function Achievements() {
                   <div className="font-display text-lg font-medium">{a.name}</div>
                   <div className="font-mono text-[0.7rem] tracking-wide opacity-70 mt-1 leading-relaxed">{a.desc}</div>
                   {!got && a.progress && (() => {
-                    const [curr, max, min = 0] = a.progress(profile);
-                    const pct = max === min ? 0 : Math.min(100, Math.max(0, ((curr - min) / (max - min)) * 100));
                     if (pct === 0 && max === 1) return null; // Hide 0/1 binary progress
                     return (
                       <div className="mt-3 max-w-xs">
