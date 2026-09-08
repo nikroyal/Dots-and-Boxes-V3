@@ -101,3 +101,6 @@
 **Learning:** When short-term goals (like a Daily Goal) are completed, removing them from high-traffic pages (like the Hub) eliminates immediate explicit motivation and creates a "Done" state that reduces post-match engagement.
 
 **Action:** When short-term goals are completed, explicitly celebrate them with a completed state and a call-to-action (e.g., "Come back tomorrow!") on the Hub to create a returning habit, and ensure they remain visible rather than being hidden.
+## 2026-09-08 - Progress to Next Rank in Profile/Dashboard
+**Learning:** Users lack immediate motivation if they don't know exactly how close they are to the next rank.
+**Action:** Displaying the numerical gap to the next rank directly in the progress bar UI makes the goal concrete and attainable.
