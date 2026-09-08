@@ -1,5 +1,20 @@
 export const EXPERIENCE_CATALOG = [
   {
+    id: 'sliding-puzzle',
+    name: 'Sliding Puzzle',
+    shortName: '15 Puzzle',
+    path: '/sliding-puzzle',
+    kind: 'Puzzle',
+    status: 'Live',
+    accent: 'var(--ochre)',
+    description: 'Classic 15-puzzle. Arrange the tiles in numerical order.',
+    features: ['Local play', 'Best moves'],
+    navItems: [
+      { to: '/sliding-puzzle', label: 'Play' },
+    ],
+    routePrefixes: ['/sliding-puzzle'],
+  },
+  {
     id: 'quick-math',
     name: 'Quick Math',
     shortName: 'Math',
