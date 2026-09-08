@@ -104,9 +104,14 @@ service cloud.firestore {
         && request.resource.data.matchId is string
         && request.resource.data.game is string
         && request.resource.data.ts is number;
+
+      function protectedInviteKeysChanged() {
+        return changedKeys().hasAny(['fromId', 'fromUsername', 'fromAvatar', 'fromElo', 'fromLineStyle', 'toId', 'toUsername', 'rows', 'cols', 'game', 'ts', 'gameType', 'createdAt']);
+      }
+
       allow update: if isSignedIn() && (
         request.auth.uid == resource.data.toId || request.auth.uid == resource.data.fromId
-      );
+      ) && !protectedInviteKeysChanged();
       allow delete: if isSignedIn() && (
         request.auth.uid == resource.data.fromId || request.auth.uid == resource.data.toId || isAdmin()
       );
