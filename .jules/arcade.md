@@ -72,3 +72,6 @@
 ## 2024-08-25 - Node.js patch scripts and ES modules
 **Learning:** When writing temporary Node.js patch scripts that use `require()` in a repository with `"type": "module"` defined in its `package.json`, it throws a runtime error.
 **Action:** Use the `.cjs` file extension (e.g., `patch.cjs`) instead of `.js` to ensure it runs correctly as a CommonJS script.
+## 2024-05-14 - Timer State in React Games
+**Learning:** For React games, accessing `Date.now()` within `setInterval` combined with a `startTimeRef` works perfectly and circumvents the common "stale closure" state bug when updating time on rapid ticks.
+**Action:** Always prefer ref-based start times over relative state increments (`time + 1`) when dealing with sub-second interval updates to maintain accuracy and prevent state lagging.
