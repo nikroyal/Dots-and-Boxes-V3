@@ -101,3 +101,8 @@
 **Learning:** When short-term goals (like a Daily Goal) are completed, removing them from high-traffic pages (like the Hub) eliminates immediate explicit motivation and creates a "Done" state that reduces post-match engagement.
 
 **Action:** When short-term goals are completed, explicitly celebrate them with a completed state and a call-to-action (e.g., "Come back tomorrow!") on the Hub to create a returning habit, and ensure they remain visible rather than being hidden.
+## 2024-07-29 - Up Next Achievement Filtering
+
+**Learning:** When users look at their "Up Next" achievement on the Dashboard or Hub, if the highest percentage achievement is already at 100% but hasn't been claimed/unlocked, it blocks actual actionable goals from being displayed. This creates confusion and removes the motivational aspect of the "Up Next" feature.
+
+**Action:** When calculating "Up Next" or closest achievements, always explicitly filter out fully completed goals (`pct < 100`) so they do not dominate the interface and obscure actionable, incremental targets. When searching for a fallback achievement using `.find()`, make sure the condition is evaluated inside the callback itself so it continues searching the array.

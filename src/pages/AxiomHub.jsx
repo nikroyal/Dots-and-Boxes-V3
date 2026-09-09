@@ -68,7 +68,13 @@ export default function AxiomHub() {
       }
     }
     if (!best) {
-      const firstLocked = ACHIEVEMENTS.find(a => !unlocked.includes(a.id));
+      const firstLocked = ACHIEVEMENTS.find(a => {
+        if (unlocked.includes(a.id)) return false;
+        if (!a.progress) return true;
+        const [curr, max, min = 0] = a.progress(profile);
+        const pct = max === min ? 0 : Math.min(100, Math.max(0, ((curr - min) / (max - min)) * 100));
+        return pct < 100;
+      });
       if (firstLocked && firstLocked.progress) {
         const [curr, max, min = 0] = firstLocked.progress(profile);
         const pct = max === min ? 0 : Math.min(100, Math.max(0, ((curr - min) / (max - min)) * 100));
